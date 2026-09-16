@@ -1,0 +1,13 @@
+__pycache__/
+.pytest_cache/
+.venv/
+*.py[cod]
+*.egg-info/
+dist/
+artifacts/
+runs/
+.env
+.env.*
+!.env.example
+opencode.json
+opencode.jsonc

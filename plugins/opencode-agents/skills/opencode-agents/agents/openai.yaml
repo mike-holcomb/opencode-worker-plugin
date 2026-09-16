@@ -1,0 +1,4 @@
+interface:
+  display_name: "OpenCode Agents"
+  short_description: "Delegate, monitor, and verify OpenCode work"
+  default_prompt: "Use $opencode-agents:opencode-agents to prepare a bounded task, monitor it, and verify the deliverable."

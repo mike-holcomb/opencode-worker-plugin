@@ -1,0 +1,15 @@
+[project]
+name = "opencode-agents-plugin"
+version = "0.1.0"
+description = "Portable Codex plugin for bounded OpenCode delegation"
+license = "MIT"
+authors = [{name = "Mike Holcomb"}]
+requires-python = ">=3.11"
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
