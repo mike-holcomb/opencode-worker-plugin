@@ -145,7 +145,7 @@ export const ReviewDispositionSchema = z.enum([
 const ReviewCriterionSchema = z
 	.object({
 		id: Id,
-		result: z.string().min(1),
+		result: z.enum(["satisfied", "unsatisfied", "not_checked"]),
 		evidence: z.array(TextLine),
 	})
 	.strict();

@@ -27,7 +27,11 @@
           },
           "result": {
             "type": "string",
-            "minLength": 1
+            "enum": [
+              "satisfied",
+              "unsatisfied",
+              "not_checked"
+            ]
           },
           "evidence": {
             "type": "array",
