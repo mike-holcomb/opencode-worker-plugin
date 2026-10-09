@@ -1,6 +1,7 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { configurationPath, loadConfiguration, stateDirectory } from "./config.js";
+import { compatibilityPath } from "./resources.js";
 
 type DoctorResult = {
   runtime: { node: string; supportedNode: boolean; toolkit: string };
@@ -18,7 +19,7 @@ export function doctor(): DoctorResult {
     backend: { binary: null, version: null, configuredModels: [], certifiedPairs: [], executionTested: false },
     storage: { path: stateDirectory(), exists: existsSync(stateDirectory()) },
   };
-  const manifest = JSON.parse(readFileSync(new URL("../../compatibility.json", import.meta.url), "utf8")) as {
+  const manifest = JSON.parse(readFileSync(compatibilityPath(), "utf8")) as {
     pairs: Array<{ binary_version: string; sdk_version: string; execution_supported: boolean }>;
   };
   result.backend.certifiedPairs = manifest.pairs.filter((pair) => pair.execution_supported)

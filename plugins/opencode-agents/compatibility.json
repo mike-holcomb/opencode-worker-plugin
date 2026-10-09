@@ -19,13 +19,16 @@
         "session creation and exact marker lookup",
         "async prompt acknowledgement and caller-assigned user message ID",
         "correlated assistant terminal message and result retrieval",
-        "pending permission and question enumeration on empty state"
+        "pending permission and question enumeration on empty state",
+        "active bash permission request surfaced through legacy permission list",
+        "scoped permission rejection cleared pending request",
+        "rejected tool-call step remains nonterminal when status is omitted",
+        "exact session and correlated result recovered after server restart"
       ],
       "unverified": [
-        "permission and question replies during active turns",
+        "permission allow-once and question replies during active turns",
         "abort confirmation and cancellation race",
         "SSE reconnect and recovery",
-        "session recovery after server restart",
         "effective worker permissions and plugin suppression",
         "structured output"
       ]

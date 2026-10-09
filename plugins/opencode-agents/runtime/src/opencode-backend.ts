@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
-import { resolve } from "node:path";
+import { compatibilityPath } from "./resources.js";
 import { createOpencodeClient } from "@opencode-ai/sdk/v2";
 import type { BackendEvent, BackendInspection, OpenCodeBackend, PendingRequest, RequestControl, SessionIdentity, TurnObservation } from "./backend.js";
 
@@ -45,7 +45,7 @@ export class SdkOpenCodeBackend implements OpenCodeBackend {
     const doc = await fetch(new URL("/doc", this.baseUrl), { headers: this.headers, signal });
     if (!doc.ok) throw new Error(`backend OpenAPI document unavailable: ${doc.status}`);
     const openapiDigest = createHash("sha256").update(Buffer.from(await doc.arrayBuffer())).digest("hex");
-    const manifest = JSON.parse(readFileSync(resolve(import.meta.dirname, "../../compatibility.json"), "utf8")) as {
+    const manifest = JSON.parse(readFileSync(compatibilityPath(), "utf8")) as {
       pairs: Array<{ binary_version: string; sdk_version: string; openapi_sha256: string; execution_supported: boolean;
         capabilities: BackendInspection["capabilities"] }>;
     };
@@ -141,7 +141,11 @@ export class SdkOpenCodeBackend implements OpenCodeBackend {
         id: request.id, sessionId, type: "question" as const, api: "v2" as const, detail: request,
       })),
     ];
-    const terminalAssistant = assistants.find(({ info }) => info.role === "assistant" && Boolean(info.finish || info.error));
+    // A tool-calls step ends one model step, not the delegated turn. In particular,
+    // a denied tool request may leave the session absent from /session/status while
+    // the assistant has not produced a final answer.
+    const terminalAssistant = assistants.find(({ info }) => info.role === "assistant" &&
+      Boolean(info.error || info.finish === "stop" || info.finish === "length"));
     const upstreamStatus = statuses[sessionId]?.type;
     // OpenCode omits idle sessions from /session/status. A correlated terminal
     // assistant message is required before interpreting that omission as idle.

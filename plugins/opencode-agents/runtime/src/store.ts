@@ -189,6 +189,37 @@ export class SqliteTaskStore {
     return rows.flatMap(({ task_id }) => { const task = this.get(scopeId, task_id); return task ? [task] : []; });
   }
 
+  unresolved(): StoredTask[] {
+    const rows = this.db.prepare(`SELECT t.scope_id,t.task_id FROM tasks t JOIN executions e ON e.execution_id=t.current_execution_id
+      WHERE e.phase NOT IN ('completed','failed','cancelled','timed_out') ORDER BY t.created_at`)
+      .all() as Array<{ scope_id: string; task_id: string }>;
+    return rows.flatMap((row) => { const task = this.get(row.scope_id, row.task_id); return task ? [task] : []; });
+  }
+
+  reserve(executionId: string, keys: string[]): boolean {
+    return this.transaction(() => {
+      for (const key of [...new Set(keys)].sort()) {
+        const owner = this.db.prepare("SELECT execution_id FROM resource_reservations WHERE resource_key=?")
+          .get(key) as { execution_id: string } | undefined;
+        if (owner && owner.execution_id !== executionId) return false;
+      }
+      for (const key of [...new Set(keys)].sort()) {
+        this.db.prepare("INSERT OR IGNORE INTO resource_reservations VALUES(?,?,?)").run(key, executionId, now());
+      }
+      return true;
+    });
+  }
+
+  release(executionId: string): void {
+    this.transaction(() => { this.db.prepare("DELETE FROM resource_reservations WHERE execution_id=?").run(executionId); });
+  }
+
+  dispatchIntent(executionId: string): { backendId: string; sessionId: string; messageId: string; acknowledged: boolean } | null {
+    const row = this.db.prepare("SELECT backend_id,session_id,user_message_id,acknowledged FROM dispatch_intents WHERE execution_id=?")
+      .get(executionId) as { backend_id: string; session_id: string; user_message_id: string; acknowledged: number } | undefined;
+    return row ? { backendId: row.backend_id, sessionId: row.session_id, messageId: row.user_message_id, acknowledged: Boolean(row.acknowledged) } : null;
+  }
+
   events(executionId: string, afterCursor = 0, limit = 100): Array<{ cursor: number; kind: string; detail: unknown; createdAt: string }> {
     const rows = this.db.prepare("SELECT sequence,kind,detail_json,created_at FROM events WHERE execution_id=? AND sequence>? ORDER BY sequence LIMIT ?")
       .all(executionId, afterCursor, limit) as Array<{ sequence: number; kind: string; detail_json: string; created_at: string }>;

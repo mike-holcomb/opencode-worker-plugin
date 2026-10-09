@@ -79,3 +79,25 @@ test("accepted review requires valid frozen evidence and every required criterio
     store.close();
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+test("resource reservations are atomic and unrelated work remains eligible", () => {
+  const dir = mkdtempSync(join(tmpdir(), "opencode-agents-store-"));
+  try {
+    const store = new SqliteTaskStore(join(dir, "state.sqlite"));
+    const make = (key: string) => store.start({
+      scopeId: "coord_resources", idempotencyKey: key, workspace: "/tmp/project",
+      packet: {}, model: "llama.cpp/laguna-s-21", profile: "bounded-build",
+      baselineHash: "a".repeat(64), promptHash: "b".repeat(64),
+    });
+    const first = make("reserve-first-0001");
+    const blocked = make("reserve-block-0001");
+    const unrelated = make("reserve-other-0001");
+    assert.equal(store.reserve(first.executionId, ["workspace:A", "port:1234"]), true);
+    assert.equal(store.reserve(blocked.executionId, ["workspace:A", "service:db"]), false);
+    assert.equal(store.reserve(unrelated.executionId, ["service:db"]), true);
+    store.release(first.executionId);
+    store.release(unrelated.executionId);
+    assert.equal(store.reserve(blocked.executionId, ["workspace:A", "service:db"]), true);
+    store.close();
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
