@@ -3,3 +3,5 @@
 **/.pytest_cache/
 *.py[cod]
 .DS_Store
+plugins/opencode-agents/runtime/node_modules/
+plugins/opencode-agents/runtime/dist/
