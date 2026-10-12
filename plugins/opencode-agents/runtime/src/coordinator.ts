@@ -11,6 +11,8 @@ import { compareBaseline, type WorkspaceBaseline } from "./workspace.js";
 import type { TaskPacket } from "./contracts.js";
 
 type BackendLease = { backendId: string; backend: OpenCodeBackend;
+  /** False only after the owned process has actually exited, not on a failed health probe. */
+  isAlive?: () => boolean;
   confirmAbortStopped?: (sessionId: string, messageId: string) => Promise<boolean>; close(): Promise<void> };
 export type BackendOpener = (input: { backendId: string; workspace: string; config: UserConfig;
   launchContract: ManagedLaunchContract | null; onDiagnostic?: (bytes: Buffer) => void }) => Promise<BackendLease>;
@@ -115,8 +117,27 @@ export class ExecutionCoordinator {
           try { await this.reconcile(task); }
           catch (error) { this.handleFailure(task, error); }
         }
+        await this.releaseIdleBackends();
       } while (this.again && !this.stopping);
     } finally { this.working = false; }
+  }
+
+  private async releaseBackend(id: string, lease: BackendLease): Promise<void> {
+    this.streams.get(id)?.abort();
+    this.streams.delete(id);
+    for (const [executionId, ack] of this.freshAbortAcks)
+      if (ack.lease === lease) this.freshAbortAcks.delete(executionId);
+    await lease.close();
+    this.backends.delete(id);
+  }
+
+  private async releaseIdleBackends(): Promise<void> {
+    const owned = new Set(this.store.unresolved().map((task) => task.backendId));
+    for (const [id, lease] of this.backends) {
+      if (owned.has(id)) continue;
+      try { await this.releaseBackend(id, lease); }
+      catch { /* Retain the lease and retry cleanup on the next reconciliation. */ }
+    }
   }
 
   private async backendFor(task: StoredTask): Promise<BackendLease> {
@@ -129,7 +150,12 @@ export class ExecutionCoordinator {
     const id = backendIdentity(task, config);
     if (task.backendId && task.backendId !== id) throw new Error("recorded backend identity differs from frozen launch configuration");
     const cached = this.backends.get(id);
-    if (cached) return cached;
+    if (cached) {
+      if (cached.isAlive?.() !== false) return cached;
+      // Only a proven dead owned process permits reopening its persisted namespace.
+      // Session/message reconciliation below still forbids resubmitting the turn.
+      await this.releaseBackend(id, cached);
+    }
     const lease = await this.opener({ backendId: id, workspace: task.workspace, config,
       launchContract: task.launchContract,
       ...(process.env.OPENCODE_AGENTS_CAPTURE_DIAGNOSTICS === "1"

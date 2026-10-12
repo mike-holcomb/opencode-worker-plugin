@@ -16,6 +16,7 @@ export type ManagedServer = {
   backendId: string;
   baseUrl: string;
   backend: SdkOpenCodeBackend;
+  isAlive(): boolean;
   /** Valid only while this owned, certified server process remains alive. */
   confirmAbortStopped(sessionId: string, messageId: string): Promise<boolean>;
   close(): Promise<void>;
@@ -285,6 +286,7 @@ export async function startManagedServer(options: ManagedServerOptions): Promise
     throw error;
   }
   return { backendId, baseUrl, backend,
+    isAlive: () => child.exitCode === null && child.signalCode === null,
     confirmAbortStopped: async (sessionId, messageId) => {
       if (child.killed || child.exitCode !== null || child.signalCode !== null) return false;
       // This is a new snapshot after the abort response, scoped to the exact

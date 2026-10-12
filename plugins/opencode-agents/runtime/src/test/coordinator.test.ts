@@ -80,11 +80,15 @@ function setup(executionTimeoutSeconds?: number, finalizationTimeoutSeconds?: nu
   const store = new SqliteTaskStore(join(root, "state.sqlite"));
   const artifacts = new ArtifactStore(join(root, "artifacts"));
   const backend = new FakeBackend(workspace);
+  const lifecycle = { opens: 0, closes: 0, alive: true };
   const opener = async ({ backendId }: { backendId: string }) => {
+    lifecycle.opens++;
+    lifecycle.alive = true;
     assert.notEqual(backendId, "");
     // The fake endpoint adopts the coordinator's stable storage identity.
     Object.assign(backend, { backendId });
-    return { backendId, backend, close: async () => {},
+    return { backendId, backend, isAlive: () => lifecycle.alive,
+      close: async () => { lifecycle.closes++; },
       ...(managedStopProof ? { confirmAbortStopped: async (sessionId: string, messageId: string) => {
         assert.equal(sessionId, backend.sessionId);
         const observed = await backend.inspectTurn(sessionId, messageId);
@@ -108,7 +112,8 @@ function setup(executionTimeoutSeconds?: number, finalizationTimeoutSeconds?: nu
     backendConfig: loadConfiguration(),
     launchContract: { configContent: "{}", effectiveConfigSha256: "fixture", reportPath },
     ...(executionTimeoutSeconds ? { executionTimeoutSeconds } : {}) });
-  return { root, store, artifacts, coordinator, restart: () => new ExecutionCoordinator(store, artifacts, opener), backend, task, restore: () => {
+  return { root, store, artifacts, coordinator, lifecycle,
+    restart: () => new ExecutionCoordinator(store, artifacts, opener), backend, task, restore: () => {
     if (previous === undefined) delete process.env.OPENCODE_AGENTS_CONFIG;
     else process.env.OPENCODE_AGENTS_CONFIG = previous;
     store.close(); rmSync(root, { recursive: true, force: true });
@@ -133,6 +138,48 @@ test("durable admission dispatches one exact message and a finished turn with no
     assert.equal(done.reportValidity, "missing");
     assert.equal(done.reviewStatus, "pending");
     assert.equal(fx.backend.submitCount, 1);
+  } finally { await fx.coordinator.close(); fx.restore(); }
+});
+
+test("terminal executions release backend leases while unresolved work retains them", async () => {
+  const fx = setup();
+  try {
+    await fx.coordinator.start();
+    assert.equal(fx.lifecycle.opens, 1);
+    assert.equal(fx.lifecycle.closes, 0);
+    fx.coordinator.kick();
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    assert.equal(fx.lifecycle.closes, 0);
+    fx.backend.finished = true;
+    fx.backend.stopped = true;
+    for (let i = 0; i < 100 && fx.lifecycle.closes === 0; i++) {
+      fx.coordinator.kick(); await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+    assert.equal(fx.store.get("scope", fx.task.taskId)?.phase, "completed");
+    assert.equal(fx.lifecycle.closes, 1);
+    assert.equal(fx.backend.submitCount, 1);
+    await fx.coordinator.close();
+    assert.equal(fx.lifecycle.closes, 1);
+  } finally { await fx.coordinator.close(); fx.restore(); }
+});
+
+test("a proven dead owned backend reopens and reconciles the exact turn without replay", async () => {
+  const fx = setup();
+  try {
+    await fx.coordinator.start();
+    const before = fx.store.get("scope", fx.task.taskId)!;
+    fx.lifecycle.alive = false;
+    for (let i = 0; i < 100 && fx.lifecycle.opens < 2; i++) {
+      fx.coordinator.kick(); await new Promise((resolve) => setTimeout(resolve, 10));
+    }
+    const after = fx.store.get("scope", fx.task.taskId)!;
+    assert.equal(fx.lifecycle.opens, 2);
+    assert.equal(fx.lifecycle.closes, 1);
+    assert.equal(after.sessionId, before.sessionId);
+    assert.equal(after.userMessageId, before.userMessageId);
+    assert.equal(after.executionId, before.executionId);
+    assert.equal(fx.backend.submitCount, 1);
+    assert.equal(after.phase, "running");
   } finally { await fx.coordinator.close(); fx.restore(); }
 });
 

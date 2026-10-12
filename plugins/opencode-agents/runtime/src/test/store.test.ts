@@ -367,3 +367,20 @@ test("failed pre-migration backup leaves an existing schema untouched", () => {
     reopened.close();
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+test("a newer schema is refused without changing stored data or creating a migration backup", () => {
+  const dir = mkdtempSync(join(tmpdir(), "opencode-agents-future-schema-"));
+  const filename = join(dir, "state.sqlite");
+  try {
+    const db = new DatabaseSync(filename);
+    db.exec("CREATE TABLE schema_version(version INTEGER); INSERT INTO schema_version VALUES(4)");
+    db.exec("CREATE TABLE retained(value BLOB); INSERT INTO retained VALUES(X'000102ff')");
+    db.close();
+    assert.throws(() => new SqliteTaskStore(filename), /schema version 4 is newer/);
+    const check = new DatabaseSync(filename, { readOnly: true });
+    assert.deepEqual(check.prepare("SELECT version FROM schema_version").get(), Object.assign(Object.create(null), { version: 4 }));
+    assert.equal((check.prepare("SELECT hex(value) AS value FROM retained").get() as { value: string }).value, "000102FF");
+    check.close();
+    assert.deepEqual(readdirSync(dir), ["state.sqlite"]);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});

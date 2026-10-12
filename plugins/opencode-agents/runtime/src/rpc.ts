@@ -27,19 +27,24 @@ export async function startRpcServer(stateDir: string, handler: RpcHandler): Pro
   const generation = randomUUID();
   const token = randomBytes(32).toString("hex");
   const server = createServer((client) => serveClient(client, token, handler));
+  let bound = false;
   try {
     await new Promise<void>((resolve, reject) => {
       server.once("error", reject);
       server.listen(socket, () => { server.off("error", reject); resolve(); });
     });
+    bound = true;
     chmodSync(socket, 0o600);
     const staged = `${connection}.${generation}.tmp`;
     writeFileSync(staged, JSON.stringify({ generation, socket, token } satisfies Connection), { mode: 0o600, flag: "wx" });
     renameSync(staged, connection);
     chmodSync(connection, 0o600);
   } catch (error) {
-    server.close();
-    if (existsSync(socket)) rmSync(socket);
+    // A losing bind must not unlink the winning supervisor's socket.
+    if (bound) {
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+      if (existsSync(socket)) rmSync(socket);
+    }
     throw error;
   }
   return {

@@ -1,11 +1,11 @@
 import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { once } from "node:events";
-import { existsSync, mkdtempSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
-import { rpcRequest } from "../rpc.js";
+import { rpcRequest, startRpcServer } from "../rpc.js";
 
 test("supervisor serves requests after a client disconnect and drains on stop", async () => {
   const dir = mkdtempSync(join(tmpdir(), "opencode-agents-daemon-"));
@@ -68,4 +68,23 @@ test("T23: concurrent full supervisor startup leaves one owner and convergent cl
     for (const { child } of children) if (child.exitCode === null) child.kill("SIGTERM");
     rmSync(dir, { recursive: true, force: true });
   }
+});
+
+test("losing supervisor does not open or migrate the owner's database", async () => {
+  const dir = mkdtempSync(join(tmpdir(), "opencode-agents-owner-first-"));
+  const database = join(dir, "state.sqlite");
+  writeFileSync(database, "database sentinel: must not be opened by losing daemon");
+  const owner = await startRpcServer(dir, async () => ({ owner: true }));
+  try {
+    const child = spawn(process.execPath, [new URL("../cli.js", import.meta.url).pathname, "daemon", "run"], {
+      env: { ...process.env, OPENCODE_AGENTS_STATE_DIR: dir }, stdio: ["ignore", "ignore", "pipe"],
+    });
+    let stderr = "";
+    child.stderr.on("data", (chunk: Buffer) => { stderr += chunk.toString(); });
+    const [code] = await once(child, "exit");
+    assert.equal(code, 1);
+    assert.match(stderr, /socket already exists/);
+    assert.equal(readFileSync(database, "utf8"), "database sentinel: must not be opened by losing daemon");
+    assert.deepEqual(await rpcRequest(dir, "health", {}), { owner: true });
+  } finally { await owner.close(); rmSync(dir, { recursive: true, force: true }); }
 });

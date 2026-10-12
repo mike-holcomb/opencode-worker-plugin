@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "campaign": "2026-10-12",
+  "release_ready": false,
+  "supported_mode": "managed, trusted workspaces only",
+  "node_versions": ["24.15.0", "24.21.0"],
+  "opencode_version": "1.18.35",
+  "model": "llama.cpp/laguna-s-21",
+  "destination": "http://127.0.0.1:8124/v1",
+  "accepted_exceptions": [
+    "Project plugins introduced after preflight can load lazily. This is not a passing plugin-suppression test or an untrusted-workspace security boundary."
+  ],
+  "gates": {
+    "fault_matrix": {"status": "in_progress", "applicable_cases": 30, "excluded": ["T28"], "pending": ["T20 parent review of live attempt"]},
+    "live_macos": {"status": "in_progress", "pending": ["parent review", "rerun restart cases after daemon election fix"]},
+    "evaluation": {"status": "in_progress", "required_scenarios": 12, "required_false_acceptances": 0, "required_duplicate_dispatches": 0},
+    "performance_soak": {"status": "running", "count": 1000, "duration_seconds": 3600},
+    "macos_node_matrix": {"status": "in_progress"},
+    "linux_node_matrix": {"status": "pending_ci"},
+    "linux_live": {"status": "pending_authorized_endpoint_on_linux"},
+    "wsl2_node_matrix": {"status": "awaiting_operator", "instructions": "../../wsl2-release-check.md"},
+    "wsl2_live": {"status": "awaiting_operator"},
+    "tag_install": {"status": "passed_historical_tag_only", "tag": "v2.0.0-dev.0", "codex": "0.162.1", "pending": ["final candidate tag"]},
+    "upgrade_rollback": {"status": "in_progress"},
+    "final_release": {"status": "blocked_by_incomplete_gates"}
+  },
+  "disabled_features": ["attached execution", "native questions"]
+}

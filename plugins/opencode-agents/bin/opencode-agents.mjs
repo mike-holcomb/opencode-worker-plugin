@@ -26266,6 +26266,7 @@ async function startManagedServer(options) {
     backendId,
     baseUrl,
     backend,
+    isAlive: () => child.exitCode === null && child.signalCode === null,
     confirmAbortStopped: async (sessionId, messageId) => {
       if (child.killed || child.exitCode !== null || child.signalCode !== null) return false;
       const observed = await backend.inspectTurn(sessionId, messageId, { timeoutMs: 5e3 });
@@ -40719,6 +40720,7 @@ async function startRpcServer(stateDir, handler) {
   const generation = randomUUID2();
   const token = randomBytes2(32).toString("hex");
   const server = createServer((client2) => serveClient(client2, token, handler));
+  let bound = false;
   try {
     await new Promise((resolve5, reject) => {
       server.once("error", reject);
@@ -40727,14 +40729,17 @@ async function startRpcServer(stateDir, handler) {
         resolve5();
       });
     });
+    bound = true;
     chmodSync(socket, 384);
     const staged = `${connection}.${generation}.tmp`;
     writeFileSync(staged, JSON.stringify({ generation, socket, token }), { mode: 384, flag: "wx" });
     renameSync(staged, connection);
     chmodSync(connection, 384);
   } catch (error62) {
-    server.close();
-    if (existsSync4(socket)) rmSync(socket);
+    if (bound) {
+      await new Promise((resolve5) => server.close(() => resolve5()));
+      if (existsSync4(socket)) rmSync(socket);
+    }
     throw error62;
   }
   return {
@@ -41535,9 +41540,28 @@ var ExecutionCoordinator = class {
             this.handleFailure(task, error62);
           }
         }
+        await this.releaseIdleBackends();
       } while (this.again && !this.stopping);
     } finally {
       this.working = false;
+    }
+  }
+  async releaseBackend(id, lease) {
+    this.streams.get(id)?.abort();
+    this.streams.delete(id);
+    for (const [executionId, ack] of this.freshAbortAcks)
+      if (ack.lease === lease) this.freshAbortAcks.delete(executionId);
+    await lease.close();
+    this.backends.delete(id);
+  }
+  async releaseIdleBackends() {
+    const owned = new Set(this.store.unresolved().map((task) => task.backendId));
+    for (const [id, lease] of this.backends) {
+      if (owned.has(id)) continue;
+      try {
+        await this.releaseBackend(id, lease);
+      } catch {
+      }
     }
   }
   async backendFor(task) {
@@ -41548,7 +41572,10 @@ var ExecutionCoordinator = class {
     const id = backendIdentity(task, config2);
     if (task.backendId && task.backendId !== id) throw new Error("recorded backend identity differs from frozen launch configuration");
     const cached2 = this.backends.get(id);
-    if (cached2) return cached2;
+    if (cached2) {
+      if (cached2.isAlive?.() !== false) return cached2;
+      await this.releaseBackend(id, cached2);
+    }
     const lease = await this.opener({
       backendId: id,
       workspace: task.workspace,
@@ -43571,56 +43598,64 @@ var SupervisorService = class {
 // src/daemon.ts
 async function runDaemon() {
   const stateDir = stateDirectory();
-  const store = new SqliteTaskStore(join8(stateDir, "state.sqlite"));
-  const artifacts = new ArtifactStore(join8(stateDir, "artifacts"));
-  const coordinator = new ExecutionCoordinator(store, artifacts);
-  const service = new SupervisorService(store, artifacts, coordinator);
-  try {
-    artifacts.reconcile((artifactId) => store.artifactById(artifactId), store.allArtifacts());
-    await coordinator.start();
-  } catch (error62) {
-    await coordinator.close();
-    store.close();
-    throw error62;
-  }
+  let resolveService;
+  let rejectService;
+  const ready = new Promise((resolve5, reject) => {
+    resolveService = resolve5;
+    rejectService = reject;
+  });
+  void ready.catch(() => {
+  });
   let lastRequest = Date.now();
   let closing = false;
-  let server;
-  const close = async () => {
-    if (closing) return;
-    closing = true;
-    clearInterval(idleTimer);
-    await server.close();
-    await coordinator.close();
-    store.close();
-  };
+  let close;
+  const server = await startRpcServer(stateDir, async (method, params) => {
+    const service = await ready;
+    lastRequest = Date.now();
+    if (method === "daemon_stop") {
+      const unresolved = service.store.unresolved();
+      if (unresolved.length) return { stopped: false, unresolved: unresolved.length };
+      setTimeout(() => {
+        void close();
+      }, 20);
+      return { stopped: true };
+    }
+    return service.handle(method, params);
+  });
+  let store;
+  let coordinator;
   try {
-    server = await startRpcServer(stateDir, async (method, params) => {
-      lastRequest = Date.now();
-      if (method === "daemon_stop") {
-        const unresolved = store.unresolved();
-        if (unresolved.length) return { stopped: false, unresolved: unresolved.length };
-        setTimeout(() => {
-          void close();
-        }, 20);
-        return { stopped: true };
-      }
-      return service.handle(method, params);
+    store = new SqliteTaskStore(join8(stateDir, "state.sqlite"));
+    const artifacts = new ArtifactStore(join8(stateDir, "artifacts"));
+    coordinator = new ExecutionCoordinator(store, artifacts);
+    const service = new SupervisorService(store, artifacts, coordinator);
+    artifacts.reconcile((artifactId) => store.artifactById(artifactId), store.allArtifacts());
+    await coordinator.start();
+    const idleTimer = setInterval(() => {
+      if (Date.now() - lastRequest >= 15 * 6e4 && store.unresolved().length === 0) void close();
+    }, 6e4);
+    close = async () => {
+      if (closing) return;
+      closing = true;
+      clearInterval(idleTimer);
+      await server.close();
+      await coordinator.close();
+      store.close();
+    };
+    process.once("SIGTERM", () => {
+      if (store.unresolved().length === 0) void close();
     });
+    process.once("SIGINT", () => {
+      if (store.unresolved().length === 0) void close();
+    });
+    resolveService(service);
   } catch (error62) {
-    await coordinator.close();
-    store.close();
+    rejectService(error62);
+    await coordinator?.close();
+    store?.close();
+    await server.close();
     throw error62;
   }
-  const idleTimer = setInterval(() => {
-    if (Date.now() - lastRequest >= 15 * 6e4 && store.unresolved().length === 0) void close();
-  }, 6e4);
-  process.once("SIGTERM", () => {
-    if (store.unresolved().length === 0) void close();
-  });
-  process.once("SIGINT", () => {
-    if (store.unresolved().length === 0) void close();
-  });
 }
 async function startDaemon(executable = fileURLToPath2(new URL("./cli.js", import.meta.url))) {
   const stateDir = stateDirectory();

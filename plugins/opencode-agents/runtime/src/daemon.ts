@@ -10,42 +10,56 @@ import { SqliteTaskStore } from "./store.js";
 
 export async function runDaemon(): Promise<void> {
   const stateDir = stateDirectory();
-  const store = new SqliteTaskStore(join(stateDir, "state.sqlite"));
-  const artifacts = new ArtifactStore(join(stateDir, "artifacts"));
-  const coordinator = new ExecutionCoordinator(store, artifacts);
-  const service = new SupervisorService(store, artifacts, coordinator);
-  try {
-    artifacts.reconcile((artifactId) => store.artifactById(artifactId), store.allArtifacts());
-    await coordinator.start();
-  } catch (error) { await coordinator.close(); store.close(); throw error; }
+  // Elect the sole owner before opening SQLite, migration, or reconciliation.
+  // Requests arriving during startup wait for the service to become ready.
+  let resolveService!: (service: SupervisorService) => void;
+  let rejectService!: (error: unknown) => void;
+  const ready = new Promise<SupervisorService>((resolve, reject) => {
+    resolveService = resolve; rejectService = reject;
+  });
+  void ready.catch(() => {});
   let lastRequest = Date.now();
   let closing = false;
-  let server: Awaited<ReturnType<typeof startRpcServer>>;
-  const close = async () => {
-    if (closing) return;
-    closing = true;
-    clearInterval(idleTimer);
-    await server.close();
-    await coordinator.close();
-    store.close();
-  };
+  let close!: () => Promise<void>;
+  const server = await startRpcServer(stateDir, async (method, params) => {
+    const service = await ready;
+    lastRequest = Date.now();
+    if (method === "daemon_stop") {
+      const unresolved = service.store.unresolved();
+      if (unresolved.length) return { stopped: false, unresolved: unresolved.length };
+      setTimeout(() => { void close(); }, 20);
+      return { stopped: true };
+    }
+    return service.handle(method, params);
+  });
+  let store: SqliteTaskStore | undefined;
+  let coordinator: ExecutionCoordinator | undefined;
   try {
-    server = await startRpcServer(stateDir, async (method, params) => {
-      lastRequest = Date.now();
-      if (method === "daemon_stop") {
-        const unresolved = store.unresolved();
-        if (unresolved.length) return { stopped: false, unresolved: unresolved.length };
-        setTimeout(() => { void close(); }, 20);
-        return { stopped: true };
-      }
-      return service.handle(method, params);
-    });
-  } catch (error) { await coordinator.close(); store.close(); throw error; }
-  const idleTimer = setInterval(() => {
-    if (Date.now() - lastRequest >= 15 * 60_000 && store.unresolved().length === 0) void close();
-  }, 60_000);
-  process.once("SIGTERM", () => { if (store.unresolved().length === 0) void close(); });
-  process.once("SIGINT", () => { if (store.unresolved().length === 0) void close(); });
+    store = new SqliteTaskStore(join(stateDir, "state.sqlite"));
+    const artifacts = new ArtifactStore(join(stateDir, "artifacts"));
+    coordinator = new ExecutionCoordinator(store, artifacts);
+    const service = new SupervisorService(store, artifacts, coordinator);
+    artifacts.reconcile((artifactId) => store!.artifactById(artifactId), store.allArtifacts());
+    await coordinator.start();
+    const idleTimer = setInterval(() => {
+      if (Date.now() - lastRequest >= 15 * 60_000 && store!.unresolved().length === 0) void close();
+    }, 60_000);
+    close = async () => {
+      if (closing) return;
+      closing = true;
+      clearInterval(idleTimer);
+      await server.close();
+      await coordinator!.close();
+      store!.close();
+    };
+    process.once("SIGTERM", () => { if (store!.unresolved().length === 0) void close(); });
+    process.once("SIGINT", () => { if (store!.unresolved().length === 0) void close(); });
+    resolveService(service);
+  } catch (error) {
+    rejectService(error);
+    await coordinator?.close(); store?.close(); await server.close();
+    throw error;
+  }
 }
 
 export async function startDaemon(executable = fileURLToPath(new URL("./cli.js", import.meta.url))): Promise<{ running: boolean; started: boolean }> {
