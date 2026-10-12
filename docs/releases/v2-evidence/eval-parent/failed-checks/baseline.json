@@ -1,0 +1,15 @@
+{
+  "schema_version": 2,
+  "scenario_id": "failed-checks",
+  "run_id": "failed-checks-1791832575095",
+  "prepared_workdir": "/private/tmp/v2-eval-parent-20261012/failed-checks/workspace",
+  "manifest_sha256": "d397b764ff5b88baa506ae6d73c3864ffc0683fe4f02b22b897013fc4d32c691",
+  "packet_schema_sha256": "d57a85f17494892fe59d470f3f0ed54071eed7dd33cee884f61d11f83506fd87",
+  "frozen_checks_sha256": "ec0b00fe802d7b7e06f7548da797a45be33a75750d6d4bfc233d6a053ef5e509",
+  "initial_files": {
+    "parser.py": "068f427d7c826ff4913495ea79e3366ddb1f099cba5e7f24ea04245ad3796a1c",
+    "scenario-input.json": "1be344a9b8d186bcc74818b63cf86f87174fa16bf90a7815dcafedffaf70e66d",
+    "task.md": "964ecc592f5ce632d68f00cbbfb9a863a4a67913e62aec4d68ba77708dbd384e",
+    "test_parser.py": "82231b3cad3c1df6b266743818c44a8732728cced66ac665fbbdebfd9f589a6b"
+  }
+}

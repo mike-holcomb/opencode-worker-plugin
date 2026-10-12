@@ -1,0 +1,86 @@
+{
+  "decision": {
+    "review_started_at": "2026-10-12T18:50:46.059Z",
+    "context_bytes": 10640,
+    "idempotency_key": "parent-review-exec_e15d3989-ac9c-4df7-bbae-f22f84688993",
+    "gate_status": "passed",
+    "review": {
+      "disposition": "accepted",
+      "rationale": "MCP client disconnected and reconnected during running work; exact execution/session/message preserved and one dispatch observed. Valid report cites violet in unchanged input.txt. Parent inspected full source and immutable report; reservations released and final runtime hashes match.",
+      "criteria": [
+        {
+          "id": "answer",
+          "result": "satisfied",
+          "evidence": [
+            "artifact:artifact_41740c57-953a-4c57-97e3-10d07c79d2f8@sha256:e9105514508add8df5c8d675c4c0e1cdbe91c70fd6e969d8bdeb3ea786c808c0",
+            "artifact:artifact_bd6c06b7-8238-439d-9de9-5ef9cdbc8e1f@sha256:ab13a710fd02fb0e9ed2976ae6f63473b3d9545aa5cb67970ec286bc4cf46251",
+            "artifact:artifact_d9c5ccf1-4d72-41c0-82a4-57e5c4064ea9@sha256:d0cd4bea03bf3ff61cc880437a9a068dbc58581dfd79c9c1b890b1b78b84f2d8"
+          ]
+        }
+      ],
+      "starting_state_sha256": "4380e08f4161f5650734c2cdcceb5d2d1d4396a748e844e1feb50467b931d127",
+      "final_manifest_sha256": "d0cd4bea03bf3ff61cc880437a9a068dbc58581dfd79c9c1b890b1b78b84f2d8",
+      "freshness": "Parent inspected complete recorded fixture inputs, immutable exports, final snapshot, and available checks.",
+      "integration_checks": [
+        "MCP client disconnected and reconnected during running work; exact execution/session/message preserved and one dispatch observed. Valid report cites violet in unchanged input.txt. Parent inspected full source and immutable report; reservations released and final runtime hashes match."
+      ],
+      "coverage_limits": [
+        "Trusted-workspace managed mode; plugin race remains separately documented.",
+        "Context measured in bytes; elapsed review time includes concurrent parent work."
+      ],
+      "unresolved_issues": [],
+      "next_action": "Retain this reviewed attempt."
+    }
+  },
+  "result": {
+    "taskId": "task_5e60c040-1d16-4f19-813c-5f3d3ac766a9",
+    "executionId": "exec_e15d3989-ac9c-4df7-bbae-f22f84688993",
+    "scopeId": "release-live5",
+    "revision": 9,
+    "phase": "completed",
+    "observation": "current",
+    "workspace": "/private/tmp/v2-live-final-20261012/live5/workspace",
+    "workspaceAccess": "exclusive",
+    "requestModel": {
+      "profile": "local"
+    },
+    "model": "llama.cpp/laguna-s-21",
+    "profile": "bounded-inspect",
+    "backendId": "backend_6919cc4ab7fe84e2558aa38428d4b5e6",
+    "sessionId": "ses_ece909e62ffei536N6ptqQcVkO",
+    "userMessageId": "msg_b1c22d5d-1071-464a-8f30-cfefdc3ea235",
+    "predecessorExecutionId": null,
+    "contextMode": null,
+    "baselineHash": "4380e08f4161f5650734c2cdcceb5d2d1d4396a748e844e1feb50467b931d127",
+    "promptHash": "85628970432e2e440c76f8004f44b2cbd52aac0f980d53653f0083cfcc2b239e",
+    "reportPath": "/private/tmp/v2-live-final-20261012/live5/state/reports/exec_e15d3989-ac9c-4df7-bbae-f22f84688993",
+    "queueDeadlineAt": "2026-10-12T18:47:44.304Z",
+    "admittedAt": "2026-10-12T18:45:44.307Z",
+    "executionDeadlineAt": "2026-10-12T18:50:44.307Z",
+    "finalizationDeadlineAt": "2026-10-12T18:46:40.675Z",
+    "intendedOutcome": "completed",
+    "creationIntent": {
+      "backendId": "backend_6919cc4ab7fe84e2558aa38428d4b5e6",
+      "marker": "opencode-agents:exec_e15d3989-ac9c-4df7-bbae-f22f84688993",
+      "sessionId": "ses_ece909e62ffei536N6ptqQcVkO",
+      "createdAt": "2026-10-12T18:45:45.494Z"
+    },
+    "cancellationIntent": null,
+    "pendingRequests": [],
+    "createdAt": "2026-10-12T18:45:44.304Z",
+    "updatedAt": "2026-10-12T18:51:22.776Z",
+    "reportValidity": "valid",
+    "finalManifestHash": "d0cd4bea03bf3ff61cc880437a9a068dbc58581dfd79c9c1b890b1b78b84f2d8",
+    "reviewStatus": "accepted",
+    "terminal": true,
+    "operationally_resolved": true,
+    "usage": {
+      "input_tokens": null,
+      "output_tokens": null,
+      "cache_tokens": null,
+      "reported_cost": null,
+      "currency": null,
+      "source": "not_captured"
+    }
+  }
+}

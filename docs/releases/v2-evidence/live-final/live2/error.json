@@ -1,0 +1,4 @@
+{
+  "error": "Error: ENOENT: no such file or directory, open '/private/tmp/v2-live-final-20261012/live2/workspace/answer.txt'",
+  "stack": "Error: ENOENT: no such file or directory, open '/private/tmp/v2-live-final-20261012/live2/workspace/answer.txt'\n    at readFileSync (node:fs:483:20)\n    at file:///Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/scripts/release/live.mjs:245:36\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)"
+}

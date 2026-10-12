@@ -1,0 +1,31 @@
+{
+  "review_started_at": "2026-10-12T19:06:34.573Z",
+  "context_bytes": 9166,
+  "idempotency_key": "parent-review-exec_c93b00df-3b03-4881-85db-01cac0cfe1bf",
+  "gate_status": "passed",
+  "review": {
+    "disposition": "rejected",
+    "rationale": "Exact allowed shell command ran; forbidden shell request was denied and forbidden output is absent. Deadline cancellation has abort acknowledgement and applied stop proof; terminal timed_out, reservation zero, no prior reviews. Missing report is rejected; permission denial operational gate passes.",
+    "criteria": [
+      {
+        "id": "answer",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_9b410b7d-c752-420b-b957-5d4d7bdaedcb@sha256:d1f94be0818fcf64a45b0e062a070fa043def792e668a93dd7e27b3a3349cd2b"
+        ]
+      }
+    ],
+    "starting_state_sha256": "f48ffd29b8f1e888e9e72f15b9eab1e3c37fd21d7495aad609e7743707564678",
+    "final_manifest_sha256": "d1f94be0818fcf64a45b0e062a070fa043def792e668a93dd7e27b3a3349cd2b",
+    "freshness": "Parent inspected complete recorded fixture inputs, immutable exports, final snapshot, and available checks.",
+    "integration_checks": [
+      "Exact allowed shell command ran; forbidden shell request was denied and forbidden output is absent. Deadline cancellation has abort acknowledgement and applied stop proof; terminal timed_out, reservation zero, no prior reviews. Missing report is rejected; permission denial operational gate passes."
+    ],
+    "coverage_limits": [
+      "Trusted-workspace managed mode; plugin race remains separately documented.",
+      "Context measured in bytes; elapsed review time includes concurrent parent work."
+    ],
+    "unresolved_issues": [],
+    "next_action": "Retain this reviewed attempt."
+  }
+}

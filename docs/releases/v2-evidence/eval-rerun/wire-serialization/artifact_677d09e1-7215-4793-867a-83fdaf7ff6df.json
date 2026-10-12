@@ -1,0 +1,9 @@
+import json
+
+
+def decode(raw):
+    message = json.loads(raw)
+    if "version" not in message:
+        raise ValueError("missing version")
+    request = message["request"]
+    return request["id"], request["body"]

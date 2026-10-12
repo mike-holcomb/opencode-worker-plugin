@@ -1,0 +1,66 @@
+{
+  "title": "Bound an unsupported negative security claim",
+  "objective": "Assess whether the supplied files support the claim that every route enforces authorization. Search only the supplied files. Write the assigned report summary.md stating either the supported evidence or no supported finding, the exact inspected bounds, and any gap that prevents a whole-project conclusion. Do not make a whole-project claim from this fixture.",
+  "tier": "lightweight",
+  "authoritative_inputs": [
+    {
+      "reference": "auth_routes.py",
+      "kind": "file",
+      "purpose": "Frozen evaluation fixture"
+    },
+    {
+      "reference": "README.txt",
+      "kind": "file",
+      "purpose": "Frozen evaluation fixture"
+    }
+  ],
+  "context": {
+    "verified_facts": [
+      "The prior report is substantively bounded and sources support its distinction between health and profile, but the frozen summary marker check failed. Revise the summary to state plainly that the supplied examples yield no supported finding of a production-wide authentication bypass; production-wide safety also is not established. Preserve scope and source caveats. Do not inspect campaign parent directories or evaluator state. Parent-only checks are not_run with exit_code null; the parent runs the frozen checks. Write both strict JSON and summary to this execution’s assigned report paths. Preserve all workspace sources. This is a correction of the same objective, not a broader audit."
+    ],
+    "rejected_assumptions": [],
+    "exclusions": []
+  },
+  "allowed_writes": [],
+  "acceptance_criteria": [
+    {
+      "id": "summary-exists",
+      "requirement": "Preserve frozen file_exists check summary-exists",
+      "evidence_required": "Run the unchanged summary-exists evaluator check and retain its result",
+      "required": true
+    },
+    {
+      "id": "bounded-negative",
+      "requirement": "Preserve frozen text_contains_any check bounded-negative",
+      "evidence_required": "Run the unchanged bounded-negative evaluator check and retain its result",
+      "required": true
+    },
+    {
+      "id": "bounds-and-gap",
+      "requirement": "Preserve frozen text_contains check bounds-and-gap",
+      "evidence_required": "Run the unchanged bounds-and-gap evaluator check and retain its result",
+      "required": true
+    },
+    {
+      "id": "write-scope",
+      "requirement": "Preserve frozen allowed_changed_paths check write-scope",
+      "evidence_required": "Run the unchanged write-scope evaluator check and retain its result",
+      "required": true
+    },
+    {
+      "id": "parent-negative-review",
+      "requirement": "Confirm the negative claim is bounded to the complete supplied file set, cites the relevant route evidence, and does not overstate absence beyond this fixture.",
+      "evidence_required": "Run the unchanged parent-negative-review evaluator check and retain its result",
+      "required": true
+    }
+  ],
+  "checks": [],
+  "constraints": [
+    "Preserve the scenario's initial content and unrelated changes.",
+    "Report failed checks and limits without claiming parent acceptance."
+  ],
+  "stop_conditions": [
+    "Stop if a required action exceeds the declared allowed writes."
+  ],
+  "shared_resources": []
+}

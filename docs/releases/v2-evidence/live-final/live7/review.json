@@ -1,0 +1,90 @@
+{
+  "decision": {
+    "review_started_at": "2026-10-12T19:06:34.573Z",
+    "context_bytes": 9166,
+    "idempotency_key": "parent-review-exec_c93b00df-3b03-4881-85db-01cac0cfe1bf",
+    "gate_status": "passed",
+    "review": {
+      "disposition": "rejected",
+      "rationale": "Exact allowed shell command ran; forbidden shell request was denied and forbidden output is absent. Deadline cancellation has abort acknowledgement and applied stop proof; terminal timed_out, reservation zero, no prior reviews. Missing report is rejected; permission denial operational gate passes.",
+      "criteria": [
+        {
+          "id": "answer",
+          "result": "not_checked",
+          "evidence": [
+            "artifact:artifact_9b410b7d-c752-420b-b957-5d4d7bdaedcb@sha256:d1f94be0818fcf64a45b0e062a070fa043def792e668a93dd7e27b3a3349cd2b"
+          ]
+        }
+      ],
+      "starting_state_sha256": "f48ffd29b8f1e888e9e72f15b9eab1e3c37fd21d7495aad609e7743707564678",
+      "final_manifest_sha256": "d1f94be0818fcf64a45b0e062a070fa043def792e668a93dd7e27b3a3349cd2b",
+      "freshness": "Parent inspected complete recorded fixture inputs, immutable exports, final snapshot, and available checks.",
+      "integration_checks": [
+        "Exact allowed shell command ran; forbidden shell request was denied and forbidden output is absent. Deadline cancellation has abort acknowledgement and applied stop proof; terminal timed_out, reservation zero, no prior reviews. Missing report is rejected; permission denial operational gate passes."
+      ],
+      "coverage_limits": [
+        "Trusted-workspace managed mode; plugin race remains separately documented.",
+        "Context measured in bytes; elapsed review time includes concurrent parent work."
+      ],
+      "unresolved_issues": [],
+      "next_action": "Retain this reviewed attempt."
+    }
+  },
+  "result": {
+    "taskId": "task_a67fcb40-0f71-41d2-a7e1-5c89d37f3c13",
+    "executionId": "exec_c93b00df-3b03-4881-85db-01cac0cfe1bf",
+    "scopeId": "release-live7",
+    "revision": 16,
+    "phase": "timed_out",
+    "observation": "current",
+    "workspace": "/private/tmp/v2-live-final-20261012/live7/workspace",
+    "workspaceAccess": "exclusive",
+    "requestModel": {
+      "profile": "local"
+    },
+    "model": "llama.cpp/laguna-s-21",
+    "profile": "bounded-build",
+    "backendId": "backend_e873917771a176ba3b5fdb9afaa9c862",
+    "sessionId": "ses_ece8fc91cffeRIDUWYcMOzrzMz",
+    "userMessageId": "msg_484ddd8c-b549-4f38-9d48-86f17ff659b7",
+    "predecessorExecutionId": null,
+    "contextMode": null,
+    "baselineHash": "f48ffd29b8f1e888e9e72f15b9eab1e3c37fd21d7495aad609e7743707564678",
+    "promptHash": "89a1acfc49dc364987df2097f5e2c2c21348a7f71af02804cc17cd2b8d753d8a",
+    "reportPath": "/private/tmp/v2-live-final-20261012/live7/state/reports/exec_c93b00df-3b03-4881-85db-01cac0cfe1bf",
+    "queueDeadlineAt": "2026-10-12T18:48:38.878Z",
+    "admittedAt": "2026-10-12T18:46:38.882Z",
+    "executionDeadlineAt": "2026-10-12T18:51:38.882Z",
+    "finalizationDeadlineAt": "2026-10-12T18:52:09.450Z",
+    "intendedOutcome": "timed_out",
+    "creationIntent": {
+      "backendId": "backend_e873917771a176ba3b5fdb9afaa9c862",
+      "marker": "opencode-agents:exec_c93b00df-3b03-4881-85db-01cac0cfe1bf",
+      "sessionId": "ses_ece8fc91cffeRIDUWYcMOzrzMz",
+      "createdAt": "2026-10-12T18:46:40.093Z"
+    },
+    "cancellationIntent": {
+      "reason": "execution deadline",
+      "requester": "supervisor",
+      "deadlineOrigin": "2026-10-12T18:51:38.882Z",
+      "createdAt": "2026-10-12T18:51:38.908Z",
+      "abortAcknowledged": true
+    },
+    "pendingRequests": [],
+    "createdAt": "2026-10-12T18:46:38.878Z",
+    "updatedAt": "2026-10-12T19:11:21.221Z",
+    "reportValidity": "missing",
+    "finalManifestHash": "d1f94be0818fcf64a45b0e062a070fa043def792e668a93dd7e27b3a3349cd2b",
+    "reviewStatus": "rejected",
+    "terminal": true,
+    "operationally_resolved": true,
+    "usage": {
+      "input_tokens": null,
+      "output_tokens": null,
+      "cache_tokens": null,
+      "reported_cost": null,
+      "currency": null,
+      "source": "not_captured"
+    }
+  }
+}

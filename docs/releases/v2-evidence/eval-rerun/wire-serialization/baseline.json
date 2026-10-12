@@ -1,0 +1,16 @@
+{
+  "schema_version": 2,
+  "scenario_id": "wire-serialization",
+  "run_id": "wire-serialization-1791830446096",
+  "prepared_workdir": "/private/tmp/v2-eval-retry-20261012/wire-serialization/workspace",
+  "manifest_sha256": "d397b764ff5b88baa506ae6d73c3864ffc0683fe4f02b22b897013fc4d32c691",
+  "packet_schema_sha256": "d57a85f17494892fe59d470f3f0ed54071eed7dd33cee884f61d11f83506fd87",
+  "frozen_checks_sha256": "4429e81a86d5083f52194a5756a4c3433dfa2a35ff60273133b2753a5fc735d8",
+  "initial_files": {
+    "consumer.py": "2ab5224df0c813e79cfddc027b1ba66bf3dddd5072c5e17a598d785d24cd3fdb",
+    "producer.py": "18c58bd3c7a608d0127c7a297d845399d38705fff5efab92d121c983c5016fc8",
+    "scenario-input.json": "399c309092877ac9384f7b5d9d8461d54f9e914ca4aa437cde6c4dfb97614620",
+    "task.md": "4e25a7b0d51fab69e9863386675be358df08b43912051fbeb5efb917f671814c",
+    "test_wire.py": "7555170db26efef5807261d60cd230a2aa895b42d7c71a1e148c6fe2fd672dac"
+  }
+}

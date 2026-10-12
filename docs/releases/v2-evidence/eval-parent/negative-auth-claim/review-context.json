@@ -1,0 +1,56 @@
+{
+  "review_started_at": "2026-10-12T18:58:32.497Z",
+  "context_bytes": 19664,
+  "files": [
+    {
+      "path": "packet.json",
+      "sha256": "71416498945fb8bde8b4f73bdd3ace270110a754c1f729d9def98d71c1abae1a",
+      "bytes": 2529
+    },
+    {
+      "path": "final.json",
+      "sha256": "1f85d07e2e5fd4c9b46da062dbbe6423c0d1ed636d15922f0d4a9a0553496fe8",
+      "bytes": 5785
+    },
+    {
+      "path": "exports.json",
+      "sha256": "72942a4ef777b83ced313ffbc9b8fbeccf52c23e25546491eca8329549b62071",
+      "bytes": 1015
+    },
+    {
+      "path": "summary.md",
+      "sha256": "c9dfa0f2d194487d2215b7a638dc2112d1e7aa282fcb7cb29fc37029e7794edd",
+      "bytes": 2833
+    },
+    {
+      "path": "artifact_eccc09f6-b49e-454c-8261-82b1975a8b34.json",
+      "sha256": "05b04f5efa5d0fe8097847cbb93ca953b4f1dea52abdbcc8a12604714d3e2461",
+      "bytes": 5573
+    },
+    {
+      "path": "artifact_7de33ddd-bf7f-4467-85c3-ed077da131b7.json",
+      "sha256": "6276fac72011a8b75c8a6e5e15841cb82bb1d8071f08d857e3bc417b8852e6bd",
+      "bytes": 1021
+    },
+    {
+      "path": "workspace/README.txt",
+      "sha256": "a372e8bda8d1864b160a899c9e6cd80b4de2e2cb99999a394b709e640ec650e2",
+      "bytes": 101
+    },
+    {
+      "path": "workspace/auth_routes.py",
+      "sha256": "ba46ef93e30a24de586bb5b937218595e313a86d21421d95d450351c74ea881e",
+      "bytes": 144
+    },
+    {
+      "path": "workspace/scenario-input.json",
+      "sha256": "3e5bd24eb66e4d848fa304acf04ad69c5d485b070b3685f31e8f38602e9068bf",
+      "bytes": 303
+    },
+    {
+      "path": "workspace/task.md",
+      "sha256": "4cae0d5c5bce25d1103dab6b678647e8d0e0115ee518e2da78b4c85d4137c362",
+      "bytes": 360
+    }
+  ]
+}

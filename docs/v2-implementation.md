@@ -24,13 +24,14 @@ An operator can now set `development_execution.enabled: true` with an exact cano
 
 ## Verification and remaining release work
 
-The [release evidence campaign](release-validation.md) records the current results in
-[ledger.json](releases/v2-evidence/ledger.json). Commit `ceb4c27` passes 92 runtime
-tests, two release-runner permission tests, nine packaging tests, five evaluation
+The [release evidence campaign](release-validation.md) records results in
+[ledger.json](releases/v2-evidence/ledger.json). Commit `fdddb44` passes 92 runtime
+tests, three release-runner permission tests, nine packaging tests, five evaluation
 harness tests, frozen-fixture validation, deterministic packaging, and relocated
-read-only installation on Node 24.15.0 and 24.21.0. Both local macOS arm64 runs and
-all four macOS 15/Ubuntu 24.04 CI jobs passed. This automated matrix does not
-certify live Linux execution or WSL2; those require separate operator evidence.
+read-only installation in all four macOS 15/Ubuntu 24.04 CI jobs on Node 24.15.0
+and 24.21.0. Local macOS arm64 runs also passed at `ceb4c27`. This automated
+matrix does not certify live Linux execution or WSL2; their operator handoffs are
+[Linux](linux-release-check.md) and [WSL2](wsl2-release-check.md).
 
 All 30 applicable fault cases now have direct coverage under the configured
 trusted-workspace boundary. T20 includes a real worker request to execute the
@@ -42,23 +43,30 @@ idle backend retention, failure to replace a proven-dead owned backend, and a
 concurrent supervisor bind loser unlinking the winner's socket. Supervisor socket
 ownership is now elected before SQLite initialization or reconciliation.
 
-New live observations close the earlier incomplete outcomes: case 6 completed
-with a valid accepted report after supervisor restart; case 7 denied the forbidden
-command, then proved timeout cancellation and released ownership; case 9 recovered
-the exact session/message without replay, then proved cancellation and released
-ownership. Missing reports in cases 7 and 9 were rejected as deliverables while
-their specified operational outcomes passed. Restart checks still need repetition
-after the final supervisor election fix. Earlier cases 1–5, 8, and 10 are retained
-below as historical observations, not silently relabeled as new runs.
+All ten macOS live cases have recorded passing observations and parent reviews.
+Cases 1, 2 and 4–10 were rerun with the repaired runtime. Case 3 retains its earlier
+accepted concurrency run with exact original provenance, reports, reviews and
+verified artifact hashes in [historical-live3](releases/v2-evidence/historical-live3/review.md).
+Supervisor restart completed with the same identities; permission denial and
+backend restart reached proven terminal stops with ownership released. Missing
+reports were rejected as deliverables while the specified operational cases passed.
+Failed-check acceptance was refused. Failed fixture attempts remain alongside the
+successful records.
 
-The twelve evaluation scenarios have actual first-attempt records, but quality
-certification is incomplete. Lookup passed parent review after a same-session
-correction of invalid JSON; the failed predecessor is retained. Log investigation
-needs a bounded coverage correction. Two edit scenarios encountered a runner
-path-spelling bug, and eight later scenarios encountered an outage of the existing
-model route. Those attempts remain failed and unaccepted. Corrected-runner reruns
-are underway. Exact-turn OpenCode counters are retained where available; unknown
-usage and billing cost remain null. The one-hour/1,000-execution soak is running.
+All twelve evaluation scenarios now have actual attempt records and aggregate
+[quality measurements](releases/v2-evidence/quality-summary.json). Six scenarios
+currently have accepted deliverables; bounded corrections remain in progress.
+Infrastructure failures, parent permission delays, incorrect runner assumptions,
+invalid reports and unresolved cancellation are retained separately from successes.
+The wire correction includes an explicit parent-feedback mistake, exposed by the
+worker and preserved in its review. No first-attempt quality success is inferred
+from an eventual correction. Exact-turn token counters are recorded where available;
+unknown usage and verified billing cost remain null.
+
+The one-hour/1,000-execution soak passed: p95 admission 83.6 ms, cached read
+1.08 ms, and material-event visibility 8.34 ms. All 1,020 backends including
+warmups closed, and final median RSS stayed within the agreed limit. See the
+[resource review](releases/v2-evidence/soak/parent-review.json).
 
 Upgrade/rollback rehearsal passed with committed WAL data, historical task and
 artifact preservation, drained writers, matching-backup restoration, and refusal

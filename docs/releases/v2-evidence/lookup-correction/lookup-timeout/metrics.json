@@ -25,6 +25,7 @@
   "parent_context_bytes": 20102,
   "observed_inference": {
     "source": "opencode_1.18.35_exact_assistant_messages",
+    "execution_id": "exec_2a27a2a2-9f17-4737-a11c-455caee9e85f",
     "session_id": "ses_eceb0f2c9ffejZPtdz33mpjD4U",
     "user_message_id": "msg_ef86e7f3-e034-4ca1-8536-c400ae4912e8",
     "input_tokens": 134581,

@@ -1,0 +1,7 @@
+diff --git a/dirty.txt b/dirty.txt
+index 4b48dee..3e27519 100644
+--- a/dirty.txt
++++ b/dirty.txt
+@@ -1 +1 @@
+-original
++pre-existing user edit

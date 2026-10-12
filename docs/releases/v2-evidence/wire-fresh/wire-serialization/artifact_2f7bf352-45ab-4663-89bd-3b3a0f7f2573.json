@@ -1,0 +1,124 @@
+{
+  "schema_version": 2,
+  "task_id": "task_88e5f185-b6cd-4518-8324-fa334ef43444",
+  "execution_id": "exec_0e6c3191-3dcb-452f-842c-5a84ff17f21a",
+  "outcome": "completed",
+  "summary": "Updated producer.py and consumer.py as a coupled pair to the v2 wire envelope using a shared ENVELOPE_VERSION=2 constant. encode writes version 2 with request.id/body; decode rejects missing/non-2 versions with ValueError and returns (request_id, body) preserving the request id. The assigned unittest python3 -m unittest -v test_wire.py passes (2/2, exit 0). Parent-only frozen evaluator checks were not run by the worker.",
+  "coverage": [
+    "producer.py encode implements v2 envelope {version, request:{id, body}}",
+    "consumer.py decode preserves request id and rejects missing version",
+    "shared ENVELOPE_VERSION=2 couples producer and consumer",
+    "test_v2_envelope_round_trip and test_missing_version_is_rejected via python3 -m unittest -v test_wire.py"
+  ],
+  "gaps": [
+    "Parent-only frozen evaluator checks (summary-exists, coupling-recorded, write-scope, parent-interface-review) were not run by this worker; their results are retained for parent review (not_run, exit_code null).",
+    "The shared version contract is duplicated as a module constant in each module rather than imported from a single source, because only producer.py and consumer.py are declared allowed writes."
+  ],
+  "findings": [
+    {
+      "id": "v2-envelope-contract",
+      "claim": "producer.encode and consumer.decode implement the v2 envelope {\"version\":2,\"request\":{\"id\",\"body\"}} with a shared ENVELOPE_VERSION constant coupling both modules.",
+      "evidence": [
+        "producer.py:3 ENVELOPE_VERSION = 2",
+        "producer.py:9 \"version\": ENVELOPE_VERSION",
+        "consumer.py:3 ENVELOPE_VERSION = 2",
+        "consumer.py:8 message.get(\"version\") != ENVELOPE_VERSION"
+      ],
+      "caveats": [
+        "The constant is duplicated across modules rather than imported from a shared module, since only producer.py and consumer.py are allowed project writes."
+      ]
+    },
+    {
+      "id": "request-id-stability",
+      "claim": "The request identifier is preserved verbatim across encode/decode: encode stores it at request.id and decode returns it as the first tuple element.",
+      "evidence": [
+        "producer.py:10 \"request\": {\"id\": request_id, \"body\": payload}",
+        "consumer.py:11 return request[\"id\"], request[\"body\"]",
+        "test_wire.py:10 encode(\"r-7\", {\"kind\": \"ping\"}) and test_wire.py:15 decode(raw) == (\"r-7\", {\"kind\": \"ping\"})"
+      ],
+      "caveats": [
+        "Round-trip stability verified only for the request id \"r-7\" as exercised by test_wire.py."
+      ]
+    },
+    {
+      "id": "missing-version-rejection",
+      "claim": "consumer.decode raises ValueError when the version field is absent or not equal to 2.",
+      "evidence": [
+        "consumer.py:8-9 if message.get(\"version\") != ENVELOPE_VERSION: raise ValueError(\"missing version\")",
+        "test_wire.py:17-20 test_missing_version_is_rejected asserts ValueError on a version-less envelope"
+      ],
+      "caveats": [
+        "The error text \"missing version\" is also raised for a present-but-non-2 version; the objective and tests only require rejection of a missing version."
+      ]
+    },
+    {
+      "id": "wire-tests-green",
+      "claim": "The assigned wire tests pass.",
+      "evidence": [
+        "python3 -m unittest -v test_wire.py -> test_missing_version_is_rejected ok; test_v2_envelope_round_trip ok; Ran 2 tests; OK; exit code 0"
+      ],
+      "caveats": [
+        "This is the only frozen evaluator check executed locally by the worker; remaining frozen checks are parent-only."
+      ]
+    }
+  ],
+  "changes": [
+    {
+      "path": "producer.py",
+      "description": "Introduced module constant ENVELOPE_VERSION = 2 and changed encode to write \"version\": ENVELOPE_VERSION (behavior unchanged: version 2 with request.id/body)."
+    },
+    {
+      "path": "consumer.py",
+      "description": "Introduced module constant ENVELOPE_VERSION = 2 and changed the guard to reject any envelope whose version is missing or != 2 via ValueError, coupling decode to the producer's version contract."
+    }
+  ],
+  "checks": [
+    {
+      "id": "wire-tests-pass",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "python3 -m unittest -v test_wire.py -> test_missing_version_is_rejected ok; test_v2_envelope_round_trip ok; Ran 2 tests; OK"
+      ],
+      "explanation": "Ran the assigned/frozen unittest argv locally. Exit code 0 confirms both the v2 envelope round-trip and missing-version rejection."
+    },
+    {
+      "id": "summary-exists",
+      "status": "not_run",
+      "exit_code": null,
+      "evidence": [
+        "Worker authored summary.md at state/reports/exec_0e6c3191-3dcb-452f-842c-5a84ff17f21a/summary.md"
+      ],
+      "explanation": "Parent-only frozen file_exists check; not run by this worker per guidance that frozen evaluator checks other than the assigned unittest are run by the parent. The summary file was authored locally so the path is present, but the frozen check result is retained for parent review."
+    },
+    {
+      "id": "coupling-recorded",
+      "status": "not_run",
+      "exit_code": null,
+      "evidence": [
+        "result.json findings.v2-envelope-contract documents the ENVELOPE_VERSION coupling; summary.md records the interface decision"
+      ],
+      "explanation": "Parent-only frozen text_contains check; not run by this worker. Coupling is recorded in findings/result.json and summary.md for parent review."
+    },
+    {
+      "id": "write-scope",
+      "status": "not_run",
+      "exit_code": null,
+      "evidence": [
+        "Only producer.py and consumer.py were edited (both declared allowed project writes); no other source files modified"
+      ],
+      "explanation": "Parent-only frozen allowed_changed_paths check; not run by this worker. Worker confirms edits were confined to the declared allowed paths, but the frozen check is deferred to parent review."
+    },
+    {
+      "id": "parent-interface-review",
+      "status": "not_run",
+      "exit_code": null,
+      "evidence": [
+        "No parent interface review performed by the worker; this is a parent-only step."
+      ],
+      "explanation": "Inherently a parent review step (verifying the parent serialized the coupled decision or kept it local). Not executable by the worker; exit_code null and status not_run reflect that parent acceptance is not claimed."
+    }
+  ],
+  "blockers": [],
+  "next_action": "Parent to run the frozen evaluator checks (summary-exists, coupling-recorded, write-scope, parent-interface-review) and accept the coupled v2 interface decision."
+}

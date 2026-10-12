@@ -1,0 +1,83 @@
+{
+  "status": "passed",
+  "source_hashes_match_candidate": {
+    "../../dist/coordinator.js": true,
+    "../../dist/service.js": true,
+    "../../dist/store.js": true,
+    "./performance.mjs": true,
+    "./fake-process.mjs": true
+  },
+  "source_revision_note": "Campaign began from a dirty 70c0b43 checkout; recorded measured-source hashes match committed candidate. Daemon/RPC startup is outside the in-memory performance fixture and separately live-tested.",
+  "observed_elapsed_ms": 3610074.599917,
+  "measured_executions": 1000,
+  "warmups": 20,
+  "opened": 1020,
+  "closed": 1020,
+  "final_active_backends": 0,
+  "final_subscriptions": 0,
+  "final_backend_pids": [],
+  "maximum_sampled_backend_processes": 1,
+  "maximum_sampled_subscriptions": 1,
+  "rss_limit": 269864140.8,
+  "final_ten_minute_median_rss": 243515392,
+  "resource_trend": [
+    {
+      "minutes": [
+        0,
+        10
+      ],
+      "sample_count": 60,
+      "median_rss": 240033792.0,
+      "max_handles": 8
+    },
+    {
+      "minutes": [
+        10,
+        20
+      ],
+      "sample_count": 60,
+      "median_rss": 245858304.0,
+      "max_handles": 9
+    },
+    {
+      "minutes": [
+        20,
+        30
+      ],
+      "sample_count": 60,
+      "median_rss": 256933888.0,
+      "max_handles": 8
+    },
+    {
+      "minutes": [
+        30,
+        40
+      ],
+      "sample_count": 60,
+      "median_rss": 265658368.0,
+      "max_handles": 8
+    },
+    {
+      "minutes": [
+        40,
+        50
+      ],
+      "sample_count": 60,
+      "median_rss": 265797632.0,
+      "max_handles": 8
+    },
+    {
+      "minutes": [
+        50,
+        60
+      ],
+      "sample_count": 60,
+      "median_rss": 243515392.0,
+      "max_handles": 9
+    }
+  ],
+  "review": "Parent inspected all resource samples by time bin. Handles remain bounded, at most one backend and subscription appear, RSS returns below the late-run plateau, and every backend close waits for process exit. No accumulating resources observed.",
+  "limitations": [
+    "Fake child lifecycle, not the OpenCode executable; live cases cover the managed OpenCode launcher"
+  ]
+}

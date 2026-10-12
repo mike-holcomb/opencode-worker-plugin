@@ -1,8 +1,8 @@
 # Linux live evidence handoff
 
 The automated Ubuntu 24.04 x64 matrix already passed on Node 24.15.0 and 24.21.0
-at commit `ceb4c272a91120baee02a995178e79ae7b558945`. See
-[CI evidence](releases/v2-evidence/ci-38291901986/run.json).
+at commit `fdddb447b8bda1378e3d1c8eb2ba23d90b0cf736`. See
+[CI evidence](releases/v2-evidence/ci-38293051099/run.json).
 This handoff covers the separate real managed-execution suite on Linux.
 
 Use a trusted disposable Linux filesystem workspace, Node 24.21.0, and the
@@ -27,13 +27,15 @@ that blocked result for operator resolution.
 ```sh
 node plugins/opencode-agents/runtime/scripts/release/live.mjs --execute --binary /absolute/path/to/opencode --out /tmp/v2-linux-live --cases live,t20 --permission-decisions /tmp/v2-parent-decisions.json
 node plugins/opencode-agents/runtime/scripts/release/usage.mjs /tmp/v2-linux-live
+node plugins/opencode-agents/runtime/scripts/release/export.mjs /tmp/v2-linux-live /tmp/v2-linux-portable
 ```
 
 Use a new output directory for each run. The suite uses private isolated state
 and an exact-workspace development opt-in; it does not enable release execution
 in the source manifest. Preserve failed attempts and unresolved ownership records.
 
-Return `campaign.json` and each case's final snapshot, metrics, events, exported
+Return `/tmp/v2-linux-portable` after checking its contents for secrets. It contains
+`campaign.json` and each case's final snapshot, metrics, events, exported
 immutable artifacts, packet, runtime hashes, and observed-usage sidecar. Include
 the `workspace` fixture files and original preparation/baseline records for
 parent review, including the peer workspace for concurrency and the dirty
@@ -52,3 +54,6 @@ accepted trusted-workspace limit, not a passing suppression test.
 Watch for `parent_permission_needed` and record an explicit scoped decision as
 described in [additional permission requests](release-validation.md#additional-permission-requests).
 Do not approve an unfamiliar command merely to keep the suite moving.
+Use a second terminal for decisions while the runner is active. Each execution
+has a five-minute deadline; unanswered requests can make the attempt incomplete.
+Retain that attempt and report it as incomplete instead of deleting or overwriting it.

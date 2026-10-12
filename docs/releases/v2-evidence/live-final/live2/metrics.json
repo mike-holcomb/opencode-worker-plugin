@@ -1,0 +1,32 @@
+{
+  "phase": "timed_out",
+  "terminal": true,
+  "report_validity": "missing",
+  "dispatches": 1,
+  "duplicate_dispatch": false,
+  "status": "failed_fixture_assertion",
+  "parent_review": "pending",
+  "elapsed_ms": 301187,
+  "recovery_source": "Read-only hash-verified artifact objects after runner assertion; no worker replay",
+  "assertion_error": "Error: ENOENT: no such file or directory, open '/private/tmp/v2-live-final-20261012/live2/workspace/answer.txt'",
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "observed_inference": {
+    "source": "opencode_1.18.35_exact_assistant_messages",
+    "execution_id": "exec_009a2c42-5f49-454a-8da8-f7758334be4a",
+    "session_id": "ses_ece95c0d5ffefGusQmdUCOUgBW",
+    "user_message_id": "msg_787f3e6d-862a-4ffd-8578-c2c8c7813d92",
+    "input_tokens": 7410,
+    "output_tokens": 162,
+    "total_tokens": 7572,
+    "assistant_messages": 1,
+    "reported_cost": null,
+    "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available."
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "review_started_at": "2026-10-12T18:58:32.530Z",
+  "context_bytes": 18311,
+  "idempotency_key": "parent-review-exec_f58879d1-c648-444c-90f9-4ec092e70ce3",
+  "gate_status": "passed",
+  "review": {
+    "disposition": "accepted",
+    "rationale": "Parent inspected all three supplied evidence files and the complete report. rev-17 healthy is correctly marked stale against rev-18 degraded; no recheck is claimed as completed. Five actual frozen automated checks pass and parent-stale-review is satisfied. Worker check statuses are self-assessments, not evidence that the parent evaluator ran; this acceptance rests on independent parent checks.",
+    "criteria": [
+      {
+        "id": "summary-exists",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_f0b04397-a528-4d31-a339-4bd2d2f08033@sha256:1f521f98bf0e0ed39b6a2b28f23338972ed8f463f1c77a620a53ebcc11e7db68",
+          "artifact:artifact_e34977fa-6adc-4564-b0bc-8f9d2459d9d6@sha256:d0b0dd2f5deb6db1b3c2ff23ef589def33fc3d2fc3e4d434d98763979529a43d",
+          "artifact:artifact_42d08035-7db9-4191-ae39-b72ec57facba@sha256:6c7c238a35c0effd1f225f2c43c922d0cd6f193af73117bb32b31d982dea3a4f"
+        ]
+      },
+      {
+        "id": "revision-mismatch",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_f0b04397-a528-4d31-a339-4bd2d2f08033@sha256:1f521f98bf0e0ed39b6a2b28f23338972ed8f463f1c77a620a53ebcc11e7db68",
+          "artifact:artifact_e34977fa-6adc-4564-b0bc-8f9d2459d9d6@sha256:d0b0dd2f5deb6db1b3c2ff23ef589def33fc3d2fc3e4d434d98763979529a43d",
+          "artifact:artifact_42d08035-7db9-4191-ae39-b72ec57facba@sha256:6c7c238a35c0effd1f225f2c43c922d0cd6f193af73117bb32b31d982dea3a4f"
+        ]
+      },
+      {
+        "id": "recheck-requested",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_f0b04397-a528-4d31-a339-4bd2d2f08033@sha256:1f521f98bf0e0ed39b6a2b28f23338972ed8f463f1c77a620a53ebcc11e7db68",
+          "artifact:artifact_e34977fa-6adc-4564-b0bc-8f9d2459d9d6@sha256:d0b0dd2f5deb6db1b3c2ff23ef589def33fc3d2fc3e4d434d98763979529a43d",
+          "artifact:artifact_42d08035-7db9-4191-ae39-b72ec57facba@sha256:6c7c238a35c0effd1f225f2c43c922d0cd6f193af73117bb32b31d982dea3a4f"
+        ]
+      },
+      {
+        "id": "evidence-unchanged",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_f0b04397-a528-4d31-a339-4bd2d2f08033@sha256:1f521f98bf0e0ed39b6a2b28f23338972ed8f463f1c77a620a53ebcc11e7db68",
+          "artifact:artifact_e34977fa-6adc-4564-b0bc-8f9d2459d9d6@sha256:d0b0dd2f5deb6db1b3c2ff23ef589def33fc3d2fc3e4d434d98763979529a43d",
+          "artifact:artifact_42d08035-7db9-4191-ae39-b72ec57facba@sha256:6c7c238a35c0effd1f225f2c43c922d0cd6f193af73117bb32b31d982dea3a4f"
+        ]
+      },
+      {
+        "id": "write-scope",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_f0b04397-a528-4d31-a339-4bd2d2f08033@sha256:1f521f98bf0e0ed39b6a2b28f23338972ed8f463f1c77a620a53ebcc11e7db68",
+          "artifact:artifact_e34977fa-6adc-4564-b0bc-8f9d2459d9d6@sha256:d0b0dd2f5deb6db1b3c2ff23ef589def33fc3d2fc3e4d434d98763979529a43d",
+          "artifact:artifact_42d08035-7db9-4191-ae39-b72ec57facba@sha256:6c7c238a35c0effd1f225f2c43c922d0cd6f193af73117bb32b31d982dea3a4f"
+        ]
+      },
+      {
+        "id": "parent-stale-review",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_f0b04397-a528-4d31-a339-4bd2d2f08033@sha256:1f521f98bf0e0ed39b6a2b28f23338972ed8f463f1c77a620a53ebcc11e7db68",
+          "artifact:artifact_e34977fa-6adc-4564-b0bc-8f9d2459d9d6@sha256:d0b0dd2f5deb6db1b3c2ff23ef589def33fc3d2fc3e4d434d98763979529a43d",
+          "artifact:artifact_42d08035-7db9-4191-ae39-b72ec57facba@sha256:6c7c238a35c0effd1f225f2c43c922d0cd6f193af73117bb32b31d982dea3a4f"
+        ]
+      }
+    ],
+    "starting_state_sha256": "6b35c0103ef59e9eb4a5080cfa4fe514da689b812f0256308ea2d1921a4a42f7",
+    "final_manifest_sha256": "6c7c238a35c0effd1f225f2c43c922d0cd6f193af73117bb32b31d982dea3a4f",
+    "freshness": "Parent inspected complete recorded fixture inputs, immutable exports, final snapshot, and available checks.",
+    "integration_checks": [
+      "Parent inspected all three supplied evidence files and the complete report. rev-17 healthy is correctly marked stale against rev-18 degraded; no recheck is claimed as completed. Five actual frozen automated checks pass and parent-stale-review is satisfied. Worker check statuses are self-assessments, not evidence that the parent evaluator ran; this acceptance rests on independent parent checks."
+    ],
+    "coverage_limits": [
+      "Trusted-workspace managed mode; plugin race remains separately documented.",
+      "Context measured in bytes; elapsed review time includes concurrent parent work."
+    ],
+    "unresolved_issues": [],
+    "next_action": "Retain this reviewed attempt."
+  }
+}

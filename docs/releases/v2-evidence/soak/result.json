@@ -1,0 +1,44 @@
+{
+  "source_sha256": {
+    "../../dist/coordinator.js": "0855a02554b8174db5a81814836929809a4f6168289c16b8cf1b1a1a11b2661b",
+    "../../dist/service.js": "33f987958095e5e93a95818b9052c403de1ed9999a787ca1e30cece238d0020c",
+    "../../dist/store.js": "fa3658d94c8868f34c2c938a77a54fca7166ccd356de32e1c246814446e22639",
+    "./performance.mjs": "3bf28cfdbe38bb1f1410f010a1ab3f86cafab8b1b7bf876bdd3ebeedf547aed6",
+    "./fake-process.mjs": "c1aaee7c0c3b163fd3d9c1075b113e0711f3e9455892b886a2c447b6863d8c9e"
+  },
+  "node": "v24.19.0",
+  "platform": "darwin",
+  "arch": "arm64",
+  "commit": "70c0b43c791a99cbccab5608d0e8d71e4e7bc7ae",
+  "count": 1000,
+  "duration_seconds": 3600,
+  "fixture": "in-memory MCP transport; programmable backend with real loopback event sockets and owned child processes; real SQLite and evidence capture",
+  "limits": {
+    "start_p95_ms": 2000,
+    "get_p95_ms": 250,
+    "event_p95_ms": 1000,
+    "wait_slack_ms": 1000
+  },
+  "limitations": [
+    "Fake child lifecycle, not the OpenCode executable; live cases cover the managed OpenCode launcher"
+  ],
+  "passes": {
+    "latency": true,
+    "waits": true,
+    "dispatches": true,
+    "memory": true,
+    "backends": true,
+    "resource_trend": true,
+    "duration": true
+  },
+  "p95": {
+    "start_ms": 83.6005830001086,
+    "get_ms": 1.0783329997211695,
+    "event_ms": 8.33737500011921
+  },
+  "dispatches": 1020,
+  "baseline_rss": 224886784,
+  "final_median_rss": 243515392,
+  "release_sized": true,
+  "status": "passed_fixture"
+}

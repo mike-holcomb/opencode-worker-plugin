@@ -1,0 +1,28 @@
+{
+  "status": "completed",
+  "conclusion": "success",
+  "headSha": "fdddb447b8bda1378e3d1c8eb2ba23d90b0cf736",
+  "url": "https://github.com/mike-holcomb/opencode-worker-plugin/actions/runs/38293051099",
+  "jobs": [
+    {
+      "name": "environment (macos-15, 24.15.0)",
+      "conclusion": "success",
+      "url": "https://github.com/mike-holcomb/opencode-worker-plugin/actions/runs/38293051099/job/114957469373"
+    },
+    {
+      "name": "environment (ubuntu-24.04, 24.15.0)",
+      "conclusion": "success",
+      "url": "https://github.com/mike-holcomb/opencode-worker-plugin/actions/runs/38293051099/job/114957469515"
+    },
+    {
+      "name": "environment (ubuntu-24.04, 24.21.0)",
+      "conclusion": "success",
+      "url": "https://github.com/mike-holcomb/opencode-worker-plugin/actions/runs/38293051099/job/114957469656"
+    },
+    {
+      "name": "environment (macos-15, 24.21.0)",
+      "conclusion": "success",
+      "url": "https://github.com/mike-holcomb/opencode-worker-plugin/actions/runs/38293051099/job/114957469769"
+    }
+  ]
+}

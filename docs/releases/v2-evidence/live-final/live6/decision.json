@@ -1,0 +1,33 @@
+{
+  "review_started_at": "2026-10-12T18:50:46.117Z",
+  "context_bytes": 9858,
+  "idempotency_key": "parent-review-exec_22064d9e-7830-4424-9e25-ec1b7be6b389",
+  "gate_status": "passed",
+  "review": {
+    "disposition": "accepted",
+    "rationale": "Supervisor killed during active work and replaced under the final election fix. Exact execution/session/message preserved, one dispatch, completed with valid report citing unchanged input.txt as violet. Parent checked runtime hashes, artifacts, and zero remaining reservations.",
+    "criteria": [
+      {
+        "id": "answer",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_58a29cf5-1e6e-45e7-9e4a-7cbc91ad90e4@sha256:9c6087778b9f2b03c136de64968f7748428e9a0da8596be569dc2f395d55cd3f",
+          "artifact:artifact_20c52408-0a7f-404b-a27f-4dc9f43c4fc3@sha256:760ba21824bd19e2dc7a554802fd208d06d7c454a35fb7a84d1ad14cd2ce9ee2",
+          "artifact:artifact_878fecce-bdfe-4035-b9fd-b0a749e44c9c@sha256:f282a4a2a382964052b69573696251ee8998a474edf5cf18e615665860444c4b"
+        ]
+      }
+    ],
+    "starting_state_sha256": "b61da04ffb85d8fb980bea05600602a8d6533e036bfd2eb8f8582edca9a3ddd1",
+    "final_manifest_sha256": "f282a4a2a382964052b69573696251ee8998a474edf5cf18e615665860444c4b",
+    "freshness": "Parent inspected complete recorded fixture inputs, immutable exports, final snapshot, and available checks.",
+    "integration_checks": [
+      "Supervisor killed during active work and replaced under the final election fix. Exact execution/session/message preserved, one dispatch, completed with valid report citing unchanged input.txt as violet. Parent checked runtime hashes, artifacts, and zero remaining reservations."
+    ],
+    "coverage_limits": [
+      "Trusted-workspace managed mode; plugin race remains separately documented.",
+      "Context measured in bytes; elapsed review time includes concurrent parent work."
+    ],
+    "unresolved_issues": [],
+    "next_action": "Retain this reviewed attempt."
+  }
+}

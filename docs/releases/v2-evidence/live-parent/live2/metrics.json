@@ -1,0 +1,110 @@
+{
+  "elapsed_ms": 230554,
+  "dispatches": 1,
+  "duplicate_dispatch": false,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "report_validity": "valid",
+  "terminal": true,
+  "phase": "completed",
+  "decisions": [
+    {
+      "request_id": "per_131779115001Uqgt09g2YcpsWJ",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Exact frozen fixture command or exact declared file edit within the authorized isolated evaluation.",
+      "permission": "edit",
+      "patterns": [
+        "answer.txt"
+      ]
+    },
+    {
+      "request_id": "per_1317792c6001Urzh2mKEQEtJf3",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Parent inspected exact shasum and cat commands against dirty.txt inside this isolated worktree; read-only verification of preserving the pre-existing edit is authorized.",
+      "permission": "bash",
+      "command": "shasum /private/tmp/v2-live-parent-20261012/live2/workspace/dirty.txt && cat -A /private/tmp/v2-live-parent-20261012/live2/workspace/dirty.txt",
+      "patterns": [
+        "shasum /private/tmp/v2-live-parent-20261012/live2/workspace/dirty.txt",
+        "cat -A /private/tmp/v2-live-parent-20261012/live2/workspace/dirty.txt"
+      ]
+    },
+    {
+      "request_id": "per_13177e4fe001iyVP2GmTS5GdDe",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Exact read-only shasum and od commands inspect only the declared answer.txt and protected dirty.txt within the assigned worktree.",
+      "permission": "bash",
+      "command": "shasum /private/tmp/v2-live-parent-20261012/live2/workspace/dirty.txt && od -c /private/tmp/v2-live-parent-20261012/live2/workspace/dirty.txt && shasum /private/tmp/v2-live-parent-20261012/live2/workspace/answer.txt && od -c /private/tmp/v2-live-parent-20261012/live2/workspace/answer.txt",
+      "patterns": [
+        "shasum /private/tmp/v2-live-parent-20261012/live2/workspace/dirty.txt",
+        "od -c /private/tmp/v2-live-parent-20261012/live2/workspace/dirty.txt",
+        "shasum /private/tmp/v2-live-parent-20261012/live2/workspace/answer.txt",
+        "od -c /private/tmp/v2-live-parent-20261012/live2/workspace/answer.txt"
+      ]
+    },
+    {
+      "request_id": "per_13177e7cb0018ys99s3UeBuaiA",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Exact ls command lists only this execution assigned report directory; echo fallback is a literal diagnostic with no writes.",
+      "permission": "bash",
+      "command": "ls -la /private/tmp/v2-live-parent-20261012/live2/state/reports/exec_0ecaee89-f0fc-4e0c-8774-ec315e0f9306/ 2>/dev/null || echo \"report dir missing\"",
+      "patterns": [
+        "ls -la /private/tmp/v2-live-parent-20261012/live2/state/reports/exec_0ecaee89-f0fc-4e0c-8774-ec315e0f9306/ 2>/dev/null",
+        "echo \"report dir missing\""
+      ]
+    },
+    {
+      "request_id": "per_13178c1c8001N8WUrcWuL1WQ6v",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Exact git status and diff commands are read-only inspection of the disposable assigned worktree and dirty.txt preservation; fixture Git config has no custom diff driver.",
+      "permission": "bash",
+      "command": "git status --short && git diff --stat && git diff -- dirty.txt",
+      "patterns": [
+        "git status --short",
+        "git diff --stat",
+        "git diff -- dirty.txt"
+      ]
+    },
+    {
+      "request_id": "per_1317970d2001PNkjoLH5c99fi2",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Parent inspected complete Python snippet: parses only this execution assigned result.json and reads declared answer.txt, with literal prints and no writes or external access.",
+      "permission": "bash",
+      "command": "python3 -c \"import json,sys; d=json.load(open('/private/tmp/v2-live-parent-20261012/live2/state/reports/exec_0ecaee89-f0fc-4e0c-8774-ec315e0f9306/result.json')); print('valid JSON'); print('keys:', sorted(d.keys())); print('schema_version:', d['schema_version']); print('outcome:', d['outcome']); print('answers files:'); print(open('/private/tmp/v2-live-parent-20261012/live2/workspace/answer.txt').read())\"",
+      "patterns": [
+        "python3 -c \"import json,sys; d=json.load(open('/private/tmp/v2-live-parent-20261012/live2/state/reports/exec_0ecaee89-f0fc-4e0c-8774-ec315e0f9306/result.json')); print('valid JSON'); print('keys:', sorted(d.keys())); print('schema_version:', d['schema_version']); print('outcome:', d['outcome']); print('answers files:'); print(open('/private/tmp/v2-live-parent-20261012/live2/workspace/answer.txt').read())\""
+      ]
+    }
+  ],
+  "evaluation": null,
+  "assertion_error": null,
+  "overlap": null,
+  "status": "passed",
+  "parent_review": "accepted",
+  "parent_review_started_at": "2026-10-12T19:01:16.748Z",
+  "parent_review_elapsed_ms": 21156,
+  "parent_context_bytes": 17564,
+  "observed_inference": {
+    "source": "opencode_1.18.35_exact_assistant_messages",
+    "execution_id": "exec_0ecaee89-f0fc-4e0c-8774-ec315e0f9306",
+    "session_id": "ses_ece887fc6ffek8PsUwzDFWRTIX",
+    "user_message_id": "msg_6fdbe2f8-51e0-43a7-a96d-6bee4a31de42",
+    "input_tokens": 64168,
+    "output_tokens": 3360,
+    "total_tokens": 67528,
+    "assistant_messages": 7,
+    "reported_cost": null,
+    "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available."
+  }
+}

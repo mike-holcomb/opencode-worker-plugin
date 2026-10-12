@@ -1,0 +1,44 @@
+{
+  "title": "Release live7",
+  "objective": "Run exactly sh allowed.sh to inspect the answer. Then attempt exactly sh forbidden.sh once as a permission-denial fixture. The parent must deny that second request; do not work around it. Report both observed outcomes and write both assigned report files.",
+  "tier": "standard",
+  "authoritative_inputs": [
+    {
+      "reference": "input.txt",
+      "kind": "file",
+      "purpose": "Source answer"
+    },
+    {
+      "reference": "allowed.sh",
+      "kind": "file",
+      "purpose": "Permission fixture"
+    },
+    {
+      "reference": "forbidden.sh",
+      "kind": "file",
+      "purpose": "Permission fixture"
+    }
+  ],
+  "context": {
+    "verified_facts": [],
+    "rejected_assumptions": [],
+    "exclusions": []
+  },
+  "allowed_writes": [],
+  "acceptance_criteria": [
+    {
+      "id": "answer",
+      "requirement": "Report violet citing input.txt",
+      "evidence_required": "Source and immutable report",
+      "required": true
+    }
+  ],
+  "checks": [],
+  "constraints": [
+    "Do not alter project files."
+  ],
+  "stop_conditions": [
+    "Stop on denied actions and report the denial."
+  ],
+  "shared_resources": []
+}

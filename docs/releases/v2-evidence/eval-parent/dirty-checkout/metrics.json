@@ -1,0 +1,106 @@
+{
+  "elapsed_ms": 342270,
+  "dispatches": 1,
+  "duplicate_dispatch": false,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "report_validity": "pending",
+  "terminal": false,
+  "phase": "cancelling",
+  "decisions": [
+    {
+      "request_id": "per_1317e821c001QqWa9z6YsHih1S",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Read-only listing of the assigned fixture workspace.",
+      "permission": "bash",
+      "command": "ls -la /private/tmp/v2-eval-parent-20261012/dirty-checkout/workspace/",
+      "patterns": [
+        "ls -la /private/tmp/v2-eval-parent-20261012/dirty-checkout/workspace/"
+      ]
+    },
+    {
+      "request_id": "per_1317e8318001VErtlYdC02NBJs",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Parent verified this isolated reports directory contains only the assigned execution exec_7ce1d449-faa9-40f6-a72c-4dc300357be0. Exact listing reveals only its report-directory entry; literal echo fallback performs no writes.",
+      "permission": "bash",
+      "command": "ls -la /private/tmp/v2-eval-parent-20261012/dirty-checkout/state/reports/ 2>/dev/null || echo \"reports dir not found\"",
+      "patterns": [
+        "ls -la /private/tmp/v2-eval-parent-20261012/dirty-checkout/state/reports/ 2>/dev/null",
+        "echo \"reports dir not found\""
+      ]
+    },
+    {
+      "request_id": "per_1317f2ba60018vhdeuZYY6hy4L",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Exact frozen fixture command or exact declared file edit within the authorized isolated evaluation.",
+      "permission": "edit",
+      "patterns": [
+        "private/tmp/v2-eval-parent-20261012/dirty-checkout/workspace/app.py"
+      ]
+    },
+    {
+      "request_id": "per_1317f3c0c001XztLXVu9XzwevJ",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Exact frozen fixture command or exact declared file edit within the authorized isolated evaluation.",
+      "permission": "bash",
+      "command": "python3 -m unittest -v test_app.py",
+      "patterns": [
+        "python3 -m unittest -v test_app.py"
+      ]
+    },
+    {
+      "request_id": "per_1317f51bc001zwHIboCr7y5blG",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Exact grep reads only assigned app.py to verify the preserved dirty marker or requested greeting; literal echo fallback does not write files.",
+      "permission": "bash",
+      "command": "grep -n \"DIRTY_USER_EDIT\" app.py || echo \"MARKER NOT FOUND\"",
+      "patterns": [
+        "grep -n \"DIRTY_USER_EDIT\" app.py",
+        "echo \"MARKER NOT FOUND\""
+      ]
+    },
+    {
+      "request_id": "per_1317f535d001icYwTJ1b2GYbTB",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Exact grep reads only assigned app.py to verify the preserved dirty marker or requested greeting; literal echo fallback does not write files.",
+      "permission": "bash",
+      "command": "grep -n 'return \"Hello, \" + name + \"!\"' app.py || echo \"CHANGE NOT FOUND\"",
+      "patterns": [
+        "grep -n 'return \"Hello, \" + name + \"!\"' app.py",
+        "echo \"CHANGE NOT FOUND\""
+      ]
+    }
+  ],
+  "evaluation": null,
+  "assertion_error": null,
+  "overlap": null,
+  "status": "incomplete",
+  "parent_review": "pending",
+  "parent_review_started_at": null,
+  "parent_review_elapsed_ms": null,
+  "parent_context_bytes": null,
+  "observed_inference": {
+    "source": "opencode_1.18.35_exact_assistant_messages",
+    "execution_id": "exec_7ce1d449-faa9-40f6-a72c-4dc300357be0",
+    "session_id": "ses_ece818d7afferhI5RURvb31EMq",
+    "user_message_id": "msg_85d075ff-1314-4934-be6d-c1e99466ba8d",
+    "input_tokens": 114916,
+    "output_tokens": 4171,
+    "total_tokens": null,
+    "assistant_messages": 12,
+    "reported_cost": null,
+    "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available."
+  }
+}

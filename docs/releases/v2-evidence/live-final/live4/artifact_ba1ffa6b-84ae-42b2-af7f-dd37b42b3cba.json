@@ -1,0 +1,47 @@
+{
+  "schema_version": 2,
+  "task_id": "task_1fb847ab-4127-44ac-a9e6-fd6717320261",
+  "execution_id": "exec_c3dff8df-47e2-4679-9dd7-63a0ee627627",
+  "outcome": "completed",
+  "summary": "Read input.txt; the file contains the single value 'violet' on line 1. The reported answer is violet, citing input.txt.",
+  "coverage": [
+    "input.txt (1 line) read in full; line 1 value 'violet'"
+  ],
+  "gaps": [],
+  "findings": [
+    {
+      "id": "finding_1",
+      "claim": "The exact answer is violet",
+      "evidence": [
+        "input.txt line 1: 'violet'"
+      ],
+      "caveats": [
+        "input.txt consists of a single line with the bare word 'violet' and no additional context; the value is reported verbatim."
+      ]
+    }
+  ],
+  "changes": [
+    {
+      "path": "/private/tmp/v2-live-final-20261012/live4/state/reports/exec_c3dff8df-47e2-4679-9dd7-63a0ee627627/result.json",
+      "description": "Wrote WorkerReport schema_version 2 result file as required by output contract."
+    },
+    {
+      "path": "/private/tmp/v2-live-final-20261012/live4/state/reports/exec_c3dff8df-47e2-4679-9dd7-63a0ee627627/summary.md",
+      "description": "Wrote readable worker summary as required by output contract."
+    }
+  ],
+  "checks": [
+    {
+      "id": "answer",
+      "status": "passed",
+      "exit_code": null,
+      "evidence": [
+        "input.txt line 1 value is 'violet'",
+        "Acceptance criterion requires reporting violet citing input.txt"
+      ],
+      "explanation": "The observed value in input.txt is 'violet', which matches the required answer; the answer is reported with citation to input.txt."
+    }
+  ],
+  "blockers": [],
+  "next_action": "Parent review of the worker report. No further worker action required."
+}

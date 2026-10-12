@@ -1,0 +1,182 @@
+{
+  "taskId": "task_a4937e72-e1b7-4d3a-b296-33ac8a0fe1ee",
+  "executionId": "exec_f58879d1-c648-444c-90f9-4ec092e70ce3",
+  "scopeId": "release-stale-snapshot",
+  "revision": 8,
+  "phase": "completed",
+  "observation": "current",
+  "workspace": "/private/tmp/v2-eval-parent-20261012/stale-snapshot/workspace",
+  "workspaceAccess": "exclusive",
+  "requestModel": {
+    "profile": "local"
+  },
+  "model": "llama.cpp/laguna-s-21",
+  "profile": "bounded-inspect",
+  "backendId": "backend_ffb2252a8876fb1f150716c75713a7a0",
+  "sessionId": "ses_ece86ec5affeU6KUsXGueqcSNV",
+  "userMessageId": "msg_26ec42ab-5c4f-4951-b20f-b1a0eb4c79f3",
+  "predecessorExecutionId": null,
+  "contextMode": null,
+  "baselineHash": "6b35c0103ef59e9eb4a5080cfa4fe514da689b812f0256308ea2d1921a4a42f7",
+  "promptHash": "3a35929f909297ccd746bac5eba1607e79585298eaaec2fca01520ef10fae9b1",
+  "reportPath": "/private/tmp/v2-eval-parent-20261012/stale-snapshot/state/reports/exec_f58879d1-c648-444c-90f9-4ec092e70ce3",
+  "queueDeadlineAt": "2026-10-12T18:58:19.694Z",
+  "admittedAt": "2026-10-12T18:56:19.698Z",
+  "executionDeadlineAt": "2026-10-12T19:01:19.698Z",
+  "finalizationDeadlineAt": "2026-10-12T18:57:26.276Z",
+  "intendedOutcome": "completed",
+  "creationIntent": {
+    "backendId": "backend_ffb2252a8876fb1f150716c75713a7a0",
+    "marker": "opencode-agents:exec_f58879d1-c648-444c-90f9-4ec092e70ce3",
+    "sessionId": "ses_ece86ec5affeU6KUsXGueqcSNV",
+    "createdAt": "2026-10-12T18:56:20.895Z"
+  },
+  "cancellationIntent": null,
+  "pendingRequests": [],
+  "createdAt": "2026-10-12T18:56:19.694Z",
+  "updatedAt": "2026-10-12T18:56:56.338Z",
+  "reportValidity": "valid",
+  "finalManifestHash": "6c7c238a35c0effd1f225f2c43c922d0cd6f193af73117bb32b31d982dea3a4f",
+  "reviewStatus": "pending",
+  "terminal": true,
+  "operationally_resolved": true,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "events": [
+    {
+      "cursor": 1,
+      "kind": "queued",
+      "detail": {
+        "taskId": "task_a4937e72-e1b7-4d3a-b296-33ac8a0fe1ee"
+      },
+      "createdAt": "2026-10-12T18:56:19.694Z"
+    },
+    {
+      "cursor": 2,
+      "kind": "admitted",
+      "detail": {
+        "executionDeadlineAt": "2026-10-12T19:01:19.698Z",
+        "resourceKeys": [
+          "workspace:/private/tmp/v2-eval-parent-20261012/stale-snapshot/workspace"
+        ]
+      },
+      "createdAt": "2026-10-12T18:56:19.699Z"
+    },
+    {
+      "cursor": 3,
+      "kind": "creation_intent",
+      "detail": {
+        "backendId": "backend_ffb2252a8876fb1f150716c75713a7a0",
+        "marker": "opencode-agents:exec_f58879d1-c648-444c-90f9-4ec092e70ce3"
+      },
+      "createdAt": "2026-10-12T18:56:20.895Z"
+    },
+    {
+      "cursor": 4,
+      "kind": "session_bound",
+      "detail": {
+        "backendId": "backend_ffb2252a8876fb1f150716c75713a7a0",
+        "sessionId": "ses_ece86ec5affeU6KUsXGueqcSNV"
+      },
+      "createdAt": "2026-10-12T18:56:20.904Z"
+    },
+    {
+      "cursor": 5,
+      "kind": "dispatch_intent",
+      "detail": {
+        "messageId": "msg_26ec42ab-5c4f-4951-b20f-b1a0eb4c79f3"
+      },
+      "createdAt": "2026-10-12T18:56:20.906Z"
+    },
+    {
+      "cursor": 6,
+      "kind": "dispatch_acknowledged",
+      "detail": {},
+      "createdAt": "2026-10-12T18:56:20.911Z"
+    },
+    {
+      "cursor": 7,
+      "kind": "running",
+      "detail": {
+        "messageId": "msg_26ec42ab-5c4f-4951-b20f-b1a0eb4c79f3"
+      },
+      "createdAt": "2026-10-12T18:56:20.911Z"
+    },
+    {
+      "cursor": 8,
+      "kind": "finalizing",
+      "detail": {
+        "detail": {
+          "error": null
+        },
+        "intendedOutcome": "completed"
+      },
+      "createdAt": "2026-10-12T18:56:56.276Z"
+    },
+    {
+      "cursor": 9,
+      "kind": "artifact_registered",
+      "detail": {
+        "artifactId": "artifact_f0b04397-a528-4d31-a339-4bd2d2f08033",
+        "sha256": "1f521f98bf0e0ed39b6a2b28f23338972ed8f463f1c77a620a53ebcc11e7db68"
+      },
+      "createdAt": "2026-10-12T18:56:56.297Z"
+    },
+    {
+      "cursor": 10,
+      "kind": "artifact_registered",
+      "detail": {
+        "artifactId": "artifact_e34977fa-6adc-4564-b0bc-8f9d2459d9d6",
+        "sha256": "d0b0dd2f5deb6db1b3c2ff23ef589def33fc3d2fc3e4d434d98763979529a43d"
+      },
+      "createdAt": "2026-10-12T18:56:56.321Z"
+    },
+    {
+      "cursor": 11,
+      "kind": "artifact_registered",
+      "detail": {
+        "artifactId": "artifact_42d08035-7db9-4191-ae39-b72ec57facba",
+        "sha256": "6c7c238a35c0effd1f225f2c43c922d0cd6f193af73117bb32b31d982dea3a4f"
+      },
+      "createdAt": "2026-10-12T18:56:56.332Z"
+    },
+    {
+      "cursor": 12,
+      "kind": "finalized",
+      "detail": {
+        "finalManifestHash": "6c7c238a35c0effd1f225f2c43c922d0cd6f193af73117bb32b31d982dea3a4f",
+        "outcome": "completed",
+        "reportValidity": "valid"
+      },
+      "createdAt": "2026-10-12T18:56:56.338Z"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "artifact_f0b04397-a528-4d31-a339-4bd2d2f08033",
+      "sha256": "1f521f98bf0e0ed39b6a2b28f23338972ed8f463f1c77a620a53ebcc11e7db68",
+      "byte_length": 5272,
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "artifact_e34977fa-6adc-4564-b0bc-8f9d2459d9d6",
+      "sha256": "d0b0dd2f5deb6db1b3c2ff23ef589def33fc3d2fc3e4d434d98763979529a43d",
+      "byte_length": 1529,
+      "media_type": "text/markdown"
+    },
+    {
+      "artifact_id": "artifact_42d08035-7db9-4191-ae39-b72ec57facba",
+      "sha256": "6c7c238a35c0effd1f225f2c43c922d0cd6f193af73117bb32b31d982dea3a4f",
+      "byte_length": 1016,
+      "media_type": "application/json"
+    }
+  ],
+  "cursor": 12,
+  "has_more_events": false
+}

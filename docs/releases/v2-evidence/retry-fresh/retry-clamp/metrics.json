@@ -1,0 +1,50 @@
+{
+  "elapsed_ms": 342299,
+  "dispatches": 1,
+  "duplicate_dispatch": false,
+  "dispatch_expectation_met": true,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "report_validity": "pending",
+  "terminal": false,
+  "phase": "cancelling",
+  "decisions": [
+    {
+      "request_id": "per_1318168bd001icNSdkuvOv7c67",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Exact cd enters the assigned workspace and runs the frozen python3 -m unittest -v test_retry.py command; no added operation beyond the authorized check.",
+      "permission": "bash",
+      "command": "cd /private/tmp/v2-eval-retry-20261012/retry-clamp/workspace && python3 -m unittest -v test_retry.py",
+      "patterns": [
+        "python3 -m unittest -v test_retry.py"
+      ]
+    }
+  ],
+  "evaluation": null,
+  "assertion_error": null,
+  "overlap": null,
+  "status": "incomplete",
+  "parent_review": "pending",
+  "parent_review_started_at": null,
+  "parent_review_elapsed_ms": null,
+  "parent_context_bytes": null,
+  "observed_inference": {
+    "source": "opencode_1.18.35_exact_assistant_messages",
+    "execution_id": "exec_b6919dde-1942-4c9c-bfec-3011f61611cd",
+    "session_id": "ses_ece7eb6a9ffeXlHKFWzmvyBrOl",
+    "user_message_id": "msg_f38f5a3e-2564-42f0-8392-e7aa3661eec0",
+    "input_tokens": 16501,
+    "output_tokens": 999,
+    "total_tokens": null,
+    "assistant_messages": 3,
+    "reported_cost": null,
+    "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available."
+  }
+}

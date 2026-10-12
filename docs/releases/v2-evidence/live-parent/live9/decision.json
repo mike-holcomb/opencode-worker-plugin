@@ -1,0 +1,31 @@
+{
+  "review_started_at": "2026-10-12T19:06:34.492Z",
+  "context_bytes": 7503,
+  "idempotency_key": "parent-review-exec_99c1da3b-0d9b-415b-9712-b8960c19b3f1",
+  "gate_status": "passed",
+  "review": {
+    "disposition": "rejected",
+    "rationale": "Owned backend was killed and recovered exact execution/session/message identities with one dispatch and no replay. Parent cancellation has applied stop proof, terminal cancelled and reservation zero. Missing report rejected; backend restart recovery gate passes.",
+    "criteria": [
+      {
+        "id": "answer",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_28696a3d-3e7a-4b69-afc1-458ad4ab11e2@sha256:cf7a049dc9a4af85160ea98e36195fade819915d9d94bd29fb9884626272b28b"
+        ]
+      }
+    ],
+    "starting_state_sha256": "d38018b3cb8df43cd800280d17b4d37754061b39df8bd287b3d6ba40ac0b8d77",
+    "final_manifest_sha256": "cf7a049dc9a4af85160ea98e36195fade819915d9d94bd29fb9884626272b28b",
+    "freshness": "Parent inspected complete recorded fixture inputs, immutable exports, final snapshot, and available checks.",
+    "integration_checks": [
+      "Owned backend was killed and recovered exact execution/session/message identities with one dispatch and no replay. Parent cancellation has applied stop proof, terminal cancelled and reservation zero. Missing report rejected; backend restart recovery gate passes."
+    ],
+    "coverage_limits": [
+      "Trusted-workspace managed mode; plugin race remains separately documented.",
+      "Context measured in bytes; elapsed review time includes concurrent parent work."
+    ],
+    "unresolved_issues": [],
+    "next_action": "Retain this reviewed attempt."
+  }
+}

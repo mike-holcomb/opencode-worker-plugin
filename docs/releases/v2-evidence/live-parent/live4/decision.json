@@ -1,0 +1,33 @@
+{
+  "review_started_at": "2026-10-12T19:02:22.544Z",
+  "context_bytes": 15541,
+  "idempotency_key": "parent-review-exec_95030330-77cc-4f25-929a-f90d682bff85",
+  "gate_status": "passed",
+  "review": {
+    "disposition": "accepted",
+    "rationale": "Parent inspected both complete sources and both execution reports. Same session, distinct message and execution, final valid report correctly cites azure from superseding correction.txt. Predecessor report with wrong task ID remains invalid and unaccepted; every predecessor artifact was re-read and hash-verified unchanged. No source modifications by the worker.",
+    "criteria": [
+      {
+        "id": "answer",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_581afb38-e705-4425-85ed-05c10ed47857@sha256:945c48fe767888ae605ec45b152efa7d12a936fbb3994640932e3ad29ab52a69",
+          "artifact:artifact_04101447-cd5f-4220-9da1-3da1ce2aad2e@sha256:acdcbf117c040cf3fd3b96dc0059f3fad01b336e1b3b9f3c7f4b56de1d1ddf4d",
+          "artifact:artifact_62d7d3d1-a9cc-4d7f-957d-6deb7c495a21@sha256:200d5dd205dc73afc25730bdbc54df5d5e791d929ae19054dbecd7660b525525"
+        ]
+      }
+    ],
+    "starting_state_sha256": "0b2b5d616c1abfd20b4c45f5524c35bbb0480718b318d782ee45496faa70a175",
+    "final_manifest_sha256": "200d5dd205dc73afc25730bdbc54df5d5e791d929ae19054dbecd7660b525525",
+    "freshness": "Parent inspected complete recorded fixture inputs, immutable exports, final snapshot, and available checks.",
+    "integration_checks": [
+      "Parent inspected both complete sources and both execution reports. Same session, distinct message and execution, final valid report correctly cites azure from superseding correction.txt. Predecessor report with wrong task ID remains invalid and unaccepted; every predecessor artifact was re-read and hash-verified unchanged. No source modifications by the worker."
+    ],
+    "coverage_limits": [
+      "Trusted-workspace managed mode; plugin race remains separately documented.",
+      "Context measured in bytes; elapsed review time includes concurrent parent work."
+    ],
+    "unresolved_issues": [],
+    "next_action": "Retain this reviewed attempt."
+  }
+}

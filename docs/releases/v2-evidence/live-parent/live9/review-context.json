@@ -1,0 +1,31 @@
+{
+  "review_started_at": "2026-10-12T19:06:34.492Z",
+  "context_bytes": 7503,
+  "files": [
+    {
+      "path": "packet.json",
+      "sha256": "9fb77d15bda33ce5238740fe6fe96c6ea8e3d3dc94dc4313fa60dfe3330a6391",
+      "bytes": 801
+    },
+    {
+      "path": "final.json",
+      "sha256": "ae959783c17fe7e8e850bd3a93fdab97eaa35a00efcbd63352c65d24fc324902",
+      "bytes": 5648
+    },
+    {
+      "path": "exports.json",
+      "sha256": "5af8c93fa1e07fca909cd83a4274e5b2bf72fb802dfc2887189a36a0eaf9d9b0",
+      "bytes": 353
+    },
+    {
+      "path": "artifact_28696a3d-3e7a-4b69-afc1-458ad4ab11e2.json",
+      "sha256": "cf7a049dc9a4af85160ea98e36195fade819915d9d94bd29fb9884626272b28b",
+      "bytes": 694
+    },
+    {
+      "path": "workspace/input.txt",
+      "sha256": "7f0259c09c16930b3de1fb778997bf6371bd9dcf4eaceac305d1827209cbbbdb",
+      "bytes": 7
+    }
+  ]
+}

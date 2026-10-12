@@ -1,0 +1,39 @@
+{
+  "schema_version": 2,
+  "scenario_id": "wire-serialization",
+  "result_artifact_sha256": "89a3d060c8650fcd4f1ed3663daad2ff95ff29d8fcbf3d86bb578bf154dd6aac",
+  "status": "review_required",
+  "parent_review_required": true,
+  "checks": [
+    {
+      "id": "wire-tests-pass",
+      "kind": "command",
+      "status": "pass",
+      "detail": "exit=0; stdout=\"\"; stderr=\"test_missing_version_is_rejected (test_wire.WireTests.test_missing_version_is_rejected) ... ok\\ntest_v2_envelope_round_trip (test_wire.WireTests.test_v2_envelope_round_trip) ... ok\\n\\n----------------------------------------------------------------------\\nRan 2 tests in 0.000s\\n\\nOK\\n\""
+    },
+    {
+      "id": "summary-exists",
+      "kind": "file_exists",
+      "status": "pass",
+      "detail": "verified result artifact: summary.md"
+    },
+    {
+      "id": "coupling-recorded",
+      "kind": "text_contains",
+      "status": "pass",
+      "detail": "searched summary.md for 3 frozen marker(s)"
+    },
+    {
+      "id": "write-scope",
+      "kind": "allowed_changed_paths",
+      "status": "pass",
+      "detail": "changed=[\"consumer.py\",\"producer.py\"]; unauthorized=[]"
+    },
+    {
+      "id": "parent-interface-review",
+      "kind": "parent_review",
+      "status": "review_required",
+      "detail": "Verify the parent serialized the coupled decision or kept it local, inspected both sides of the interface, and checked the v2 envelope and missing-version rejection from source and tests."
+    }
+  ]
+}

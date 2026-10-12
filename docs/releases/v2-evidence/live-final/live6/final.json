@@ -1,0 +1,182 @@
+{
+  "taskId": "task_c29424e9-7844-42fb-a30f-922868a319ad",
+  "executionId": "exec_22064d9e-7830-4424-9e25-ec1b7be6b389",
+  "scopeId": "release-live6",
+  "revision": 8,
+  "phase": "completed",
+  "observation": "current",
+  "workspace": "/private/tmp/v2-live-final-20261012/live6/workspace",
+  "workspaceAccess": "exclusive",
+  "requestModel": {
+    "profile": "local"
+  },
+  "model": "llama.cpp/laguna-s-21",
+  "profile": "bounded-inspect",
+  "backendId": "backend_4b05c19ddafa7ecfa7f9f22763de5f11",
+  "sessionId": "ses_ece901b45ffeTNEbjDDTS3Ax1U",
+  "userMessageId": "msg_164e0b79-1b73-4c2a-a6f1-859214780e11",
+  "predecessorExecutionId": null,
+  "contextMode": null,
+  "baselineHash": "b61da04ffb85d8fb980bea05600602a8d6533e036bfd2eb8f8582edca9a3ddd1",
+  "promptHash": "8aca0628c7d0a523f85c5857c1558035da738c057bc2dc817d879a32dcbc17f0",
+  "reportPath": "/private/tmp/v2-live-final-20261012/live6/state/reports/exec_22064d9e-7830-4424-9e25-ec1b7be6b389",
+  "queueDeadlineAt": "2026-10-12T18:48:17.820Z",
+  "admittedAt": "2026-10-12T18:46:17.823Z",
+  "executionDeadlineAt": "2026-10-12T18:51:17.823Z",
+  "finalizationDeadlineAt": "2026-10-12T18:47:01.217Z",
+  "intendedOutcome": "completed",
+  "creationIntent": {
+    "backendId": "backend_4b05c19ddafa7ecfa7f9f22763de5f11",
+    "marker": "opencode-agents:exec_22064d9e-7830-4424-9e25-ec1b7be6b389",
+    "sessionId": "ses_ece901b45ffeTNEbjDDTS3Ax1U",
+    "createdAt": "2026-10-12T18:46:19.059Z"
+  },
+  "cancellationIntent": null,
+  "pendingRequests": [],
+  "createdAt": "2026-10-12T18:46:17.820Z",
+  "updatedAt": "2026-10-12T18:46:31.757Z",
+  "reportValidity": "valid",
+  "finalManifestHash": "f282a4a2a382964052b69573696251ee8998a474edf5cf18e615665860444c4b",
+  "reviewStatus": "pending",
+  "terminal": true,
+  "operationally_resolved": true,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "events": [
+    {
+      "cursor": 1,
+      "kind": "queued",
+      "detail": {
+        "taskId": "task_c29424e9-7844-42fb-a30f-922868a319ad"
+      },
+      "createdAt": "2026-10-12T18:46:17.820Z"
+    },
+    {
+      "cursor": 2,
+      "kind": "admitted",
+      "detail": {
+        "executionDeadlineAt": "2026-10-12T18:51:17.823Z",
+        "resourceKeys": [
+          "workspace:/private/tmp/v2-live-final-20261012/live6/workspace"
+        ]
+      },
+      "createdAt": "2026-10-12T18:46:17.823Z"
+    },
+    {
+      "cursor": 3,
+      "kind": "creation_intent",
+      "detail": {
+        "backendId": "backend_4b05c19ddafa7ecfa7f9f22763de5f11",
+        "marker": "opencode-agents:exec_22064d9e-7830-4424-9e25-ec1b7be6b389"
+      },
+      "createdAt": "2026-10-12T18:46:19.059Z"
+    },
+    {
+      "cursor": 4,
+      "kind": "session_bound",
+      "detail": {
+        "backendId": "backend_4b05c19ddafa7ecfa7f9f22763de5f11",
+        "sessionId": "ses_ece901b45ffeTNEbjDDTS3Ax1U"
+      },
+      "createdAt": "2026-10-12T18:46:19.069Z"
+    },
+    {
+      "cursor": 5,
+      "kind": "dispatch_intent",
+      "detail": {
+        "messageId": "msg_164e0b79-1b73-4c2a-a6f1-859214780e11"
+      },
+      "createdAt": "2026-10-12T18:46:19.070Z"
+    },
+    {
+      "cursor": 6,
+      "kind": "dispatch_acknowledged",
+      "detail": {},
+      "createdAt": "2026-10-12T18:46:19.075Z"
+    },
+    {
+      "cursor": 7,
+      "kind": "running",
+      "detail": {
+        "messageId": "msg_164e0b79-1b73-4c2a-a6f1-859214780e11"
+      },
+      "createdAt": "2026-10-12T18:46:19.076Z"
+    },
+    {
+      "cursor": 8,
+      "kind": "finalizing",
+      "detail": {
+        "detail": {
+          "error": null
+        },
+        "intendedOutcome": "completed"
+      },
+      "createdAt": "2026-10-12T18:46:31.217Z"
+    },
+    {
+      "cursor": 9,
+      "kind": "artifact_registered",
+      "detail": {
+        "artifactId": "artifact_58a29cf5-1e6e-45e7-9e4a-7cbc91ad90e4",
+        "sha256": "9c6087778b9f2b03c136de64968f7748428e9a0da8596be569dc2f395d55cd3f"
+      },
+      "createdAt": "2026-10-12T18:46:31.726Z"
+    },
+    {
+      "cursor": 10,
+      "kind": "artifact_registered",
+      "detail": {
+        "artifactId": "artifact_20c52408-0a7f-404b-a27f-4dc9f43c4fc3",
+        "sha256": "760ba21824bd19e2dc7a554802fd208d06d7c454a35fb7a84d1ad14cd2ce9ee2"
+      },
+      "createdAt": "2026-10-12T18:46:31.743Z"
+    },
+    {
+      "cursor": 11,
+      "kind": "artifact_registered",
+      "detail": {
+        "artifactId": "artifact_878fecce-bdfe-4035-b9fd-b0a749e44c9c",
+        "sha256": "f282a4a2a382964052b69573696251ee8998a474edf5cf18e615665860444c4b"
+      },
+      "createdAt": "2026-10-12T18:46:31.751Z"
+    },
+    {
+      "cursor": 12,
+      "kind": "finalized",
+      "detail": {
+        "finalManifestHash": "f282a4a2a382964052b69573696251ee8998a474edf5cf18e615665860444c4b",
+        "outcome": "completed",
+        "reportValidity": "valid"
+      },
+      "createdAt": "2026-10-12T18:46:31.757Z"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "artifact_58a29cf5-1e6e-45e7-9e4a-7cbc91ad90e4",
+      "sha256": "9c6087778b9f2b03c136de64968f7748428e9a0da8596be569dc2f395d55cd3f",
+      "byte_length": 920,
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "artifact_20c52408-0a7f-404b-a27f-4dc9f43c4fc3",
+      "sha256": "760ba21824bd19e2dc7a554802fd208d06d7c454a35fb7a84d1ad14cd2ce9ee2",
+      "byte_length": 389,
+      "media_type": "text/markdown"
+    },
+    {
+      "artifact_id": "artifact_878fecce-bdfe-4035-b9fd-b0a749e44c9c",
+      "sha256": "f282a4a2a382964052b69573696251ee8998a474edf5cf18e615665860444c4b",
+      "byte_length": 1004,
+      "media_type": "application/json"
+    }
+  ],
+  "cursor": 12,
+  "has_more_events": false
+}

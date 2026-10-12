@@ -76,6 +76,19 @@ All twelve intended scenario outcomes and evidence checks must pass. Require zer
 false acceptance and zero duplicate dispatches. An expected rejection can pass a
 scenario while its deliverable remains rejected. Retain every failed attempt.
 
+After parent review, `usage.mjs CAMPAIGN` records exact-turn counters and
+`export.mjs CAMPAIGN NEW_PORTABLE_DIRECTORY` copies portable evidence, verifies
+artifact hashes, and excludes HOME/XDG/state/configuration directories. Inspect
+the fixture and report contents for secrets before sharing. It refuses symlinks
+in fixture trees and never overwrites an existing export directory.
+`quality.mjs EVIDENCE_ROOT` aggregates campaign subdirectories into
+`quality-summary.json`, retaining failed attempts and unavailable measurements.
+Its totals are measurements, not an automatic quality certification.
+
+An explicitly assisted fresh evaluation may use `--guidance-file FILE` to add
+parent guidance to the recorded packet. This is a separate assisted attempt,
+recorded in `parent-guidance.json`; preserve the original frozen attempt.
+
 ## Distribution and release decision
 
 Test an immutable remote tag in an isolated Codex home. Verify host-resolved MCP
@@ -150,3 +163,17 @@ Write the file atomically. A missing decision waits within the existing executio
 deadline; it never grants permission. Cases 7 and T20 retain their deliberate
 negative decisions regardless of this file. A parent decision authorizes one
 request; it does not change the frozen packet or acceptance checks.
+
+A resume correction requires the backend to recover the exact predecessor turn
+as finished. A safely cancelled/timed-out local task may still lack that upstream
+finished marker after its server closes. A refused resume with zero dispatches is
+retained as a failed recovery attempt; it is not a passing resumed correction.
+After the predecessor is terminal and operationally resolved, explicitly choose
+`--context-mode fresh` for a new-session follow-up when appropriate. The runner
+records that context choice and verifies distinct session/message identities.
+Never turn a refused resume into an automatic replay. Live case 4 continues to
+require actual same-session recovery.
+
+Live case 4 retains both predecessor and follow-up artifact exports. The usage
+sidecar separately records each turn, so the predecessor's inference is included
+without counting it twice as the final turn.

@@ -1,0 +1,14 @@
+{
+  "schema_version": 2,
+  "scenario_id": "false-completion",
+  "run_id": "false-completion-1791832072003",
+  "tier": "standard",
+  "context_mode": "fresh",
+  "context_basis": "simulated predecessor summary; no real recorded session",
+  "task_file": "task.md",
+  "fixture_files": [
+    "acceptance.json",
+    "README.txt",
+    "prior-summary.md"
+  ]
+}

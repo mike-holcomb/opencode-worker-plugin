@@ -1,0 +1,18 @@
+[
+  {
+    "artifact_id": "artifact_70a2d342-2c47-4f6b-b226-12c4cdddb42d",
+    "sha256": "95aebb28195b8d737effe0df18d71d39c8d8ba6569286fd3930fbc9f9767181e",
+    "byte_length": 8,
+    "media_type": "application/octet-stream",
+    "execution_id": "exec_d782e371-ebd1-4756-ba08-d785e80030ce",
+    "path": "artifact_70a2d342-2c47-4f6b-b226-12c4cdddb42d.json"
+  },
+  {
+    "artifact_id": "artifact_acb1bbd7-7564-43c5-8061-45fae74a19ae",
+    "sha256": "3ddb431aeee2ad155eebb64bbe3424421e5bf55c2d611dd9370804b3d23a4b66",
+    "byte_length": 1222,
+    "media_type": "application/json",
+    "execution_id": "exec_d782e371-ebd1-4756-ba08-d785e80030ce",
+    "path": "artifact_acb1bbd7-7564-43c5-8061-45fae74a19ae.json"
+  }
+]

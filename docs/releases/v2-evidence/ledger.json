@@ -26,17 +26,23 @@
       ]
     },
     "live_macos": {
-      "status": "in_progress",
-      "pending": [
-        "parent review",
-        "rerun restart cases after daemon election fix"
-      ],
-      "completed_gap_observations": [
-        "6 supervisor restart completed with valid accepted report",
-        "7 exact denial with proven timeout stop and released reservation",
-        "9 backend restart with exact lookup, no replay, proven cancellation, released reservation"
-      ],
-      "evidence": "initial-live-eval/"
+      "status": "passed_with_historical_case_3",
+      "cases": {
+        "1": "live-final/live1/",
+        "2": "live-parent/live2/",
+        "3": "historical-live3/",
+        "4": "live-parent/live4/",
+        "5": "live-final/live5/",
+        "6": "live-final/live6/",
+        "7": "live-final/live7/",
+        "8": "live-parent/live8/",
+        "9": "live-parent/live9/",
+        "10": "live-parent/live10/"
+      },
+      "limits": [
+        "Case 3 retains its previously accepted concurrency observation with original runtime provenance.",
+        "Cases 7, 8 and 9 reject missing reports while passing the specified denial/cancellation/recovery behavior; case 10 rejects its failed criterion."
+      ]
     },
     "evaluation": {
       "status": "in_progress",
@@ -45,19 +51,37 @@
       "required_duplicate_dispatches": 0,
       "accepted_scenarios": [
         "lookup-timeout",
-        "log-regression"
+        "log-regression",
+        "wire-serialization",
+        "negative-auth-claim",
+        "stale-snapshot",
+        "context-reconcile"
       ],
       "preserved_failed_attempts": 12,
-      "reruns": "running after model route restored",
+      "reruns": "Bounded corrections in progress; failed and unresolved attempts retained",
       "evidence": [
         "initial-live-eval/",
-        "lookup-correction/"
-      ]
+        "lookup-correction/",
+        "log-correction/",
+        "eval-parent/",
+        "wire-fresh/",
+        "negative-correction/"
+      ],
+      "recorded_attempts": 29,
+      "measurements": "quality-summary.json"
     },
     "performance_soak": {
-      "status": "running",
+      "status": "passed",
       "count": 1000,
-      "duration_seconds": 3600
+      "duration_seconds": 3600,
+      "warmups": 20,
+      "evidence": "soak/",
+      "p95_ms": {
+        "start_ms": 83.6005830001086,
+        "get_ms": 1.0783329997211695,
+        "event_ms": 8.33737500011921
+      },
+      "node": "v24.19.0"
     },
     "macos_node_matrix": {
       "status": "passed",
@@ -66,13 +90,15 @@
         "macos-local-24.15.0/",
         "macos-local-24.21.0/",
         "ci-38291901986/"
-      ]
+      ],
+      "latest_ci_revision": "fdddb447b8bda1378e3d1c8eb2ba23d90b0cf736"
     },
     "linux_node_matrix": {
       "status": "passed",
       "platform": "Ubuntu 24.04 x64",
       "evidence": "ci-38291901986/",
-      "ci_url": "https://github.com/mike-holcomb/opencode-worker-plugin/actions/runs/38291901986"
+      "ci_url": "https://github.com/mike-holcomb/opencode-worker-plugin/actions/runs/38291901986",
+      "latest_ci_evidence": "ci-38293051099/"
     },
     "linux_live": {
       "status": "operator_handoff",

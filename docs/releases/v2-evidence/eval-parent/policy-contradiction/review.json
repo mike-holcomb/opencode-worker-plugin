@@ -1,0 +1,113 @@
+{
+  "decision": {
+    "review_started_at": "2026-10-12T19:15:59.849Z",
+    "context_bytes": 12065,
+    "idempotency_key": "parent-review-exec_3e5e1fea-fedb-4ec9-83df-df578a7a5d07",
+    "gate_status": "failed",
+    "review": {
+      "disposition": "rejected",
+      "rationale": "Parent inspected packet, fixture sources, final snapshot and immutable manifest. Required result.json and summary.md are missing after timeout; no deliverable can be accepted. Workspace listing was allowed, parent campaign inspection denied. This attempt fails quality evaluation despite safe proven cancellation.",
+      "criteria": [
+        {
+          "id": "summary-exists",
+          "result": "not_checked",
+          "evidence": [
+            "artifact:artifact_7a01cb53-99e7-4d0e-9716-15b0e8b71693@sha256:0222f29728109cd47d19a883e737469749f15f864892de862fa26837249c521c"
+          ]
+        },
+        {
+          "id": "coverage-recorded",
+          "result": "not_checked",
+          "evidence": [
+            "artifact:artifact_7a01cb53-99e7-4d0e-9716-15b0e8b71693@sha256:0222f29728109cd47d19a883e737469749f15f864892de862fa26837249c521c"
+          ]
+        },
+        {
+          "id": "write-scope",
+          "result": "not_checked",
+          "evidence": [
+            "artifact:artifact_7a01cb53-99e7-4d0e-9716-15b0e8b71693@sha256:0222f29728109cd47d19a883e737469749f15f864892de862fa26837249c521c"
+          ]
+        },
+        {
+          "id": "parent-qualitative-review",
+          "result": "not_checked",
+          "evidence": [
+            "artifact:artifact_7a01cb53-99e7-4d0e-9716-15b0e8b71693@sha256:0222f29728109cd47d19a883e737469749f15f864892de862fa26837249c521c"
+          ]
+        }
+      ],
+      "starting_state_sha256": "a26ef13d36c38161a5e377bf642437d0ffad8203b32a6e527f0dad14c4258a85",
+      "final_manifest_sha256": "0222f29728109cd47d19a883e737469749f15f864892de862fa26837249c521c",
+      "freshness": "Parent inspected complete recorded fixture inputs, immutable exports, final snapshot, and available checks.",
+      "integration_checks": [
+        "Parent inspected packet, fixture sources, final snapshot and immutable manifest. Required result.json and summary.md are missing after timeout; no deliverable can be accepted. Workspace listing was allowed, parent campaign inspection denied. This attempt fails quality evaluation despite safe proven cancellation."
+      ],
+      "coverage_limits": [
+        "Trusted-workspace managed mode; plugin race remains separately documented.",
+        "Context measured in bytes; elapsed review time includes concurrent parent work."
+      ],
+      "unresolved_issues": [
+        "Parent inspected packet, fixture sources, final snapshot and immutable manifest. Required result.json and summary.md are missing after timeout; no deliverable can be accepted. Workspace listing was allowed, parent campaign inspection denied. This attempt fails quality evaluation despite safe proven cancellation."
+      ],
+      "next_action": "Bounded correction or rerun; preserve this attempt."
+    }
+  },
+  "result": {
+    "taskId": "task_e5cd8bdf-8583-4a2b-8a0f-5a2d8359df92",
+    "executionId": "exec_3e5e1fea-fedb-4ec9-83df-df578a7a5d07",
+    "scopeId": "release-policy-contradiction",
+    "revision": 18,
+    "phase": "timed_out",
+    "observation": "current",
+    "workspace": "/private/tmp/v2-eval-parent-20261012/policy-contradiction/workspace",
+    "workspaceAccess": "exclusive",
+    "requestModel": {
+      "profile": "local"
+    },
+    "model": "llama.cpp/laguna-s-21",
+    "profile": "bounded-build",
+    "backendId": "backend_c37f67ba1e7548d89a6461f0bfd05d58",
+    "sessionId": "ses_ece8df1acffejcWeGFLk48v0rE",
+    "userMessageId": "msg_76252b9a-6805-40f7-9e70-fb6f32566d1b",
+    "predecessorExecutionId": null,
+    "contextMode": null,
+    "baselineHash": "a26ef13d36c38161a5e377bf642437d0ffad8203b32a6e527f0dad14c4258a85",
+    "promptHash": "6382b9b952cc1bddcd3db1635f1f8746d160d59e9682d54e7c4520d0e00d4067",
+    "reportPath": "/private/tmp/v2-eval-parent-20261012/policy-contradiction/state/reports/exec_3e5e1fea-fedb-4ec9-83df-df578a7a5d07",
+    "queueDeadlineAt": "2026-10-12T18:50:39.591Z",
+    "admittedAt": "2026-10-12T18:48:39.595Z",
+    "executionDeadlineAt": "2026-10-12T18:53:39.595Z",
+    "finalizationDeadlineAt": "2026-10-12T18:54:10.135Z",
+    "intendedOutcome": "timed_out",
+    "creationIntent": {
+      "backendId": "backend_c37f67ba1e7548d89a6461f0bfd05d58",
+      "marker": "opencode-agents:exec_3e5e1fea-fedb-4ec9-83df-df578a7a5d07",
+      "sessionId": "ses_ece8df1acffejcWeGFLk48v0rE",
+      "createdAt": "2026-10-12T18:48:40.780Z"
+    },
+    "cancellationIntent": {
+      "reason": "execution deadline",
+      "requester": "supervisor",
+      "deadlineOrigin": "2026-10-12T18:53:39.595Z",
+      "createdAt": "2026-10-12T18:53:39.598Z",
+      "abortAcknowledged": true
+    },
+    "pendingRequests": [],
+    "createdAt": "2026-10-12T18:48:39.591Z",
+    "updatedAt": "2026-10-12T19:16:13.574Z",
+    "reportValidity": "missing",
+    "finalManifestHash": "0222f29728109cd47d19a883e737469749f15f864892de862fa26837249c521c",
+    "reviewStatus": "rejected",
+    "terminal": true,
+    "operationally_resolved": true,
+    "usage": {
+      "input_tokens": null,
+      "output_tokens": null,
+      "cache_tokens": null,
+      "reported_cost": null,
+      "currency": null,
+      "source": "not_captured"
+    }
+  }
+}

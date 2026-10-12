@@ -1,0 +1,26 @@
+[
+  {
+    "artifact_id": "artifact_2769e6e5-9c32-4bf6-a459-3482c0cdebfb",
+    "sha256": "08c242ec18e575c5bb5bde4f292fef5d413f250cba49a0bf323ebef2ccb1ccdb",
+    "byte_length": 8085,
+    "media_type": "application/json",
+    "execution_id": "exec_248cd7b3-1a03-4325-9847-fcb671d10d40",
+    "path": "artifact_2769e6e5-9c32-4bf6-a459-3482c0cdebfb.json"
+  },
+  {
+    "artifact_id": "artifact_f209bb95-2813-47bc-b53b-6ba408608c15",
+    "sha256": "f06b6f31d5de240bf418abf87be7cd5cb8963f404f52c87b20a0bbe9fe7479af",
+    "byte_length": 6342,
+    "media_type": "text/markdown",
+    "execution_id": "exec_248cd7b3-1a03-4325-9847-fcb671d10d40",
+    "path": "summary.md"
+  },
+  {
+    "artifact_id": "artifact_3177353e-88ca-4c35-89d2-d3088f2589a6",
+    "sha256": "f3a06b84942690f46527356673c693e618940763b2dcda01b463fc80e25332ea",
+    "byte_length": 1020,
+    "media_type": "application/json",
+    "execution_id": "exec_248cd7b3-1a03-4325-9847-fcb671d10d40",
+    "path": "artifact_3177353e-88ca-4c35-89d2-d3088f2589a6.json"
+  }
+]

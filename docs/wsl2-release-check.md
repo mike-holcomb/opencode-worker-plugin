@@ -37,6 +37,8 @@ required check. Once OpenCode 1.18.35 and the authorized existing route at
 
 ```sh
 node plugins/opencode-agents/runtime/scripts/release/live.mjs --execute --binary /absolute/path/to/opencode --out /tmp/v2-wsl2-live --cases live,t20 --permission-decisions /tmp/v2-parent-decisions.json
+node plugins/opencode-agents/runtime/scripts/release/usage.mjs /tmp/v2-wsl2-live
+node plugins/opencode-agents/runtime/scripts/release/export.mjs /tmp/v2-wsl2-live /tmp/v2-wsl2-portable
 ```
 
 The runner covers all ten live cases and the review-channel attempt. Parent
@@ -44,7 +46,9 @@ review of the exported artifacts is required before any case passes. Do not
 create a tunnel to make this command work. It requires a route already authorized and reachable from WSL2.
 Keep live evidence private: it includes execution state, provider configuration,
 and local transport identity. Share redacted summaries and immutable report
-artifacts, not credentials or the complete private state directory.
+artifacts, not credentials or the complete private state directory. Inspect and
+return `/tmp/v2-wsl2-portable`; the exporter excludes private runtime directories
+and verifies exported artifact hashes. Keep the original campaign locally for recovery.
 
 The development label and compatibility flag stay in place until the returned
 results and all remaining release gates have passed parent review.

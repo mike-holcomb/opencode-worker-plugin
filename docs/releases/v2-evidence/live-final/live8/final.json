@@ -1,0 +1,207 @@
+{
+  "taskId": "task_d41de2d0-266f-4fef-b5d8-2084fce3f32c",
+  "executionId": "exec_4cae9262-a55f-4a01-9e58-a5de82232b92",
+  "scopeId": "release-live8",
+  "revision": 12,
+  "phase": "cancelled",
+  "observation": "current",
+  "workspace": "/private/tmp/v2-live-final-20261012/live8/workspace",
+  "workspaceAccess": "exclusive",
+  "requestModel": {
+    "profile": "local"
+  },
+  "model": "llama.cpp/laguna-s-21",
+  "profile": "bounded-build",
+  "backendId": "backend_2abb37891fce93a7df1e70edce638ee7",
+  "sessionId": "ses_ece8b1720ffeQmGGl66LwYOBjk",
+  "userMessageId": "msg_34347e3f-2ba3-46c4-b5fe-cac92ec34c24",
+  "predecessorExecutionId": null,
+  "contextMode": null,
+  "baselineHash": "d98caa9b63353c46ee6e5dbe24740848529689838457e85f086d9b8400e3f836",
+  "promptHash": "7bdb86764e1468207b51f3475e4ad2ad20991563e9a7389cdf7464d0929d3167",
+  "reportPath": "/private/tmp/v2-live-final-20261012/live8/state/reports/exec_4cae9262-a55f-4a01-9e58-a5de82232b92",
+  "queueDeadlineAt": "2026-10-12T18:53:46.602Z",
+  "admittedAt": "2026-10-12T18:51:46.606Z",
+  "executionDeadlineAt": "2026-10-12T18:56:46.606Z",
+  "finalizationDeadlineAt": "2026-10-12T18:54:39.062Z",
+  "intendedOutcome": "cancelled",
+  "creationIntent": {
+    "backendId": "backend_2abb37891fce93a7df1e70edce638ee7",
+    "marker": "opencode-agents:exec_4cae9262-a55f-4a01-9e58-a5de82232b92",
+    "sessionId": "ses_ece8b1720ffeQmGGl66LwYOBjk",
+    "createdAt": "2026-10-12T18:51:47.801Z"
+  },
+  "cancellationIntent": {
+    "reason": "Stop outdated permission runner; preserve attempt and resume using explicit parent decisions",
+    "requester": "parent",
+    "deadlineOrigin": null,
+    "createdAt": "2026-10-12T18:54:09.052Z",
+    "abortAcknowledged": true
+  },
+  "pendingRequests": [],
+  "createdAt": "2026-10-12T18:51:46.602Z",
+  "updatedAt": "2026-10-12T18:54:09.081Z",
+  "reportValidity": "missing",
+  "finalManifestHash": "8d7dbcc29dc95cdcabeda8628e733ef7f7b0907e2ffe31d7b4442c7385266ede",
+  "reviewStatus": "pending",
+  "terminal": true,
+  "operationally_resolved": true,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "events": [
+    {
+      "cursor": 1,
+      "kind": "queued",
+      "detail": {
+        "taskId": "task_d41de2d0-266f-4fef-b5d8-2084fce3f32c"
+      },
+      "createdAt": "2026-10-12T18:51:46.602Z"
+    },
+    {
+      "cursor": 2,
+      "kind": "admitted",
+      "detail": {
+        "executionDeadlineAt": "2026-10-12T18:56:46.606Z",
+        "resourceKeys": [
+          "workspace:/private/tmp/v2-live-final-20261012/live8/workspace"
+        ]
+      },
+      "createdAt": "2026-10-12T18:51:46.606Z"
+    },
+    {
+      "cursor": 3,
+      "kind": "creation_intent",
+      "detail": {
+        "backendId": "backend_2abb37891fce93a7df1e70edce638ee7",
+        "marker": "opencode-agents:exec_4cae9262-a55f-4a01-9e58-a5de82232b92"
+      },
+      "createdAt": "2026-10-12T18:51:47.801Z"
+    },
+    {
+      "cursor": 4,
+      "kind": "session_bound",
+      "detail": {
+        "backendId": "backend_2abb37891fce93a7df1e70edce638ee7",
+        "sessionId": "ses_ece8b1720ffeQmGGl66LwYOBjk"
+      },
+      "createdAt": "2026-10-12T18:51:47.810Z"
+    },
+    {
+      "cursor": 5,
+      "kind": "dispatch_intent",
+      "detail": {
+        "messageId": "msg_34347e3f-2ba3-46c4-b5fe-cac92ec34c24"
+      },
+      "createdAt": "2026-10-12T18:51:47.812Z"
+    },
+    {
+      "cursor": 6,
+      "kind": "dispatch_acknowledged",
+      "detail": {},
+      "createdAt": "2026-10-12T18:51:47.817Z"
+    },
+    {
+      "cursor": 7,
+      "kind": "running",
+      "detail": {
+        "messageId": "msg_34347e3f-2ba3-46c4-b5fe-cac92ec34c24"
+      },
+      "createdAt": "2026-10-12T18:51:47.817Z"
+    },
+    {
+      "cursor": 8,
+      "kind": "input_request",
+      "detail": {
+        "kind": "permission",
+        "requestId": "per_13174f351001RFZJAU4hfMTJz2",
+        "revision": 1
+      },
+      "createdAt": "2026-10-12T18:51:50.488Z"
+    },
+    {
+      "cursor": 9,
+      "kind": "input_response_intent",
+      "detail": {
+        "requestId": "per_13174f351001RFZJAU4hfMTJz2",
+        "requestRevision": 1
+      },
+      "createdAt": "2026-10-12T18:51:50.518Z"
+    },
+    {
+      "cursor": 10,
+      "kind": "input_response_acknowledged",
+      "detail": {
+        "requestId": "per_13174f351001RFZJAU4hfMTJz2"
+      },
+      "createdAt": "2026-10-12T18:51:50.532Z"
+    },
+    {
+      "cursor": 11,
+      "kind": "running",
+      "detail": {},
+      "createdAt": "2026-10-12T18:51:50.547Z"
+    },
+    {
+      "cursor": 12,
+      "kind": "cancellation_requested",
+      "detail": {
+        "phase": "cancelling",
+        "reason": "Stop outdated permission runner; preserve attempt and resume using explicit parent decisions",
+        "requester": "parent"
+      },
+      "createdAt": "2026-10-12T18:54:09.052Z"
+    },
+    {
+      "cursor": 13,
+      "kind": "abort_acknowledged",
+      "detail": {},
+      "createdAt": "2026-10-12T18:54:09.058Z"
+    },
+    {
+      "cursor": 14,
+      "kind": "finalizing",
+      "detail": {
+        "detail": {
+          "cancelEffect": "applied"
+        },
+        "intendedOutcome": "cancelled"
+      },
+      "createdAt": "2026-10-12T18:54:09.062Z"
+    },
+    {
+      "cursor": 15,
+      "kind": "artifact_registered",
+      "detail": {
+        "artifactId": "artifact_d283bc60-a0cb-48e4-aae6-7d740fdb6ffd",
+        "sha256": "8d7dbcc29dc95cdcabeda8628e733ef7f7b0907e2ffe31d7b4442c7385266ede"
+      },
+      "createdAt": "2026-10-12T18:54:09.074Z"
+    },
+    {
+      "cursor": 16,
+      "kind": "finalized",
+      "detail": {
+        "finalManifestHash": "8d7dbcc29dc95cdcabeda8628e733ef7f7b0907e2ffe31d7b4442c7385266ede",
+        "outcome": "cancelled",
+        "reportValidity": "missing"
+      },
+      "createdAt": "2026-10-12T18:54:09.081Z"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "artifact_d283bc60-a0cb-48e4-aae6-7d740fdb6ffd",
+      "sha256": "8d7dbcc29dc95cdcabeda8628e733ef7f7b0907e2ffe31d7b4442c7385266ede",
+      "byte_length": 693,
+      "media_type": "application/json"
+    }
+  ],
+  "cursor": 16,
+  "has_more_events": false
+}

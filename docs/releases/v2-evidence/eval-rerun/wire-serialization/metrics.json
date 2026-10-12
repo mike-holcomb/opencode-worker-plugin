@@ -1,0 +1,71 @@
+{
+  "elapsed_ms": 303341,
+  "dispatches": 1,
+  "duplicate_dispatch": false,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "report_validity": "missing",
+  "terminal": true,
+  "phase": "timed_out",
+  "decisions": [
+    {
+      "request_id": "per_1316b0d10001hqYd24intTbqgl",
+      "reply": "allow_once",
+      "permission": "edit",
+      "patterns": [
+        "private/tmp/v2-eval-retry-20261012/wire-serialization/workspace/producer.py"
+      ]
+    },
+    {
+      "request_id": "per_1316b0e540019OTWFVrBZ0rgWZ",
+      "reply": "allow_once",
+      "permission": "edit",
+      "patterns": [
+        "private/tmp/v2-eval-retry-20261012/wire-serialization/workspace/consumer.py"
+      ]
+    },
+    {
+      "request_id": "per_1316b1238001AbXkqasAcDfiqp",
+      "reply": "allow_once",
+      "permission": "bash",
+      "command": "python3 -m unittest -v test_wire.py",
+      "patterns": [
+        "python3 -m unittest -v test_wire.py"
+      ]
+    },
+    {
+      "request_id": "per_1316b1d48001Mjf7A2SN9xEmza",
+      "reply": "deny",
+      "permission": "bash",
+      "command": "python3 -c \"\nimport json\nfrom producer import encode\nfrom consumer import decode\n\nraw = encode('r-7', {'kind': 'ping'})\nprint('encoded:', raw)\nprint('parsed:', json.loads(raw))\n\nrid, body = decode(raw)\nprint('decoded id:', rid)\nprint('decoded body:', body)\nassert rid == 'r-7', 'request id not stable'\n\n# missing version rejection\nimport sys\nmissing = json.dumps({'request': {'id': 'r-7', 'body': {'kind': 'ping'}}})\ntry:\n    decode(missing)\n    print('FAIL: no ValueError raised')\n    sys.exit(1)\nexcept ValueError as e:\n    print('rejected missing version with ValueError:', e)\n\"",
+      "patterns": [
+        "python3 -c \"\nimport json\nfrom producer import encode\nfrom consumer import decode\n\nraw = encode('r-7', {'kind': 'ping'})\nprint('encoded:', raw)\nprint('parsed:', json.loads(raw))\n\nrid, body = decode(raw)\nprint('decoded id:', rid)\nprint('decoded body:', body)\nassert rid == 'r-7', 'request id not stable'\n\n# missing version rejection\nimport sys\nmissing = json.dumps({'request': {'id': 'r-7', 'body': {'kind': 'ping'}}})\ntry:\n    decode(missing)\n    print('FAIL: no ValueError raised')\n    sys.exit(1)\nexcept ValueError as e:\n    print('rejected missing version with ValueError:', e)\n\""
+      ]
+    }
+  ],
+  "evaluation": null,
+  "overlap": null,
+  "status": "awaiting_parent_review",
+  "parent_review": "pending",
+  "parent_review_started_at": null,
+  "parent_review_elapsed_ms": null,
+  "parent_context_bytes": null,
+  "observed_inference": {
+    "source": "opencode_1.18.35_exact_assistant_messages",
+    "execution_id": "exec_53e7ebff-6856-4522-9c36-f05a764454f8",
+    "session_id": "ses_ece9522c7ffe0Z8xeK7DNvw5Ir",
+    "user_message_id": "msg_1491bf9a-9bdb-464f-860a-d35d1d1e7ba5",
+    "input_tokens": 37078,
+    "output_tokens": 2003,
+    "total_tokens": 39081,
+    "assistant_messages": 4,
+    "reported_cost": null,
+    "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available."
+  }
+}

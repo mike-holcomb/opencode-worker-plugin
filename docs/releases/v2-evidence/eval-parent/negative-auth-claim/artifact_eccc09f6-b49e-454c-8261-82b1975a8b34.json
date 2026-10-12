@@ -1,0 +1,95 @@
+{
+  "schema_version": 2,
+  "task_id": "task_f4ecfab4-b18d-48b1-abf2-50b2485c6d0d",
+  "execution_id": "exec_660d1a07-eaa2-49e2-92ee-3f68f6a1a701",
+  "outcome": "no_supported_finding",
+  "summary": "The supplied files do not support the claim that every route enforces authorization: health() in auth_routes.py returns 'ok' with no authorization check, whereas profile(session) does enforce authorization. Finding is bounded to the two supplied fixture files; README.txt states they are example routes and not a complete inventory, so no whole-project conclusion is drawn.",
+  "coverage": [
+    "auth_routes.py: route handlers health() and profile(session) (complete file, 8 lines)",
+    "README.txt: scope statement (complete file, 2 lines)"
+  ],
+  "gaps": [
+    "README.txt states the two routes are a non-exhaustive example set ('not a complete route inventory'), so a whole-project authorization conclusion cannot be drawn from this fixture.",
+    "Only the two supplied fixture files were inspected; no other project source, route definitions, or middleware were available in the workspace.",
+    "Frozen evaluator check scripts were not located in the accessible workspace, so each check's condition was verified directly against the produced report artifacts rather than by invoking an external runner."
+  ],
+  "findings": [
+    {
+      "id": "HEALTH_NO_AUTH_CHECK",
+      "claim": "The supplied files do not support the claim that every route enforces authorization. The health() route in auth_routes.py performs no authorization check (returns 'ok' unconditionally), while profile(session) enforces authorization via a session guard.",
+      "evidence": [
+        "auth_routes.py:1-2 -> def health(): return \"ok\" (no session parameter, no authorization guard)",
+        "auth_routes.py:5-8 -> def profile(session): if not session: raise PermissionError(\"missing session\"); return \"profile\" (authorization enforced)"
+      ],
+      "caveats": [
+        "Bounded to the two supplied fixture files only.",
+        "The gap is specific to health(); profile() demonstrates an authorization check exists in the same fixture, so this is not a blanket absence of authorization."
+      ]
+    }
+  ],
+  "changes": [
+    {
+      "path": "/private/tmp/v2-eval-parent-20261012/negative-auth-claim/state/reports/exec_660d1a07-eaa2-49e2-92ee-3f68f6a1a701/summary.md",
+      "description": "Worker summary written per output contract (readable bounded review report)."
+    },
+    {
+      "path": "/private/tmp/v2-eval-parent-20261012/negative-auth-claim/state/reports/exec_660d1a07-eaa2-49e2-92ee-3f68f6a1a701/result.json",
+      "description": "WorkerReport schema_version 2 written per output contract."
+    }
+  ],
+  "checks": [
+    {
+      "id": "summary-exists",
+      "status": "passed",
+      "exit_code": null,
+      "evidence": [
+        "summary.md exists at /private/tmp/v2-eval-parent-20261012/negative-auth-claim/state/reports/exec_660d1a07-eaa2-49e2-92ee-3f68f6a1a701/summary.md"
+      ],
+      "explanation": "Verified summary.md is present at the required report path."
+    },
+    {
+      "id": "bounded-negative",
+      "status": "passed",
+      "exit_code": null,
+      "evidence": [
+        "summary.md states: 'The supplied files do NOT support the claim that every route enforces authorization.'",
+        "summary.md states: 'health() ... performs no authorization check' / 'does not enforce authorization.'",
+        "summary.md states the outcome label: 'no_supported_finding.'"
+      ],
+      "explanation": "summary.md contains the bounded negative finding (the claim is not supported) plus the contradicting route evidence."
+    },
+    {
+      "id": "bounds-and-gap",
+      "status": "passed",
+      "exit_code": null,
+      "evidence": [
+        "summary.md includes an 'Inspected bounds (exact)' section listing auth_routes.py and README.txt with full paths.",
+        "summary.md includes a 'Gap (prevents whole-project conclusion)' section stating the routes are an example/non-exhaustive set."
+      ],
+      "explanation": "summary.md documents the exact inspected bounds and the gap that prevents a whole-project conclusion."
+    },
+    {
+      "id": "write-scope",
+      "status": "passed",
+      "exit_code": null,
+      "evidence": [
+        "Only summary.md and result.json were written, both to the sanctioned reports directory.",
+        "auth_routes.py and README.txt were not modified (unchanged from initial content)."
+      ],
+      "explanation": "Only the two output-contract-mandated report artifacts were written; no fixture or project files were modified. The empty allowed_changed_paths list is reconciled with the output contract that explicitly requires these two report writes."
+    },
+    {
+      "id": "parent-negative-review",
+      "status": "passed",
+      "exit_code": null,
+      "evidence": [
+        "Negative claim is bounded to the complete supplied file set (auth_routes.py + README.txt).",
+        "Route evidence cited: health() has no authorization check; profile(session) enforces authorization.",
+        "Gap stated (non-exhaustive example set) so absence is not overstated beyond this fixture."
+      ],
+      "explanation": "The negative finding is scoped to the supplied fixture, cites the relevant route evidence, and explicitly avoids a whole-project claim."
+    }
+  ],
+  "blockers": [],
+  "next_action": "Parent/harness to review the bounded report. If whole-project authorization coverage is required, extend the review across the complete project route inventory (out of scope for this fixture)."
+}

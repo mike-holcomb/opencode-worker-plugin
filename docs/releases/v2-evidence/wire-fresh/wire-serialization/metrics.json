@@ -1,0 +1,130 @@
+{
+  "elapsed_ms": 260411,
+  "dispatches": 1,
+  "duplicate_dispatch": false,
+  "dispatch_expectation_met": true,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "report_validity": "valid",
+  "terminal": true,
+  "phase": "completed",
+  "decisions": [
+    {
+      "request_id": "per_13187c1cb001XuPYh8rrbfS8rb",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Exact frozen fixture command or exact declared file edit within the authorized isolated evaluation.",
+      "permission": "bash",
+      "command": "python3 -m unittest -v test_wire.py",
+      "patterns": [
+        "python3 -m unittest -v test_wire.py"
+      ]
+    },
+    {
+      "request_id": "per_1318871b2001Et34H0OvIcyI4G",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Read-only existence check of the exact assigned execution report directory; literal echo only.",
+      "permission": "bash",
+      "command": "ls -d /private/tmp/v2-eval-retry-20261012/wire-serialization/state/reports/exec_0e6c3191-3dcb-452f-842c-5a84ff17f21a 2>/dev/null && echo \"exists\" || echo \"missing\"",
+      "patterns": [
+        "ls -d /private/tmp/v2-eval-retry-20261012/wire-serialization/state/reports/exec_0e6c3191-3dcb-452f-842c-5a84ff17f21a 2>/dev/null",
+        "echo \"exists\"",
+        "echo \"missing\""
+      ]
+    },
+    {
+      "request_id": "per_131891e0b001gs6NvXLwZmY73H",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Exact frozen fixture command or exact declared file edit within the authorized isolated evaluation.",
+      "permission": "edit",
+      "patterns": [
+        "private/tmp/v2-eval-retry-20261012/wire-serialization/workspace/producer.py"
+      ]
+    },
+    {
+      "request_id": "per_1318920ee0013ZBSp3B2QHqHuC",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Exact frozen fixture command or exact declared file edit within the authorized isolated evaluation.",
+      "permission": "edit",
+      "patterns": [
+        "private/tmp/v2-eval-retry-20261012/wire-serialization/workspace/consumer.py"
+      ]
+    },
+    {
+      "request_id": "per_1318924d0001GIDsWMFQ3QTqqc",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Exact frozen fixture command or exact declared file edit within the authorized isolated evaluation.",
+      "permission": "bash",
+      "command": "python3 -m unittest -v test_wire.py",
+      "patterns": [
+        "python3 -m unittest -v test_wire.py"
+      ]
+    },
+    {
+      "request_id": "per_1318a917b001XsRzekJbNom4xB",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Read-only parse of worker result.json plus exact assigned wire unittest; no writes or broader imports beyond standard JSON/sys and frozen test.",
+      "permission": "bash",
+      "command": "python3 -c \"import json,sys; json.load(open('result.json')); print('result.json: valid JSON')\" && python3 -m unittest -v test_wire.py",
+      "patterns": [
+        "python3 -c \"import json,sys; json.load(open('result.json')); print('result.json: valid JSON')\"",
+        "python3 -m unittest -v test_wire.py"
+      ]
+    },
+    {
+      "request_id": "per_1318af638001QuoSvVjhTAbMWW",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Exact frozen fixture command or exact declared file edit within the authorized isolated evaluation.",
+      "permission": "bash",
+      "command": "python3 -m unittest -v test_wire.py",
+      "patterns": [
+        "python3 -m unittest -v test_wire.py"
+      ]
+    },
+    {
+      "request_id": "per_1318b007f001LN6cQysAwiGJ0d",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Exact read-only listing of the two assigned execution report files.",
+      "permission": "bash",
+      "command": "ls -l /private/tmp/v2-eval-retry-20261012/wire-serialization/state/reports/exec_0e6c3191-3dcb-452f-842c-5a84ff17f21a/summary.md /private/tmp/v2-eval-retry-20261012/wire-serialization/state/reports/exec_0e6c3191-3dcb-452f-842c-5a84ff17f21a/result.json",
+      "patterns": [
+        "ls -l /private/tmp/v2-eval-retry-20261012/wire-serialization/state/reports/exec_0e6c3191-3dcb-452f-842c-5a84ff17f21a/summary.md /private/tmp/v2-eval-retry-20261012/wire-serialization/state/reports/exec_0e6c3191-3dcb-452f-842c-5a84ff17f21a/result.json"
+      ]
+    }
+  ],
+  "evaluation": {
+    "exit_code": 2
+  },
+  "assertion_error": null,
+  "overlap": null,
+  "status": "passed",
+  "parent_review": "accepted",
+  "parent_review_started_at": "2026-10-12T19:41:03.994Z",
+  "parent_review_elapsed_ms": 51528,
+  "parent_context_bytes": 28024,
+  "observed_inference": {
+    "source": "opencode_1.18.35_exact_assistant_messages",
+    "execution_id": "exec_0e6c3191-3dcb-452f-842c-5a84ff17f21a",
+    "session_id": "ses_ece785019ffeh1k2oxA6Uf5Zsy",
+    "user_message_id": "msg_5ff87135-0bc1-4504-be25-2e8f5cf8ced1",
+    "input_tokens": 192358,
+    "output_tokens": 16971,
+    "total_tokens": 209329,
+    "assistant_messages": 11,
+    "reported_cost": null,
+    "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available."
+  }
+}

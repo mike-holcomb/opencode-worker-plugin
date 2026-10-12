@@ -1,0 +1,190 @@
+{
+  "source": "opencode_1.18.35_exact_assistant_messages",
+  "execution_id": "exec_0e6c3191-3dcb-452f-842c-5a84ff17f21a",
+  "session_id": "ses_ece785019ffeh1k2oxA6Uf5Zsy",
+  "user_message_id": "msg_5ff87135-0bc1-4504-be25-2e8f5cf8ced1",
+  "input_tokens": 192358,
+  "output_tokens": 16971,
+  "total_tokens": 209329,
+  "assistant_messages": 11,
+  "reported_cost": null,
+  "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available.",
+  "messages": [
+    {
+      "id": "msg_13187b08c001R9OCYTFtpwdzdz",
+      "parent_id": "msg_5ff87135-0bc1-4504-be25-2e8f5cf8ced1",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 8302,
+        "input": 8068,
+        "output": 234,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_13187b943001eZzikLdu5bwV0b",
+      "parent_id": "msg_5ff87135-0bc1-4504-be25-2e8f5cf8ced1",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 9234,
+        "input": 8965,
+        "output": 269,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_13187c3ca001reH87w7T5FSv3q",
+      "parent_id": "msg_5ff87135-0bc1-4504-be25-2e8f5cf8ced1",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 14834,
+        "input": 9310,
+        "output": 5524,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_1318915de001yL3eJ6ZprX2Muz",
+      "parent_id": "msg_5ff87135-0bc1-4504-be25-2e8f5cf8ced1",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 15368,
+        "input": 14906,
+        "output": 462,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_131892251001QA5AGaX3hLUI3V",
+      "parent_id": "msg_5ff87135-0bc1-4504-be25-2e8f5cf8ced1",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 15474,
+        "input": 15395,
+        "output": 79,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_1318925af0015wsMXEZ6oXBiQw",
+      "parent_id": "msg_5ff87135-0bc1-4504-be25-2e8f5cf8ced1",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 15665,
+        "input": 15550,
+        "output": 115,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_1318928fd001chkLDGf2I7V32p",
+      "parent_id": "msg_5ff87135-0bc1-4504-be25-2e8f5cf8ced1",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 25548,
+        "input": 16015,
+        "output": 9533,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_1318a88ff001pH4opPPe0oYUzU",
+      "parent_id": "msg_5ff87135-0bc1-4504-be25-2e8f5cf8ced1",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 25748,
+        "input": 25575,
+        "output": 173,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_1318af0d5001g4dIrQJNnnu4Uk",
+      "parent_id": "msg_5ff87135-0bc1-4504-be25-2e8f5cf8ced1",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 26035,
+        "input": 25915,
+        "output": 120,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_1318af79f001AZV4hkGPtANL47",
+      "parent_id": "msg_5ff87135-0bc1-4504-be25-2e8f5cf8ced1",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 26347,
+        "input": 26111,
+        "output": 236,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_1318b8d9d001txAoNQXeeWOYdW",
+      "parent_id": "msg_5ff87135-0bc1-4504-be25-2e8f5cf8ced1",
+      "finish": "stop",
+      "tokens": {
+        "total": 26774,
+        "input": 26548,
+        "output": 226,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    }
+  ]
+}

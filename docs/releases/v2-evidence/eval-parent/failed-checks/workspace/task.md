@@ -1,0 +1,1 @@
+Investigate the parser change in parser.py and run test_parser.py. Write the assigned report summary.md with the command, exit status, failing test or error, affected scope, and next action. If the check fails, report partial or blocked work and do not claim acceptance. This is a read-only investigation: do not edit parser.py or test_parser.py.

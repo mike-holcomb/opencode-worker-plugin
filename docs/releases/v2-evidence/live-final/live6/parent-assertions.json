@@ -1,0 +1,9 @@
+{
+  "action": "supervisor_killed",
+  "exact_ids_preserved": true,
+  "final_runtime_hashes_match": true,
+  "reservations": 0,
+  "dispatches": 1,
+  "phase": "completed",
+  "report_validity": "valid"
+}

@@ -1,0 +1,68 @@
+{
+  "review_started_at": "2026-10-12T19:15:59.936Z",
+  "context_bytes": 12146,
+  "idempotency_key": "parent-review-exec_bc62801d-e232-41d4-bc9f-86d0ea9cae35",
+  "gate_status": "failed",
+  "review": {
+    "disposition": "rejected",
+    "rationale": "Parent inspected packet, fixture sources, final snapshot and immutable manifest. Required result.json and summary.md are missing after timeout; no deliverable can be accepted. Workspace listing was allowed, parent campaign inspection denied. This attempt fails quality evaluation despite safe proven cancellation.",
+    "criteria": [
+      {
+        "id": "summary-exists",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_81116718-87af-4713-8cdc-2fe4357de94f@sha256:ab9bf80afadba747292bdc3f6bfdd7561de1ea52d588d4d871c2962cd8c16d99"
+        ]
+      },
+      {
+        "id": "acceptance-state",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_81116718-87af-4713-8cdc-2fe4357de94f@sha256:ab9bf80afadba747292bdc3f6bfdd7561de1ea52d588d4d871c2962cd8c16d99"
+        ]
+      },
+      {
+        "id": "missing-deliverable-visible",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_81116718-87af-4713-8cdc-2fe4357de94f@sha256:ab9bf80afadba747292bdc3f6bfdd7561de1ea52d588d4d871c2962cd8c16d99"
+        ]
+      },
+      {
+        "id": "acceptance-owned-by-parent",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_81116718-87af-4713-8cdc-2fe4357de94f@sha256:ab9bf80afadba747292bdc3f6bfdd7561de1ea52d588d4d871c2962cd8c16d99"
+        ]
+      },
+      {
+        "id": "write-scope",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_81116718-87af-4713-8cdc-2fe4357de94f@sha256:ab9bf80afadba747292bdc3f6bfdd7561de1ea52d588d4d871c2962cd8c16d99"
+        ]
+      },
+      {
+        "id": "parent-false-completion-review",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_81116718-87af-4713-8cdc-2fe4357de94f@sha256:ab9bf80afadba747292bdc3f6bfdd7561de1ea52d588d4d871c2962cd8c16d99"
+        ]
+      }
+    ],
+    "starting_state_sha256": "1a4dd1562856bea2c76a71a6faec6e830e4e777e89d3bcd33c434d11ded9a4ea",
+    "final_manifest_sha256": "ab9bf80afadba747292bdc3f6bfdd7561de1ea52d588d4d871c2962cd8c16d99",
+    "freshness": "Parent inspected complete recorded fixture inputs, immutable exports, final snapshot, and available checks.",
+    "integration_checks": [
+      "Parent inspected packet, fixture sources, final snapshot and immutable manifest. Required result.json and summary.md are missing after timeout; no deliverable can be accepted. Workspace listing was allowed, parent campaign inspection denied. This attempt fails quality evaluation despite safe proven cancellation."
+    ],
+    "coverage_limits": [
+      "Trusted-workspace managed mode; plugin race remains separately documented.",
+      "Context measured in bytes; elapsed review time includes concurrent parent work."
+    ],
+    "unresolved_issues": [
+      "Parent inspected packet, fixture sources, final snapshot and immutable manifest. Required result.json and summary.md are missing after timeout; no deliverable can be accepted. Workspace listing was allowed, parent campaign inspection denied. This attempt fails quality evaluation despite safe proven cancellation."
+    ],
+    "next_action": "Bounded correction or rerun; preserve this attempt."
+  }
+}
