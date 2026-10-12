@@ -1,6 +1,6 @@
 // Apply an explicit parent-authored review. Never infer acceptance from text markers.
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Client } from '@modelcontextprotocol/client';
@@ -8,7 +8,10 @@ import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
 import { rpcRequest } from '../../dist/rpc.js';
 const args=process.argv.slice(2),opt=name=>args[args.indexOf(name)+1];
 assert(args.includes('--case-dir')&&args.includes('--decision'),'Supply --case-dir and --decision');
-const dir=resolve(opt('--case-dir')),state=join(dir,'state');
+const dir=resolve(opt('--case-dir'));
+let source=dir; const seen=new Set();
+while(existsSync(join(source,'continuation.json'))){assert(!seen.has(source),'Continuation cycle');seen.add(source);source=resolve(JSON.parse(readFileSync(join(source,'continuation.json'))).source_case);}
+const state=join(source,'state');
 const prior=JSON.parse(readFileSync(join(dir,'final.json'))),decision=JSON.parse(readFileSync(resolve(opt('--decision'))));
 const metrics=JSON.parse(readFileSync(join(dir,'metrics.json')));
 assert(decision.review && typeof decision.review_started_at==='string' && Number.isSafeInteger(decision.context_bytes), 'Explicit review and measurement required');

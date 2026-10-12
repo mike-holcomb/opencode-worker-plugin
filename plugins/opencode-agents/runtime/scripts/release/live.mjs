@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { spawn, spawnSync, execFileSync } from 'node:child_process';
 import { once } from 'node:events';
-import { mkdirSync, readFileSync, writeFileSync, appendFileSync, existsSync, rmSync, realpathSync } from 'node:fs';
+import { copyFileSync, mkdirSync, readFileSync, writeFileSync, appendFileSync, existsSync, rmSync, realpathSync } from 'node:fs';
 import { resolve, join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { setTimeout as sleep } from 'node:timers/promises';
@@ -11,6 +11,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { Client } from '@modelcontextprotocol/client';
 import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
 import { rpcRequest } from '../../dist/rpc.js';
+import { allowsDeclaredEdit } from './permissions.mjs';
 const args = process.argv.slice(2);
 const opt = (name, fallback) => args.includes(name) ? args[args.indexOf(name) + 1] : fallback;
 assert(args.includes('--execute'), 'Live inference requires --execute');
@@ -27,11 +28,16 @@ assert(endpoint.ok); const models = await endpoint.json(); assert(models.data.so
 const manifest = JSON.parse(readFileSync(join(plugin, 'evaluation/v2-cases.json')));
 const selected = opt('--cases', 'live6,live7,live9,t20').split(',');
 const cases = selected.flatMap(c => c === 'eval' ? manifest.cases.map(c => c.id) : c === 'live' ? Array.from({length:10},(_,i)=>`live${i+1}`) : [c]);
+const continuation=opt('--continue-from')?resolve(opt('--continue-from')):null;
+assert(!continuation||(cases.length===1&&args.includes('--feedback-file')),'Continuation requires one scenario and --feedback-file');
+let origin=continuation; const ancestors=new Set();
+while(origin&&existsSync(join(origin,'continuation.json'))){assert(!ancestors.has(origin),'Continuation cycle');ancestors.add(origin);origin=resolve(JSON.parse(readFileSync(join(origin,'continuation.json'))).source_case);}
 const hash = value => createHash('sha256').update(value).digest('hex');
 writeFileSync(join(root, 'campaign.json'), JSON.stringify({ started_at: new Date().toISOString(), route, model,
   binary, version, node: process.version, platform: process.platform, arch: process.arch, cases,
   revision: execFileSync('git', ['rev-parse','HEAD'], { encoding: 'utf8' }).trim(),
-  source_sha256: Object.fromEntries(['dist/coordinator.js','dist/managed-server.js','dist/service.js'].map(f => [f, hash(readFileSync(join(runtime,f)))])),
+  source_sha256: Object.fromEntries(['dist/coordinator.js','dist/managed-server.js','dist/service.js','dist/daemon.js','dist/rpc.js','dist/store.js'].map(f => [f, hash(readFileSync(join(runtime,f)))])),
+  permission_helper_sha256: hash(readFileSync(new URL('./permissions.mjs',import.meta.url))),
   runner_sha256: hash(readFileSync(fileURLToPath(import.meta.url))),
   evaluation_sha256: hash(readFileSync(join(plugin,'evaluation/v2-cases.json'))),
   usage_policy: 'Unavailable token and cost counters remain null; parent context is measured as bytes read, not fabricated tokens.' }, null, 2));
@@ -42,11 +48,24 @@ function children(pid) {
   }); } catch { return []; }
 }
 for (const id of cases) {
+  try {
+    const response=await fetch(`${route}/models`,{signal:AbortSignal.timeout(10000)});
+    assert(response.ok);assert((await response.json()).data.some(m=>m.id===model));
+  } catch(error) {
+    writeFileSync(join(root,'blocked.json'),JSON.stringify({case:id,reason:'Existing authorized model route unavailable',error:String(error),at:new Date().toISOString()},null,2));
+    process.exitCode=1;break;
+  }
   const dir = join(root,id); mkdirSync(dir);
-  const state = join(dir,'state'), workspace = join(dir,'workspace'); mkdirSync(state);
+  const state = join(origin??dir,'state'), workspace = join(origin??dir,'workspace'); if(!continuation)mkdirSync(state);
   const scope = `release-${id}`; let packet, prepared;
   const scenario = manifest.cases.find(c => c.id === id);
-  if (scenario) {
+  if (scenario && continuation) {
+    packet={...scenario.packet,context:{...scenario.packet.context,
+      verified_facts:[...scenario.packet.context.verified_facts,readFileSync(resolve(opt('--feedback-file')),'utf8')]}};
+    copyFileSync(join(continuation,'baseline.json'),join(dir,'baseline.json'));
+    copyFileSync(join(continuation,'preparation.json'),join(dir,'preparation.json'));
+    writeFileSync(join(dir,'continuation.json'),JSON.stringify({source_case:continuation,feedback:opt('--feedback-file')},null,2));
+  } else if (scenario) {
     const preparation = execFileSync(process.execPath, [join(plugin,'evaluation/harness.mjs'),'prepare','--case',id,
       '--run-id',`${id}-${Date.now()}`, '--out',workspace,'--state',join(dir,'baseline.json')], { encoding:'utf8' });
     prepared = JSON.parse(preparation); packet = scenario.packet;
@@ -95,8 +114,9 @@ for (const id of cases) {
     }
   }
   writeFileSync(join(dir,'packet.json'), JSON.stringify(packet,null,2));
-  const home = join(dir,'home'), configHome = join(dir,'xdg-config');
-  for (const path of [home, join(configHome,'opencode'), join(dir,'xdg-data'), join(dir,'xdg-cache')]) mkdirSync(path,{recursive:true});
+  const sandboxRoot=origin??dir;
+  const home = join(sandboxRoot,'home'), configHome = join(sandboxRoot,'xdg-config');
+  for (const path of [home, join(configHome,'opencode'), join(sandboxRoot,'xdg-data'), join(sandboxRoot,'xdg-cache')]) mkdirSync(path,{recursive:true});
   writeFileSync(join(configHome,'opencode/opencode.json'), JSON.stringify({ provider: { 'llama.cpp': {
     npm:'@ai-sdk/openai-compatible',options:{baseURL:route},models:{[model]:{limit:{context:131072,output:32768}}} } } }));
   const configFile = join(state,'config.json');
@@ -104,8 +124,8 @@ for (const id of cases) {
     development_execution:{enabled:true,trusted_workspaces:id==='live3'?[workspace,join(dir,'peer')]:[workspace]},
     models:{local:{provider_id:'llama.cpp',model_id:model,destination:route}},
     limits:{concurrency:id==='live3'?2:1,queue_timeout_seconds:120,execution_timeout_seconds:300,finalization_timeout_seconds:30,artifact_bytes:50000000} }));
-  const env = { ...process.env, HOME:home, XDG_CONFIG_HOME:configHome, XDG_DATA_HOME:join(dir,'xdg-data'),
-    XDG_CACHE_HOME:join(dir,'xdg-cache'), OPENCODE_TEST_HOME:home, OPENCODE_CONFIG_DIR:join(configHome,'opencode'),
+  const env = { ...process.env, HOME:home, XDG_CONFIG_HOME:configHome, XDG_DATA_HOME:join(sandboxRoot,'xdg-data'),
+    XDG_CACHE_HOME:join(sandboxRoot,'xdg-cache'), OPENCODE_TEST_HOME:home, OPENCODE_CONFIG_DIR:join(configHome,'opencode'),
     OPENCODE_AGENTS_CONFIG:configFile,OPENCODE_AGENTS_STATE_DIR:state,OPENCODE_AGENTS_CAPTURE_DIAGNOSTICS:'1',
     PYTHONDONTWRITEBYTECODE:'1' };
   for (const name of ['OPENCODE_CONFIG','OPENCODE_CONFIG_CONTENT']) delete env[name];
@@ -130,9 +150,18 @@ for (const id of cases) {
   try {
     daemon=await startDaemon(); await connect();
     assert.equal((await client.listTools()).tools.length,10);
-    task=await call('start_task',{scope_id:scope,idempotency_key:`release-start-${id}-0001`,
+    if(continuation){
+      const previous=JSON.parse(readFileSync(join(continuation,'final.json')));
+      const current=await call('get_task',{scope_id:previous.scopeId,task_id:previous.taskId});
+      assert(current.terminal&&current.operationally_resolved,'Predecessor must be resolved');
+      assert.equal(current.executionId,previous.executionId,'Observe an existing continuation instead of repeating it');
+      predecessor=current;
+      task=await call('continue_task',{scope_id:current.scopeId,task_id:current.taskId,predecessor_execution_id:current.executionId,
+        expected_revision:current.revision,idempotency_key:`release-correction-${current.executionId}`,context_mode:'resume',packet});
+      log('continued',{predecessor_execution_id:current.executionId,execution_id:task.executionId});
+    } else task=await call('start_task',{scope_id:scope,idempotency_key:`release-start-${id}-0001`,
       workspace:{path:workspace,access:'exclusive'},model:{profile:'local'},
-      profile:scenario ? (packet.allowed_writes.length?'bounded-build':'bounded-inspect') : ['live2','live7','live8','t20'].includes(id)?'bounded-build':'bounded-inspect',
+      profile:scenario ? (packet.allowed_writes.length||packet.checks.some(c=>c.argv?.length)?'bounded-build':'bounded-inspect') : ['live2','live7','live8','t20'].includes(id)?'bounded-build':'bounded-inspect',
       limits:{queue_timeout_seconds:120,execution_timeout_seconds:300},packet});
     writeFileSync(join(dir,'runtime-hashes.json'),JSON.stringify(Object.fromEntries(['coordinator','daemon','rpc','managed-server','service'].map(n=>[n,hash(readFileSync(join(runtime,`dist/${n}.js`)))])),null,2));
     if(id==='live3')peer=await call('start_task',{scope_id:scope,idempotency_key:'release-peer-start-0001',
@@ -195,7 +224,7 @@ for (const id of cases) {
         const command=detail.metadata?.command;
         const patterns=detail.patterns ?? [];
         const allowedPaths=packet.allowed_writes.filter(w=>w.kind==='file').map(w=>resolve(workspace,w.path));
-        const editAllowed=detail.permission==='edit' && patterns.length>0 && patterns.every(p=>allowedPaths.includes(resolve(workspace,p)));
+        const editAllowed=allowsDeclaredEdit(detail,workspace,allowedPaths);
         const commands=new Set((scenario?.frozen_checks??[]).filter(c=>c.kind==='command').map(c=>(c.argv??[]).join(' ')));
         if (id==='live7')commands.add('sh allowed.sh');
         if (id==='live8')commands.add('sh partial.sh');
@@ -211,6 +240,7 @@ for (const id of cases) {
     }
     assert(final,'no snapshot');
     writeFileSync(join(dir,'final.json'),JSON.stringify(final,null,2));
+    if(continuation){assert.equal(final.sessionId,predecessor.sessionId);assert.notEqual(final.userMessageId,predecessor.userMessageId);}
     if(identity) for(const key of Object.keys(identity))assert.equal(final[key],identity[key]);
     if(id==='live2') {assert.equal(readFileSync(join(workspace,'answer.txt'),'utf8'),'violet\n');assert.equal(readFileSync(join(workspace,'dirty.txt'),'utf8'),'pre-existing user edit\n');}
     if(id==='live3') {assert(overlap,'no observed concurrent running executions');assert(peerFinal.terminal);assert.equal(peerFinal.reportValidity,'valid');writeFileSync(join(dir,'peer-final.json'),JSON.stringify(peerFinal,null,2));}

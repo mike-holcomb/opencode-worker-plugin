@@ -90,3 +90,39 @@ A historical development-tag result does not certify a changed candidate.
 Rebuild the final candidate, repeat affected checks, and verify its immutable
 pushed tag and checksums before requesting publication. Do not publish while
 Linux/WSL2 or any other required gate is incomplete.
+
+## Corrections and usage measurements
+
+Preserve a failed scenario and continue its exact session with explicit parent
+feedback. Use a new evidence root; do not edit the predecessor's report:
+
+```sh
+node plugins/opencode-agents/runtime/scripts/release/live.mjs --execute --binary /absolute/path/to/opencode --out /tmp/v2-correction --cases lookup-timeout --continue-from /tmp/v2-live-evidence/lookup-timeout --feedback-file /tmp/parent-feedback.txt
+node plugins/opencode-agents/runtime/scripts/release/usage.mjs /tmp/v2-live-evidence
+node plugins/opencode-agents/runtime/scripts/release/usage.mjs /tmp/v2-correction
+```
+
+The usage sidecar reads the isolated OpenCode database without changing it and
+matches assistant records to the exact session and parent message. It preserves
+raw counters and distinguishes unknown billing cost from zero. Public runtime
+usage remains `not_captured`; this sidecar is an evaluation measurement only.
+Corrections count as additional attempts and must receive a new parent review.
+The runner checks the existing model route before each new case; an outage leaves
+completed evidence intact and prevents additional admissions.
+
+## Upgrade and rollback rehearsal
+
+Compile a separate checkout of the previous pushed tag with its locked dependencies.
+Do not use a production state directory. Then run:
+
+```sh
+node plugins/opencode-agents/runtime/scripts/release/upgrade.mjs --previous-runtime /absolute/path/to/previous/plugins/opencode-agents/runtime --out /tmp/v2-upgrade-evidence
+```
+
+The rehearsal drains old work, snapshots SQLite including committed WAL data,
+checks historical task and immutable artifact preservation in the candidate,
+creates and drains candidate work, stops all writers, and restores the matching
+backup before opening it with the previous runtime. It also checks that both
+runtimes refuse a future schema. The selected development tag and candidate both
+use schema 3; store tests separately exercise automatic migration snapshots and
+backup failures. The rehearsal never downgrades a live database in place.
