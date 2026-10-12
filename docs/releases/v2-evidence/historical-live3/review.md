@@ -1,0 +1,20 @@
+# Additional isolated v2 live checks — 2026-10-12
+
+The user authorized live execution through the existing port-forwarded model server, while prohibiting new SSH tunnels. These checks used the configured `http://127.0.0.1:8124/v1` forward with `llama.cpp/laguna-s-21`; no test created or changed a tunnel. A later listener inspection confirmed an existing `ssh` process owned port 8124. Versions: OpenCode 1.18.35, `@opencode-ai/sdk` 1.18.35, Node 24.19.0, toolkit 2.0.0-dev.0. The fixture was `/private/tmp/opencode-agents-live-extra-20261012-001`, separate from the earlier fixture and the source workspace. Its HOME, XDG directories, toolkit state, and two project workspaces were isolated. The source `compatibility.json` remained `execution_supported: false`; only the disposable package copy was set to true. The copied manifest SHA-256 was `aaa3d056f5d2b5f02f808b95c11182a3e9375ed231dfa87ac16262ce7d662159`; the harness SHA-256 was `f997359ea696acba133c30f7def3a25ee7fa83ff84df442aae0a9a713b8ed0eb`. Source HEAD at the run was `57bfa6127a8c3455db17cc300cc55bf5dfc04ee3`, with uncommitted v2 changes; the copied runtime files and harness in the fixture are the run artifact.
+
+## Case 3: two independent workspaces
+
+Scope `live-extra-20261012` contained two bounded inspection tasks. Workspace A had `input.txt` stating `alpha`; workspace B stated `beta`. A entered `running` at 15:04:20.823 UTC and B at 15:04:22.680 UTC. Both remained `running` until B completed at 15:04:37.318 UTC, proving about 14.6 seconds of overlapping active toolkit executions in separate workspaces and distinct OpenCode sessions. This does not establish simultaneous model token generation at the provider.
+
+| Task | Execution | Exact upstream session / user message | Result |
+| --- | --- | --- | --- |
+| `task_d5d59e25-76aa-4447-9db8-9a59c2127f7f` | `exec_6aee666a-d052-4b1f-afd2-3bb47bad8039` | `ses_ecf5b549fffeFILIFPUVIaoGmn` / `msg_c2427eaa-ce5c-4042-af28-cad089f50c77` | Completed; valid report; accepted review. Report artifact `artifact_92886798-4262-4735-90dd-9737e524e299`, SHA-256 `71b754f125c6f54da635fbcb7f72468fdfa496b82a409a48083e03fd24c7dc0d`; final manifest SHA-256 `903262fbe4f7990c41c456a1d9a80f5a5af20f2c2f8f2a2c7b99cb9df374221c`. |
+| `task_5691769d-8fd7-431b-952b-fa850ba4abed` | `exec_3e73a1bc-e790-47bc-93d0-33834226eca6` | `ses_ecf5b4d55ffe6dPTG5uMnHsPK8` / `msg_7394c98e-89bd-4f80-a57d-2f7410915b34` | Completed; valid report; accepted review. Report artifact `artifact_d88bbe56-e9e3-439e-a6cc-03abad22ef4d`, SHA-256 `954e50b962c46bb1e2d70d060cf9009c2725ab4a239226c70134eb6fce51a600`; final manifest SHA-256 `7ce3482187bb72cea6b4ac911c6a975e7cc254a383fe47793310085d5abfde36`. |
+
+The immutable reports cite the exact input file contents and mark the inspection check passed. I independently read both input files after completion. Both final manifests have empty `changes` and `gaps`. Each execution has exactly one acknowledged durable dispatch intent and one parent review record. Observed token and cost usage was unavailable (`not_captured`), not zero. Elapsed start-to-terminal time was approximately 20 seconds for A and 17 seconds for B.
+
+## Case 5: MCP reconnect during active work
+
+Task A was started through a stdio MCP client. At 15:04:20.825 UTC, `opencode_get_task` on that client showed `running`, with the exact session/message above. The MCP client closed at 15:04:20.829 UTC. A fresh stdio MCP client connected and, at 15:04:21.164 UTC, recovered the **same** execution, session, and message while its phase was still `running`. A later snapshot completed with a valid report. No second start request was sent on reconnect, and the database contains one dispatch intent for A.
+
+The isolated daemon returned `{"stopped":true}` after both reviews. Its `connection.json` and supervisor socket were removed; the fixture's SQLite state, immutable artifacts, harness, and `extra.log` remain for inspection. This test-only pass does not clear the source compatibility gate: the separate plugin-suppression race remains unresolved.

@@ -1,0 +1,1 @@
+Update producer.py and consumer.py together for the v2 envelope specified in test_wire.py. Keep the request identifier stable across encode/decode, reject a missing version, and write the assigned report summary.md with the interface decision, changed paths, and test result. Treat producer and consumer as one coupled assignment.

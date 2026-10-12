@@ -1,0 +1,32 @@
+{
+  "phase": "completed",
+  "terminal": true,
+  "report_validity": "valid",
+  "dispatches": 1,
+  "duplicate_dispatch": false,
+  "status": "failed_fixture_assertion",
+  "parent_review": "pending",
+  "elapsed_ms": 30629,
+  "recovery_source": "Read-only hash-verified artifact objects after runner assertion; no worker replay",
+  "assertion_error": "AssertionError [ERR_ASSERTION]: {\"content\":[{\"type\":\"text\",\"text\":\"INVALID_INPUT: follow-up cannot change the task objective\"}],\"isError\":true}",
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "observed_inference": {
+    "source": "opencode_1.18.35_exact_assistant_messages",
+    "execution_id": "exec_c3dff8df-47e2-4679-9dd7-63a0ee627627",
+    "session_id": "ses_ece91209bffeIkKNsThU1D4wbV",
+    "user_message_id": "msg_0268bb71-9da0-43cb-a87c-69ef0eb15bf4",
+    "input_tokens": 61044,
+    "output_tokens": 3865,
+    "total_tokens": 64909,
+    "assistant_messages": 8,
+    "reported_cost": null,
+    "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available."
+  }
+}

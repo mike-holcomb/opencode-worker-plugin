@@ -1,0 +1,1 @@
+Compare snapshot.json with current.json and README.txt. Write the assigned report summary.md identifying the snapshot revision, current revision, affected conclusion, and a bounded next action when evidence is stale or missing. Do not update the evidence files or claim that a recheck happened.

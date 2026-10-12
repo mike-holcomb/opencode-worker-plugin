@@ -1,0 +1,25 @@
+{
+  "case": "false-completion",
+  "execution": "exec_1bb5f71e-39db-4b3a-844f-a35a52339f35",
+  "phase": "failed",
+  "terminal": true,
+  "report_validity": "missing",
+  "dispatches": 1,
+  "finalization": [
+    {
+      "detail": {
+        "error": "{\"name\":\"APIError\",\"data\":{\"message\":\"Cannot connect to API: Unable to connect. Is the computer able to access the url?\",\"isRetryable\":true,\"metadata\":{\"url\":\"http://127.0.0.1:8124/v1/chat/completions\"}}}"
+      },
+      "intendedOutcome": "failed"
+    }
+  ],
+  "permission_decisions": [],
+  "required_criteria": [
+    "summary-exists",
+    "acceptance-state",
+    "missing-deliverable-visible",
+    "acceptance-owned-by-parent",
+    "write-scope",
+    "parent-false-completion-review"
+  ]
+}

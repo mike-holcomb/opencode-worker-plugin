@@ -1,0 +1,2 @@
+The adapter owns configuration normalization. A new flag must be represented in
+the normalized interface before downstream feature code can rely on it.

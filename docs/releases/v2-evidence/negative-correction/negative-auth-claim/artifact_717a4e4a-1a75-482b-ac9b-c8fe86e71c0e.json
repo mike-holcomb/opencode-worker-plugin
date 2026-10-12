@@ -1,0 +1,81 @@
+{
+  "schema_version": 2,
+  "task_id": "task_f4ecfab4-b18d-48b1-abf2-50b2485c6d0d",
+  "execution_id": "exec_3401f309-f830-4bfa-96ac-5638cb54cdc6",
+  "outcome": "no_supported_finding",
+  "summary": "The supplied files do not support the claim that every route enforces authorization: within the fixture, health() has no authorization check while profile(session) enforces authorization. The supplied examples yield no supported finding of a production-wide authentication bypass, and production-wide safety is not established. Finding is bounded to the two supplied fixture files; README.txt states they are example routes, not a complete inventory, so no whole-project or production conclusion is drawn.",
+  "coverage": [
+    "auth_routes.py (complete file, 8 lines): route handlers health() (no authorization check) and profile(session) (authorization enforced via session guard)",
+    "README.txt (complete file, 2 lines): scope clarification stating the routes are an example set, not a complete inventory"
+  ],
+  "gaps": [
+    "README.txt states the supplied routes are an example set ('not a complete route inventory'), so no whole-project or production-wide conclusion can be drawn from this fixture.",
+    "Only auth_routes.py and README.txt were supplied and inspected; no other route handlers, middleware, configuration, or project sources were available in the workspace."
+  ],
+  "findings": [
+    {
+      "id": "HEALTH_NO_AUTH_CHECK",
+      "claim": "The supplied files do not support the assertion that every route enforces authorization: health() in auth_routes.py has no authorization check, whereas profile(session) enforces authorization via a session guard. This bounded gap does not establish a production-wide authentication bypass, and production-wide safety is not established by these example files.",
+      "evidence": [
+        "auth_routes.py:1-2 -> def health(): return \"ok\" (no session parameter, no authorization guard)",
+        "auth_routes.py:5-8 -> def profile(session): if not session: raise PermissionError(\"missing session\"); return \"profile\" (authorization enforced)",
+        "README.txt:1-2 -> 'These are two example routes supplied for a bounded review. They are not a complete route inventory.'"
+      ],
+      "caveats": [
+        "Bounded to the two supplied fixture files only; not a complete route inventory.",
+        "Does not establish a production-wide authentication bypass; the fixture is explicitly an example set, not a production inventory.",
+        "Production-wide safety is not established by these files either.",
+        "The gap is specific to the single supplied health() route; profile() demonstrates an authorization check in the same fixture."
+      ]
+    }
+  ],
+  "changes": [
+    {
+      "path": "/private/tmp/v2-eval-parent-20261012/negative-auth-claim/state/reports/exec_3401f309-f830-4bfa-96ac-5638cb54cdc6/summary.md",
+      "description": "Corrected worker summary written per output contract (strict readable summary)."
+    },
+    {
+      "path": "/private/tmp/v2-eval-parent-20261012/negative-auth-claim/state/reports/exec_3401f309-f830-4bfa-96ac-5638cb54cdc6/result.json",
+      "description": "WorkerReport schema_version 2 (strict JSON) written per output contract."
+    }
+  ],
+  "checks": [
+    {
+      "id": "summary-exists",
+      "status": "not_run",
+      "exit_code": null,
+      "evidence": [],
+      "explanation": "Parent-only frozen file_exists check; the parent executes it against the report path. summary.md was written to the assigned path."
+    },
+    {
+      "id": "bounded-negative",
+      "status": "not_run",
+      "exit_code": null,
+      "evidence": [],
+      "explanation": "Parent-only frozen text_contains_any check; the parent executes it. summary.md states the plain conclusion that the supplied examples yield no supported finding of a production-wide authentication bypass and that production-wide safety is not established."
+    },
+    {
+      "id": "bounds-and-gap",
+      "status": "not_run",
+      "exit_code": null,
+      "evidence": [],
+      "explanation": "Parent-only frozen text_contains check; the parent executes it. summary.md includes an 'Inspected bounds (exact)' section and a 'Gap (prevents whole-project / production conclusion)' section."
+    },
+    {
+      "id": "write-scope",
+      "status": "not_run",
+      "exit_code": null,
+      "evidence": [],
+      "explanation": "Parent-only frozen allowed_changed_paths check; the parent executes it. Only the two output-contract-mandated report artifacts were written to the assigned reports directory; auth_routes.py and README.txt were left unchanged."
+    },
+    {
+      "id": "parent-negative-review",
+      "status": "not_run",
+      "exit_code": null,
+      "evidence": [],
+      "explanation": "Parent-only check; the parent executes it. summary.md bounds the negative claim to the supplied file set, cites route evidence (health() no check, profile() enforces authorization), states the gap, and avoids overstating absence beyond the fixture."
+    }
+  ],
+  "blockers": [],
+  "next_action": "Parent/harness to execute the frozen checks (summary-exists, bounded-negative, bounds-and-gap, write-scope, parent-negative-review) against the produced artifacts at the assigned report path. If whole-project or production authorization coverage is required, extend the review across a complete inventory (out of scope for this fixture)."
+}

@@ -1,0 +1,63 @@
+{
+  "started_at": "2026-10-12T18:04:53.751Z",
+  "node": "v24.21.0",
+  "platform": "darwin",
+  "arch": "arm64",
+  "kernel": "25.6.0",
+  "wsl2": false,
+  "cpu": "Apple M5",
+  "revision": "70c0b43c791a99cbccab5608d0e8d71e4e7bc7ae",
+  "diff_sha256": "0cc09b5400b4be3a93283546c9c0a739f903a50abd9d8c570a5ea0f65e9863f4",
+  "checks": [
+    {
+      "name": "build",
+      "command": "npm",
+      "argv": [
+        "run",
+        "bundle"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "elapsed_ms": 2469
+    },
+    {
+      "name": "runtime",
+      "command": "/private/tmp/v2-node-releases/node-v24.21.0-darwin-arm64/bin/node",
+      "argv": [
+        "--test",
+        "/Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/artifacts.test.js",
+        "/Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/attached.test.js",
+        "/Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/backend-binding.test.js",
+        "/Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/contracts.test.js",
+        "/Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/coordinator.test.js",
+        "/Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/daemon.test.js",
+        "/Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/development-execution.test.js",
+        "/Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/diagnostic-bounds.test.js",
+        "/Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/event-page.test.js",
+        "/Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/evidence.test.js",
+        "/Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/launch-config.test.js",
+        "/Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/managed-server.test.js",
+        "/Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/mcp.test.js",
+        "/Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/opencode-backend.test.js",
+        "/Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/release-matrix-admission.test.js",
+        "/Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/release-matrix-events.test.js",
+        "/Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/release-matrix-public.test.js",
+        "/Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/rpc.test.js",
+        "/Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/service.test.js",
+        "/Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/store.test.js",
+        "/Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/workspace.test.js"
+      ],
+      "exit_code": 1,
+      "signal": null,
+      "error": null,
+      "elapsed_ms": 7911
+    }
+  ],
+  "status": "failed",
+  "limits": [
+    "No inference, managed live cases, or marketplace installation in this runner"
+  ],
+  "error": "AssertionError [ERR_ASSERTION]: runtime: \n\n1 !== 0\n",
+  "finished_at": "2026-10-12T18:05:04.228Z"
+}

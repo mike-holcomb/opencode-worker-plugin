@@ -1,0 +1,142 @@
+✔ artifact registration precedes publication and content is immutable (109.861279ms)
+✔ failed registration leaves no staged bytes (26.255514ms)
+✔ startup reconciles a committed staged artifact and removes an unregistered orphan (39.067729ms)
+✔ T24: attached loopback diagnostics use only GET and dispatch remains closed (1000.339055ms)
+✔ attached endpoint configuration rejects non-loopback and credential-bearing URLs (0.924912ms)
+✔ queued and restarted execution uses its frozen backend launch contract (1125.476558ms)
+✔ T29: a new task uses a new config generation while active work keeps its frozen contract (870.714441ms)
+✔ task packet rejects undeclared nested authority (2.759482ms)
+✔ worker report cannot omit check outcome (1.141435ms)
+✔ durable admission dispatches one exact message and a finished turn with no report remains unaccepted (2009.48137ms)
+✔ terminal executions release backend leases while unresolved work retains them (1098.561019ms)
+✔ a proven dead owned backend reopens and reconciles the exact turn without replay (41.036834ms)
+✔ generic backend abort acknowledgement and idle snapshot retain ownership (145.048322ms)
+✔ a fresh managed abort acknowledgement and independent exact-turn stop snapshot release ownership (589.152456ms)
+✔ persisted abort acknowledgement cannot confirm stop after coordinator restart (109.100863ms)
+✔ a correlated abort error after deadline acknowledgement resolves as timed out (547.466283ms)
+✔ lost prompt acknowledgement reconciles the exact recorded message without resubmission (67.517024ms)
+✔ lost session creation acknowledgement uses the exact marker before dispatch (50.59133ms)
+✔ cancellation before any session or prompt finalizes without upstream submission (41.966394ms)
+✔ an admitted dispatching task times out before session creation (1626.814035ms)
+✔ file report and readable summary are frozen as valid evidence before acceptance (535.752824ms)
+✔ capture failure expires the configured finalization deadline with invalid evidence (1609.132023ms)
+✔ a normal completion racing with cancellation retains the completed outcome (532.869056ms)
+✔ stale queued input fails before session creation or inference (16.074746ms)
+✔ a pending permission is recovered by snapshot after a lost event stream (67.691224ms)
+✔ a durable reply intent left before network send is observed without resubmission (86.23854ms)
+✔ a lost reply acknowledgement never resends the same intent (82.63066ms)
+✔ a lost acknowledgement after the request disappears is recorded as unconfirmed (71.343205ms)
+✔ a wrong-session permission is rejected without exposing a replyable request (42.554558ms)
+✔ storage failure before dispatch intent prevents any prompt submission (18.596301ms)
+✔ supervisor serves requests after a client disconnect and drains on stop (556.781929ms)
+✖ T23: concurrent full supervisor startup leaves one owner and convergent clients (5246.808591ms)
+✔ losing supervisor does not open or migrate the owner's database (126.223113ms)
+✔ development opt-in requires an exact trusted workspace and keeps certification false (1247.509555ms)
+✔ development pair gate rejects unknown pair even with workspace opt-in (0.320939ms)
+✔ T26: oversized private diagnostics use bounded cursors without hiding material blockers (38.301925ms)
+✔ diagnostic cursor rejects changed captured bytes before the cap (31.143254ms)
+✔ idle diagnostic retention runs without a read or new stderr (21.464709ms)
+✔ oversized event details are explicitly truncated while cursors retain every blocker (131.503987ms)
+✔ Git evidence separates pre-existing dirt from added files and deletions (88.19598ms)
+✔ undeclared Git changes and required snapshot omissions fail review evidence (102.247451ms)
+✔ symlinked summary is rejected without following its target (67.976765ms)
+✔ retry capture counts already registered bytes against the execution limit (20.043627ms)
+✔ retrying the same evidence reuses verified artifacts and final manifest (20.090921ms)
+✔ retry rejects a registered artifact whose immutable bytes changed (17.959914ms)
+✔ non-Git declared directory evidence includes nested additions and deletions (38.487853ms)
+✔ managed launch freezes provider routing and rejects a changed effective config (200.287964ms)
+✔ frozen launch contract survives a restart without appearing in task projections (33.569778ms)
+✔ worker launch fails closed when git cannot establish the worktree root (28.580436ms)
+✔ worker profiles restrict inspection edits to the assigned execution report (1.270808ms)
+✔ worker plugin scan uses the child HOME rather than the supervisor HOME (1.001226ms)
+✔ local project plugin files cause worker launch to fail closed (0.897581ms)
+✔ V2 plugin declarations in project and global documents fail closed (4.461613ms)
+✔ custom config content and config file plugin declarations fail closed (1.074925ms)
+✔ MCP client discovers ten tools and read-only annotations, then calls health (35.184249ms)
+✔ a denied tool-call step is not mistaken for a completed turn (0.889999ms)
+✔ T01/T02/T03: lost start response recovers one execution and changed payload cannot dispatch (52.573635ms)
+✔ T05: ambiguous create retains ownership until the exact marker is recovered (69.146634ms)
+✔ T13: conflicting workspace stays queued while unrelated workspace dispatches (567.672461ms)
+✔ T16: missing and malformed reports preserve operational completion but refuse acceptance (544.680923ms)
+✔ T06: initial idle snapshot after prompt acceptance is not completion (90.993873ms)
+✔ T07: duplicate and late event notifications cannot reverse completion or duplicate evidence (185.687541ms)
+✔ T08: an SSE disconnect during a permission request recovers the exact request by snapshot (41.945618ms)
+✔ T15: a symlink workspace alias resolves to the same reservation key (16.44412ms)
+✔ T20: worker policy excludes the parent review channel and rejects an enabled inherited MCP (0.685043ms)
+✔ T30: native question capability is absent; a blocked report can be followed in a new execution (565.244845ms)
+✔ T31: delayed evidence capture holds the reservation and follow-up gate until publication (566.60974ms)
+✔ T09/T25: MCP wait timeout preserves queued work and reports unknown usage as null (62.78989ms)
+✔ T12/T31: unresolved and finalizing predecessors cannot be continued, and finalization holds ownership (15.538096ms)
+✔ T17: accepted review rejects failed or unchecked required criteria (20.349733ms)
+✔ T18: changed captured bytes block acceptance while the historical registration remains (17.929398ms)
+✔ T19: wrong-session or expired permission requests are rejected before any upstream reply (16.209099ms)
+✔ T26: get_task event pages retain blockers and advance an explicit cursor (107.499484ms)
+✔ client reconnects to the same supervisor and concurrent bind is refused (6.712075ms)
+✔ simultaneous RPC bind loser leaves the winning socket reachable (1.691256ms)
+✔ dry-run checks configured model and baseline without admitting a task (37.39874ms)
+✔ finalizing is ineligible for follow-up (30.150561ms)
+✔ a lost start response is recovered by the same key after reopening the store (27.979345ms)
+✔ dispatch intent and exact session survive a restart (15.243801ms)
+✔ accepted review requires valid frozen evidence and every required criterion (20.105835ms)
+✔ resource reservations are atomic and unrelated work remains eligible (15.028546ms)
+✔ admission freezes deadlines and creation intent before a lost session acknowledgement (12.827819ms)
+✔ pagination filters before limiting and historical executions survive a follow-up (14.151456ms)
+✔ resume follow-up keeps the exact session but binds a new execution-scoped backend after restart (32.820349ms)
+✔ cancellation and request response intents survive restart without releasing ownership (19.841605ms)
+✔ old v2 database is backed up before schema changes and retains its data (21.061466ms)
+✔ version 3 database with missing v2 objects receives a backup before repair (12.839006ms)
+✔ failed pre-migration backup leaves an existing schema untouched (3.774788ms)
+✔ a newer schema is refused without changing stored data or creating a migration backup (5.472474ms)
+✔ declared mutable input and dirty Git state become stale after changes (73.869874ms)
+✔ canonical root validation rejects symlink escapes and non-Git manifests state their bounds (2.703758ms)
+✔ a queued task sees changes inside a declared output directory before dispatch (2.921814ms)
+ℹ tests 92
+ℹ suites 0
+ℹ pass 91
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9841.524092
+
+✖ failing tests:
+
+test at dist/test/daemon.test.js:42:1
+✖ T23: concurrent full supervisor startup leaves one owner and convergent clients (5246.808591ms)
+  AssertionError [ERR_ASSERTION]: no reachable owner: pid=2288 exit=1 stderr=node:events:505
+      throw er; // Unhandled 'error' event
+      ^
+  
+  Error: write EPIPE
+      at afterWriteDispatched (node:internal/stream_base_commons:159:15)
+      at writeGeneric (node:internal/stream_base_commons:150:3)
+      at Socket._writeGeneric (node:net:1262:11)
+      at Socket._write (node:net:1274:8)
+      at writeOrBuffer (node:internal/streams/writable:574:12)
+      at _write (node:internal/streams/writable:503:10)
+      at Writable.end (node:internal/streams/writable:825:17)
+      at Socket.end (node:net:1026:31)
+      at file:///home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/rpc.js:88:20
+      at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+  Emitted 'error' event on Socket instance at:
+      at emitErrorNT (node:internal/streams/destroy:170:8)
+      at emitErrorCloseNT (node:internal/streams/destroy:129:3)
+      at process.processTicksAndRejections (node:internal/process/task_queues:90:21) {
+    errno: -32,
+    code: 'EPIPE',
+    syscall: 'write'
+  }
+  
+  Node.js v24.21.0
+   | pid=2289 exit=1 stderr=Error: socket already exists; reconcile the recorded supervisor before removal
+  
+      at TestContext.<anonymous> (file:///home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/daemon.test.js:65:16)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

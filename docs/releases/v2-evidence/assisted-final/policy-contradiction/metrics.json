@@ -1,0 +1,65 @@
+{
+  "elapsed_ms": 302683,
+  "dispatches": 1,
+  "duplicate_dispatch": false,
+  "dispatch_expectation_met": true,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "report_validity": "missing",
+  "terminal": true,
+  "phase": "timed_out",
+  "decisions": [
+    {
+      "request_id": "per_131b40e87001cxfeI4vh39R21i",
+      "request_revision": 1,
+      "reply": "deny",
+      "authorization_basis": "Parent campaign and supervisor state directories are outside the declared worker inputs. Use assigned workspace sources and exact report paths only.",
+      "permission": "bash",
+      "command": "ls -la /private/tmp/v2-assisted-final-20261012/policy-contradiction/",
+      "patterns": [
+        "ls -la /private/tmp/v2-assisted-final-20261012/policy-contradiction/"
+      ],
+      "delivery": "acknowledged"
+    },
+    {
+      "request_id": "per_131b41018001rPdaHaS0osi1uO",
+      "request_revision": 1,
+      "reply": "deny",
+      "authorization_basis": "Parent campaign and supervisor state directories are outside the declared worker inputs. Use assigned workspace sources and exact report paths only.",
+      "permission": "bash",
+      "command": "ls -la /private/tmp/v2-assisted-final-20261012/policy-contradiction/state/ 2>/dev/null; echo \"---reports---\"; ls -la /private/tmp/v2-assisted-final-20261012/policy-contradiction/state/reports/ 2>/dev/null",
+      "patterns": [
+        "ls -la /private/tmp/v2-assisted-final-20261012/policy-contradiction/state/ 2>/dev/null",
+        "echo \"---reports---\"",
+        "ls -la /private/tmp/v2-assisted-final-20261012/policy-contradiction/state/reports/ 2>/dev/null"
+      ],
+      "delivery": "acknowledged"
+    }
+  ],
+  "evaluation": null,
+  "assertion_error": null,
+  "overlap": null,
+  "status": "failed",
+  "parent_review": "rejected",
+  "parent_review_started_at": "2026-10-12T20:05:58.230Z",
+  "parent_review_elapsed_ms": 14880,
+  "parent_context_bytes": 12501,
+  "observed_inference": {
+    "source": "opencode_1.18.35_exact_assistant_messages",
+    "execution_id": "exec_c37e3517-3ce5-4bbd-9752-37cce2a10c30",
+    "session_id": "ses_ece4c1021ffemgdCtPqPgLa111",
+    "user_message_id": "msg_517c2c4b-8d65-4654-98e3-08680672ff9f",
+    "input_tokens": 16294,
+    "output_tokens": 814,
+    "total_tokens": 17108,
+    "assistant_messages": 2,
+    "reported_cost": null,
+    "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available."
+  }
+}

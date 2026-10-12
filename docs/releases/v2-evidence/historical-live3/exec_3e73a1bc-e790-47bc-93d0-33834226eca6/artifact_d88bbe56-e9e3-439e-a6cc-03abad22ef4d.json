@@ -1,0 +1,37 @@
+{
+  "schema_version": 2,
+  "task_id": "task_5691769d-8fd7-431b-952b-fa850ba4abed",
+  "execution_id": "exec_3e73a1bc-e790-47bc-93d0-33834226eca6",
+  "outcome": "completed",
+  "summary": "Read input.txt in the assigned workspace. The file contained one line stating 'The fixture answer is beta.' The fixture answer beta is therefore beta. Report artifacts written to the certified report channel directory.",
+  "coverage": [
+    "input.txt inspected"
+  ],
+  "gaps": [],
+  "findings": [
+    {
+      "id": "fixture-beta",
+      "claim": "The fixture answer beta is beta.",
+      "evidence": [
+        "input.txt:1: The fixture answer is beta."
+      ],
+      "caveats": [
+        "Single-line fixture file inspected; content accepted as authoritative for this task only."
+      ]
+    }
+  ],
+  "changes": [],
+  "checks": [
+    {
+      "id": "inspect-input",
+      "status": "passed",
+      "exit_code": null,
+      "evidence": [
+        "input.txt:1: The fixture answer is beta."
+      ],
+      "explanation": "Read input.txt and it stated the fixture answer is beta, confirming the answer."
+    }
+  ],
+  "blockers": [],
+  "next_action": "Await parent review of the worker report; no further action required."
+}

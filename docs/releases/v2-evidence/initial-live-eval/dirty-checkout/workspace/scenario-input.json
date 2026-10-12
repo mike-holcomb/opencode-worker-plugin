@@ -1,0 +1,14 @@
+{
+  "schema_version": 2,
+  "scenario_id": "dirty-checkout",
+  "run_id": "dirty-checkout-1791829805397",
+  "tier": "standard",
+  "context_mode": "fresh",
+  "context_basis": "ordinary fresh context",
+  "task_file": "task.md",
+  "fixture_files": [
+    "app.py",
+    "starting_state.json",
+    "test_app.py"
+  ]
+}

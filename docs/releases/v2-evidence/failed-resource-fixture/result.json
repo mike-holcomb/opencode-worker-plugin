@@ -1,0 +1,36 @@
+{
+  "node": "v24.19.0",
+  "platform": "darwin",
+  "arch": "arm64",
+  "commit": "70c0b43c791a99cbccab5608d0e8d71e4e7bc7ae",
+  "count": 10,
+  "duration_seconds": 0,
+  "fixture": "in-memory MCP transport and backend; real SQLite and evidence capture",
+  "limits": {
+    "start_p95_ms": 2000,
+    "get_p95_ms": 250,
+    "event_p95_ms": 1000,
+    "wait_slack_ms": 1000
+  },
+  "limitations": [
+    "No managed child process or network socket lifecycle exercised by this fixture"
+  ],
+  "passes": {
+    "latency": true,
+    "waits": true,
+    "dispatches": true,
+    "memory": true,
+    "backends": false,
+    "duration": true
+  },
+  "p95": {
+    "start_ms": 85.85224999999991,
+    "get_ms": 0.5863750000007713,
+    "event_ms": 4.532790999999634
+  },
+  "dispatches": 30,
+  "baseline_rss": 227819520,
+  "final_median_rss": 227852288,
+  "release_sized": false,
+  "status": "failed"
+}

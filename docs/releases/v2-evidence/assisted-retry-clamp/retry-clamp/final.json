@@ -1,0 +1,263 @@
+{
+  "taskId": "task_060b1043-ce5a-4978-bfda-01a83ba15c97",
+  "executionId": "exec_1ae192de-ace6-457c-8176-a40de2ef8709",
+  "scopeId": "release-retry-clamp",
+  "revision": 14,
+  "phase": "completed",
+  "observation": "current",
+  "workspace": "/private/tmp/v2-assisted-retry-clamp-20261012/retry-clamp/workspace",
+  "workspaceAccess": "exclusive",
+  "requestModel": {
+    "profile": "local"
+  },
+  "model": "llama.cpp/laguna-s-21",
+  "profile": "bounded-build",
+  "backendId": "backend_e31f43d29d8c5555e53574d507d89a35",
+  "sessionId": "ses_ece577e1fffeH7LI4qoYmupczp",
+  "userMessageId": "msg_271b87bf-fd64-420b-bd9d-46b3923bfdcd",
+  "predecessorExecutionId": null,
+  "contextMode": null,
+  "baselineHash": "180117230fc49a0e634277e500ac29f3d5ffcc7dc3adeb23fa807242e8514236",
+  "promptHash": "71b37f708627053972978ffe796319b64d182c44e5e1e6d590723273d50a4d5b",
+  "reportPath": "/private/tmp/v2-assisted-retry-clamp-20261012/retry-clamp/state/reports/exec_1ae192de-ace6-457c-8176-a40de2ef8709",
+  "queueDeadlineAt": "2026-10-12T19:50:08.105Z",
+  "admittedAt": "2026-10-12T19:48:08.108Z",
+  "executionDeadlineAt": "2026-10-12T19:53:08.108Z",
+  "finalizationDeadlineAt": "2026-10-12T19:48:54.004Z",
+  "intendedOutcome": "completed",
+  "creationIntent": {
+    "backendId": "backend_e31f43d29d8c5555e53574d507d89a35",
+    "marker": "opencode-agents:exec_1ae192de-ace6-457c-8176-a40de2ef8709",
+    "sessionId": "ses_ece577e1fffeH7LI4qoYmupczp",
+    "createdAt": "2026-10-12T19:48:09.306Z"
+  },
+  "cancellationIntent": null,
+  "pendingRequests": [],
+  "createdAt": "2026-10-12T19:48:08.105Z",
+  "updatedAt": "2026-10-12T19:48:24.069Z",
+  "reportValidity": "valid",
+  "finalManifestHash": "fcea4851d10a70a4b990e2766f1e1dcb6994fb779387e40db14da4b4b3e829e3",
+  "reviewStatus": "pending",
+  "terminal": true,
+  "operationally_resolved": true,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "events": [
+    {
+      "cursor": 1,
+      "kind": "queued",
+      "detail": {
+        "taskId": "task_060b1043-ce5a-4978-bfda-01a83ba15c97"
+      },
+      "createdAt": "2026-10-12T19:48:08.105Z"
+    },
+    {
+      "cursor": 2,
+      "kind": "admitted",
+      "detail": {
+        "executionDeadlineAt": "2026-10-12T19:53:08.108Z",
+        "resourceKeys": [
+          "workspace:/private/tmp/v2-assisted-retry-clamp-20261012/retry-clamp/workspace"
+        ]
+      },
+      "createdAt": "2026-10-12T19:48:08.108Z"
+    },
+    {
+      "cursor": 3,
+      "kind": "creation_intent",
+      "detail": {
+        "backendId": "backend_e31f43d29d8c5555e53574d507d89a35",
+        "marker": "opencode-agents:exec_1ae192de-ace6-457c-8176-a40de2ef8709"
+      },
+      "createdAt": "2026-10-12T19:48:09.306Z"
+    },
+    {
+      "cursor": 4,
+      "kind": "session_bound",
+      "detail": {
+        "backendId": "backend_e31f43d29d8c5555e53574d507d89a35",
+        "sessionId": "ses_ece577e1fffeH7LI4qoYmupczp"
+      },
+      "createdAt": "2026-10-12T19:48:09.316Z"
+    },
+    {
+      "cursor": 5,
+      "kind": "dispatch_intent",
+      "detail": {
+        "messageId": "msg_271b87bf-fd64-420b-bd9d-46b3923bfdcd"
+      },
+      "createdAt": "2026-10-12T19:48:09.317Z"
+    },
+    {
+      "cursor": 6,
+      "kind": "dispatch_acknowledged",
+      "detail": {},
+      "createdAt": "2026-10-12T19:48:09.322Z"
+    },
+    {
+      "cursor": 7,
+      "kind": "running",
+      "detail": {
+        "messageId": "msg_271b87bf-fd64-420b-bd9d-46b3923bfdcd"
+      },
+      "createdAt": "2026-10-12T19:48:09.322Z"
+    },
+    {
+      "cursor": 8,
+      "kind": "input_request",
+      "detail": {
+        "kind": "permission",
+        "requestId": "per_131a88f8d001f2Vrc9r2E58Pmf",
+        "revision": 1
+      },
+      "createdAt": "2026-10-12T19:48:12.820Z"
+    },
+    {
+      "cursor": 9,
+      "kind": "input_response_intent",
+      "detail": {
+        "requestId": "per_131a88f8d001f2Vrc9r2E58Pmf",
+        "requestRevision": 1
+      },
+      "createdAt": "2026-10-12T19:48:13.085Z"
+    },
+    {
+      "cursor": 10,
+      "kind": "input_response_acknowledged",
+      "detail": {
+        "requestId": "per_131a88f8d001f2Vrc9r2E58Pmf"
+      },
+      "createdAt": "2026-10-12T19:48:13.096Z"
+    },
+    {
+      "cursor": 11,
+      "kind": "running",
+      "detail": {},
+      "createdAt": "2026-10-12T19:48:13.128Z"
+    },
+    {
+      "cursor": 12,
+      "kind": "input_request",
+      "detail": {
+        "kind": "permission",
+        "requestId": "per_131a892ac00140oBlYnZGnOhPe",
+        "revision": 1
+      },
+      "createdAt": "2026-10-12T19:48:13.620Z"
+    },
+    {
+      "cursor": 13,
+      "kind": "input_response_intent",
+      "detail": {
+        "requestId": "per_131a892ac00140oBlYnZGnOhPe",
+        "requestRevision": 1
+      },
+      "createdAt": "2026-10-12T19:48:13.813Z"
+    },
+    {
+      "cursor": 14,
+      "kind": "input_response_acknowledged",
+      "detail": {
+        "requestId": "per_131a892ac00140oBlYnZGnOhPe"
+      },
+      "createdAt": "2026-10-12T19:48:13.822Z"
+    },
+    {
+      "cursor": 15,
+      "kind": "running",
+      "detail": {},
+      "createdAt": "2026-10-12T19:48:13.839Z"
+    },
+    {
+      "cursor": 16,
+      "kind": "finalizing",
+      "detail": {
+        "detail": {
+          "error": null
+        },
+        "intendedOutcome": "completed"
+      },
+      "createdAt": "2026-10-12T19:48:24.004Z"
+    },
+    {
+      "cursor": 17,
+      "kind": "artifact_registered",
+      "detail": {
+        "artifactId": "artifact_b9c4e6c9-c1f5-4b85-b544-4005dc4acc9f",
+        "sha256": "da3dfe611f4cf155b8011451d67b20beec4fd8687bf1e8724b70767f30d551ef"
+      },
+      "createdAt": "2026-10-12T19:48:24.023Z"
+    },
+    {
+      "cursor": 18,
+      "kind": "artifact_registered",
+      "detail": {
+        "artifactId": "artifact_b9fb4ae9-850d-4d63-be21-b2c511b6c1cf",
+        "sha256": "5f0e328db22a72273b67875702fab8e673a86ba38a2644a51419d9ec1fe9d7d1"
+      },
+      "createdAt": "2026-10-12T19:48:24.041Z"
+    },
+    {
+      "cursor": 19,
+      "kind": "artifact_registered",
+      "detail": {
+        "artifactId": "artifact_3db6b56b-5ffa-407d-9813-a440b57a54ae",
+        "sha256": "e23dbd831401484d51db3b126fc59671a9db873e66822049def9870b9c7ba4b4"
+      },
+      "createdAt": "2026-10-12T19:48:24.054Z"
+    },
+    {
+      "cursor": 20,
+      "kind": "artifact_registered",
+      "detail": {
+        "artifactId": "artifact_d5b1b4de-72a4-47f2-9872-fcd3658d9295",
+        "sha256": "fcea4851d10a70a4b990e2766f1e1dcb6994fb779387e40db14da4b4b3e829e3"
+      },
+      "createdAt": "2026-10-12T19:48:24.063Z"
+    },
+    {
+      "cursor": 21,
+      "kind": "finalized",
+      "detail": {
+        "finalManifestHash": "fcea4851d10a70a4b990e2766f1e1dcb6994fb779387e40db14da4b4b3e829e3",
+        "outcome": "completed",
+        "reportValidity": "valid"
+      },
+      "createdAt": "2026-10-12T19:48:24.069Z"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "artifact_b9c4e6c9-c1f5-4b85-b544-4005dc4acc9f",
+      "sha256": "da3dfe611f4cf155b8011451d67b20beec4fd8687bf1e8724b70767f30d551ef",
+      "byte_length": 3857,
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "artifact_b9fb4ae9-850d-4d63-be21-b2c511b6c1cf",
+      "sha256": "5f0e328db22a72273b67875702fab8e673a86ba38a2644a51419d9ec1fe9d7d1",
+      "byte_length": 1183,
+      "media_type": "text/markdown"
+    },
+    {
+      "artifact_id": "artifact_3db6b56b-5ffa-407d-9813-a440b57a54ae",
+      "sha256": "e23dbd831401484d51db3b126fc59671a9db873e66822049def9870b9c7ba4b4",
+      "byte_length": 193,
+      "media_type": "application/octet-stream"
+    },
+    {
+      "artifact_id": "artifact_d5b1b4de-72a4-47f2-9872-fcd3658d9295",
+      "sha256": "fcea4851d10a70a4b990e2766f1e1dcb6994fb779387e40db14da4b4b3e829e3",
+      "byte_length": 1608,
+      "media_type": "application/json"
+    }
+  ],
+  "cursor": 21,
+  "has_more_events": false
+}

@@ -1,0 +1,79 @@
+{
+  "review_started_at": "2026-10-12T18:30:25.559Z",
+  "context_bytes": 20102,
+  "idempotency_key": "parent-release-review-lookup-timeout-correction-0001",
+  "gate_status": "passed",
+  "review": {
+    "disposition": "accepted",
+    "rationale": "Parent inspected both complete source files, corrected strict JSON report, summary, immutable manifest, and frozen checks. DEFAULT_TIMEOUT_SECONDS=12, health override=3, and Client.request explicit argument precedence are supported. All five automated checks pass; parent source review also passes. Failed predecessor remains preserved.",
+    "criteria": [
+      {
+        "id": "summary-exists",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_87572ded-09db-4bec-a018-e7eb3015e74f@sha256:d11cd2367924b431a86346509b9515e4d994bb50c29480a0095ff6d5dee7703f",
+          "artifact:artifact_16879c7f-6e78-483f-afcb-7646dd4b12d0@sha256:3170e51b920003f4401ee621114b243975c8496ffb6ab99da5b589c067c992c0",
+          "artifact:artifact_2c47a63d-f9f9-419a-b1b6-6611f9e0cd6d@sha256:ad20803e1acb1069b68ec630fd9412ed9c437776677456b59c62116db5708036"
+        ]
+      },
+      {
+        "id": "definition-cited",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_87572ded-09db-4bec-a018-e7eb3015e74f@sha256:d11cd2367924b431a86346509b9515e4d994bb50c29480a0095ff6d5dee7703f",
+          "artifact:artifact_16879c7f-6e78-483f-afcb-7646dd4b12d0@sha256:3170e51b920003f4401ee621114b243975c8496ffb6ab99da5b589c067c992c0",
+          "artifact:artifact_2c47a63d-f9f9-419a-b1b6-6611f9e0cd6d@sha256:ad20803e1acb1069b68ec630fd9412ed9c437776677456b59c62116db5708036"
+        ]
+      },
+      {
+        "id": "caller-cited",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_87572ded-09db-4bec-a018-e7eb3015e74f@sha256:d11cd2367924b431a86346509b9515e4d994bb50c29480a0095ff6d5dee7703f",
+          "artifact:artifact_16879c7f-6e78-483f-afcb-7646dd4b12d0@sha256:3170e51b920003f4401ee621114b243975c8496ffb6ab99da5b589c067c992c0",
+          "artifact:artifact_2c47a63d-f9f9-419a-b1b6-6611f9e0cd6d@sha256:ad20803e1acb1069b68ec630fd9412ed9c437776677456b59c62116db5708036"
+        ]
+      },
+      {
+        "id": "source-unchanged",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_87572ded-09db-4bec-a018-e7eb3015e74f@sha256:d11cd2367924b431a86346509b9515e4d994bb50c29480a0095ff6d5dee7703f",
+          "artifact:artifact_16879c7f-6e78-483f-afcb-7646dd4b12d0@sha256:3170e51b920003f4401ee621114b243975c8496ffb6ab99da5b589c067c992c0",
+          "artifact:artifact_2c47a63d-f9f9-419a-b1b6-6611f9e0cd6d@sha256:ad20803e1acb1069b68ec630fd9412ed9c437776677456b59c62116db5708036"
+        ]
+      },
+      {
+        "id": "write-scope",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_87572ded-09db-4bec-a018-e7eb3015e74f@sha256:d11cd2367924b431a86346509b9515e4d994bb50c29480a0095ff6d5dee7703f",
+          "artifact:artifact_16879c7f-6e78-483f-afcb-7646dd4b12d0@sha256:3170e51b920003f4401ee621114b243975c8496ffb6ab99da5b589c067c992c0",
+          "artifact:artifact_2c47a63d-f9f9-419a-b1b6-6611f9e0cd6d@sha256:ad20803e1acb1069b68ec630fd9412ed9c437776677456b59c62116db5708036"
+        ]
+      },
+      {
+        "id": "parent-lookup-review",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_87572ded-09db-4bec-a018-e7eb3015e74f@sha256:d11cd2367924b431a86346509b9515e4d994bb50c29480a0095ff6d5dee7703f",
+          "artifact:artifact_16879c7f-6e78-483f-afcb-7646dd4b12d0@sha256:3170e51b920003f4401ee621114b243975c8496ffb6ab99da5b589c067c992c0",
+          "artifact:artifact_2c47a63d-f9f9-419a-b1b6-6611f9e0cd6d@sha256:ad20803e1acb1069b68ec630fd9412ed9c437776677456b59c62116db5708036"
+        ]
+      }
+    ],
+    "starting_state_sha256": "d11bc6b00ac53d6cc6b021bbdafd54c14ac72f29206b50df8093deab58bd1b90",
+    "final_manifest_sha256": "ad20803e1acb1069b68ec630fd9412ed9c437776677456b59c62116db5708036",
+    "freshness": "Fixture sources and final manifest inspected; immutable exports hash-verified.",
+    "integration_checks": [
+      "Five frozen automated checks passed; parent-lookup-review completed by inspecting both complete sources",
+      "Exact session preserved, new message and execution, one dispatch, valid immutable report"
+    ],
+    "coverage_limits": [
+      "Private development execution on macOS; plugin race remains accepted separately",
+      "Context byte count covers recorded review inputs, not uninstrumented earlier inspection."
+    ],
+    "unresolved_issues": [],
+    "next_action": "No further correction required for this scenario"
+  }
+}

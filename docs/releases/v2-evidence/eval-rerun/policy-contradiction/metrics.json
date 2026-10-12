@@ -1,0 +1,32 @@
+{
+  "phase": "cancelled",
+  "terminal": true,
+  "report_validity": "missing",
+  "dispatches": 1,
+  "duplicate_dispatch": false,
+  "elapsed_ms": 143461,
+  "status": "failed",
+  "parent_review": "pending",
+  "runner_interrupted": true,
+  "reason": "Outdated runner denied scoped inspections; parent cancelled exact task",
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "observed_inference": {
+    "source": "opencode_1.18.35_exact_assistant_messages",
+    "execution_id": "exec_790d6a36-c73a-45ef-b20c-361cacb38deb",
+    "session_id": "ses_ece906eb9ffe8mCT17WllJQxZs",
+    "user_message_id": "msg_15e23530-033d-4e4b-9cc7-ece37287fcb5",
+    "input_tokens": 15921,
+    "output_tokens": 2483,
+    "total_tokens": 18404,
+    "assistant_messages": 2,
+    "reported_cost": null,
+    "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available."
+  }
+}

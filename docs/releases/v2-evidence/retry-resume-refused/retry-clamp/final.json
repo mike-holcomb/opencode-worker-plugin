@@ -1,0 +1,80 @@
+{
+  "taskId": "task_fc02d3b4-42fc-4046-aa4b-3bd7f08be5d3",
+  "executionId": "exec_620055b2-e7b9-4089-b8f3-a13fe167fec4",
+  "scopeId": "release-retry-clamp",
+  "revision": 3,
+  "phase": "failed",
+  "observation": "current",
+  "workspace": "/private/tmp/v2-eval-retry-20261012/retry-clamp/workspace",
+  "workspaceAccess": "exclusive",
+  "requestModel": {
+    "profile": "local"
+  },
+  "model": "llama.cpp/laguna-s-21",
+  "profile": "bounded-build",
+  "backendId": null,
+  "sessionId": "ses_ece99d4f7ffeZhT2YMASriuHZl",
+  "userMessageId": null,
+  "predecessorExecutionId": "exec_6fb00601-3fa1-43c0-8968-df86f508d10b",
+  "contextMode": "resume",
+  "baselineHash": "b553a459cc2e1e4c3a552e2a39f3a9dcbb6b8c928eb9da3a51c79bf6521915bf",
+  "promptHash": "725855c48bc96c5876de5542917b2b0f73a961621996467195ced20d44082c64",
+  "reportPath": "/private/tmp/v2-eval-retry-20261012/retry-clamp/state/reports/exec_620055b2-e7b9-4089-b8f3-a13fe167fec4",
+  "queueDeadlineAt": "2026-10-12T19:04:07.199Z",
+  "admittedAt": "2026-10-12T19:02:07.204Z",
+  "executionDeadlineAt": "2026-10-12T19:07:07.204Z",
+  "finalizationDeadlineAt": null,
+  "intendedOutcome": null,
+  "creationIntent": null,
+  "cancellationIntent": null,
+  "pendingRequests": [],
+  "createdAt": "2026-10-12T19:02:07.199Z",
+  "updatedAt": "2026-10-12T19:02:08.947Z",
+  "reportValidity": "pending",
+  "finalManifestHash": null,
+  "reviewStatus": "pending",
+  "terminal": true,
+  "operationally_resolved": true,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "events": [
+    {
+      "cursor": 26,
+      "kind": "queued",
+      "detail": {
+        "contextMode": "resume",
+        "predecessorExecutionId": "exec_6fb00601-3fa1-43c0-8968-df86f508d10b",
+        "taskId": "task_fc02d3b4-42fc-4046-aa4b-3bd7f08be5d3"
+      },
+      "createdAt": "2026-10-12T19:02:07.199Z"
+    },
+    {
+      "cursor": 27,
+      "kind": "admitted",
+      "detail": {
+        "executionDeadlineAt": "2026-10-12T19:07:07.204Z",
+        "resourceKeys": [
+          "workspace:/private/tmp/v2-eval-retry-20261012/retry-clamp/workspace"
+        ]
+      },
+      "createdAt": "2026-10-12T19:02:07.204Z"
+    },
+    {
+      "cursor": 28,
+      "kind": "failed",
+      "detail": {
+        "error": "Error: recorded resume session was not recovered in the scoped worker"
+      },
+      "createdAt": "2026-10-12T19:02:08.947Z"
+    }
+  ],
+  "artifacts": [],
+  "cursor": 28,
+  "has_more_events": false
+}

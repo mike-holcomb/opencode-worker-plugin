@@ -1,0 +1,45 @@
+{
+  "schema_version": 2,
+  "scenario_id": "lookup-timeout",
+  "result_artifact_sha256": "3170e51b920003f4401ee621114b243975c8496ffb6ab99da5b589c067c992c0",
+  "status": "review_required",
+  "parent_review_required": true,
+  "checks": [
+    {
+      "id": "summary-exists",
+      "kind": "file_exists",
+      "status": "pass",
+      "detail": "verified result artifact: summary.md"
+    },
+    {
+      "id": "definition-cited",
+      "kind": "text_contains",
+      "status": "pass",
+      "detail": "searched summary.md for 2 frozen marker(s)"
+    },
+    {
+      "id": "caller-cited",
+      "kind": "text_contains",
+      "status": "pass",
+      "detail": "searched summary.md for 2 frozen marker(s)"
+    },
+    {
+      "id": "source-unchanged",
+      "kind": "unchanged_paths",
+      "status": "pass",
+      "detail": "changed=[]"
+    },
+    {
+      "id": "write-scope",
+      "kind": "allowed_changed_paths",
+      "status": "pass",
+      "detail": "changed=[]; unauthorized=[]"
+    },
+    {
+      "id": "parent-lookup-review",
+      "kind": "parent_review",
+      "status": "review_required",
+      "detail": "Verify the full supplied source was inspected, the defining symbol and caller are accurate, and default versus override is supported by the cited lines."
+    }
+  ]
+}

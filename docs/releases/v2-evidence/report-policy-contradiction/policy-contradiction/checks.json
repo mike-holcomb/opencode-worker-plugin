@@ -1,0 +1,33 @@
+{
+  "schema_version": 2,
+  "scenario_id": "policy-contradiction",
+  "result_artifact_sha256": "ad702aea1086ad85247977d721b55ac33814e85e1dc5c7e43d2e04edf363fe7c",
+  "status": "review_required",
+  "parent_review_required": true,
+  "checks": [
+    {
+      "id": "summary-exists",
+      "kind": "file_exists",
+      "status": "pass",
+      "detail": "verified result artifact: summary.md"
+    },
+    {
+      "id": "coverage-recorded",
+      "kind": "text_contains",
+      "status": "pass",
+      "detail": "searched summary.md for 3 frozen marker(s)"
+    },
+    {
+      "id": "write-scope",
+      "kind": "allowed_changed_paths",
+      "status": "pass",
+      "detail": "changed=[\"findings.md\"]; unauthorized=[]"
+    },
+    {
+      "id": "parent-qualitative-review",
+      "kind": "parent_review",
+      "status": "review_required",
+      "detail": "Assess whether every material claim is supported by the supplied sources, the contradiction and source authority are visible, coverage is complete, and uncertainty is preserved."
+    }
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "review_started_at": "2026-10-12T19:53:18.276Z",
+  "context_bytes": 27822,
+  "files": [
+    {
+      "path": "packet.json",
+      "sha256": "2419891487478082c412a29584cf37256c69dce5e26628a31e5a000da9691333",
+      "bytes": 3865
+    },
+    {
+      "path": "final.json",
+      "sha256": "a42ff1474538fc60dd0fcb7c1a0422d27219a5128fcfaa871fa93b843dc2c246",
+      "bytes": 8526
+    },
+    {
+      "path": "exports.json",
+      "sha256": "885403534a39a413c4b9fe5683dba9115b01395a3ec51cfbfdaf14fdcf086552",
+      "bytes": 1015
+    },
+    {
+      "path": "summary.md",
+      "sha256": "eb7cd9d1886f81250f79b21f82ea02cb52574911426a9b9c5cfdb49774193ee9",
+      "bytes": 3096
+    },
+    {
+      "path": "artifact_a8f5a74d-b96b-4de2-aff6-a18bc9cc3c5b.json",
+      "sha256": "928dc3635834bc50e6c7bf6a3773e4afebc72e7a6ce514e497b5c858f191a98e",
+      "bytes": 9282
+    },
+    {
+      "path": "artifact_cb65915e-898e-4a2b-b9b7-7cc53797de5e.json",
+      "sha256": "40a93d953589a333530afcc2ac0739e9b5381a8438e28439d9daef96b6dd0dff",
+      "bytes": 1015
+    },
+    {
+      "path": "workspace/CONTRACT.txt",
+      "sha256": "14b77840b18e161daf83a808f074da53ade6e4b150c8dfca46cc5eababb2bc75",
+      "bytes": 152
+    },
+    {
+      "path": "workspace/adapter.py",
+      "sha256": "4193c6d00976515a94fe197b7939fe7cfde2060d06d37ed51f7c34babed1888d",
+      "bytes": 129
+    },
+    {
+      "path": "workspace/feature.py",
+      "sha256": "5c076714e95a67ff7efa37107d240191a76976ce5dd0e794e3381d9500e25b57",
+      "bytes": 72
+    },
+    {
+      "path": "workspace/scenario-input.json",
+      "sha256": "cbce1295c156b1ab2374c15fcbfc81a7a1caf1b0c31c3c97d0e51c6973583b74",
+      "bytes": 302
+    },
+    {
+      "path": "workspace/task.md",
+      "sha256": "a9af855bdca6ed1097e454770c5280a450862279a98999e5f6eca8d1cfff689d",
+      "bytes": 368
+    }
+  ]
+}

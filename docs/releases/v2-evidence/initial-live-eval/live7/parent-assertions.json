@@ -1,0 +1,19 @@
+{
+  "phase": "timed_out",
+  "report": "missing",
+  "execution": "exec_49470f13-ad50-460c-b89a-73dc35f2027a",
+  "reservations": 0,
+  "reviews": 0,
+  "dispatches": 1,
+  "abort_acknowledged": true,
+  "input_preserved": true,
+  "forbidden_absent": true,
+  "finalizing": [
+    {
+      "detail": {
+        "cancelEffect": "applied"
+      },
+      "intendedOutcome": "timed_out"
+    }
+  ]
+}

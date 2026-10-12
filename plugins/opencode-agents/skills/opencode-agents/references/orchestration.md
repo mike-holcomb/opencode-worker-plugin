@@ -28,17 +28,17 @@ serialize the interface first.
 | Planner delegates implementation | Validated design decisions, required interface, rationale and checks; no need to copy the conversation. |
 
 Fresh context can increase rediscovery; continued context can preserve mistakes.
-The helper supports fresh sessions and `--session`, not conversation forking or
-selective-history machinery. Curated state is ordinary task-file content.
+`opencode_continue_task` supports `fresh` and `resume` after the predecessor is
+terminal and operationally resolved. Curated state belongs in the typed packet.
 
-Before replacement or continuation reconcile the original process and writes.
-Use a new job directory and identify the predecessor; preserve earlier results.
+Before replacement or continuation reconcile the original execution and writes.
+Each follow-up gets a new execution and report location; preserve earlier results.
 A new session is not a clean checkout and an unchecked summary is not authority.
 
 ## Repository and resource contract
 
-Conversation state, files and external services are different. The helper separates
-sessions only. Record relevant starting revision and dirty input hashes/snapshot,
+Conversation state, files and external services are different. A fresh session
+separates conversation state only. Record relevant starting revision and dirty input hashes/snapshot,
 read dependencies, permitted writes/resources, interface inputs/outputs/failures
 and downstream consumer, plus freshness and integration checks. Commit ID alone
 cannot identify a dirty checkout. Preserve pre-existing edits.

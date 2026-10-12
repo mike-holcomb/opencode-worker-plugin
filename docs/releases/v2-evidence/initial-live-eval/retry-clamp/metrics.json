@@ -1,0 +1,44 @@
+{
+  "elapsed_ms": 302889,
+  "dispatches": 1,
+  "duplicate_dispatch": false,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "report_validity": "missing",
+  "terminal": true,
+  "phase": "timed_out",
+  "decisions": [
+    {
+      "request_id": "per_13152770b001s9S4hDMMuKgEEQ",
+      "reply": "deny",
+      "permission": "edit",
+      "patterns": [
+        "private/tmp/v2-live-campaign-20261012-01/retry-clamp/workspace/retry.py"
+      ]
+    }
+  ],
+  "evaluation": null,
+  "status": "failed",
+  "parent_review": "rejected",
+  "parent_review_started_at": "2026-10-12T18:35:56.647131+00:00",
+  "parent_review_elapsed_ms": 18987,
+  "parent_context_bytes": 713,
+  "observed_inference": {
+    "source": "opencode_1.18.35_exact_assistant_messages",
+    "execution_id": "exec_1f16ba1e-6616-4c55-9a13-e15fdce16b13",
+    "session_id": "ses_ecead9c3dffeFb8VQxIuxHPRy9",
+    "user_message_id": "msg_414d8231-fe82-4540-a54a-1eb1502c4bb9",
+    "input_tokens": 16195,
+    "output_tokens": 573,
+    "total_tokens": 16768,
+    "assistant_messages": 2,
+    "reported_cost": null,
+    "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available."
+  }
+}

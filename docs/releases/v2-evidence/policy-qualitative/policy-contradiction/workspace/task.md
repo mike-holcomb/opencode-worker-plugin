@@ -1,0 +1,1 @@
+Review the supplied policy and audit note against review_scope.txt. Write the assigned report summary.md with indexed findings, the contradiction if one exists, source paths for each material claim, coverage, uncertainty, and a recommendation. Do not resolve a contradiction by silently choosing one source.

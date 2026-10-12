@@ -1,0 +1,1 @@
+Implement the requested retry boundary in retry.py: negative values behave as zero and values above three behave as three, while values from zero through three are preserved. Keep the public function name and write a concise assigned report summary.md with the check command and result. Do not change tests.

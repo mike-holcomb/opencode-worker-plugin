@@ -1,0 +1,104 @@
+{
+  "decision": {
+    "review_started_at": "2026-10-12T18:35:56.669598+00:00",
+    "context_bytes": 703,
+    "idempotency_key": "parent-release-reject-context-reconcile-0001",
+    "gate_status": "failed",
+    "review": {
+      "disposition": "rejected",
+      "rationale": "Existing model route failed with API connection errors; no report was produced. Preserve this infrastructure failure and rerun after route restoration.",
+      "criteria": [
+        {
+          "id": "summary-exists",
+          "result": "not_checked",
+          "evidence": []
+        },
+        {
+          "id": "verified-unverified",
+          "result": "not_checked",
+          "evidence": []
+        },
+        {
+          "id": "reconciliation",
+          "result": "not_checked",
+          "evidence": []
+        },
+        {
+          "id": "write-scope",
+          "result": "not_checked",
+          "evidence": []
+        },
+        {
+          "id": "parent-context-review",
+          "result": "not_checked",
+          "evidence": []
+        }
+      ],
+      "starting_state_sha256": "dcbe809ac718fb79a3aea2beaf970ca5f9638607b8ac199209e2f3bf973d4eb0",
+      "final_manifest_sha256": "72cf3d356bcd65eb4219fb19e308047083be94e9b4338e087f53fccdcc493e3a",
+      "freshness": "Current terminal snapshot and recorded failure inspected.",
+      "integration_checks": [
+        "One dispatch recorded; missing report prevents acceptance."
+      ],
+      "coverage_limits": [
+        "Rejection based on terminal failure evidence; no successful qualitative source review claimed.",
+        "Context bytes measure the recorded rejection input only."
+      ],
+      "unresolved_issues": [
+        "Existing model route failed with API connection errors; no report was produced. Preserve this infrastructure failure and rerun after route restoration."
+      ],
+      "next_action": "Fresh isolated rerun; preserve this failed attempt."
+    }
+  },
+  "result": {
+    "taskId": "task_ba92634f-2156-44dc-a128-cec2448d4272",
+    "executionId": "exec_61c9764c-34b7-434b-8892-8cb33c74ca95",
+    "scopeId": "release-context-reconcile",
+    "revision": 9,
+    "phase": "failed",
+    "observation": "current",
+    "workspace": "/private/tmp/v2-live-campaign-20261012-01/context-reconcile/workspace",
+    "workspaceAccess": "exclusive",
+    "requestModel": {
+      "profile": "local"
+    },
+    "model": "llama.cpp/laguna-s-21",
+    "profile": "bounded-inspect",
+    "backendId": "backend_656549bd894e75d297cac1f903feb67a",
+    "sessionId": "ses_ece9caf13ffeUqaclDU65yWB4y",
+    "userMessageId": "msg_1d5b1184-31fb-40e4-bb54-199a525f9d68",
+    "predecessorExecutionId": null,
+    "contextMode": null,
+    "baselineHash": "dcbe809ac718fb79a3aea2beaf970ca5f9638607b8ac199209e2f3bf973d4eb0",
+    "promptHash": "bdd2a39afd3cef3319db6c43ea24ae66ab83663d6cbfd69becaf405786b1df85",
+    "reportPath": "/private/tmp/v2-live-campaign-20261012-01/context-reconcile/state/reports/exec_61c9764c-34b7-434b-8892-8cb33c74ca95",
+    "queueDeadlineAt": "2026-10-12T18:34:33.572Z",
+    "admittedAt": "2026-10-12T18:32:33.577Z",
+    "executionDeadlineAt": "2026-10-12T18:37:33.577Z",
+    "finalizationDeadlineAt": "2026-10-12T18:34:10.175Z",
+    "intendedOutcome": "failed",
+    "creationIntent": {
+      "backendId": "backend_656549bd894e75d297cac1f903feb67a",
+      "marker": "opencode-agents:exec_61c9764c-34b7-434b-8892-8cb33c74ca95",
+      "sessionId": "ses_ece9caf13ffeUqaclDU65yWB4y",
+      "createdAt": "2026-10-12T18:32:34.786Z"
+    },
+    "cancellationIntent": null,
+    "pendingRequests": [],
+    "createdAt": "2026-10-12T18:32:33.572Z",
+    "updatedAt": "2026-10-12T18:36:21.672Z",
+    "reportValidity": "missing",
+    "finalManifestHash": "72cf3d356bcd65eb4219fb19e308047083be94e9b4338e087f53fccdcc493e3a",
+    "reviewStatus": "rejected",
+    "terminal": true,
+    "operationally_resolved": true,
+    "usage": {
+      "input_tokens": null,
+      "output_tokens": null,
+      "cache_tokens": null,
+      "reported_cost": null,
+      "currency": null,
+      "source": "not_captured"
+    }
+  }
+}

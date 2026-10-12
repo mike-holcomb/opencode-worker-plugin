@@ -1,0 +1,51 @@
+{
+  "review_started_at": "2026-10-12T18:35:56.665017+00:00",
+  "context_bytes": 714,
+  "idempotency_key": "parent-release-reject-dirty-checkout-0001",
+  "gate_status": "failed",
+  "review": {
+    "disposition": "rejected",
+    "rationale": "Existing model route failed with API connection errors; no report was produced. Preserve this infrastructure failure and rerun after route restoration.",
+    "criteria": [
+      {
+        "id": "app-tests-pass",
+        "result": "not_checked",
+        "evidence": []
+      },
+      {
+        "id": "dirty-marker-preserved",
+        "result": "not_checked",
+        "evidence": []
+      },
+      {
+        "id": "summary-distinguishes-state",
+        "result": "not_checked",
+        "evidence": []
+      },
+      {
+        "id": "write-scope",
+        "result": "not_checked",
+        "evidence": []
+      },
+      {
+        "id": "parent-dirty-review",
+        "result": "not_checked",
+        "evidence": []
+      }
+    ],
+    "starting_state_sha256": "a86d4f2f30721adb53e4fb4fcc46c2587d116625cc3ddb32d388a9074fa63ca8",
+    "final_manifest_sha256": "2f7419a59e5ede41282ad7cd65f410f14aaad48f09a68c21fd77ba666e701d94",
+    "freshness": "Current terminal snapshot and recorded failure inspected.",
+    "integration_checks": [
+      "One dispatch recorded; missing report prevents acceptance."
+    ],
+    "coverage_limits": [
+      "Rejection based on terminal failure evidence; no successful qualitative source review claimed.",
+      "Context bytes measure the recorded rejection input only."
+    ],
+    "unresolved_issues": [
+      "Existing model route failed with API connection errors; no report was produced. Preserve this infrastructure failure and rerun after route restoration."
+    ],
+    "next_action": "Fresh isolated rerun; preserve this failed attempt."
+  }
+}

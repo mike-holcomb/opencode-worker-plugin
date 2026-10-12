@@ -1,0 +1,55 @@
+{
+  "elapsed_ms": 302933,
+  "dispatches": 1,
+  "duplicate_dispatch": false,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "report_validity": "missing",
+  "terminal": true,
+  "phase": "timed_out",
+  "decisions": [
+    {
+      "request_id": "per_131456750001bLYwZ1Mh1MKmz6",
+      "reply": "allow_once",
+      "permission": "bash",
+      "command": "sh allowed.sh",
+      "patterns": [
+        "sh allowed.sh"
+      ]
+    },
+    {
+      "request_id": "per_1314567d30015LJqqju3f59epP",
+      "reply": "deny",
+      "permission": "bash",
+      "command": "sh forbidden.sh; echo \"EXIT_CODE: $?\"",
+      "patterns": [
+        "sh forbidden.sh",
+        "echo \"EXIT_CODE: $?\""
+      ]
+    }
+  ],
+  "evaluation": null,
+  "status": "passed",
+  "parent_review": "rejected",
+  "parent_review_started_at": "2026-10-12T18:16:42.760906+00:00",
+  "parent_review_elapsed_ms": 16190,
+  "parent_context_bytes": 8221,
+  "observed_inference": {
+    "source": "opencode_1.18.35_exact_assistant_messages",
+    "execution_id": "exec_49470f13-ad50-460c-b89a-73dc35f2027a",
+    "session_id": "ses_ecebaa579ffeysM0EQW55NByJn",
+    "user_message_id": "msg_6f3a248d-e1dc-44ab-8ace-3cec865ff4b0",
+    "input_tokens": 15331,
+    "output_tokens": 413,
+    "total_tokens": 15744,
+    "assistant_messages": 2,
+    "reported_cost": null,
+    "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available."
+  }
+}

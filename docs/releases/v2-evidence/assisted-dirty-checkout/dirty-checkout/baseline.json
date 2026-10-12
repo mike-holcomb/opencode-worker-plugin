@@ -1,0 +1,16 @@
+{
+  "schema_version": 2,
+  "scenario_id": "dirty-checkout",
+  "run_id": "dirty-checkout-1791834509534",
+  "prepared_workdir": "/private/tmp/v2-assisted-dirty-checkout-20261012/dirty-checkout/workspace",
+  "manifest_sha256": "d397b764ff5b88baa506ae6d73c3864ffc0683fe4f02b22b897013fc4d32c691",
+  "packet_schema_sha256": "d57a85f17494892fe59d470f3f0ed54071eed7dd33cee884f61d11f83506fd87",
+  "frozen_checks_sha256": "6a758f32ed0604e572dc037edaf79af687cb8822615917129c731dc40cd03a83",
+  "initial_files": {
+    "app.py": "1d47173c660d00578f0bfb222a7e78c631502dcbec5a75dedaac4384120f0bdc",
+    "scenario-input.json": "d5a132aad2324e8d61b945bbef9ca27b86955b32ea9404e3f4792127dcf9207c",
+    "starting_state.json": "b5840916234e3239f85b1487474662f4f898e1acb230d299c140ce1cc154b0f8",
+    "task.md": "a4d5fefa76e3598af341ab6587f7f25ecf26ab5803a118121d6cde6bf92cc88c",
+    "test_app.py": "210c7599ae7857bb885517fb4dfcdbc002a00f213b4f77d27eb35ad087ccf8ba"
+  }
+}

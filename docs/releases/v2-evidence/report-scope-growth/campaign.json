@@ -1,0 +1,26 @@
+{
+  "started_at": "2026-10-12T19:49:30.219Z",
+  "route": "http://127.0.0.1:8124/v1",
+  "model": "laguna-s-21",
+  "binary": "/Users/S197758/.opencode/bin/opencode",
+  "version": "1.18.35",
+  "node": "v24.21.0",
+  "platform": "darwin",
+  "arch": "arm64",
+  "cases": [
+    "scope-growth"
+  ],
+  "revision": "77331332e0412f9dc88ad179f8ecdaf9a1dac0a9",
+  "source_sha256": {
+    "dist/coordinator.js": "0855a02554b8174db5a81814836929809a4f6168289c16b8cf1b1a1a11b2661b",
+    "dist/managed-server.js": "90b54780255a8aff59a69e6a4612ccaffb9a8786921736154a1518e897945455",
+    "dist/service.js": "33f987958095e5e93a95818b9052c403de1ed9999a787ca1e30cece238d0020c",
+    "dist/daemon.js": "97c69d719e173de678bc8df138a98e04a1adf745b5fb3836c1506eae3f0f9d52",
+    "dist/rpc.js": "64c300dcd0f75dd5d893db6c718f2d50054dd21f8f1b76e133c0aaa61c3bf5a5",
+    "dist/store.js": "fa3658d94c8868f34c2c938a77a54fca7166ccd356de32e1c246814446e22639"
+  },
+  "permission_helper_sha256": "73e0c50cd846148e4c2ea56e9941a79061f2fcab6066c15b5fbac79b47c358f9",
+  "runner_sha256": "d45abada82dfa507fc9cd8cd73d936099a6fbfb5acf4e829dfb457db4daf5de1",
+  "evaluation_sha256": "d397b764ff5b88baa506ae6d73c3864ffc0683fe4f02b22b897013fc4d32c691",
+  "usage_policy": "Unavailable token and cost counters remain null; parent context is measured as bytes read, not fabricated tokens."
+}

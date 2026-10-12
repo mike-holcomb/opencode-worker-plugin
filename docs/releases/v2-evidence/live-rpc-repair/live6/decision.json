@@ -1,0 +1,33 @@
+{
+  "review_started_at": "2026-10-12T20:00:31.414Z",
+  "context_bytes": 11298,
+  "idempotency_key": "parent-review-exec_7cee62c0-a6f3-44ed-a337-e0f017064958",
+  "gate_status": "passed",
+  "review": {
+    "disposition": "accepted",
+    "rationale": "Full source and reports identify violet at input.txt line 1. Supervisor kill/recovery preserved exact execution, session and message identities, one dispatch, valid terminal report. Parent source inspection supports answer; worker grep exit-code statement is not used as independent subprocess measurement. No declared workspace changes, with non-Git coverage limits retained.",
+    "criteria": [
+      {
+        "id": "answer",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_a2eceaa3-bac3-4242-862f-79e77d1e7474@sha256:6714c1bab01449ef17b7cc98bda92aac57f8f4b8ba36e7bbc1ebcf716c9cd862",
+          "artifact:artifact_a14b4698-4522-41d3-8ba1-c52b46290290@sha256:404a36467aca2c4af4af65e5516aacdce063e046f8b75710c51a7e4bb3608ff7",
+          "artifact:artifact_df147039-9e77-4275-be12-e7a2a5cadfcd@sha256:cf1e37c2df76c8c78624cb930623eb36ed96094cbdd7236c7405b96b7661a1b3"
+        ]
+      }
+    ],
+    "starting_state_sha256": "26bf91d4f258fa94eb5246e777304ec5332f1e1ded8946dba2c985f9d5e2da65",
+    "final_manifest_sha256": "cf1e37c2df76c8c78624cb930623eb36ed96094cbdd7236c7405b96b7661a1b3",
+    "freshness": "Parent inspected complete recorded fixture inputs, immutable exports, final snapshot, and available checks.",
+    "integration_checks": [
+      "Full source and reports identify violet at input.txt line 1. Supervisor kill/recovery preserved exact execution, session and message identities, one dispatch, valid terminal report. Parent source inspection supports answer; worker grep exit-code statement is not used as independent subprocess measurement. No declared workspace changes, with non-Git coverage limits retained."
+    ],
+    "coverage_limits": [
+      "Trusted-workspace managed mode; plugin race remains separately documented.",
+      "Context measured in bytes; elapsed review time includes concurrent parent work."
+    ],
+    "unresolved_issues": [],
+    "next_action": "Retain this reviewed attempt."
+  }
+}

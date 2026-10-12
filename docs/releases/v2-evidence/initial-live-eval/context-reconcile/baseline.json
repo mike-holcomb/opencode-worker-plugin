@@ -1,0 +1,16 @@
+{
+  "schema_version": 2,
+  "scenario_id": "context-reconcile",
+  "run_id": "context-reconcile-1791829951376",
+  "prepared_workdir": "/private/tmp/v2-live-campaign-20261012-01/context-reconcile/workspace",
+  "manifest_sha256": "d397b764ff5b88baa506ae6d73c3864ffc0683fe4f02b22b897013fc4d32c691",
+  "packet_schema_sha256": "d57a85f17494892fe59d470f3f0ed54071eed7dd33cee884f61d11f83506fd87",
+  "frozen_checks_sha256": "88922d72e117cd54355e1e8c3bc931bf08f87c2e34889ea9977f59b699f9306b",
+  "initial_files": {
+    "decision-log.md": "8b2a9fdc4a7d5203215f69693aa224ddc49c7b9caab4be2db3a350c4e53d1bdf",
+    "handoff.md": "b7aa78f8750dceb022670620ae21c39f8fba18786bb088a72a05ed1e8cd5db4d",
+    "scenario-input.json": "f493b42ec903ea9d01b0cb1560ebb2e17635b52858f503d6e09acb3dfd221678",
+    "source.py": "d8f2567ba28086cd39e0a352d5f217dac14251f0f2a968db3f2b6860e3c7be03",
+    "task.md": "1802038cdb89cb9f817c20626332a62f22c599f6ca28acd050994bfe97c50f27"
+  }
+}

@@ -1,0 +1,52 @@
+{
+  "elapsed_ms": 302948,
+  "dispatches": 1,
+  "duplicate_dispatch": false,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "report_validity": "missing",
+  "terminal": true,
+  "phase": "timed_out",
+  "decisions": [
+    {
+      "request_id": "per_13157354b001r3bkE49MczeSdl",
+      "reply": "deny",
+      "permission": "edit",
+      "patterns": [
+        "private/tmp/v2-live-campaign-20261012-01/wire-serialization/workspace/producer.py"
+      ]
+    },
+    {
+      "request_id": "per_131573744001zka6YSZmGkuShM",
+      "reply": "deny",
+      "permission": "edit",
+      "patterns": [
+        "private/tmp/v2-live-campaign-20261012-01/wire-serialization/workspace/consumer.py"
+      ]
+    }
+  ],
+  "evaluation": null,
+  "status": "failed",
+  "parent_review": "rejected",
+  "parent_review_started_at": "2026-10-12T18:35:56.650887+00:00",
+  "parent_review_elapsed_ms": 19760,
+  "parent_context_bytes": 981,
+  "observed_inference": {
+    "source": "opencode_1.18.35_exact_assistant_messages",
+    "execution_id": "exec_4a691069-e8d0-4246-ab80-cd34b23d593d",
+    "session_id": "ses_ecea8eb2bffeB0InRhku3yLwsL",
+    "user_message_id": "msg_a1ace897-8cdb-4cba-bc66-4f46514783c0",
+    "input_tokens": 26011,
+    "output_tokens": 904,
+    "total_tokens": 26915,
+    "assistant_messages": 3,
+    "reported_cost": null,
+    "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available."
+  }
+}

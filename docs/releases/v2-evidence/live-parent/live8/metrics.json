@@ -1,0 +1,62 @@
+{
+  "elapsed_ms": 84467,
+  "dispatches": 1,
+  "duplicate_dispatch": false,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "report_validity": "missing",
+  "terminal": true,
+  "phase": "cancelled",
+  "decisions": [
+    {
+      "request_id": "per_1317baafa001xNo4UcgVZGqb74",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Read-only listing is confined to this execution assigned report directory; literal echo fallback has no writes.",
+      "permission": "bash",
+      "command": "ls -la /private/tmp/v2-live-parent-20261012/live8/state/reports/exec_d782e371-ebd1-4756-ba08-d785e80030ce/ 2>/dev/null || echo \"Directory does not exist\"",
+      "patterns": [
+        "ls -la /private/tmp/v2-live-parent-20261012/live8/state/reports/exec_d782e371-ebd1-4756-ba08-d785e80030ce/ 2>/dev/null",
+        "echo \"Directory does not exist\""
+      ]
+    },
+    {
+      "request_id": "per_1317be1f9001xLzJ2dHCtenm2M",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Runs the exact authorized partial.sh fixture once; the appended echo only prints its exit code. Script writes only declared partial.txt and sleeps for the cancellation test.",
+      "permission": "bash",
+      "command": "sh partial.sh; echo \"EXIT_CODE=$?\"",
+      "patterns": [
+        "sh partial.sh",
+        "echo \"EXIT_CODE=$?\""
+      ]
+    }
+  ],
+  "evaluation": null,
+  "assertion_error": null,
+  "overlap": null,
+  "status": "passed",
+  "parent_review": "rejected",
+  "parent_review_started_at": "2026-10-12T19:06:34.448Z",
+  "parent_review_elapsed_ms": 287474,
+  "parent_context_bytes": 10545,
+  "observed_inference": {
+    "source": "opencode_1.18.35_exact_assistant_messages",
+    "execution_id": "exec_d782e371-ebd1-4756-ba08-d785e80030ce",
+    "session_id": "ses_ece846641ffeslyM6NgOvF32VU",
+    "user_message_id": "msg_19ae9dee-a766-4992-9c99-857bfd505eeb",
+    "input_tokens": 15145,
+    "output_tokens": 513,
+    "total_tokens": null,
+    "assistant_messages": 3,
+    "reported_cost": null,
+    "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available."
+  }
+}

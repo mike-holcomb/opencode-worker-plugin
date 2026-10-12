@@ -1,0 +1,69 @@
+{
+  "review_started_at": "2026-10-12T19:42:50.332Z",
+  "context_bytes": 20115,
+  "idempotency_key": "parent-review-exec_3401f309-f830-4bfa-96ac-5638cb54cdc6",
+  "gate_status": "passed",
+  "review": {
+    "disposition": "accepted",
+    "rationale": "Parent read both full authoritative source files and all immutable report artifacts. Four automatic frozen checks pass. Report correctly distinguishes unguarded health from guarded profile and limits its conclusion to the example inventory; it does not infer production-wide bypass or safety. Workspace unchanged, same recorded session with a new message and one dispatch; failed predecessor retained.",
+    "criteria": [
+      {
+        "id": "summary-exists",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_717a4e4a-1a75-482b-ac9b-c8fe86e71c0e@sha256:b792f8eb336709add8cbae4f8c89f5a3ad715a86c4099aa486e4aed382746ad6",
+          "artifact:artifact_b672fbea-5a42-4781-8b0f-e014d4f9874f@sha256:655dc2f7d3d6381138e48d7c70082715c436476e098d5f88e86151c523867dd8",
+          "artifact:artifact_2c2c2296-6b7e-4317-81a2-68a364ae85f8@sha256:18abb9a3a47d775da172d83c3be5098f124ef8558f0ee93f3078da46a746e638"
+        ]
+      },
+      {
+        "id": "bounded-negative",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_717a4e4a-1a75-482b-ac9b-c8fe86e71c0e@sha256:b792f8eb336709add8cbae4f8c89f5a3ad715a86c4099aa486e4aed382746ad6",
+          "artifact:artifact_b672fbea-5a42-4781-8b0f-e014d4f9874f@sha256:655dc2f7d3d6381138e48d7c70082715c436476e098d5f88e86151c523867dd8",
+          "artifact:artifact_2c2c2296-6b7e-4317-81a2-68a364ae85f8@sha256:18abb9a3a47d775da172d83c3be5098f124ef8558f0ee93f3078da46a746e638"
+        ]
+      },
+      {
+        "id": "bounds-and-gap",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_717a4e4a-1a75-482b-ac9b-c8fe86e71c0e@sha256:b792f8eb336709add8cbae4f8c89f5a3ad715a86c4099aa486e4aed382746ad6",
+          "artifact:artifact_b672fbea-5a42-4781-8b0f-e014d4f9874f@sha256:655dc2f7d3d6381138e48d7c70082715c436476e098d5f88e86151c523867dd8",
+          "artifact:artifact_2c2c2296-6b7e-4317-81a2-68a364ae85f8@sha256:18abb9a3a47d775da172d83c3be5098f124ef8558f0ee93f3078da46a746e638"
+        ]
+      },
+      {
+        "id": "write-scope",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_717a4e4a-1a75-482b-ac9b-c8fe86e71c0e@sha256:b792f8eb336709add8cbae4f8c89f5a3ad715a86c4099aa486e4aed382746ad6",
+          "artifact:artifact_b672fbea-5a42-4781-8b0f-e014d4f9874f@sha256:655dc2f7d3d6381138e48d7c70082715c436476e098d5f88e86151c523867dd8",
+          "artifact:artifact_2c2c2296-6b7e-4317-81a2-68a364ae85f8@sha256:18abb9a3a47d775da172d83c3be5098f124ef8558f0ee93f3078da46a746e638"
+        ]
+      },
+      {
+        "id": "parent-negative-review",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_717a4e4a-1a75-482b-ac9b-c8fe86e71c0e@sha256:b792f8eb336709add8cbae4f8c89f5a3ad715a86c4099aa486e4aed382746ad6",
+          "artifact:artifact_b672fbea-5a42-4781-8b0f-e014d4f9874f@sha256:655dc2f7d3d6381138e48d7c70082715c436476e098d5f88e86151c523867dd8",
+          "artifact:artifact_2c2c2296-6b7e-4317-81a2-68a364ae85f8@sha256:18abb9a3a47d775da172d83c3be5098f124ef8558f0ee93f3078da46a746e638"
+        ]
+      }
+    ],
+    "starting_state_sha256": "76066f5ac2430cff8dc6fa3424c5145d77d866389868913c627f50733efd7a8c",
+    "final_manifest_sha256": "18abb9a3a47d775da172d83c3be5098f124ef8558f0ee93f3078da46a746e638",
+    "freshness": "Parent inspected complete recorded fixture inputs, immutable exports, final snapshot, and available checks.",
+    "integration_checks": [
+      "Parent read both full authoritative source files and all immutable report artifacts. Four automatic frozen checks pass. Report correctly distinguishes unguarded health from guarded profile and limits its conclusion to the example inventory; it does not infer production-wide bypass or safety. Workspace unchanged, same recorded session with a new message and one dispatch; failed predecessor retained."
+    ],
+    "coverage_limits": [
+      "Trusted-workspace managed mode; plugin race remains separately documented.",
+      "Context measured in bytes; elapsed review time includes concurrent parent work."
+    ],
+    "unresolved_issues": [],
+    "next_action": "Retain this reviewed attempt."
+  }
+}

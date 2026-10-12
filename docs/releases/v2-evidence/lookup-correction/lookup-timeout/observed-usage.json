@@ -1,0 +1,94 @@
+{
+  "source": "opencode_1.18.35_exact_assistant_messages",
+  "execution_id": "exec_2a27a2a2-9f17-4737-a11c-455caee9e85f",
+  "session_id": "ses_eceb0f2c9ffejZPtdz33mpjD4U",
+  "user_message_id": "msg_ef86e7f3-e034-4ca1-8536-c400ae4912e8",
+  "input_tokens": 134581,
+  "output_tokens": 4282,
+  "total_tokens": 138863,
+  "assistant_messages": 5,
+  "reported_cost": null,
+  "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available.",
+  "messages": [
+    {
+      "id": "msg_13156ad10001aupK17UgFqFF5h",
+      "parent_id": "msg_ef86e7f3-e034-4ca1-8536-c400ae4912e8",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 24156,
+        "input": 24031,
+        "output": 125,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_13156b2d2001AIII7GQdbmaNxR",
+      "parent_id": "msg_ef86e7f3-e034-4ca1-8536-c400ae4912e8",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 26277,
+        "input": 24403,
+        "output": 1874,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_13156f22f0018WxITFQJEVbCRF",
+      "parent_id": "msg_ef86e7f3-e034-4ca1-8536-c400ae4912e8",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 28221,
+        "input": 26292,
+        "output": 1929,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_13157247f001C6DniovhUIhdCm",
+      "parent_id": "msg_ef86e7f3-e034-4ca1-8536-c400ae4912e8",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 28419,
+        "input": 28236,
+        "output": 183,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_1315731e20019ewtmMo6cxWvCr",
+      "parent_id": "msg_ef86e7f3-e034-4ca1-8536-c400ae4912e8",
+      "finish": "stop",
+      "tokens": {
+        "total": 31790,
+        "input": 31619,
+        "output": 171,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+{
+  "schema_version": 2,
+  "scenario_id": "negative-auth-claim",
+  "result_artifact_sha256": "c9dfa0f2d194487d2215b7a638dc2112d1e7aa282fcb7cb29fc37029e7794edd",
+  "status": "fail",
+  "parent_review_required": true,
+  "checks": [
+    {
+      "id": "summary-exists",
+      "kind": "file_exists",
+      "status": "pass",
+      "detail": "verified result artifact: summary.md"
+    },
+    {
+      "id": "bounded-negative",
+      "kind": "text_contains_any",
+      "status": "fail",
+      "detail": "searched summary.md for 3 frozen marker(s)"
+    },
+    {
+      "id": "bounds-and-gap",
+      "kind": "text_contains",
+      "status": "pass",
+      "detail": "searched summary.md for 3 frozen marker(s)"
+    },
+    {
+      "id": "write-scope",
+      "kind": "allowed_changed_paths",
+      "status": "pass",
+      "detail": "changed=[]; unauthorized=[]"
+    },
+    {
+      "id": "parent-negative-review",
+      "kind": "parent_review",
+      "status": "review_required",
+      "detail": "Confirm the negative claim is bounded to the complete supplied file set, cites the relevant route evidence, and does not overstate absence beyond this fixture."
+    }
+  ]
+}

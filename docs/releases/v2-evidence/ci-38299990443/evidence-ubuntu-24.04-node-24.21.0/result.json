@@ -1,0 +1,64 @@
+{
+  "started_at": "2026-10-12T19:47:49.452Z",
+  "node": "v24.21.0",
+  "platform": "linux",
+  "arch": "x64",
+  "kernel": "6.17.0-1022-azure",
+  "wsl2": false,
+  "cpu": "AMD EPYC 9V45 96-Core Processor",
+  "revision": "77331332e0412f9dc88ad179f8ecdaf9a1dac0a9",
+  "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "checks": [
+    {
+      "name": "build",
+      "command": "npm",
+      "argv": [
+        "run",
+        "bundle"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "elapsed_ms": 2125
+    },
+    {
+      "name": "runtime",
+      "command": "/opt/hostedtoolcache/node/24.21.0/x64/bin/node",
+      "argv": [
+        "--test",
+        "/home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/artifacts.test.js",
+        "/home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/attached.test.js",
+        "/home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/backend-binding.test.js",
+        "/home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/contracts.test.js",
+        "/home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/coordinator.test.js",
+        "/home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/daemon.test.js",
+        "/home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/development-execution.test.js",
+        "/home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/diagnostic-bounds.test.js",
+        "/home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/event-page.test.js",
+        "/home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/evidence.test.js",
+        "/home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/launch-config.test.js",
+        "/home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/managed-server.test.js",
+        "/home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/mcp.test.js",
+        "/home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/opencode-backend.test.js",
+        "/home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/release-matrix-admission.test.js",
+        "/home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/release-matrix-events.test.js",
+        "/home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/release-matrix-public.test.js",
+        "/home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/rpc.test.js",
+        "/home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/service.test.js",
+        "/home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/store.test.js",
+        "/home/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/workspace.test.js"
+      ],
+      "exit_code": 1,
+      "signal": null,
+      "error": null,
+      "elapsed_ms": 9880
+    }
+  ],
+  "status": "failed",
+  "limits": [
+    "No inference, managed live cases, or marketplace installation in this runner"
+  ],
+  "runner_sha256": "45fcd9a8cb699f282024ce6320c28b97b66107b692197e889f711e01fe319f07",
+  "error": "AssertionError [ERR_ASSERTION]: runtime: \n\n1 !== 0\n",
+  "finished_at": "2026-10-12T19:48:01.498Z"
+}

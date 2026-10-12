@@ -1,0 +1,188 @@
+{
+  "taskId": "task_d57884e3-f0ac-4b32-af00-217b5a78ab70",
+  "executionId": "exec_fa333acc-d913-4e3d-973b-0d97388fa126",
+  "scopeId": "release-live9",
+  "revision": 11,
+  "phase": "cancelled",
+  "observation": "current",
+  "workspace": "/private/tmp/v2-live-campaign-20261012-01/live9/workspace",
+  "workspaceAccess": "exclusive",
+  "requestModel": {
+    "profile": "local"
+  },
+  "model": "llama.cpp/laguna-s-21",
+  "profile": "bounded-inspect",
+  "backendId": "backend_36260487e711603c27887e133dca10aa",
+  "sessionId": "ses_eceb5f1a9ffeuhG2kXaykrmRVX",
+  "userMessageId": "msg_e5850bdf-d0c7-4eca-8a6b-463d8efd2e44",
+  "predecessorExecutionId": null,
+  "contextMode": null,
+  "baselineHash": "9ea3bb5aba180c62587bc91271f67f42bdc46352ffbe33cbaa92c630d8b3c690",
+  "promptHash": "68d0a346e76c9bf5edd6cc690b32a9384e63b5d28b8e62a7ec4889f8ba019335",
+  "reportPath": "/private/tmp/v2-live-campaign-20261012-01/live9/state/reports/exec_fa333acc-d913-4e3d-973b-0d97388fa126",
+  "queueDeadlineAt": "2026-10-12T18:06:58.065Z",
+  "admittedAt": "2026-10-12T18:04:58.068Z",
+  "executionDeadlineAt": "2026-10-12T18:09:58.068Z",
+  "finalizationDeadlineAt": "2026-10-12T18:05:40.614Z",
+  "intendedOutcome": "cancelled",
+  "creationIntent": {
+    "backendId": "backend_36260487e711603c27887e133dca10aa",
+    "marker": "opencode-agents:exec_fa333acc-d913-4e3d-973b-0d97388fa126",
+    "sessionId": "ses_eceb5f1a9ffeuhG2kXaykrmRVX",
+    "createdAt": "2026-10-12T18:04:59.341Z"
+  },
+  "cancellationIntent": {
+    "reason": "Resolve the exact interrupted turn after backend restart without replay",
+    "requester": "parent",
+    "deadlineOrigin": null,
+    "createdAt": "2026-10-12T18:05:10.584Z",
+    "abortAcknowledged": true
+  },
+  "pendingRequests": [],
+  "createdAt": "2026-10-12T18:04:58.065Z",
+  "updatedAt": "2026-10-12T18:05:10.635Z",
+  "reportValidity": "missing",
+  "finalManifestHash": "7f028cdfecea79e37a880ed800b7f6c80de1b3f44c8e8837d586f63bc4f67abf",
+  "reviewStatus": "pending",
+  "terminal": true,
+  "operationally_resolved": true,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "events": [
+    {
+      "cursor": 1,
+      "kind": "queued",
+      "detail": {
+        "taskId": "task_d57884e3-f0ac-4b32-af00-217b5a78ab70"
+      },
+      "createdAt": "2026-10-12T18:04:58.066Z"
+    },
+    {
+      "cursor": 2,
+      "kind": "admitted",
+      "detail": {
+        "executionDeadlineAt": "2026-10-12T18:09:58.068Z",
+        "resourceKeys": [
+          "workspace:/private/tmp/v2-live-campaign-20261012-01/live9/workspace"
+        ]
+      },
+      "createdAt": "2026-10-12T18:04:58.068Z"
+    },
+    {
+      "cursor": 3,
+      "kind": "creation_intent",
+      "detail": {
+        "backendId": "backend_36260487e711603c27887e133dca10aa",
+        "marker": "opencode-agents:exec_fa333acc-d913-4e3d-973b-0d97388fa126"
+      },
+      "createdAt": "2026-10-12T18:04:59.341Z"
+    },
+    {
+      "cursor": 4,
+      "kind": "session_bound",
+      "detail": {
+        "backendId": "backend_36260487e711603c27887e133dca10aa",
+        "sessionId": "ses_eceb5f1a9ffeuhG2kXaykrmRVX"
+      },
+      "createdAt": "2026-10-12T18:04:59.354Z"
+    },
+    {
+      "cursor": 5,
+      "kind": "dispatch_intent",
+      "detail": {
+        "messageId": "msg_e5850bdf-d0c7-4eca-8a6b-463d8efd2e44"
+      },
+      "createdAt": "2026-10-12T18:04:59.355Z"
+    },
+    {
+      "cursor": 6,
+      "kind": "dispatch_acknowledged",
+      "detail": {},
+      "createdAt": "2026-10-12T18:04:59.361Z"
+    },
+    {
+      "cursor": 7,
+      "kind": "running",
+      "detail": {
+        "messageId": "msg_e5850bdf-d0c7-4eca-8a6b-463d8efd2e44"
+      },
+      "createdAt": "2026-10-12T18:04:59.362Z"
+    },
+    {
+      "cursor": 8,
+      "kind": "running",
+      "detail": {
+        "reason": "Error: inspect status: {}"
+      },
+      "createdAt": "2026-10-12T18:04:59.530Z"
+    },
+    {
+      "cursor": 9,
+      "kind": "running",
+      "detail": {},
+      "createdAt": "2026-10-12T18:05:01.223Z"
+    },
+    {
+      "cursor": 10,
+      "kind": "cancellation_requested",
+      "detail": {
+        "phase": "cancelling",
+        "reason": "Resolve the exact interrupted turn after backend restart without replay",
+        "requester": "parent"
+      },
+      "createdAt": "2026-10-12T18:05:10.585Z"
+    },
+    {
+      "cursor": 11,
+      "kind": "abort_acknowledged",
+      "detail": {},
+      "createdAt": "2026-10-12T18:05:10.603Z"
+    },
+    {
+      "cursor": 12,
+      "kind": "finalizing",
+      "detail": {
+        "detail": {
+          "cancelEffect": "applied"
+        },
+        "intendedOutcome": "cancelled"
+      },
+      "createdAt": "2026-10-12T18:05:10.614Z"
+    },
+    {
+      "cursor": 13,
+      "kind": "artifact_registered",
+      "detail": {
+        "artifactId": "artifact_b8a279d7-ff3a-4874-bce3-12ceffa1edec",
+        "sha256": "7f028cdfecea79e37a880ed800b7f6c80de1b3f44c8e8837d586f63bc4f67abf"
+      },
+      "createdAt": "2026-10-12T18:05:10.629Z"
+    },
+    {
+      "cursor": 14,
+      "kind": "finalized",
+      "detail": {
+        "finalManifestHash": "7f028cdfecea79e37a880ed800b7f6c80de1b3f44c8e8837d586f63bc4f67abf",
+        "outcome": "cancelled",
+        "reportValidity": "missing"
+      },
+      "createdAt": "2026-10-12T18:05:10.635Z"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "artifact_b8a279d7-ff3a-4874-bce3-12ceffa1edec",
+      "sha256": "7f028cdfecea79e37a880ed800b7f6c80de1b3f44c8e8837d586f63bc4f67abf",
+      "byte_length": 699,
+      "media_type": "application/json"
+    }
+  ],
+  "cursor": 14,
+  "has_more_events": false
+}

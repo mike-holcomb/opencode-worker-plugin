@@ -1,0 +1,195 @@
+{
+  "taskId": "task_76d10410-f17a-4650-8c41-e36a21ce303c",
+  "executionId": "exec_197847b5-d186-44af-ac45-c284a1d7e89a",
+  "scopeId": "release-failed-checks",
+  "revision": 10,
+  "phase": "waiting_input",
+  "observation": "current",
+  "workspace": "/private/tmp/v2-eval-parent-20261012/failed-checks/workspace",
+  "workspaceAccess": "exclusive",
+  "requestModel": {
+    "profile": "local"
+  },
+  "model": "llama.cpp/laguna-s-21",
+  "profile": "bounded-build",
+  "backendId": "backend_c8eeb0f22707c997f1648e0b4c5216fb",
+  "sessionId": "ses_ece74a75cffehcoqkQqAY4g64C",
+  "userMessageId": "msg_9222a847-4ec0-43b1-aefa-f6b8114b0286",
+  "predecessorExecutionId": null,
+  "contextMode": null,
+  "baselineHash": "e10236f328e07b8c3fa56751e18ce057cb5adec7cdb21e0d1b2ac965883df5ec",
+  "promptHash": "2f52b0c1a517eb54102516159ead76a478412b799185f4e0a14988ad866ed1c2",
+  "reportPath": "/private/tmp/v2-eval-parent-20261012/failed-checks/state/reports/exec_197847b5-d186-44af-ac45-c284a1d7e89a",
+  "queueDeadlineAt": "2026-10-12T19:18:16.984Z",
+  "admittedAt": "2026-10-12T19:16:16.988Z",
+  "executionDeadlineAt": "2026-10-12T19:21:16.988Z",
+  "finalizationDeadlineAt": null,
+  "intendedOutcome": null,
+  "creationIntent": {
+    "backendId": "backend_c8eeb0f22707c997f1648e0b4c5216fb",
+    "marker": "opencode-agents:exec_197847b5-d186-44af-ac45-c284a1d7e89a",
+    "sessionId": "ses_ece74a75cffehcoqkQqAY4g64C",
+    "createdAt": "2026-10-12T19:16:18.204Z"
+  },
+  "cancellationIntent": null,
+  "pendingRequests": [
+    {
+      "requestId": "per_1318ba1ae001NZpwcBPG57mPfl",
+      "executionId": "exec_197847b5-d186-44af-ac45-c284a1d7e89a",
+      "kind": "permission",
+      "revision": 1,
+      "detail": {
+        "api": "legacy",
+        "detail": {
+          "always": [
+            "python3 *",
+            "echo *"
+          ],
+          "id": "per_1318ba1ae001NZpwcBPG57mPfl",
+          "metadata": {
+            "command": "python3 -m unittest -v test_parser.py 2>&1; echo \"EXIT_CODE=$?\""
+          },
+          "patterns": [
+            "python3 -m unittest -v test_parser.py 2>&1",
+            "echo \"EXIT_CODE=$?\""
+          ],
+          "permission": "bash",
+          "sessionID": "ses_ece74a75cffehcoqkQqAY4g64C",
+          "tool": {
+            "callID": "chatcmpl-tool-8941362a563b2012",
+            "messageID": "msg_1318b9f61001mYN1fSEocbqjNz"
+          }
+        },
+        "id": "per_1318ba1ae001NZpwcBPG57mPfl",
+        "sessionId": "ses_ece74a75cffehcoqkQqAY4g64C",
+        "type": "permission"
+      },
+      "status": "pending",
+      "createdAt": "2026-10-12T19:16:36.919Z",
+      "response": null,
+      "authorizationBasis": null
+    }
+  ],
+  "createdAt": "2026-10-12T19:16:16.984Z",
+  "updatedAt": "2026-10-12T19:16:36.919Z",
+  "reportValidity": "pending",
+  "finalManifestHash": null,
+  "reviewStatus": "pending",
+  "terminal": false,
+  "operationally_resolved": false,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "events": [
+    {
+      "cursor": 1,
+      "kind": "queued",
+      "detail": {
+        "taskId": "task_76d10410-f17a-4650-8c41-e36a21ce303c"
+      },
+      "createdAt": "2026-10-12T19:16:16.984Z"
+    },
+    {
+      "cursor": 2,
+      "kind": "admitted",
+      "detail": {
+        "executionDeadlineAt": "2026-10-12T19:21:16.988Z",
+        "resourceKeys": [
+          "workspace:/private/tmp/v2-eval-parent-20261012/failed-checks/workspace"
+        ]
+      },
+      "createdAt": "2026-10-12T19:16:16.988Z"
+    },
+    {
+      "cursor": 3,
+      "kind": "creation_intent",
+      "detail": {
+        "backendId": "backend_c8eeb0f22707c997f1648e0b4c5216fb",
+        "marker": "opencode-agents:exec_197847b5-d186-44af-ac45-c284a1d7e89a"
+      },
+      "createdAt": "2026-10-12T19:16:18.204Z"
+    },
+    {
+      "cursor": 4,
+      "kind": "session_bound",
+      "detail": {
+        "backendId": "backend_c8eeb0f22707c997f1648e0b4c5216fb",
+        "sessionId": "ses_ece74a75cffehcoqkQqAY4g64C"
+      },
+      "createdAt": "2026-10-12T19:16:18.214Z"
+    },
+    {
+      "cursor": 5,
+      "kind": "dispatch_intent",
+      "detail": {
+        "messageId": "msg_9222a847-4ec0-43b1-aefa-f6b8114b0286"
+      },
+      "createdAt": "2026-10-12T19:16:18.216Z"
+    },
+    {
+      "cursor": 6,
+      "kind": "dispatch_acknowledged",
+      "detail": {},
+      "createdAt": "2026-10-12T19:16:18.223Z"
+    },
+    {
+      "cursor": 7,
+      "kind": "running",
+      "detail": {
+        "messageId": "msg_9222a847-4ec0-43b1-aefa-f6b8114b0286"
+      },
+      "createdAt": "2026-10-12T19:16:18.223Z"
+    },
+    {
+      "cursor": 8,
+      "kind": "input_request",
+      "detail": {
+        "kind": "permission",
+        "requestId": "per_1318b6656001fEiKTOWLTa4sDZ",
+        "revision": 1
+      },
+      "createdAt": "2026-10-12T19:16:21.726Z"
+    },
+    {
+      "cursor": 9,
+      "kind": "input_response_intent",
+      "detail": {
+        "requestId": "per_1318b6656001fEiKTOWLTa4sDZ",
+        "requestRevision": 1
+      },
+      "createdAt": "2026-10-12T19:16:31.674Z"
+    },
+    {
+      "cursor": 10,
+      "kind": "input_response_acknowledged",
+      "detail": {
+        "requestId": "per_1318b6656001fEiKTOWLTa4sDZ"
+      },
+      "createdAt": "2026-10-12T19:16:31.679Z"
+    },
+    {
+      "cursor": 11,
+      "kind": "running",
+      "detail": {},
+      "createdAt": "2026-10-12T19:16:31.686Z"
+    },
+    {
+      "cursor": 12,
+      "kind": "input_request",
+      "detail": {
+        "kind": "permission",
+        "requestId": "per_1318ba1ae001NZpwcBPG57mPfl",
+        "revision": 1
+      },
+      "createdAt": "2026-10-12T19:16:36.919Z"
+    }
+  ],
+  "artifacts": [],
+  "cursor": 12,
+  "has_more_events": false
+}

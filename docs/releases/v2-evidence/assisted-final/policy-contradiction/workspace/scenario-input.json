@@ -1,0 +1,14 @@
+{
+  "schema_version": 2,
+  "scenario_id": "policy-contradiction",
+  "run_id": "policy-contradiction-1791835235230",
+  "tier": "full",
+  "context_mode": "fresh",
+  "context_basis": "ordinary fresh context",
+  "task_file": "task.md",
+  "fixture_files": [
+    "policy.md",
+    "audit-note.md",
+    "review_scope.txt"
+  ]
+}

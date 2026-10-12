@@ -1,0 +1,51 @@
+{
+  "review_started_at": "2026-10-12T18:35:56.650887+00:00",
+  "context_bytes": 981,
+  "idempotency_key": "parent-release-reject-wire-serialization-0001",
+  "gate_status": "failed",
+  "review": {
+    "disposition": "rejected",
+    "rationale": "Harness incorrectly denied declared edit paths; worker timed out without a report. Preserve this invalid harness attempt and rerun with corrected path handling.",
+    "criteria": [
+      {
+        "id": "wire-tests-pass",
+        "result": "not_checked",
+        "evidence": []
+      },
+      {
+        "id": "summary-exists",
+        "result": "not_checked",
+        "evidence": []
+      },
+      {
+        "id": "coupling-recorded",
+        "result": "not_checked",
+        "evidence": []
+      },
+      {
+        "id": "write-scope",
+        "result": "not_checked",
+        "evidence": []
+      },
+      {
+        "id": "parent-interface-review",
+        "result": "not_checked",
+        "evidence": []
+      }
+    ],
+    "starting_state_sha256": "d300b6d3677c81faf96158bc3ce709e0779351860be77c8feb45c1e81dc6929c",
+    "final_manifest_sha256": "b2352c3ce373955c2697a40be388473052792c07a38968bf2011082833da98ac",
+    "freshness": "Current terminal snapshot and recorded failure inspected.",
+    "integration_checks": [
+      "One dispatch recorded; missing report prevents acceptance."
+    ],
+    "coverage_limits": [
+      "Rejection based on terminal failure evidence; no successful qualitative source review claimed.",
+      "Context bytes measure the recorded rejection input only."
+    ],
+    "unresolved_issues": [
+      "Harness incorrectly denied declared edit paths; worker timed out without a report. Preserve this invalid harness attempt and rerun with corrected path handling."
+    ],
+    "next_action": "Fresh isolated rerun; preserve this failed attempt."
+  }
+}

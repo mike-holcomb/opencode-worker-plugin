@@ -1,0 +1,1 @@
+Assess whether the supplied files support the claim that every route enforces authorization. Search only the supplied files. Write the assigned report summary.md stating either the supported evidence or no supported finding, the exact inspected bounds, and any gap that prevents a whole-project conclusion. Do not make a whole-project claim from this fixture.

@@ -1,0 +1,13 @@
+✔ portable export verifies artifacts, copies fixtures and excludes private runtime state (93.470925ms)
+✔ portable export refuses artifact traversal, hash mismatch and fixture symlinks (112.669934ms)
+✔ declared edit accepts absolute, relative, and corroborated OpenCode stripped paths (1.135364ms)
+✔ parent decisions require exact request and revision and cannot grant persistent authority (1.69514ms)
+✔ edit scope rejects undeclared targets, traversal, wildcards, and uncorroborated stripped paths (3.768708ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 274.611144

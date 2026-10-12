@@ -1,0 +1,11 @@
+✔ declared edit accepts absolute, relative, and corroborated OpenCode stripped paths (0.975342ms)
+✔ parent decisions require exact request and revision and cannot grant persistent authority (1.475826ms)
+✔ edit scope rejects undeclared targets, traversal, wildcards, and uncorroborated stripped paths (0.965193ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 65.015862

@@ -1,0 +1,34 @@
+{
+  "review_started_at": "2026-10-12T18:16:42.762595+00:00",
+  "context_bytes": 6744,
+  "idempotency_key": "parent-release-review-live9-0001",
+  "gate_status": "passed",
+  "review": {
+    "disposition": "rejected",
+    "rationale": "Killed only the owned backend; replacement reconciled the exact execution/session/message with one dispatch. Fresh acknowledged abort and independent stop proof finalized cancelled and released ownership. This is the agreed proven-terminal recovery outcome, not successful delivery.",
+    "criteria": [
+      {
+        "id": "answer",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_b8a279d7-ff3a-4874-bce3-12ceffa1edec@sha256:7f028cdfecea79e37a880ed800b7f6c80de1b3f44c8e8837d586f63bc4f67abf"
+        ]
+      }
+    ],
+    "starting_state_sha256": "9ea3bb5aba180c62587bc91271f67f42bdc46352ffbe33cbaa92c630d8b3c690",
+    "final_manifest_sha256": "7f028cdfecea79e37a880ed800b7f6c80de1b3f44c8e8837d586f63bc4f67abf",
+    "freshness": "Fixture sources and final manifest inspected; immutable exports hash-verified.",
+    "integration_checks": [
+      "Exact durable identities and one dispatch checked",
+      "Reviewed supplied source and recorded gate-specific outcome"
+    ],
+    "coverage_limits": [
+      "Private development execution on macOS; plugin race remains accepted separately",
+      "Context byte count covers recorded review inputs, not uninstrumented earlier inspection."
+    ],
+    "unresolved_issues": [
+      "Missing or incomplete deliverable; no acceptance claimed"
+    ],
+    "next_action": "Retain release evidence"
+  }
+}

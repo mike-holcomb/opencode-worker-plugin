@@ -1,0 +1,108 @@
+{
+  "review_started_at": "2026-10-12T18:39:48.631Z",
+  "context_bytes": 25838,
+  "idempotency_key": "parent-release-review-log-correction-0001",
+  "gate_status": "passed",
+  "review": {
+    "disposition": "accepted",
+    "rationale": "Parent inspected all five log lines and all three deployment lines, corrected report, summary, manifest, and frozen checks. Full supplied coverage and narrower spike are distinguished; req-1042/1043/1044 count exactly three. Deployment timing is explicitly correlation, not causation, and findings are bounded to the sample. Eight automated checks pass and parent-log-review is now satisfied.",
+    "criteria": [
+      {
+        "id": "summary-exists",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_12883167-7b23-479c-a61a-0e84a6dd7fc7@sha256:c7e0a212e02b4a98c4a4dbb1267cc0581ea16fe4c51af066cb96750b00373ee6",
+          "artifact:artifact_dd902275-ab83-412b-8b76-c8ca0904ebbc@sha256:419f29051461992cbaec54e27ab043439f7524b410fc485a522afd6bc01d22d2",
+          "artifact:artifact_c85f91d6-c279-4f09-af7e-a76f416458b1@sha256:0310538bb032d605b941637a2c6db173faedda0e82b6b62ddf1bc134ee6b8da5"
+        ]
+      },
+      {
+        "id": "affected-requests",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_12883167-7b23-479c-a61a-0e84a6dd7fc7@sha256:c7e0a212e02b4a98c4a4dbb1267cc0581ea16fe4c51af066cb96750b00373ee6",
+          "artifact:artifact_dd902275-ab83-412b-8b76-c8ca0904ebbc@sha256:419f29051461992cbaec54e27ab043439f7524b410fc485a522afd6bc01d22d2",
+          "artifact:artifact_c85f91d6-c279-4f09-af7e-a76f416458b1@sha256:0310538bb032d605b941637a2c6db173faedda0e82b6b62ddf1bc134ee6b8da5"
+        ]
+      },
+      {
+        "id": "bounded-window",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_12883167-7b23-479c-a61a-0e84a6dd7fc7@sha256:c7e0a212e02b4a98c4a4dbb1267cc0581ea16fe4c51af066cb96750b00373ee6",
+          "artifact:artifact_dd902275-ab83-412b-8b76-c8ca0904ebbc@sha256:419f29051461992cbaec54e27ab043439f7524b410fc485a522afd6bc01d22d2",
+          "artifact:artifact_c85f91d6-c279-4f09-af7e-a76f416458b1@sha256:0310538bb032d605b941637a2c6db173faedda0e82b6b62ddf1bc134ee6b8da5"
+        ]
+      },
+      {
+        "id": "timeout-count-recorded",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_12883167-7b23-479c-a61a-0e84a6dd7fc7@sha256:c7e0a212e02b4a98c4a4dbb1267cc0581ea16fe4c51af066cb96750b00373ee6",
+          "artifact:artifact_dd902275-ab83-412b-8b76-c8ca0904ebbc@sha256:419f29051461992cbaec54e27ab043439f7524b410fc485a522afd6bc01d22d2",
+          "artifact:artifact_c85f91d6-c279-4f09-af7e-a76f416458b1@sha256:0310538bb032d605b941637a2c6db173faedda0e82b6b62ddf1bc134ee6b8da5"
+        ]
+      },
+      {
+        "id": "correlation-labeled",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_12883167-7b23-479c-a61a-0e84a6dd7fc7@sha256:c7e0a212e02b4a98c4a4dbb1267cc0581ea16fe4c51af066cb96750b00373ee6",
+          "artifact:artifact_dd902275-ab83-412b-8b76-c8ca0904ebbc@sha256:419f29051461992cbaec54e27ab043439f7524b410fc485a522afd6bc01d22d2",
+          "artifact:artifact_c85f91d6-c279-4f09-af7e-a76f416458b1@sha256:0310538bb032d605b941637a2c6db173faedda0e82b6b62ddf1bc134ee6b8da5"
+        ]
+      },
+      {
+        "id": "evidence-paths",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_12883167-7b23-479c-a61a-0e84a6dd7fc7@sha256:c7e0a212e02b4a98c4a4dbb1267cc0581ea16fe4c51af066cb96750b00373ee6",
+          "artifact:artifact_dd902275-ab83-412b-8b76-c8ca0904ebbc@sha256:419f29051461992cbaec54e27ab043439f7524b410fc485a522afd6bc01d22d2",
+          "artifact:artifact_c85f91d6-c279-4f09-af7e-a76f416458b1@sha256:0310538bb032d605b941637a2c6db173faedda0e82b6b62ddf1bc134ee6b8da5"
+        ]
+      },
+      {
+        "id": "source-unchanged",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_12883167-7b23-479c-a61a-0e84a6dd7fc7@sha256:c7e0a212e02b4a98c4a4dbb1267cc0581ea16fe4c51af066cb96750b00373ee6",
+          "artifact:artifact_dd902275-ab83-412b-8b76-c8ca0904ebbc@sha256:419f29051461992cbaec54e27ab043439f7524b410fc485a522afd6bc01d22d2",
+          "artifact:artifact_c85f91d6-c279-4f09-af7e-a76f416458b1@sha256:0310538bb032d605b941637a2c6db173faedda0e82b6b62ddf1bc134ee6b8da5"
+        ]
+      },
+      {
+        "id": "write-scope",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_12883167-7b23-479c-a61a-0e84a6dd7fc7@sha256:c7e0a212e02b4a98c4a4dbb1267cc0581ea16fe4c51af066cb96750b00373ee6",
+          "artifact:artifact_dd902275-ab83-412b-8b76-c8ca0904ebbc@sha256:419f29051461992cbaec54e27ab043439f7524b410fc485a522afd6bc01d22d2",
+          "artifact:artifact_c85f91d6-c279-4f09-af7e-a76f416458b1@sha256:0310538bb032d605b941637a2c6db173faedda0e82b6b62ddf1bc134ee6b8da5"
+        ]
+      },
+      {
+        "id": "parent-log-review",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_12883167-7b23-479c-a61a-0e84a6dd7fc7@sha256:c7e0a212e02b4a98c4a4dbb1267cc0581ea16fe4c51af066cb96750b00373ee6",
+          "artifact:artifact_dd902275-ab83-412b-8b76-c8ca0904ebbc@sha256:419f29051461992cbaec54e27ab043439f7524b410fc485a522afd6bc01d22d2",
+          "artifact:artifact_c85f91d6-c279-4f09-af7e-a76f416458b1@sha256:0310538bb032d605b941637a2c6db173faedda0e82b6b62ddf1bc134ee6b8da5"
+        ]
+      }
+    ],
+    "starting_state_sha256": "fdc618c76d8f530b86f03e75278967fbc6d33354ba07a5946558d0fe4ca98031",
+    "final_manifest_sha256": "0310538bb032d605b941637a2c6db173faedda0e82b6b62ddf1bc134ee6b8da5",
+    "freshness": "Complete frozen inputs and immutable exports inspected; automated source comparison unchanged.",
+    "integration_checks": [
+      "Eight unchanged automated checks pass",
+      "Parent reviewed every supplied log and deployment line",
+      "Same session, new execution and message, one dispatch; predecessor retained"
+    ],
+    "coverage_limits": [
+      "Worker check statuses describe manual inspections, not execution of parent evaluator; parent ran the actual frozen checks.",
+      "Review context measured in bytes; wall time includes parent work.",
+      "No inference beyond supplied sample."
+    ],
+    "unresolved_issues": [],
+    "next_action": "Scenario accepted; retain both attempts."
+  }
+}

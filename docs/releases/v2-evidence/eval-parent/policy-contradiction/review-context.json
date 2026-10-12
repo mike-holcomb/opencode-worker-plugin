@@ -1,0 +1,51 @@
+{
+  "review_started_at": "2026-10-12T19:15:59.849Z",
+  "context_bytes": 12065,
+  "files": [
+    {
+      "path": "packet.json",
+      "sha256": "308532cd6a5eb09cdf0f4e482a18e0b5a1000836d91f066fdd961e8ca104065f",
+      "bytes": 2475
+    },
+    {
+      "path": "final.json",
+      "sha256": "c22a46f78d510fe55d63cdfa5019a365fb895b0d2dccb0349de645cabc08434c",
+      "bytes": 7354
+    },
+    {
+      "path": "exports.json",
+      "sha256": "f9d4702663f724bf792fd47fecb54d898af57a2673ef8f22e73a4f7097785f6e",
+      "bytes": 353
+    },
+    {
+      "path": "artifact_7a01cb53-99e7-4d0e-9716-15b0e8b71693.json",
+      "sha256": "0222f29728109cd47d19a883e737469749f15f864892de862fa26837249c521c",
+      "bytes": 709
+    },
+    {
+      "path": "workspace/audit-note.md",
+      "sha256": "2fdcb554e4812aee6be4c8df9f83841d2deff5077cbabf135011988e12cc4882",
+      "bytes": 212
+    },
+    {
+      "path": "workspace/policy.md",
+      "sha256": "b021230be1e446eb74b6e22a0c632ad954dce44afddbc2a18bd941e97e658d82",
+      "bytes": 184
+    },
+    {
+      "path": "workspace/review_scope.txt",
+      "sha256": "9d7c7bc16771721c28687d9fd06827a7e376dd7b6458971cf59bc566b7cebca2",
+      "bytes": 150
+    },
+    {
+      "path": "workspace/scenario-input.json",
+      "sha256": "ae76673b786c8cfbbb4dd735e10acdffe077020a8c48ea49d2d4ced0866a26e8",
+      "bytes": 320
+    },
+    {
+      "path": "workspace/task.md",
+      "sha256": "5e156e5814cf54537e9709d5fd0309baab51863873fd7f102f98bc5084628dae",
+      "bytes": 308
+    }
+  ]
+}

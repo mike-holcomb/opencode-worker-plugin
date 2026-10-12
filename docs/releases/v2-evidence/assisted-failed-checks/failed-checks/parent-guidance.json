@@ -1,0 +1,4 @@
+{
+  "kind": "assisted_fresh_evaluation",
+  "guidance": "This is an explicitly assisted fresh evaluation after earlier attempts timed out during parent permission waits. Complete only the frozen objective, keeping source changes within the declared files and preserving unrelated dirty content. The assigned unittest command is directly authorized. Use read/glob/grep for inspection; avoid extra shell validators or directory discovery. The two assigned report directories already exist: write strict JSON and summary directly to those exact report paths, then finish the turn promptly. The parent runs all frozen evaluator checks except the assigned unittest. Mark those parent-only checks not_run with exit_code null, and never search for evaluator files or parent/supervisor state. Report the actual test result honestly, including any expected failure. Do not claim parent acceptance. Original acceptance criteria and source fixtures remain authoritative."
+}

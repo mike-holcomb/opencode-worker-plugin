@@ -1,0 +1,4 @@
+{
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 1\n",
+  "stack": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n0 !== 1\n\n    at file:///Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/scripts/release/live.mjs:275:24\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)"
+}

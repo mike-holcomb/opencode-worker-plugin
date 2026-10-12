@@ -1,0 +1,78 @@
+{
+  "source": "opencode_1.18.35_exact_assistant_messages",
+  "execution_id": "exec_f31adf95-a493-477c-b461-f110ccb759b7",
+  "session_id": "ses_eceaf802fffeohUKIwYG5UjKSR",
+  "user_message_id": "msg_a4f1fbb6-68a6-46c2-bbbf-9a65bfc0e441",
+  "input_tokens": 173313,
+  "output_tokens": 18408,
+  "total_tokens": 191721,
+  "assistant_messages": 4,
+  "reported_cost": null,
+  "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available.",
+  "messages": [
+    {
+      "id": "msg_131663c73001oHTHvyIqOE8Xlm",
+      "parent_id": "msg_a4f1fbb6-68a6-46c2-bbbf-9a65bfc0e441",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 42125,
+        "input": 29417,
+        "output": 12708,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_13168423f001q1m1iKzdmI3RCu",
+      "parent_id": "msg_a4f1fbb6-68a6-46c2-bbbf-9a65bfc0e441",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 47569,
+        "input": 42598,
+        "output": 4971,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_13168d07c001kR2AX5ojMkKbWs",
+      "parent_id": "msg_a4f1fbb6-68a6-46c2-bbbf-9a65bfc0e441",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 47813,
+        "input": 47596,
+        "output": 217,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_13168da61001LK1fX1iwRZb73w",
+      "parent_id": "msg_a4f1fbb6-68a6-46c2-bbbf-9a65bfc0e441",
+      "finish": "stop",
+      "tokens": {
+        "total": 54214,
+        "input": 53702,
+        "output": 512,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    }
+  ]
+}

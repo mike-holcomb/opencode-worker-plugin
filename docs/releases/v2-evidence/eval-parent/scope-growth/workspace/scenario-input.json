@@ -1,0 +1,14 @@
+{
+  "schema_version": 2,
+  "scenario_id": "scope-growth",
+  "run_id": "scope-growth-1791831421410",
+  "tier": "standard",
+  "context_mode": "fresh",
+  "context_basis": "ordinary fresh context",
+  "task_file": "task.md",
+  "fixture_files": [
+    "feature.py",
+    "adapter.py",
+    "CONTRACT.txt"
+  ]
+}

@@ -1,0 +1,61 @@
+{
+  "source": "opencode_1.18.35_exact_assistant_messages",
+  "execution_id": "exec_b6919dde-1942-4c9c-bfec-3011f61611cd",
+  "session_id": "ses_ece7eb6a9ffeXlHKFWzmvyBrOl",
+  "user_message_id": "msg_f38f5a3e-2564-42f0-8392-e7aa3661eec0",
+  "input_tokens": 16501,
+  "output_tokens": 999,
+  "total_tokens": null,
+  "assistant_messages": 3,
+  "reported_cost": null,
+  "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available.",
+  "messages": [
+    {
+      "id": "msg_131814d0f0019zc0PewZ8BQDiZ",
+      "parent_id": "msg_f38f5a3e-2564-42f0-8392-e7aa3661eec0",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 8168,
+        "input": 7969,
+        "output": 199,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_13181530c001KL1XA6sXxlzsns",
+      "parent_id": "msg_f38f5a3e-2564-42f0-8392-e7aa3661eec0",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 9332,
+        "input": 8532,
+        "output": 800,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_131824064001JmJHqfKy31St5z",
+      "parent_id": "msg_f38f5a3e-2564-42f0-8392-e7aa3661eec0",
+      "finish": null,
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "reasoning": 0,
+        "cache": {
+          "read": 0,
+          "write": 0
+        }
+      },
+      "raw_cost": 0
+    }
+  ]
+}

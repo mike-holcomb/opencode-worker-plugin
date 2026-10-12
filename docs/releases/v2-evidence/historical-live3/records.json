@@ -1,0 +1,202 @@
+{
+  "provenance": "Historical accepted concurrency run; not relabeled as a current-runtime rerun",
+  "executions": [
+    {
+      "task_id": "task_d5d59e25-76aa-4447-9db8-9a59c2127f7f",
+      "workspace": "/private/tmp/opencode-agents-live-extra-20261012-001/workspace-a",
+      "scope_id": "live-extra-20261012",
+      "execution_id": "exec_6aee666a-d052-4b1f-afd2-3bb47bad8039",
+      "phase": "completed",
+      "observation": "current",
+      "session_id": "ses_ecf5b549fffeFILIFPUVIaoGmn",
+      "user_message_id": "msg_c2427eaa-ce5c-4042-af28-cad089f50c77",
+      "baseline_hash": "9e2ec1cee9a570edf98be05f2b50a532dd8e1a904e124ece14efcb0c2764b47d",
+      "prompt_hash": "b5c604e4d21383c33e3103bc57229bc696bb5b90cededff8ab53010bd8f697a3",
+      "final_manifest_hash": "903262fbe4f7990c41c456a1d9a80f5a5af20f2c2f8f2a2c7b99cb9df374221c",
+      "review_status": "accepted",
+      "report_validity": "valid",
+      "created_at": "2026-10-12T15:04:19.289Z",
+      "updated_at": "2026-10-12T15:05:41.610Z",
+      "packet": {
+        "acceptance_criteria": [
+          {
+            "evidence_required": "File content and report artifact",
+            "id": "fact",
+            "required": true,
+            "requirement": "Report cites input.txt and states alpha"
+          }
+        ],
+        "allowed_writes": [],
+        "authoritative_inputs": [
+          {
+            "kind": "file",
+            "purpose": "Fixture fact to inspect",
+            "reference": "input.txt"
+          }
+        ],
+        "checks": [
+          {
+            "description": "Read input.txt and report its answer",
+            "id": "inspect-input"
+          }
+        ],
+        "constraints": [
+          "Use the configured local model endpoint only",
+          "Do not change project files"
+        ],
+        "context": {
+          "exclusions": [
+            "No network use or project edits"
+          ],
+          "rejected_assumptions": [],
+          "verified_facts": []
+        },
+        "objective": "Read input.txt in this workspace. Identify the fixture answer alpha only after reading the file. Write a complete schema-valid result.json and summary.md in the assigned report directory. Preserve all project files.",
+        "shared_resources": [],
+        "stop_conditions": [
+          "Stop if the assigned report path cannot be written"
+        ],
+        "tier": "lightweight",
+        "title": "Independent alpha fixture inspection"
+      },
+      "reviews": [
+        {
+          "review_id": "review_2235fd46-7978-4629-aac9-f7b8eaf99298",
+          "execution_id": "exec_6aee666a-d052-4b1f-afd2-3bb47bad8039",
+          "disposition": "accepted",
+          "record_json": "{\"coverage_limits\":[\"Non-Git change indexing covers declared write targets only\"],\"criteria\":[{\"evidence\":[\"artifact:artifact_92886798-4262-4735-90dd-9737e524e299@sha256:71b754f125c6f54da635fbcb7f72468fdfa496b82a409a48083e03fd24c7dc0d\"],\"id\":\"fact\",\"result\":\"satisfied\"}],\"disposition\":\"accepted\",\"final_manifest_sha256\":\"903262fbe4f7990c41c456a1d9a80f5a5af20f2c2f8f2a2c7b99cb9df374221c\",\"freshness\":\"current\",\"integration_checks\":[\"Read workspace-a/input.txt after execution\",\"Verified report check inspect-input passed\",\"Verified final manifest changes and gaps are empty\"],\"next_action\":\"Close isolated concurrency and reconnect probe\",\"rationale\":\"Immutable report cites the exact input.txt answer alpha; the file was independently read after completion and the final manifest has no changes or gaps.\",\"starting_state_sha256\":\"9e2ec1cee9a570edf98be05f2b50a532dd8e1a904e124ece14efcb0c2764b47d\",\"unresolved_issues\":[]}",
+          "created_at": "2026-10-12T15:05:41.610Z"
+        }
+      ],
+      "dispatches": 1,
+      "artifacts": [
+        {
+          "artifact_id": "artifact_92886798-4262-4735-90dd-9737e524e299",
+          "execution_id": "exec_6aee666a-d052-4b1f-afd2-3bb47bad8039",
+          "sha256": "71b754f125c6f54da635fbcb7f72468fdfa496b82a409a48083e03fd24c7dc0d",
+          "byte_length": 1018,
+          "media_type": "application/json",
+          "created_at": "2026-10-12T15:04:39.137Z",
+          "export_path": "artifact_92886798-4262-4735-90dd-9737e524e299.json"
+        },
+        {
+          "artifact_id": "artifact_8ffa4111-8ec1-45d9-a3d2-78ba42af5377",
+          "execution_id": "exec_6aee666a-d052-4b1f-afd2-3bb47bad8039",
+          "sha256": "c5523d6d86b655d6deef4398d2c94ea868497dc90344933d1fccdac52cdb7c88",
+          "byte_length": 973,
+          "media_type": "text/markdown",
+          "created_at": "2026-10-12T15:04:39.149Z",
+          "export_path": "artifact_8ffa4111-8ec1-45d9-a3d2-78ba42af5377.md"
+        },
+        {
+          "artifact_id": "artifact_208f30eb-5409-41f6-b6c0-cbc5bac6de72",
+          "execution_id": "exec_6aee666a-d052-4b1f-afd2-3bb47bad8039",
+          "sha256": "903262fbe4f7990c41c456a1d9a80f5a5af20f2c2f8f2a2c7b99cb9df374221c",
+          "byte_length": 1018,
+          "media_type": "application/json",
+          "created_at": "2026-10-12T15:04:39.160Z",
+          "export_path": "artifact_208f30eb-5409-41f6-b6c0-cbc5bac6de72.json"
+        }
+      ]
+    },
+    {
+      "task_id": "task_5691769d-8fd7-431b-952b-fa850ba4abed",
+      "workspace": "/private/tmp/opencode-agents-live-extra-20261012-001/workspace-b",
+      "scope_id": "live-extra-20261012",
+      "execution_id": "exec_3e73a1bc-e790-47bc-93d0-33834226eca6",
+      "phase": "completed",
+      "observation": "current",
+      "session_id": "ses_ecf5b4d55ffe6dPTG5uMnHsPK8",
+      "user_message_id": "msg_7394c98e-89bd-4f80-a57d-2f7410915b34",
+      "baseline_hash": "dda182028f15f69f322ec6f05d75eabfeca0b33a1c185f7684ada4571dba31f3",
+      "prompt_hash": "2380eb3c9fcb2877b6e553ba5cc0b802f41b298c668630796418661fc8f8d4f1",
+      "final_manifest_hash": "7ce3482187bb72cea6b4ac911c6a975e7cc254a383fe47793310085d5abfde36",
+      "review_status": "accepted",
+      "report_validity": "valid",
+      "created_at": "2026-10-12T15:04:20.314Z",
+      "updated_at": "2026-10-12T15:05:41.622Z",
+      "packet": {
+        "acceptance_criteria": [
+          {
+            "evidence_required": "File content and report artifact",
+            "id": "fact",
+            "required": true,
+            "requirement": "Report cites input.txt and states beta"
+          }
+        ],
+        "allowed_writes": [],
+        "authoritative_inputs": [
+          {
+            "kind": "file",
+            "purpose": "Fixture fact to inspect",
+            "reference": "input.txt"
+          }
+        ],
+        "checks": [
+          {
+            "description": "Read input.txt and report its answer",
+            "id": "inspect-input"
+          }
+        ],
+        "constraints": [
+          "Use the configured local model endpoint only",
+          "Do not change project files"
+        ],
+        "context": {
+          "exclusions": [
+            "No network use or project edits"
+          ],
+          "rejected_assumptions": [],
+          "verified_facts": []
+        },
+        "objective": "Read input.txt in this workspace. Identify the fixture answer beta only after reading the file. Write a complete schema-valid result.json and summary.md in the assigned report directory. Preserve all project files.",
+        "shared_resources": [],
+        "stop_conditions": [
+          "Stop if the assigned report path cannot be written"
+        ],
+        "tier": "lightweight",
+        "title": "Independent beta fixture inspection"
+      },
+      "reviews": [
+        {
+          "review_id": "review_240e3e2e-31f7-4244-b8f7-0e1cab8daef1",
+          "execution_id": "exec_3e73a1bc-e790-47bc-93d0-33834226eca6",
+          "disposition": "accepted",
+          "record_json": "{\"coverage_limits\":[\"Non-Git change indexing covers declared write targets only\"],\"criteria\":[{\"evidence\":[\"artifact:artifact_d88bbe56-e9e3-439e-a6cc-03abad22ef4d@sha256:954e50b962c46bb1e2d70d060cf9009c2725ab4a239226c70134eb6fce51a600\"],\"id\":\"fact\",\"result\":\"satisfied\"}],\"disposition\":\"accepted\",\"final_manifest_sha256\":\"7ce3482187bb72cea6b4ac911c6a975e7cc254a383fe47793310085d5abfde36\",\"freshness\":\"current\",\"integration_checks\":[\"Read workspace-b/input.txt after execution\",\"Verified report check inspect-input passed\",\"Verified final manifest changes and gaps are empty\"],\"next_action\":\"Close isolated concurrency and reconnect probe\",\"rationale\":\"Immutable report cites the exact input.txt answer beta; the file was independently read after completion and the final manifest has no changes or gaps.\",\"starting_state_sha256\":\"dda182028f15f69f322ec6f05d75eabfeca0b33a1c185f7684ada4571dba31f3\",\"unresolved_issues\":[]}",
+          "created_at": "2026-10-12T15:05:41.622Z"
+        }
+      ],
+      "dispatches": 1,
+      "artifacts": [
+        {
+          "artifact_id": "artifact_d88bbe56-e9e3-439e-a6cc-03abad22ef4d",
+          "execution_id": "exec_3e73a1bc-e790-47bc-93d0-33834226eca6",
+          "sha256": "954e50b962c46bb1e2d70d060cf9009c2725ab4a239226c70134eb6fce51a600",
+          "byte_length": 1207,
+          "media_type": "application/json",
+          "created_at": "2026-10-12T15:04:37.065Z",
+          "export_path": "artifact_d88bbe56-e9e3-439e-a6cc-03abad22ef4d.json"
+        },
+        {
+          "artifact_id": "artifact_a72dc14d-3b78-4f4e-b0b0-f7468568dd3d",
+          "execution_id": "exec_3e73a1bc-e790-47bc-93d0-33834226eca6",
+          "sha256": "49dc6ddc7b78f5d2e24d848f4ebd02e09838a1b8a2115682c79f6a92b38d90be",
+          "byte_length": 1272,
+          "media_type": "text/markdown",
+          "created_at": "2026-10-12T15:04:37.078Z",
+          "export_path": "artifact_a72dc14d-3b78-4f4e-b0b0-f7468568dd3d.md"
+        },
+        {
+          "artifact_id": "artifact_94ca06cb-37c4-4f4e-9417-63115c912ed1",
+          "execution_id": "exec_3e73a1bc-e790-47bc-93d0-33834226eca6",
+          "sha256": "7ce3482187bb72cea6b4ac911c6a975e7cc254a383fe47793310085d5abfde36",
+          "byte_length": 1019,
+          "media_type": "application/json",
+          "created_at": "2026-10-12T15:04:37.090Z",
+          "export_path": "artifact_94ca06cb-37c4-4f4e-9417-63115c912ed1.json"
+        }
+      ]
+    }
+  ],
+  "reserved": 0
+}

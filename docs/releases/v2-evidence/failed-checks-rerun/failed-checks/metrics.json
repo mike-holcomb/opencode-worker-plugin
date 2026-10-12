@@ -1,0 +1,11 @@
+{
+  "phase": "cancelling",
+  "terminal": false,
+  "report_validity": "pending",
+  "dispatches": 1,
+  "duplicate_dispatch": false,
+  "elapsed_ms": 301451,
+  "status": "incomplete",
+  "parent_review": "not_recordable_without_final_manifest",
+  "reason": "Permission expired across deadline; runner error preserved. Cancellation uncertainty retains ownership."
+}

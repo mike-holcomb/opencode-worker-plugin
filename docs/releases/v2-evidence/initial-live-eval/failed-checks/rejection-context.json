@@ -1,0 +1,26 @@
+{
+  "case": "failed-checks",
+  "execution": "exec_75289526-b7ff-46b0-ab5e-c7f3c188eeba",
+  "phase": "failed",
+  "terminal": true,
+  "report_validity": "missing",
+  "dispatches": 1,
+  "finalization": [
+    {
+      "detail": {
+        "error": "{\"name\":\"APIError\",\"data\":{\"message\":\"Cannot connect to API: Unable to connect. Is the computer able to access the url?\",\"isRetryable\":true,\"metadata\":{\"url\":\"http://127.0.0.1:8124/v1/chat/completions\"}}}"
+      },
+      "intendedOutcome": "failed"
+    }
+  ],
+  "permission_decisions": [],
+  "required_criteria": [
+    "fixture-check-fails",
+    "summary-exists",
+    "failed-status-visible",
+    "exit-status-visible",
+    "source-and-tests-unchanged",
+    "write-scope",
+    "parent-failure-review"
+  ]
+}

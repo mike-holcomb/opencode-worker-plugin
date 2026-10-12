@@ -1,11 +1,11 @@
 # Changelog
 
-## 0.1.0 — 2026-09-16
+## 2.0.0-dev.0 — development
 
-- Extract the existing standard-library Python OpenCode runner without runtime changes.
-- Add lightweight, standard and full handoffs, deliberate context selection,
-  source-state coordination, progressive reporting and separate parent acceptance.
-- Migrate operational tests and add relocation, read-only and path portability checks.
-- Prepare an allowlisted bundle and migration/release documentation.
-- Validate local and end-to-end delegation behavior, installed discovery, and
-  deterministic release packaging.
+- Add a TypeScript/Node MCP runtime with durable task admission, exact session recovery, bounded worker profiles, artifact capture, and parent review.
+- Add ten MCP tools and a shared diagnostic CLI.
+- Package a deterministic Node-built archive with a read-only installed smoke test.
+- Add twelve v2 evaluation scenarios and a Node preparation/check harness.
+- Remove the Python job launcher, legacy import/inspection commands, and comparison tooling.
+
+Release certification is pending; see [validation](docs/validation.md).

@@ -1,0 +1,54 @@
+{
+  "review_started_at": "2026-10-12T20:05:58.230Z",
+  "context_bytes": 12501,
+  "idempotency_key": "parent-review-exec_c37e3517-3ce5-4bbd-9752-37cce2a10c30",
+  "gate_status": "failed",
+  "review": {
+    "disposition": "rejected",
+    "rationale": "No worker summary or structured report was produced. Exact task timed out after denied parent-campaign and supervisor-state discovery requests; terminal stop was proved, one dispatch and immutable missing-report manifest preserved. Supplied policy has signed-session language and a health authorization exemption; audit lacks service-identity evidence. There is no accepted worker assessment preserving that uncertainty. Repeated correction attempts have failed; retain this gate as incomplete rather than infer an answer from parent knowledge.",
+    "criteria": [
+      {
+        "id": "summary-exists",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_d5492365-95bf-4f4c-9d2c-227a03c5c7da@sha256:292db7a805c52f87f55d773966b332c1e98065f3c5c7fba6a6c2a96715e85734"
+        ]
+      },
+      {
+        "id": "coverage-recorded",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_d5492365-95bf-4f4c-9d2c-227a03c5c7da@sha256:292db7a805c52f87f55d773966b332c1e98065f3c5c7fba6a6c2a96715e85734"
+        ]
+      },
+      {
+        "id": "write-scope",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_d5492365-95bf-4f4c-9d2c-227a03c5c7da@sha256:292db7a805c52f87f55d773966b332c1e98065f3c5c7fba6a6c2a96715e85734"
+        ]
+      },
+      {
+        "id": "parent-qualitative-review",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_d5492365-95bf-4f4c-9d2c-227a03c5c7da@sha256:292db7a805c52f87f55d773966b332c1e98065f3c5c7fba6a6c2a96715e85734"
+        ]
+      }
+    ],
+    "starting_state_sha256": "0cc7b797f7b6cfab5ec59250af9b8f2a93d680726eefa2b1e99577e9b3256fb2",
+    "final_manifest_sha256": "292db7a805c52f87f55d773966b332c1e98065f3c5c7fba6a6c2a96715e85734",
+    "freshness": "Parent inspected complete recorded fixture inputs, immutable exports, final snapshot, and available checks.",
+    "integration_checks": [
+      "No worker summary or structured report was produced. Exact task timed out after denied parent-campaign and supervisor-state discovery requests; terminal stop was proved, one dispatch and immutable missing-report manifest preserved. Supplied policy has signed-session language and a health authorization exemption; audit lacks service-identity evidence. There is no accepted worker assessment preserving that uncertainty. Repeated correction attempts have failed; retain this gate as incomplete rather than infer an answer from parent knowledge."
+    ],
+    "coverage_limits": [
+      "Trusted-workspace managed mode; plugin race remains separately documented.",
+      "Context measured in bytes; elapsed review time includes concurrent parent work."
+    ],
+    "unresolved_issues": [
+      "No worker summary or structured report was produced. Exact task timed out after denied parent-campaign and supervisor-state discovery requests; terminal stop was proved, one dispatch and immutable missing-report manifest preserved. Supplied policy has signed-session language and a health authorization exemption; audit lacks service-identity evidence. There is no accepted worker assessment preserving that uncertainty. Repeated correction attempts have failed; retain this gate as incomplete rather than infer an answer from parent knowledge."
+    ],
+    "next_action": "Bounded correction or rerun; preserve this attempt."
+  }
+}

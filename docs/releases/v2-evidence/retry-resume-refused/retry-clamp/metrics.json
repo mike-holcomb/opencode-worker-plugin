@@ -1,0 +1,31 @@
+{
+  "status": "failed_before_dispatch",
+  "phase": "failed",
+  "report_validity": "pending",
+  "terminal": true,
+  "dispatches": 0,
+  "duplicate_dispatch": false,
+  "parent_review": "not_recordable_without_final_manifest",
+  "elapsed_ms": 1748,
+  "reason": "Exact resume guard could not observe finished predecessor turn after timeout; no prompt submitted",
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "observed_inference": {
+    "source": "opencode_1.18.35_exact_assistant_messages",
+    "execution_id": "exec_620055b2-e7b9-4089-b8f3-a13fe167fec4",
+    "session_id": "ses_ece99d4f7ffeZhT2YMASriuHZl",
+    "user_message_id": null,
+    "input_tokens": null,
+    "output_tokens": null,
+    "total_tokens": null,
+    "assistant_messages": 0,
+    "reported_cost": null,
+    "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available."
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "schema_version": 2,
+  "scenario_id": "log-regression",
+  "run_id": "log-regression-1791828718296",
+  "prepared_workdir": "/private/tmp/v2-live-campaign-20261012-01/log-regression/workspace",
+  "manifest_sha256": "d397b764ff5b88baa506ae6d73c3864ffc0683fe4f02b22b897013fc4d32c691",
+  "packet_schema_sha256": "d57a85f17494892fe59d470f3f0ed54071eed7dd33cee884f61d11f83506fd87",
+  "frozen_checks_sha256": "ea3b127f8113efb2c984a6605ff2c6e4508455d205497d8c40291d39a164faeb",
+  "initial_files": {
+    "deployments.txt": "b6bbc30c9b8b3e6714b3bc5c7b184b084be51d4bcc887ff32766acb44b590910",
+    "scenario-input.json": "7741f5d6d7a877a55fa262ec2f29db923e77d76fbaff2ee0008c75beb3ba8fa2",
+    "service.log": "bd16226e787c3317f575106eb6b7a208c9dd933c38a4867c1be8c0ad92b5b613",
+    "task.md": "7e03aca03a08142fa0ba8fddd7a3cfb0fa6ed0f2922cd3651399e8bb3c530c71"
+  }
+}

@@ -1,0 +1,1 @@
+printf 'forbidden' > forbidden.txt

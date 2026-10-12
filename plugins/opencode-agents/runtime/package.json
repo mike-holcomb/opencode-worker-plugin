@@ -1,0 +1,26 @@
+{
+  "name": "@mike-holcomb/opencode-agents",
+  "version": "2.0.0-dev.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=24.15 <25" },
+  "bin": { "opencode-agents": "./dist/cli.js" },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "schemas": "npm run build && node dist/generate-schemas.js",
+    "bundle": "npm run build && node scripts/bundle.mjs",
+    "test": "node --test dist/test/*.test.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "2.3.1",
+    "@opencode-ai/sdk": "1.18.35",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "2.3.1",
+    "@types/node": "24.10.3",
+    "esbuild": "0.28.2",
+    "typescript": "6.0.2"
+  }
+}

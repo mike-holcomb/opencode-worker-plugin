@@ -1,0 +1,39 @@
+{
+  "schema_version": 2,
+  "scenario_id": "context-reconcile",
+  "result_artifact_sha256": "f06b6f31d5de240bf418abf87be7cd5cb8963f404f52c87b20a0bbe9fe7479af",
+  "status": "review_required",
+  "parent_review_required": true,
+  "checks": [
+    {
+      "id": "summary-exists",
+      "kind": "file_exists",
+      "status": "pass",
+      "detail": "verified result artifact: summary.md"
+    },
+    {
+      "id": "verified-unverified",
+      "kind": "text_contains",
+      "status": "pass",
+      "detail": "searched summary.md for 3 frozen marker(s)"
+    },
+    {
+      "id": "reconciliation",
+      "kind": "text_contains_any",
+      "status": "pass",
+      "detail": "searched summary.md for 4 frozen marker(s)"
+    },
+    {
+      "id": "write-scope",
+      "kind": "allowed_changed_paths",
+      "status": "pass",
+      "detail": "changed=[]; unauthorized=[]"
+    },
+    {
+      "id": "parent-context-review",
+      "kind": "parent_review",
+      "status": "review_required",
+      "detail": "Assess whether the simulated predecessor evidence supports the selected future context policy, all source support was inspected, and unverified assumptions stayed out of parent acceptance."
+    }
+  ]
+}

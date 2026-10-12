@@ -1,0 +1,149 @@
+{
+  "started_at": "2026-10-12T19:52:08.891Z",
+  "node": "v24.15.0",
+  "platform": "darwin",
+  "arch": "arm64",
+  "kernel": "24.6.0",
+  "wsl2": false,
+  "cpu": "Apple M1 (Virtual)",
+  "revision": "494efb6c535e53aac7fb247233ef3db2163bcf90",
+  "diff_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "checks": [
+    {
+      "name": "build",
+      "command": "npm",
+      "argv": [
+        "run",
+        "bundle"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "elapsed_ms": 2783
+    },
+    {
+      "name": "runtime",
+      "command": "/Users/runner/hostedtoolcache/node/24.15.0/arm64/bin/node",
+      "argv": [
+        "--test",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/artifacts.test.js",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/attached.test.js",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/backend-binding.test.js",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/contracts.test.js",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/coordinator.test.js",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/daemon.test.js",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/development-execution.test.js",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/diagnostic-bounds.test.js",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/event-page.test.js",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/evidence.test.js",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/launch-config.test.js",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/managed-server.test.js",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/mcp.test.js",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/opencode-backend.test.js",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/release-matrix-admission.test.js",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/release-matrix-events.test.js",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/release-matrix-public.test.js",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/rpc.test.js",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/service.test.js",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/store.test.js",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/dist/test/workspace.test.js"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "elapsed_ms": 7211
+    },
+    {
+      "name": "release-runner-tests",
+      "command": "/Users/runner/hostedtoolcache/node/24.15.0/arm64/bin/node",
+      "argv": [
+        "--test",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/scripts/release/export.test.mjs",
+        "/Users/runner/work/opencode-worker-plugin/opencode-worker-plugin/plugins/opencode-agents/runtime/scripts/release/permissions.test.mjs"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "elapsed_ms": 290
+    },
+    {
+      "name": "packaging",
+      "command": "/Users/runner/hostedtoolcache/node/24.15.0/arm64/bin/node",
+      "argv": [
+        "--test",
+        "tests/packaging.test.mjs"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "elapsed_ms": 199
+    },
+    {
+      "name": "evaluation-tests",
+      "command": "/Users/runner/hostedtoolcache/node/24.15.0/arm64/bin/node",
+      "argv": [
+        "--test",
+        "evaluation/harness.test.mjs"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "elapsed_ms": 247
+    },
+    {
+      "name": "evaluation-fixtures",
+      "command": "/Users/runner/hostedtoolcache/node/24.15.0/arm64/bin/node",
+      "argv": [
+        "evaluation/harness.mjs",
+        "validate"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "elapsed_ms": 36
+    },
+    {
+      "name": "inventory",
+      "command": "/Users/runner/hostedtoolcache/node/24.15.0/arm64/bin/node",
+      "argv": [
+        "scripts/build_bundle.mjs",
+        "--check"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "elapsed_ms": 159
+    },
+    {
+      "name": "archive",
+      "command": "/Users/runner/hostedtoolcache/node/24.15.0/arm64/bin/node",
+      "argv": [
+        "scripts/build_bundle.mjs",
+        "--out",
+        "/Users/runner/work/_temp/release-evidence/opencode-agents.zip"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "elapsed_ms": 269
+    },
+    {
+      "name": "installed-smoke",
+      "command": "/Users/runner/hostedtoolcache/node/24.15.0/arm64/bin/node",
+      "argv": [
+        "scripts/smoke_installed_bundle.mjs",
+        "/Users/runner/work/_temp/release-evidence/opencode-agents.zip"
+      ],
+      "exit_code": 0,
+      "signal": null,
+      "error": null,
+      "elapsed_ms": 516
+    }
+  ],
+  "status": "passed",
+  "limits": [
+    "No inference, managed live cases, or marketplace installation in this runner"
+  ],
+  "runner_sha256": "45fcd9a8cb699f282024ce6320c28b97b66107b692197e889f711e01fe319f07",
+  "finished_at": "2026-10-12T19:52:20.669Z"
+}

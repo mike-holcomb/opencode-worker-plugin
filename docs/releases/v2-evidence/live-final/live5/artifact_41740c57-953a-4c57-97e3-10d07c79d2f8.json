@@ -1,0 +1,46 @@
+{
+  "schema_version": 2,
+  "task_id": "task_5e60c040-1d16-4f19-813c-5f3d3ac766a9",
+  "execution_id": "exec_e15d3989-ac9c-4df7-bbae-f22f84688993",
+  "outcome": "completed",
+  "summary": "Read input.txt and confirmed the answer is 'violet'. Wrote the WorkerReport (result.json) and readable summary (summary.md) per the output contract.",
+  "coverage": [
+    "input.txt (read at workspace root)"
+  ],
+  "gaps": [],
+  "findings": [
+    {
+      "id": "1",
+      "claim": "The answer is violet.",
+      "evidence": [
+        "input.txt:1 contains the token 'violet'"
+      ],
+      "caveats": [
+        "Single file read; content verified at inspection time and not re-checked afterward."
+      ]
+    }
+  ],
+  "changes": [],
+  "checks": [
+    {
+      "id": "input_read",
+      "status": "passed",
+      "exit_code": null,
+      "evidence": [
+        "input.txt exists and contains 'violet' on line 1"
+      ],
+      "explanation": "Confirmed input.txt was readable and contained the expected value."
+    },
+    {
+      "id": "report_write",
+      "status": "passed",
+      "exit_code": null,
+      "evidence": [
+        "result.json and summary.md written to the assigned report directory"
+      ],
+      "explanation": "Report files were written to the contract-specified paths."
+    }
+  ],
+  "blockers": [],
+  "next_action": "Parent review of the written reports."
+}

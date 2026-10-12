@@ -1,0 +1,13 @@
+{
+  "schema_version": 2,
+  "scenario_id": "log-regression",
+  "run_id": "log-regression-1791828718296",
+  "tier": "standard",
+  "context_mode": "fresh",
+  "context_basis": "ordinary fresh context",
+  "task_file": "task.md",
+  "fixture_files": [
+    "service.log",
+    "deployments.txt"
+  ]
+}

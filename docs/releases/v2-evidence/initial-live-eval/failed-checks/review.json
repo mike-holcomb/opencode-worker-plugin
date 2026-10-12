@@ -1,0 +1,114 @@
+{
+  "decision": {
+    "review_started_at": "2026-10-12T18:35:56.672191+00:00",
+    "context_bytes": 767,
+    "idempotency_key": "parent-release-reject-failed-checks-0001",
+    "gate_status": "failed",
+    "review": {
+      "disposition": "rejected",
+      "rationale": "Existing model route failed with API connection errors; no report was produced. Preserve this infrastructure failure and rerun after route restoration.",
+      "criteria": [
+        {
+          "id": "fixture-check-fails",
+          "result": "not_checked",
+          "evidence": []
+        },
+        {
+          "id": "summary-exists",
+          "result": "not_checked",
+          "evidence": []
+        },
+        {
+          "id": "failed-status-visible",
+          "result": "not_checked",
+          "evidence": []
+        },
+        {
+          "id": "exit-status-visible",
+          "result": "not_checked",
+          "evidence": []
+        },
+        {
+          "id": "source-and-tests-unchanged",
+          "result": "not_checked",
+          "evidence": []
+        },
+        {
+          "id": "write-scope",
+          "result": "not_checked",
+          "evidence": []
+        },
+        {
+          "id": "parent-failure-review",
+          "result": "not_checked",
+          "evidence": []
+        }
+      ],
+      "starting_state_sha256": "f92eb9c5b387fad8cdbd37375e27cee5a8be202b300a0a6f0687e852760ca088",
+      "final_manifest_sha256": "7c99d5f6143bde353d42b1d171496eeada82ac73dc1cf61f6d8fe958826a0a0c",
+      "freshness": "Current terminal snapshot and recorded failure inspected.",
+      "integration_checks": [
+        "One dispatch recorded; missing report prevents acceptance."
+      ],
+      "coverage_limits": [
+        "Rejection based on terminal failure evidence; no successful qualitative source review claimed.",
+        "Context bytes measure the recorded rejection input only."
+      ],
+      "unresolved_issues": [
+        "Existing model route failed with API connection errors; no report was produced. Preserve this infrastructure failure and rerun after route restoration."
+      ],
+      "next_action": "Fresh isolated rerun; preserve this failed attempt."
+    }
+  },
+  "result": {
+    "taskId": "task_1c01d2ba-51d4-40b2-b357-916cf38a79a0",
+    "executionId": "exec_75289526-b7ff-46b0-ab5e-c7f3c188eeba",
+    "scopeId": "release-failed-checks",
+    "revision": 9,
+    "phase": "failed",
+    "observation": "current",
+    "workspace": "/private/tmp/v2-live-campaign-20261012-01/failed-checks/workspace",
+    "workspaceAccess": "exclusive",
+    "requestModel": {
+      "profile": "local"
+    },
+    "model": "llama.cpp/laguna-s-21",
+    "profile": "bounded-inspect",
+    "backendId": "backend_5c01cb3f0be0ddf3ff1402b84f0c58eb",
+    "sessionId": "ses_ece9b8ed2ffeLXV6VSYL3zW0Q9",
+    "userMessageId": "msg_69b8b464-b42c-4aa5-808d-eb32c498f591",
+    "predecessorExecutionId": null,
+    "contextMode": null,
+    "baselineHash": "f92eb9c5b387fad8cdbd37375e27cee5a8be202b300a0a6f0687e852760ca088",
+    "promptHash": "94465bb80502620c9048061ea99b5da6bb2dbb955e32923d6e7a35db26ccdbae",
+    "reportPath": "/private/tmp/v2-live-campaign-20261012-01/failed-checks/state/reports/exec_75289526-b7ff-46b0-ab5e-c7f3c188eeba",
+    "queueDeadlineAt": "2026-10-12T18:35:47.366Z",
+    "admittedAt": "2026-10-12T18:33:47.369Z",
+    "executionDeadlineAt": "2026-10-12T18:38:47.369Z",
+    "finalizationDeadlineAt": "2026-10-12T18:35:23.133Z",
+    "intendedOutcome": "failed",
+    "creationIntent": {
+      "backendId": "backend_5c01cb3f0be0ddf3ff1402b84f0c58eb",
+      "marker": "opencode-agents:exec_75289526-b7ff-46b0-ab5e-c7f3c188eeba",
+      "sessionId": "ses_ece9b8ed2ffeLXV6VSYL3zW0Q9",
+      "createdAt": "2026-10-12T18:33:48.580Z"
+    },
+    "cancellationIntent": null,
+    "pendingRequests": [],
+    "createdAt": "2026-10-12T18:33:47.366Z",
+    "updatedAt": "2026-10-12T18:36:22.419Z",
+    "reportValidity": "missing",
+    "finalManifestHash": "7c99d5f6143bde353d42b1d171496eeada82ac73dc1cf61f6d8fe958826a0a0c",
+    "reviewStatus": "rejected",
+    "terminal": true,
+    "operationally_resolved": true,
+    "usage": {
+      "input_tokens": null,
+      "output_tokens": null,
+      "cache_tokens": null,
+      "reported_cost": null,
+      "currency": null,
+      "source": "not_captured"
+    }
+  }
+}

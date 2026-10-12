@@ -1,0 +1,41 @@
+{
+  "review_started_at": "2026-10-12T20:00:31.414Z",
+  "context_bytes": 11298,
+  "files": [
+    {
+      "path": "packet.json",
+      "sha256": "58bccb9b43d4135c159aa03d621b50bdc43c223879e03d22dc3d8f87a4d5ca3e",
+      "bytes": 801
+    },
+    {
+      "path": "final.json",
+      "sha256": "7c76ee58f2007adc80da97f9470e4d8e3b60caeabcb10acd880f09957ab84998",
+      "bytes": 5740
+    },
+    {
+      "path": "exports.json",
+      "sha256": "979596dfda80b90f0309d68d106e31ab4e71baf2df1092cf2c10b7d0015aa3d7",
+      "bytes": 1014
+    },
+    {
+      "path": "summary.md",
+      "sha256": "404a36467aca2c4af4af65e5516aacdce063e046f8b75710c51a7e4bb3608ff7",
+      "bytes": 801
+    },
+    {
+      "path": "artifact_a2eceaa3-bac3-4242-862f-79e77d1e7474.json",
+      "sha256": "6714c1bab01449ef17b7cc98bda92aac57f8f4b8ba36e7bbc1ebcf716c9cd862",
+      "bytes": 1925
+    },
+    {
+      "path": "artifact_df147039-9e77-4275-be12-e7a2a5cadfcd.json",
+      "sha256": "cf1e37c2df76c8c78624cb930623eb36ed96094cbdd7236c7405b96b7661a1b3",
+      "bytes": 1010
+    },
+    {
+      "path": "workspace/input.txt",
+      "sha256": "7f0259c09c16930b3de1fb778997bf6371bd9dcf4eaceac305d1827209cbbbdb",
+      "bytes": 7
+    }
+  ]
+}

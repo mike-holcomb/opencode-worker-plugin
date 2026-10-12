@@ -1,0 +1,36 @@
+{
+  "review_started_at": "2026-10-12T19:01:16.748Z",
+  "context_bytes": 17564,
+  "idempotency_key": "parent-review-exec_0ecaee89-f0fc-4e0c-8774-ec315e0f9306",
+  "gate_status": "passed",
+  "review": {
+    "disposition": "accepted",
+    "rationale": "Parent verified a separate Git worktree, exact answer.txt bytes violet plus newline, unchanged pre-existing dirty.txt, and the immutable manifest recording only answer.txt as added. Valid report distinguishes the pre-existing dirty diff from its declared change. All extra commands were individually scoped read-only checks; one dispatch, current terminal completion.",
+    "criteria": [
+      {
+        "id": "answer",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_e0272081-d7d5-40b9-b320-2e6583cc5ec2@sha256:5cfd5e897478736a13d75279b9addda955ef87649a690fa3f77c5a380b655e88",
+          "artifact:artifact_fcf8e345-038a-4a78-a1d0-1d23463b938a@sha256:69b3b101c6333580f87e4acb0037dbe69decdfb7aa147291465f3deaa62085df",
+          "artifact:artifact_c0e67a1c-502b-4429-9f5c-781e3f50b719@sha256:fd405a2f0f57c92230e9b3fb9750ef77a431f9dd9a03b09990a16a84c1dc9070",
+          "artifact:artifact_9712e428-33b1-44d8-afe9-8dde7f76d196@sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "artifact:artifact_abfe77f4-c019-4391-8aac-8bf9764cae7d@sha256:7f0259c09c16930b3de1fb778997bf6371bd9dcf4eaceac305d1827209cbbbdb",
+          "artifact:artifact_6c955134-f198-4dd1-b9d5-6cde3bba94e0@sha256:b2fad8877b3ae99eaa2b0a405c799f9f6c4da611403d613f2adf6697fd95f671"
+        ]
+      }
+    ],
+    "starting_state_sha256": "e935106dbec40068e4b39844a3a01d8e0af03bb4ccdfdac56d2173876382ed2e",
+    "final_manifest_sha256": "b2fad8877b3ae99eaa2b0a405c799f9f6c4da611403d613f2adf6697fd95f671",
+    "freshness": "Parent inspected complete recorded fixture inputs, immutable exports, final snapshot, and available checks.",
+    "integration_checks": [
+      "Parent verified a separate Git worktree, exact answer.txt bytes violet plus newline, unchanged pre-existing dirty.txt, and the immutable manifest recording only answer.txt as added. Valid report distinguishes the pre-existing dirty diff from its declared change. All extra commands were individually scoped read-only checks; one dispatch, current terminal completion."
+    ],
+    "coverage_limits": [
+      "Trusted-workspace managed mode; plugin race remains separately documented.",
+      "Context measured in bytes; elapsed review time includes concurrent parent work."
+    ],
+    "unresolved_issues": [],
+    "next_action": "Retain this reviewed attempt."
+  }
+}

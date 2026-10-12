@@ -1,0 +1,93 @@
+{
+  "source": "opencode_1.18.35_exact_assistant_messages",
+  "execution_id": "exec_15f04a24-a02c-4839-a93c-9d769cb85c58",
+  "session_id": "ses_ece5aac00ffeW0fVKFWnbycCuZ",
+  "user_message_id": "msg_59d99990-51ba-4774-b4f4-3288c830020b",
+  "input_tokens": 133871,
+  "output_tokens": 10705,
+  "total_tokens": null,
+  "assistant_messages": 5,
+  "reported_cost": null,
+  "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available.",
+  "messages": [
+    {
+      "id": "msg_131ac8dcd0013AxnePtPXfnbL7",
+      "parent_id": "msg_59d99990-51ba-4774-b4f4-3288c830020b",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 30180,
+        "input": 29426,
+        "output": 754,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_131aca95f001nfKfCVosFk62EI",
+      "parent_id": "msg_59d99990-51ba-4774-b4f4-3288c830020b",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 34190,
+        "input": 30500,
+        "output": 3690,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_131ae7e6c001AWsUOzRg8XYPwo",
+      "parent_id": "msg_59d99990-51ba-4774-b4f4-3288c830020b",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 39637,
+        "input": 34269,
+        "output": 5368,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_131af2906001A7rGZ9cRxK8J1R",
+      "parent_id": "msg_59d99990-51ba-4774-b4f4-3288c830020b",
+      "finish": "tool-calls",
+      "tokens": {
+        "total": 40569,
+        "input": 39676,
+        "output": 893,
+        "reasoning": 0,
+        "cache": {
+          "write": 0,
+          "read": 0
+        }
+      },
+      "raw_cost": 0
+    },
+    {
+      "id": "msg_131af76a4001ix88rYU6A3wRsM",
+      "parent_id": "msg_59d99990-51ba-4774-b4f4-3288c830020b",
+      "finish": null,
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "reasoning": 0,
+        "cache": {
+          "read": 0,
+          "write": 0
+        }
+      },
+      "raw_cost": 0
+    }
+  ]
+}

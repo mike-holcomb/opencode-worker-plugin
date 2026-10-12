@@ -1,0 +1,49 @@
+{
+  "elapsed_ms": 1106589,
+  "dispatches": 1,
+  "duplicate_dispatch": false,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "report_validity": "pending",
+  "terminal": false,
+  "phase": "waiting_input",
+  "decisions": [
+    {
+      "request_id": "per_1318b6656001fEiKTOWLTa4sDZ",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Read-only listing in the assigned fixture workspace.",
+      "permission": "bash",
+      "command": "ls -la",
+      "patterns": [
+        "ls -la"
+      ]
+    }
+  ],
+  "evaluation": null,
+  "assertion_error": null,
+  "overlap": null,
+  "status": "incomplete",
+  "parent_review": "pending",
+  "parent_review_started_at": null,
+  "parent_review_elapsed_ms": null,
+  "parent_context_bytes": null,
+  "observed_inference": {
+    "source": "opencode_1.18.35_exact_assistant_messages",
+    "execution_id": "exec_197847b5-d186-44af-ac45-c284a1d7e89a",
+    "session_id": "ses_ece74a75cffehcoqkQqAY4g64C",
+    "user_message_id": "msg_9222a847-4ec0-43b1-aefa-f6b8114b0286",
+    "input_tokens": 61207,
+    "output_tokens": 832,
+    "total_tokens": null,
+    "assistant_messages": 8,
+    "reported_cost": null,
+    "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available."
+  }
+}

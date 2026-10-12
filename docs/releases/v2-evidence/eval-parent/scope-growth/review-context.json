@@ -1,0 +1,51 @@
+{
+  "review_started_at": "2026-10-12T19:15:59.892Z",
+  "context_bytes": 11941,
+  "files": [
+    {
+      "path": "packet.json",
+      "sha256": "53134e0e7824cacdab305a409b837ddf20c8d5dcc255502dd51d24f1da930002",
+      "bytes": 3034
+    },
+    {
+      "path": "final.json",
+      "sha256": "466c0020b6cc34d5ce1b1d719326d35f4522daadf34249eaae9fd097e419a437",
+      "bytes": 6830
+    },
+    {
+      "path": "exports.json",
+      "sha256": "4d95735940ed5e14041ebe635c25e61c5e8be9aaf48f695cd00ed90d519a5a69",
+      "bytes": 353
+    },
+    {
+      "path": "artifact_36a2cbfc-315d-4bfd-9811-d7765914853a.json",
+      "sha256": "5ad63a9516485ca7a996bbe46e7df42ba31773449ef7b35b9b9485063791dc3a",
+      "bytes": 701
+    },
+    {
+      "path": "workspace/CONTRACT.txt",
+      "sha256": "14b77840b18e161daf83a808f074da53ade6e4b150c8dfca46cc5eababb2bc75",
+      "bytes": 152
+    },
+    {
+      "path": "workspace/adapter.py",
+      "sha256": "4193c6d00976515a94fe197b7939fe7cfde2060d06d37ed51f7c34babed1888d",
+      "bytes": 129
+    },
+    {
+      "path": "workspace/feature.py",
+      "sha256": "5c076714e95a67ff7efa37107d240191a76976ce5dd0e794e3381d9500e25b57",
+      "bytes": 72
+    },
+    {
+      "path": "workspace/scenario-input.json",
+      "sha256": "cbce1295c156b1ab2374c15fcbfc81a7a1caf1b0c31c3c97d0e51c6973583b74",
+      "bytes": 302
+    },
+    {
+      "path": "workspace/task.md",
+      "sha256": "a9af855bdca6ed1097e454770c5280a450862279a98999e5f6eca8d1cfff689d",
+      "bytes": 368
+    }
+  ]
+}

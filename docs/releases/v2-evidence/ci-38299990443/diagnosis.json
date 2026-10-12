@@ -1,0 +1,11 @@
+{
+  "status": "repaired",
+  "failed_run": 38299990443,
+  "failing_job": "Ubuntu 24.04 / Node 24.21.0",
+  "failure": "Unhandled EPIPE in late RPC response terminated the elected supervisor during T23 concurrent startup.",
+  "fix_revision": "494efb6c535e53aac7fb247233ef3db2163bcf90",
+  "fix": "Handle per-client socket errors without cancelling the admitted handler or terminating supervisor.",
+  "regression": "Timed-out caller, late response, handler executes exactly once, next health request succeeds.",
+  "successful_four_job_run": 38300447074,
+  "soak_scope": "The soak uses in-memory MCP transport and does not exercise local RPC sockets; all measured coordinator/store/backend fixture sources are unchanged."
+}

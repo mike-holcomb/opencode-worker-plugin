@@ -1,0 +1,33 @@
+{
+  "review_started_at": "2026-10-12T18:45:18.104Z",
+  "context_bytes": 9867,
+  "idempotency_key": "parent-review-exec_fe1bd2f2-2fc7-44d0-9bf8-4b20f719d773",
+  "gate_status": "passed",
+  "review": {
+    "disposition": "accepted",
+    "rationale": "Fresh read-only task completed with valid report citing input.txt line 1 as violet. Parent checked the entire source and immutable report, matching manifest, one dispatch, and unchanged input.",
+    "criteria": [
+      {
+        "id": "answer",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_2717e623-5ac6-4988-80b1-b8893d4e0ee9@sha256:09c4daf62b0df5c284dd8a03489a65643d9d4c15f538f99b7d87c9c86154ceab",
+          "artifact:artifact_35e40297-4a89-45f1-90f1-ea899cfe3a4a@sha256:1661048fe67482e9da16c96936dda66ce98146e7b93984ed700d388f087b0e3d",
+          "artifact:artifact_f0052c18-9ba5-4132-9710-6eaf310e96fd@sha256:a27ad57826078857b2e8219795656147f953274ef0be4a23ea62fa2e2f48e20e"
+        ]
+      }
+    ],
+    "starting_state_sha256": "a677031d56fc4a498e944ec4fb62d475f829fe527073cd13f0a7dac282acbaa6",
+    "final_manifest_sha256": "a27ad57826078857b2e8219795656147f953274ef0be4a23ea62fa2e2f48e20e",
+    "freshness": "Parent inspected complete recorded fixture inputs, immutable exports, final snapshot, and available checks.",
+    "integration_checks": [
+      "Fresh read-only task completed with valid report citing input.txt line 1 as violet. Parent checked the entire source and immutable report, matching manifest, one dispatch, and unchanged input."
+    ],
+    "coverage_limits": [
+      "Trusted-workspace managed mode; plugin race remains separately documented.",
+      "Context measured in bytes; elapsed review time includes concurrent parent work."
+    ],
+    "unresolved_issues": [],
+    "next_action": "Retain this reviewed attempt."
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "schema_version": 2,
+  "scenario_count": 12,
+  "frozen_check_count": 69,
+  "fixture_file_count": 31,
+  "manifest_sha256": "d397b764ff5b88baa506ae6d73c3864ffc0683fe4f02b22b897013fc4d32c691",
+  "packet_schema_sha256": "d57a85f17494892fe59d470f3f0ed54071eed7dd33cee884f61d11f83506fd87",
+  "inference_started": false
+}

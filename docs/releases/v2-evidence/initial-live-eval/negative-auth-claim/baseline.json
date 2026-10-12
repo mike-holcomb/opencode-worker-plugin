@@ -1,0 +1,15 @@
+{
+  "schema_version": 2,
+  "scenario_id": "negative-auth-claim",
+  "run_id": "negative-auth-claim-1791829584508",
+  "prepared_workdir": "/private/tmp/v2-live-campaign-20261012-01/negative-auth-claim/workspace",
+  "manifest_sha256": "d397b764ff5b88baa506ae6d73c3864ffc0683fe4f02b22b897013fc4d32c691",
+  "packet_schema_sha256": "d57a85f17494892fe59d470f3f0ed54071eed7dd33cee884f61d11f83506fd87",
+  "frozen_checks_sha256": "9535c19b040aa10d31ba2e48b071ac5b820f74721706ee76fc76fe743c8ea563",
+  "initial_files": {
+    "auth_routes.py": "ba46ef93e30a24de586bb5b937218595e313a86d21421d95d450351c74ea881e",
+    "README.txt": "a372e8bda8d1864b160a899c9e6cd80b4de2e2cb99999a394b709e640ec650e2",
+    "scenario-input.json": "8d45254e1a96e2389f8661126a93705c24d449ab5b7e1e7f4c8e65b8c5ab75aa",
+    "task.md": "4cae0d5c5bce25d1103dab6b678647e8d0e0115ee518e2da78b4c85d4137c362"
+  }
+}

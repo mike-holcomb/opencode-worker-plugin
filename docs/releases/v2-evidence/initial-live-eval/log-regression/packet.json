@@ -1,0 +1,88 @@
+{
+  "title": "Investigate a timeout spike in verbose logs",
+  "objective": "Investigate service.log for the timeout spike and correlate it with deployments.txt. Write the assigned report summary.md with the bounded time window, affected request IDs, timeout count, the deployment correlation, and gaps. Quote evidence paths and do not infer an outage outside the supplied logs.",
+  "tier": "standard",
+  "authoritative_inputs": [
+    {
+      "reference": "service.log",
+      "kind": "file",
+      "purpose": "Frozen evaluation fixture"
+    },
+    {
+      "reference": "deployments.txt",
+      "kind": "file",
+      "purpose": "Frozen evaluation fixture"
+    }
+  ],
+  "context": {
+    "verified_facts": [],
+    "rejected_assumptions": [],
+    "exclusions": []
+  },
+  "allowed_writes": [],
+  "acceptance_criteria": [
+    {
+      "id": "summary-exists",
+      "requirement": "Preserve frozen file_exists check summary-exists",
+      "evidence_required": "Run the unchanged summary-exists evaluator check and retain its result",
+      "required": true
+    },
+    {
+      "id": "affected-requests",
+      "requirement": "Preserve frozen text_contains check affected-requests",
+      "evidence_required": "Run the unchanged affected-requests evaluator check and retain its result",
+      "required": true
+    },
+    {
+      "id": "bounded-window",
+      "requirement": "Preserve frozen text_contains check bounded-window",
+      "evidence_required": "Run the unchanged bounded-window evaluator check and retain its result",
+      "required": true
+    },
+    {
+      "id": "timeout-count-recorded",
+      "requirement": "Preserve frozen text_contains check timeout-count-recorded",
+      "evidence_required": "Run the unchanged timeout-count-recorded evaluator check and retain its result",
+      "required": true
+    },
+    {
+      "id": "correlation-labeled",
+      "requirement": "Preserve frozen text_contains_any check correlation-labeled",
+      "evidence_required": "Run the unchanged correlation-labeled evaluator check and retain its result",
+      "required": true
+    },
+    {
+      "id": "evidence-paths",
+      "requirement": "Preserve frozen text_contains check evidence-paths",
+      "evidence_required": "Run the unchanged evidence-paths evaluator check and retain its result",
+      "required": true
+    },
+    {
+      "id": "source-unchanged",
+      "requirement": "Preserve frozen unchanged_paths check source-unchanged",
+      "evidence_required": "Run the unchanged source-unchanged evaluator check and retain its result",
+      "required": true
+    },
+    {
+      "id": "write-scope",
+      "requirement": "Preserve frozen allowed_changed_paths check write-scope",
+      "evidence_required": "Run the unchanged write-scope evaluator check and retain its result",
+      "required": true
+    },
+    {
+      "id": "parent-log-review",
+      "requirement": "Verify all supplied log lines were covered, the timeout count is exactly three, and deployment timing is described as correlation rather than proof of causation.",
+      "evidence_required": "Run the unchanged parent-log-review evaluator check and retain its result",
+      "required": true
+    }
+  ],
+  "checks": [],
+  "constraints": [
+    "Preserve the scenario's initial content and unrelated changes.",
+    "Report failed checks and limits without claiming parent acceptance."
+  ],
+  "stop_conditions": [
+    "Stop if a required action exceeds the declared allowed writes."
+  ],
+  "shared_resources": []
+}

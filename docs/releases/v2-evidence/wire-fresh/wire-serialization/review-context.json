@@ -1,0 +1,71 @@
+{
+  "review_started_at": "2026-10-12T19:41:03.994Z",
+  "context_bytes": 28024,
+  "files": [
+    {
+      "path": "packet.json",
+      "sha256": "eae6ef180585d644fc93eac40822bdc69c870d1a7328467f0dffbfb257fff654",
+      "bytes": 3977
+    },
+    {
+      "path": "final.json",
+      "sha256": "5bb28a613ef406d5e31154a815ef9d4eeec7b7b2088ff7d5e2a1945029c39673",
+      "bytes": 9007
+    },
+    {
+      "path": "exports.json",
+      "sha256": "e3d61ebb3b6574f29053f690d4bcfb78eb28f2c7593c85eaf3cac10f04b9b5a5",
+      "bytes": 1733
+    },
+    {
+      "path": "summary.md",
+      "sha256": "89a3d060c8650fcd4f1ed3663daad2ff95ff29d8fcbf3d86bb578bf154dd6aac",
+      "bytes": 1971
+    },
+    {
+      "path": "artifact_2f7bf352-45ab-4663-89bd-3b3a0f7f2573.json",
+      "sha256": "4b0179b3c682c010aeff875e9bdec85fc5be5e74a25c1d32ec61fece97da92d5",
+      "bytes": 6768
+    },
+    {
+      "path": "artifact_61afcb3d-d8d9-4d5d-bfd6-2d3157d9afa1.json",
+      "sha256": "cc217016e7a89afa105b6ffc3d3e673f7d696b6c789b531d7ad79f9b39c1d8b8",
+      "bytes": 253
+    },
+    {
+      "path": "artifact_8eedbcb2-597b-4208-8ef6-60e131b35b64.json",
+      "sha256": "9963c143e40a7c32f213bf4968d865ea66fd39b78953d3dca2a777581b8701c3",
+      "bytes": 271
+    },
+    {
+      "path": "artifact_21c16e86-2828-47eb-b367-194c08a722a1.json",
+      "sha256": "ab921d7279cdba3d5401689d08e96c5cb015cde7234b7372ef3fd8b317363a17",
+      "bytes": 2210
+    },
+    {
+      "path": "workspace/consumer.py",
+      "sha256": "cc217016e7a89afa105b6ffc3d3e673f7d696b6c789b531d7ad79f9b39c1d8b8",
+      "bytes": 253
+    },
+    {
+      "path": "workspace/producer.py",
+      "sha256": "9963c143e40a7c32f213bf4968d865ea66fd39b78953d3dca2a777581b8701c3",
+      "bytes": 271
+    },
+    {
+      "path": "workspace/scenario-input.json",
+      "sha256": "399c309092877ac9384f7b5d9d8461d54f9e914ca4aa437cde6c4dfb97614620",
+      "bytes": 312
+    },
+    {
+      "path": "workspace/task.md",
+      "sha256": "4e25a7b0d51fab69e9863386675be358df08b43912051fbeb5efb917f671814c",
+      "bytes": 331
+    },
+    {
+      "path": "workspace/test_wire.py",
+      "sha256": "7555170db26efef5807261d60cd230a2aa895b42d7c71a1e148c6fe2fd672dac",
+      "bytes": 667
+    }
+  ]
+}

@@ -1,0 +1,136 @@
+{
+  "schema_version": 2,
+  "task_id": "task_07589af2-3c49-428b-bec8-cafee1b8feb4",
+  "execution_id": "exec_d3e773a4-76ef-4e78-a900-24ee566662b3",
+  "outcome": "completed",
+  "summary": "Inspected config.py and client.py. The request timeout definition is DEFAULT_TIMEOUT_SECONDS = 12 in config.py:1. The timeout_for function (config.py:4-5) overrides this to 3 for the 'health' endpoint. The caller Client.request (client.py:5-6) invokes timeout_for(endpoint) to obtain the effective timeout when no explicit timeout argument is provided.",
+  "coverage": [
+    "config.py:1 — DEFAULT_TIMEOUT_SECONDS = 12 (definition)",
+    "config.py:4-5 — timeout_for function returning 3 for 'health', else DEFAULT_TIMEOUT_SECONDS (override logic)",
+    "client.py:1 — from config import timeout_for (import)",
+    "client.py:5-6 — Client.request method calling timeout_for(endpoint) (caller)",
+    "workspace/config.py — full file read",
+    "workspace/client.py — full file read"
+  ],
+  "gaps": [
+    "No evaluator scripts were located in accessible paths; checks were verified manually via the read tool rather than by executing frozen evaluator scripts.",
+    "Cannot confirm exhaustive absence of additional timeout definitions or callers outside config.py and client.py."
+  ],
+  "findings": [
+    {
+      "id": "definition",
+      "claim": "The request timeout definition is DEFAULT_TIMEOUT_SECONDS = 12, defined in config.py at line 1.",
+      "evidence": [
+        "config.py:1 — 'DEFAULT_TIMEOUT_SECONDS = 12'",
+      ],
+      "caveats": [
+        "DEFAULT_TIMEOUT_SECONDS is module-level; timeout_for (config.py:4-5) is the derived resolver that both uses this constant and provides the override."
+      ]
+    },
+    {
+      "id": "caller",
+      "claim": "The caller that uses the timeout is Client.request, defined in client.py at lines 5-6, which calls timeout_for(endpoint) when no explicit timeout is passed.",
+      "evidence": [
+        "client.py:1 — 'from config import timeout_for'",
+        "client.py:5 — 'def request(self, endpoint, timeout=None):'",
+        "client.py:6 — 'effective_timeout = timeout if timeout is not None else timeout_for(endpoint)'"
+      ],
+      "caveats": [
+        "Client.request directly calls timeout_for, not DEFAULT_TIMEOUT_SECONDS. The constant DEFAULT_TIMEOUT_SECONDS is used by timeout_for within config.py."
+      ]
+    },
+    {
+      "id": "default-vs-override",
+      "claim": "The default timeout is 12 seconds (DEFAULT_TIMEOUT_SECONDS). The override is 3 seconds for the 'health' endpoint, returned by timeout_for when endpoint == 'health'.",
+      "evidence": [
+        "config.py:1 — DEFAULT_TIMEOUT_SECONDS = 12",
+        "config.py:5 — 'return 3 if endpoint == \"health\" else DEFAULT_TIMEOUT_SECONDS'"
+      ],
+      "caveats": [
+        "The override is hardcoded to 3 seconds within timeout_for; no configuration parameter controls it.",
+        "Client.request also accepts an explicit timeout parameter that supersedes both default and override (client.py:6)."
+      ]
+    }
+  ],
+  "changes": [
+    {
+      "path": "/private/tmp/v2-live-campaign-20261012-01/lookup-timeout/state/reports/exec_d3e773a4-76ef-4e78-a900-24ee566662b3/summary.md",
+      "description": "Created worker report summary.md with defining path/symbol, caller path/symbol, and default-vs-override distinction."
+    },
+    {
+      "path": "/private/tmp/v2-live-campaign-20261012-01/lookup-timeout/state/reports/exec_d3e773a4-76ef-4e78-a900-24ee566662b3/result.json",
+      "description": "Created WorkerReport schema_version 2 result JSON."
+    }
+  ],
+  "checks": [
+    {
+      "id": "summary-exists",
+      "status": "passed",
+      "exit_code": null,
+      "evidence": [
+        "Read back /private/tmp/v2-live-campaign-20261012-01/lookup-timeout/state/reports/exec_d3e773a4-76ef-4e78-a900-24ee566662b3/summary.md — file exists with 37 lines."
+      ],
+      "explanation": "Verified summary.md exists by reading it back via the read tool. No shell/exec tool was available to invoke the frozen evaluator script directly, but the file existence requirement was satisfied."
+    },
+    {
+      "id": "definition-cited",
+      "status": "passed",
+      "exit_code": null,
+      "evidence": [
+        "summary.md line 3: 'Defining path and symbol'",
+        "summary.md line 5: 'The request timeout definition lives in config.py'",
+        "summary.md line 7: 'Symbol: DEFAULT_TIMEOUT_SECONDS'",
+        "summary.md line 9: 'File / line: config.py:1'"
+      ],
+      "explanation": "summary.md contains the defining path (config.py) and symbol (DEFAULT_TIMEOUT_SECONDS) with cited line. No shell/exec tool available to run the frozen text_contains evaluator; manual verification via read tool confirms the text is present."
+    },
+    {
+      "id": "caller-cited",
+      "status": "passed",
+      "exit_code": null,
+      "evidence": [
+        "summary.md line 17: 'Caller path and symbol'",
+        "summary.md line 19: 'The caller that uses the timeout is client.py'",
+        "summary.md line 21: 'Symbol: Client.request (method)'",
+        "summary.md line 22: 'File / line: client.py:5-6'"
+      ],
+      "explanation": "summary.md contains the caller path (client.py) and symbol (Client.request) with cited line. No shell/exec tool available to run the frozen text_contains evaluator; manual verification via read tool confirms the text is present."
+    },
+    {
+      "id": "source-unchanged",
+      "status": "passed",
+      "exit_code": null,
+      "evidence": [
+        "config.py re-read after workflow: identical to initial content (DEFAULT_TIMEOUT_SECONDS = 12, timeout_for function, 5 lines).",
+        "client.py re-read after workflow: identical to initial content (import, Client.request method, 7 lines).",
+        "No edit or write operations were performed on config.py or client.py."
+      ],
+      "explanation": "Both source files were re-read and confirmed unchanged. Only summary.md and result.json were written to the reports directory. No shell/exec tool was available to run the frozen unchanged_paths evaluator; manual verification via read tool confirms source integrity."
+    },
+    {
+      "id": "write-scope",
+      "status": "passed",
+      "exit_code": null,
+      "evidence": [
+        "Files written: summary.md and result.json, both under /private/tmp/v2-live-campaign-20261012-01/lookup-timeout/state/reports/exec_d3e773a4-76ef-4e78-a900-24ee566662b3/ (allowed write path).",
+        "No files outside the allowed write-scope were created or modified."
+      ],
+      "explanation": "All writes were confined to the reports directory for this execution ID, which is a permitted path. No shell/exec tool was available to run the frozen allowed_changed_paths evaluator; manual verification confirms scope compliance."
+    },
+    {
+      "id": "parent-lookup-review",
+      "status": "passed",
+      "exit_code": null,
+      "evidence": [
+        "Full config.py (5 lines) inspected: DEFAULT_TIMEOUT_SECONDS (line 1), timeout_for (lines 4-5).",
+        "Full client.py (7 lines) inspected: import (line 1), Client.request (lines 5-6).",
+        "Definition citation matches config.py:1 content exactly.",
+        "Caller citation matches client.py:5-6 content exactly.",
+        "Default (12) vs override (3 for health) distinction supported by config.py:1 and config.py:5."
+      ],
+      "explanation": "All source lines were inspected and cited findings match the original file contents. The defining symbol (DEFAULT_TIMEOUT_SECONDS) and caller (Client.request) are accurate, and the default-vs-override distinction is supported by the cited lines."
+    }
+  ],
+  "blockers": [],
+  "next_action": "Parent to run frozen evaluator checks (summary-exists, definition-cited, caller-cited, source-unchanged, write-scope, parent-lookup-review) against the produced summary.md and source files. No further worker action required."
+}

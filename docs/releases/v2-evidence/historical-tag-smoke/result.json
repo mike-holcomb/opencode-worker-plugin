@@ -1,0 +1,50 @@
+{
+  "status": "passed",
+  "node": "v24.21.0",
+  "platform": "darwin",
+  "plugin": "/private/tmp/v2-marketplace-tag-20261012/codex/plugins/cache/opencode-worker-plugin/opencode-agents/2.0.0-dev.0",
+  "tools": [
+    "opencode_health",
+    "opencode_start_task",
+    "opencode_get_task",
+    "opencode_list_tasks",
+    "opencode_wait_tasks",
+    "opencode_continue_task",
+    "opencode_cancel_task",
+    "opencode_respond_to_request",
+    "opencode_read_artifact",
+    "opencode_record_review"
+  ],
+  "health": {
+    "runtime": {
+      "node": "24.21.0",
+      "supportedNode": true,
+      "toolkit": "2.0.0-dev.0"
+    },
+    "configuration": {
+      "path": "/private/tmp/v2-marketplace-tag-smoke-20261012/state/config.json",
+      "status": "missing"
+    },
+    "backend": {
+      "mode": "managed",
+      "binary": null,
+      "version": null,
+      "configuredModels": [],
+      "certifiedPairs": [],
+      "executionTested": false
+    },
+    "storage": {
+      "path": "/private/tmp/v2-marketplace-tag-smoke-20261012/state",
+      "exists": true
+    },
+    "supervisor": {
+      "state": "running",
+      "queued": 0,
+      "unresolved": 0
+    }
+  },
+  "bundle_unchanged": true,
+  "state_outside_bundle": true,
+  "executable_sha256": "6f32fa0b03b812da84510acf4bce239d24a0764e32bf0f07c83914269831f1b0",
+  "file_count": 116
+}

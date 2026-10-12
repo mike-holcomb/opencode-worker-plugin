@@ -1,0 +1,56 @@
+{
+  "schema_version": 2,
+  "task_id": "task_1bc8c8c0-a626-4a44-9b1a-08c9e015797f",
+  "execution_id": "exec_0ecaee89-f0fc-4e0c-8774-ec315e0f9306",
+  "outcome": "completed",
+  "summary": "Read input.txt (content: 'violet') and wrote answer.txt containing exactly 'violet' followed by a newline. dirty.txt left unmodified.",
+  "coverage": [
+    "input.txt",
+    "dirty.txt"
+  ],
+  "gaps": [],
+  "findings": [
+    {
+      "id": "f1",
+      "claim": "input.txt contains the answer 'violet'.",
+      "evidence": ["input.txt content: 'violet'"],
+      "caveats": []
+    },
+    {
+      "id": "f2",
+      "claim": "answer.txt was written with exactly 'violet' followed by a newline (7 bytes).",
+      "evidence": ["od -c answer.txt -> 'v' 'i' 'o' 'l' 'e' 't' '\\n'", "shasum: e84b5222849839c128f5570cc93878a6e151108c"],
+      "caveats": []
+    },
+    {
+      "id": "f3",
+      "claim": "dirty.txt was preserved exactly; no edits applied.",
+      "evidence": ["shasum dirty.txt: 3e90df0b8b221afd0301376645082bcfc109b595", "od -c dirty.txt -> 'pre-existing user edit\\n'", "git diff -- dirty.txt matches pre-existing dirty state, no new changes from this worker"],
+      "caveats": ["dirty.txt shows a git working-tree modification ('original' -> 'pre-existing user edit') present before worker started; worker did not touch it"]
+    }
+  ],
+  "changes": [
+    {
+      "path": "/private/tmp/v2-live-parent-20261012/live2/workspace/answer.txt",
+      "description": "Created answer.txt containing exactly 'violet' followed by a newline, sourced from input.txt."
+    }
+  ],
+  "checks": [
+    {
+      "id": "c1",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": ["od -c answer.txt output: 'v i o l e t \\n'", "byte count: 7"],
+      "explanation": "answer.txt contains exactly 'violet' followed by a single newline, matching the required output."
+    },
+    {
+      "id": "c2",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": ["shasum dirty.txt: 3e90df0b8b221afd0301376645082bcfc109b595 (unchanged)", "git status shows dirty.txt dirty-state is the original pre-existing modification, not a new worker edit"],
+      "explanation": "dirty.txt was preserved exactly; no worker modifications."
+    }
+  ],
+  "blockers": [],
+  "next_action": "No further action required; reports written to state/reports/<execution_id>."
+}

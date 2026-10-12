@@ -1,0 +1,50 @@
+[
+  {
+    "artifact_id": "artifact_581afb38-e705-4425-85ed-05c10ed47857",
+    "sha256": "945c48fe767888ae605ec45b152efa7d12a936fbb3994640932e3ad29ab52a69",
+    "byte_length": 1530,
+    "media_type": "application/json",
+    "execution_id": "exec_95030330-77cc-4f25-929a-f90d682bff85",
+    "path": "artifact_581afb38-e705-4425-85ed-05c10ed47857.json"
+  },
+  {
+    "artifact_id": "artifact_04101447-cd5f-4220-9da1-3da1ce2aad2e",
+    "sha256": "acdcbf117c040cf3fd3b96dc0059f3fad01b336e1b3b9f3c7f4b56de1d1ddf4d",
+    "byte_length": 1298,
+    "media_type": "text/markdown",
+    "execution_id": "exec_95030330-77cc-4f25-929a-f90d682bff85",
+    "path": "summary.md"
+  },
+  {
+    "artifact_id": "artifact_62d7d3d1-a9cc-4d7f-957d-6deb7c495a21",
+    "sha256": "200d5dd205dc73afc25730bdbc54df5d5e791d929ae19054dbecd7660b525525",
+    "byte_length": 1007,
+    "media_type": "application/json",
+    "execution_id": "exec_95030330-77cc-4f25-929a-f90d682bff85",
+    "path": "artifact_62d7d3d1-a9cc-4d7f-957d-6deb7c495a21.json"
+  },
+  {
+    "artifact_id": "artifact_29c9377c-5347-4dd2-a0c5-ac86ba4f879e",
+    "sha256": "f8633e40120ac9a364ae319825b39a60b525fbfc4f45aec25e36c40fba2fab69",
+    "byte_length": 1193,
+    "media_type": "application/json",
+    "path": "predecessor-artifact_29c9377c-5347-4dd2-a0c5-ac86ba4f879e.json",
+    "execution_id": "exec_ad3e5441-417f-4b45-8195-176ad6f50bbb"
+  },
+  {
+    "artifact_id": "artifact_9b7c5a10-8c5c-4253-9646-1c4a2af27885",
+    "sha256": "7de9a3a8347ef1c67e88158998f9d001cc28ee762f342e3ed7a1daed8254c302",
+    "byte_length": 901,
+    "media_type": "text/markdown",
+    "path": "predecessor-summary.md",
+    "execution_id": "exec_ad3e5441-417f-4b45-8195-176ad6f50bbb"
+  },
+  {
+    "artifact_id": "artifact_2dfdf588-aa43-49ac-8c78-e2abadbd9aed",
+    "sha256": "3b6a3306d82f88a7e2254785ecce43d63d4334cb752ae2ffaac1b9ced5781e23",
+    "byte_length": 1050,
+    "media_type": "application/json",
+    "path": "predecessor-artifact_2dfdf588-aa43-49ac-8c78-e2abadbd9aed.json",
+    "execution_id": "exec_ad3e5441-417f-4b45-8195-176ad6f50bbb"
+  }
+]

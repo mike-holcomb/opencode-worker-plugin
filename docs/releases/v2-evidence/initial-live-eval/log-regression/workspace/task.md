@@ -1,0 +1,1 @@
+Investigate service.log for the timeout spike and correlate it with deployments.txt. Write the assigned report summary.md with the bounded time window, affected request IDs, timeout count, the deployment correlation, and gaps. Quote evidence paths and do not infer an outage outside the supplied logs.

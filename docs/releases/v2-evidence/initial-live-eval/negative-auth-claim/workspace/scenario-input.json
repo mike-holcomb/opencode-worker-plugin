@@ -1,0 +1,13 @@
+{
+  "schema_version": 2,
+  "scenario_id": "negative-auth-claim",
+  "run_id": "negative-auth-claim-1791829584508",
+  "tier": "lightweight",
+  "context_mode": "fresh",
+  "context_basis": "ordinary fresh context",
+  "task_file": "task.md",
+  "fixture_files": [
+    "auth_routes.py",
+    "README.txt"
+  ]
+}

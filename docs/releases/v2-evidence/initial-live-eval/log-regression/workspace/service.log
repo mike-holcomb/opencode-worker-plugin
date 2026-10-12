@@ -1,0 +1,5 @@
+2026-08-04T10:00:01Z INFO request=req-1041 route=/items status=200 duration_ms=41
+2026-08-04T10:01:12Z WARN request=req-1042 route=/items timeout duration_ms=30000
+2026-08-04T10:02:03Z WARN request=req-1043 route=/items timeout duration_ms=30000
+2026-08-04T10:04:55Z WARN request=req-1044 route=/search timeout duration_ms=30000
+2026-08-04T10:05:02Z INFO request=req-1045 route=/items status=200 duration_ms=48

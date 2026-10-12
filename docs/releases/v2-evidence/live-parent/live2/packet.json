@@ -1,0 +1,40 @@
+{
+  "title": "Release live2",
+  "objective": "Read input.txt and write answer.txt containing exactly violet followed by a newline. Preserve dirty.txt exactly. Write both assigned reports.",
+  "tier": "standard",
+  "authoritative_inputs": [
+    {
+      "reference": "input.txt",
+      "kind": "file",
+      "purpose": "Source answer"
+    }
+  ],
+  "context": {
+    "verified_facts": [],
+    "rejected_assumptions": [],
+    "exclusions": []
+  },
+  "allowed_writes": [
+    {
+      "path": "answer.txt",
+      "kind": "file",
+      "purpose": "Declared output"
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "answer",
+      "requirement": "Report violet citing input.txt",
+      "evidence_required": "Source and immutable report",
+      "required": true
+    }
+  ],
+  "checks": [],
+  "constraints": [
+    "Change only answer.txt; preserve dirty.txt."
+  ],
+  "stop_conditions": [
+    "Stop on denied actions and report the denial."
+  ],
+  "shared_resources": []
+}

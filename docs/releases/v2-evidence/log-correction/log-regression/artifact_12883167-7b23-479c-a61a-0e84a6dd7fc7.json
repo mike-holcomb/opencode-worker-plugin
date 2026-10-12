@@ -1,0 +1,185 @@
+{
+  "schema_version": 2,
+  "task_id": "task_52cd3122-5c29-4821-8832-bf56bb2c6177",
+  "execution_id": "exec_f31adf95-a493-477c-b461-f110ccb759b7",
+  "outcome": "completed",
+  "summary": "Inspected service.log (all 5 lines) and deployments.txt (all 3 lines). Exactly three timeouts (req-1042, req-1043, req-1044) occur in the spike window 2026-08-04T10:01:12Z-2026-08-04T10:04:55Z, within the full supplied coverage 2026-08-04T10:00:01Z-2026-08-04T10:05:02Z. Worker version=2026.08.04 deploy at 10:00Z is correlated (not causally proven) with the spike onset.",
+  "coverage": [
+    "service.log - all 5 lines inspected (2026-08-04T10:00:01Z through 2026-08-04T10:05:02Z)",
+    "deployments.txt - all 3 lines inspected (09:40Z, 10:00Z, 10:06Z)",
+    "task.md - inspected",
+    "scenario-input.json - inspected"
+  ],
+  "gaps": [
+    "No error traces, exception messages, or stack traces in service.log; timeout cause unrecorded",
+    "No metrics supplied (CPU, memory, network, database latency, queue depth)",
+    "No deployment internals or root-cause data available",
+    "Limited to a 5-line log sample; findings confined to this sample, no exhaustive negative finding beyond it",
+    "Deployment timing proximity is correlation only; no causal mechanism recorded or inferred",
+    "No outage inferred outside supplied log coverage",
+    "Could not execute the parent frozen evaluator scripts (no shell tool available); each check condition was verified manually against the written output"
+  ],
+  "findings": [
+    {
+      "id": "full-coverage",
+      "claim": "The supplied log coverage is bounded to 2026-08-04T10:00:01Z (first line) through 2026-08-04T10:05:02Z (last line); all 5 lines were inspected",
+      "evidence": [
+        "service.log:1: 2026-08-04T10:00:01Z INFO request=req-1041 route=/items status=200 duration_ms=41",
+        "service.log:5: 2026-08-04T10:05:02Z INFO request=req-1045 route=/items status=200 duration_ms=48"
+      ],
+      "caveats": [
+        "Bounded by observed first and last log timestamps only"
+      ]
+    },
+    {
+      "id": "timeout-count",
+      "claim": "Exactly three (3) timeout events occur in service.log, each carrying the timeout flag and duration_ms=30000",
+      "evidence": [
+        "service.log:2: 2026-08-04T10:01:12Z WARN request=req-1042 route=/items timeout duration_ms=30000",
+        "service.log:3: 2026-08-04T10:02:03Z WARN request=req-1043 route=/items timeout duration_ms=30000",
+        "service.log:4: 2026-08-04T10:04:55Z WARN request=req-1044 route=/search timeout duration_ms=30000"
+      ],
+      "caveats": [
+        "Confined to the supplied 5-line log sample"
+      ]
+    },
+    {
+      "id": "affected-requests",
+      "claim": "Affected request IDs are req-1042, req-1043, and req-1044; surrounding healthy requests are req-1041 (200, 41ms) and req-1045 (200, 48ms)",
+      "evidence": [
+        "service.log:2: request=req-1042 timeout",
+        "service.log:3: request=req-1043 timeout",
+        "service.log:4: request=req-1044 timeout",
+        "service.log:1: request=req-1041 status=200",
+        "service.log:5: request=req-1045 status=200"
+      ],
+      "caveats": [
+        "No request bodies, headers, or caller identity provided"
+      ]
+    },
+    {
+      "id": "bounded-window",
+      "claim": "The timeout spike window (narrower) is 2026-08-04T10:01:12Z through 2026-08-04T10:04:55Z; the full supplied coverage window (broader) is 2026-08-04T10:00:01Z through 2026-08-04T10:05:02Z",
+      "evidence": [
+        "service.log:2: first timeout at 2026-08-04T10:01:12Z",
+        "service.log:4: last timeout at 2026-08-04T10:04:55Z",
+        "service.log:1: first supplied line at 2026-08-04T10:00:01Z",
+        "service.log:5: last supplied line at 2026-08-04T10:05:02Z"
+      ],
+      "caveats": [
+        "Both windows are reported per parent guidance to distinguish full coverage from the spike window"
+      ]
+    },
+    {
+      "id": "deployment-correlation",
+      "claim": "Worker version=2026.08.04 deployment completed at 10:00Z, immediately before the first timeout at 10:01:12Z; api 2026.08.03 completed at 09:40Z and api 2026.08.05 started at 10:06Z. This temporal proximity is a correlation, not proof of causation",
+      "evidence": [
+        "deployments.txt:2: 2026-08-04T10:00Z deploy worker version=2026.08.04 status=complete",
+        "deployments.txt:1: 2026-08-04T09:40Z deploy api version=2026.08.03 status=complete",
+        "deployments.txt:3: 2026-08-04T10:06Z deploy api version=2026.08.05 status=started",
+        "service.log:2: first timeout at 2026-08-04T10:01:12Z"
+      ],
+      "caveats": [
+        "No deployment internals, error traces, or dependency metrics establish a causal mechanism",
+        "api 2026.08.05 deploy started after the last timeout and cannot account for this spike"
+      ]
+    }
+  ],
+  "changes": [
+    {
+      "path": "/private/tmp/v2-live-campaign-20261012-01/log-regression/state/reports/exec_f31adf95-a493-477c-b461-f110ccb759b7/summary.md",
+      "description": "Wrote readable investigation summary report"
+    },
+    {
+      "path": "/private/tmp/v2-live-campaign-20261012-01/log-regression/state/reports/exec_f31adf95-a493-477c-b461-f110ccb759b7/result.json",
+      "description": "Wrote WorkerReport schema_version 2 result"
+    }
+  ],
+  "checks": [
+    {
+      "id": "summary-exists",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "summary.md read back at /private/tmp/v2-live-campaign-20261012-01/log-regression/state/reports/exec_f31adf95-a493-477c-b461-f110ccb759b7/summary.md"
+      ],
+      "explanation": "Verified the file_exists condition (report file present) by reading it back. The frozen file_exists evaluator is run by the parent harness outside this worker environment; this worker only confirms the file was written."
+    },
+    {
+      "id": "affected-requests",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "summary.md contains req-1042, req-1043, req-1044"
+      ],
+      "explanation": "Verified the text_contains condition for affected request IDs against summary.md content. The frozen text_contains check is run by the parent harness; this worker confirms the IDs are present."
+    },
+    {
+      "id": "bounded-window",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "summary.md contains full coverage timestamps 2026-08-04T10:00:01Z and 2026-08-04T10:05:02Z, plus spike window 2026-08-04T10:01:12Z and 2026-08-04T10:04:55Z"
+      ],
+      "explanation": "Verified the text_contains condition for the bounded window: summary.md now includes the full supplied coverage timestamps (2026-08-04T10:00:01Z, 2026-08-04T10:05:02Z) in addition to the narrower timeout spike window, per parent guidance that the predecessor omitted full coverage."
+    },
+    {
+      "id": "timeout-count-recorded",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "summary.md states Timeout count: 3 (exactly three)"
+      ],
+      "explanation": "Verified the text_contains condition for the timeout count is satisfied; the recorded count is exactly three."
+    },
+    {
+      "id": "correlation-labeled",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "summary.md contains correlation, not causation"
+      ],
+      "explanation": "Verified the text_contains_any condition for correlation labeling is satisfied by summary.md content."
+    },
+    {
+      "id": "evidence-paths",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "summary.md references service.log and deployments.txt with quoted lines"
+      ],
+      "explanation": "Verified the text_contains condition for evidence paths is satisfied; summary.md quotes both frozen fixtures."
+    },
+    {
+      "id": "source-unchanged",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "workspace/service.log and workspace/deployments.txt read back unchanged; predecessor reports in exec_2b72c67b... directory were not edited"
+      ],
+      "explanation": "Verified the unchanged_paths condition: no source log or fixture files were modified, and the predecessor reports were left untouched."
+    },
+    {
+      "id": "write-scope",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "Only summary.md and result.json were written to the reports directory for exec_f31adf95-a493-477c-b461-f110ccb759b7"
+      ],
+      "explanation": "Verified the allowed_changed_paths condition: writes were confined to the output report directory for this execution; no workspace/project writes were made."
+    },
+    {
+      "id": "parent-log-review",
+      "status": "passed",
+      "exit_code": 0,
+      "evidence": [
+        "service.log has exactly three timeout lines (lines 2, 3, 4); all 5 log lines and all 3 deployment lines covered",
+        "summary.md states timeout count is 3 / exactly three",
+        "summary.md describes deployment timing as correlation, not causation"
+      ],
+      "explanation": "Verified all supplied log lines were covered (5/5 service.log, 3/3 deployments.txt), timeout count is exactly three, and deployment timing is described as correlation rather than proof of causation. This worker does not perform parent review; only the parent can accept."
+    }
+  ],
+  "blockers": [],
+  "next_action": "Parent to run its frozen evaluator checks against the written summary.md and result.json; worker made no workspace changes and awaits parent review and acceptance."
+}
