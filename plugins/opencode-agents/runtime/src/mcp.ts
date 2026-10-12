@@ -44,7 +44,8 @@ export function createMcpServer(call: (method: string, params: unknown) => Promi
   }, async (input) => result(await call("start_task", input)));
   server.registerTool("opencode_get_task", {
     description: "Read a compact task snapshot and material events.",
-    inputSchema: z.object({ ...Scope, task_id: Id, execution_id: Id.optional(), after_cursor: z.number().int().min(0).optional() }).strict(),
+    inputSchema: z.object({ ...Scope, task_id: Id, execution_id: Id.optional(), after_cursor: z.number().int().min(0).optional(),
+      event_detail_cursor: Id.optional(), diagnostic_cursor: Id.optional() }).strict(),
     annotations: { readOnlyHint: true },
   }, async (input) => result(await call("get_task", input)));
   server.registerTool("opencode_list_tasks", {
@@ -86,6 +87,8 @@ export function createMcpServer(call: (method: string, params: unknown) => Promi
 
 export async function runMcp(): Promise<void> {
   await startDaemon(process.argv[1]);
-  const server = createMcpServer((method, params) => rpcRequest(stateDirectory(), method, params));
+  const server = createMcpServer((method, params) => rpcRequest(stateDirectory(), method, params,
+    method === "wait_tasks" && params && typeof params === "object" && "timeout_ms" in params &&
+      typeof params.timeout_ms === "number" ? params.timeout_ms + 1_500 : 30_000));
   await server.connect(new StdioServerTransport());
 }

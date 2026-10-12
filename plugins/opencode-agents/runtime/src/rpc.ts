@@ -4,7 +4,7 @@ import { chmodSync, existsSync, mkdirSync, readFileSync, renameSync, rmSync, wri
 import { join } from "node:path";
 
 type Request = { id: string; token: string; method: string; params: unknown };
-type Response = { id: string; result?: unknown; error?: { code: string; message: string } };
+type Response = { id: string; result?: unknown; error?: { code: string; message: string; retry?: string; details?: unknown } };
 type Connection = { generation: string; socket: string; token: string };
 export type RpcHandler = (method: string, params: unknown) => Promise<unknown>;
 
@@ -78,7 +78,13 @@ function serveClient(client: Socket, token: string, handler: RpcHandler): void {
       const response: Response = { id: request.id, result };
       client.end(`${JSON.stringify(response)}\n`);
     }).catch((error) => {
-      const response: Response = { id: request.id, error: { code: "INTERNAL", message: String(error) } };
+      const known = error && typeof error === "object" ? error as { code?: unknown; message?: unknown; retry?: unknown; details?: unknown } : null;
+      const response: Response = { id: request.id, error: {
+        code: typeof known?.code === "string" ? known.code : "INTERNAL",
+        message: typeof known?.message === "string" ? known.message : String(error),
+        ...(typeof known?.retry === "string" ? { retry: known.retry } : {}),
+        ...(known?.details !== undefined ? { details: known.details } : {}),
+      } };
       client.end(`${JSON.stringify(response)}\n`);
     });
   });
@@ -114,7 +120,13 @@ export async function rpcRequest(stateDir: string, method: string, params: unkno
       try {
         const parsed = JSON.parse(response.trim()) as Response;
         if (parsed.id !== id) throw new Error("supervisor response ID mismatch");
-        if (parsed.error) throw new Error(`${parsed.error.code}: ${parsed.error.message}`);
+        if (parsed.error) {
+          const error = new Error(`${parsed.error.code}: ${parsed.error.message}`) as Error & { code: string; retry?: string; details?: unknown };
+          error.code = parsed.error.code;
+          if (parsed.error.retry) error.retry = parsed.error.retry;
+          if (parsed.error.details !== undefined) error.details = parsed.error.details;
+          throw error;
+        }
         resolve(parsed.result);
       } catch (error) { reject(error); }
     });

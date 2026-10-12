@@ -1,8 +1,8 @@
 # OpenCode Agents v2 — Product and Technical Specification
 
-**Status:** Proposed implementation specification; no v2 software has been implemented or validated by this document.  
+**Status:** V2 implementation specification; development status and release evidence are tracked in [v2-implementation.md](v2-implementation.md).
 **Date:** October 9, 2026  
-**Baseline inspected:** Installed `opencode-agents` plugin 0.1.0 and its Python runner, task templates, orchestration guidance, reporting guidance, and evaluation fixtures.  
+**Baseline inspected:** The earlier plugin's task templates, orchestration guidance, reporting guidance, and evaluation fixtures informed this design. The v2 release has no legacy runtime or import surface.
 **Product identity:** Retain `opencode-agents`. “v2” means the second generation of this toolkit, independently of OpenCode's or the MCP SDK's version numbers. A `2.0.0` toolkit release is proposed to make the breaking runtime and interface changes explicit.
 
 ## 1. Decision and intended outcome
@@ -21,7 +21,7 @@ The toolkit must let Codex:
 6. Cancel through OpenCode and distinguish a cancellation request from confirmed stopping.
 7. Inspect artifacts and record its own acceptance decision.
 
-The change replaces subprocess-based orchestration as the primary integration. The v1 assignment discipline, evidence requirements, and explicit acceptance model remain central.
+The toolkit uses the MCP runtime for orchestration. Bounded assignments, evidence requirements, and explicit parent acceptance remain central.
 
 ### 1.1 Success criteria
 
@@ -472,7 +472,9 @@ The managed worker profile/configuration must:
 - Exclude the parent-facing toolkit MCP server from worker access.
 - Respect applicable project guidance while refusing configuration that broadens the declared worker policy.
 
-V1 uses `run --pure`. V2 must verify the equivalent external-plugin suppression behavior for the selected server version; it cannot assume that a run-mode flag has identical server-mode behavior. If effective policy cannot be established, execution fails with `POLICY_MISMATCH`.
+The selected server version must be probed for effective external-plugin suppression. A run-mode flag alone does not establish server-mode behavior. If effective policy cannot be established, execution fails with `POLICY_MISMATCH`, subject to the accepted development exception below.
+
+**Accepted development exception (2026-10-12):** The user chose to proceed with the known OpenCode 1.18.35 race in which a project plugin added after launch inspection can load during a worker turn. This is a FIXME for the plugin control boundary, not evidence that suppression passed. Continue only with trusted workspaces under this exception; retain the launch-time checks and record the limitation in compatibility and installation guidance. The other release gates remain in force. A later implementation should use an immutable sanitized worker view or an upstream loader disable switch before claiming strict enforcement of this section.
 
 ### 9.2 Attached mode
 
@@ -480,7 +482,7 @@ An operator may configure an existing local OpenCode endpoint. V2 supports only 
 
 The toolkit must establish the server's identity, workspace routing, storage namespace, and effective worker policy. It must not patch global configuration or kill the attached server. If an attached instance cannot meet the same execution contract, diagnostics remain available but task dispatch is refused.
 
-Attaching does not grant access to arbitrary historical sessions. Only sessions created by the toolkit or explicitly imported through the migration workflow may be continued.
+Attaching does not grant access to arbitrary historical sessions. Only sessions created and recorded by the v2 toolkit may be continued.
 
 ### 9.3 Configuration changes
 
@@ -697,8 +699,6 @@ opencode-agents doctor
 opencode-agents daemon start|status|stop
 opencode-agents tasks list|get|wait|cancel
 opencode-agents artifacts read|export
-opencode-agents legacy inspect
-opencode-agents migrate-v1
 ```
 
 Use the same application services as MCP; do not implement an alternative subprocess runner. `doctor` performs read-only checks by default and distinguishes configured, reachable, compatible, and execution-tested. Any live inference probe is an explicit diagnostic option with visible model/destination.
@@ -707,7 +707,7 @@ Machine-readable output goes to stdout and diagnostics to stderr. MCP stdout con
 
 ### 15.4 Upgrade and cleanup
 
-Create a database backup before migrations. Refuse older runtimes against newer schemas. Do not hot-swap the supervisor or backend while work is active; drain before activating an incompatible runtime.
+Create a SQLite snapshot before mutating an existing database schema and abort the upgrade if the snapshot fails. Refuse older runtimes against newer schemas. Do not hot-swap the supervisor or backend while work is active; drain before activating an incompatible runtime.
 
 Rollback means returning to a compatible runtime and matching backup after reconciliation. Do not run old and new supervisors against the same state directory.
 
@@ -772,32 +772,13 @@ Installation does not configure providers, install OpenCode, modify global OpenC
 
 Release artifacts use an allowlist, deterministic archive metadata, checksums, dependency lockfiles, and a manifest of shipped files. Test a read-only installation launched from an unrelated working directory, including paths with spaces.
 
-## 18. Migration from v1
+## 18. V2-only upgrade
 
-The Python runner remains a historical format supported by inspection/import. V2 does not keep it as an alternative execution backend.
+The release ships one MCP runtime, one diagnostic CLI, and v2 worker profiles. It does not ship the Python job launcher or expose legacy inspection, import, replay, or comparison operations. Installation replaces the old plugin entry point; it does not convert historical job directories or bind their sessions to v2 tasks.
 
-| V1 concept | V2 mapping |
-| --- | --- |
-| `--cwd` | Explicit canonical workspace binding |
-| `--model` and `--agent` | Configured provider/model plus bounded worker profile |
-| Frozen task attachment | Validated packet and frozen rendered prompt |
-| `job.json` | Task/execution records plus immutable launch manifest |
-| `events.jsonl` / `stderr.log` | Optional private diagnostics plus normalized durable events |
-| `exit.json` | Operational result, distinct from report validity and review |
-| Exact `--session` | Recorded backend/session/workspace identity used by `continue_task` |
-| Parent acceptance file | Append-only review associated with evidence hashes |
+Preserve existing user data when upgrading. A pre-existing database may contain earlier imported rows; schema upgrades leave those bytes intact while removing the import API. New work starts as a v2 task with a validated packet and frozen execution contract. Back up the database before schema upgrades, drain active v2 work before swapping runtimes, and use a matching runtime and backup for rollback.
 
-Migration procedure:
-
-1. Inventory historical job directories without executing stored commands.
-2. Preserve originals unchanged; import selected records with source hashes and a `legacy` provenance flag.
-3. Import operational and acceptance evidence independently. A v1 exit zero never becomes v2 acceptance.
-4. If a v1 process may still be running, mark it unreconciled. Do not take ownership or kill it from a saved PID.
-5. Historical session IDs remain unverified until the operator identifies the original OpenCode storage/workspace and confirms that the intended session exists.
-6. Legacy jobs are read-only by default. An explicit migration operation may bind a verified legacy session to a new v2 task/execution lineage; the first live continuation requires the normal profile, authority, and freshness checks.
-7. Disable the old skill's execution path when enabling v2 to avoid competing launch mechanisms. Keep old records inspectable.
-
-Do not rewrite a legacy job's paths or replay its saved command as a migration strategy. The existing evaluation fixtures are ported without silently changing their acceptance criteria.
+The twelve evaluation scenarios are retained as v2 fixtures. Eleven keep their original checks; the coupled wire-format scenario checks only the v2 envelope and missing-version handling. They require no historical runner or matched comparison runs.
 
 ## 19. Verification and release gates
 
@@ -834,7 +815,6 @@ Use a fake OpenCode backend with programmable responses, events, delays, and fai
 | T25 | Unknown token/cost information | Null with provenance; never fabricated zero |
 | T26 | Diagnostic/log response exceeds limit | Explicit truncation/cursor; blockers retained |
 | T27 | Read-only plugin and unrelated cwd | All resources resolve; runtime state stays outside bundle |
-| T28 | Imported v1 success without review | Historical operational result only; review pending |
 | T29 | Operator changes policy/configuration | New generation; active tasks keep recorded contract |
 | T30 | Native question support absent | Question tool disabled; blocked-report follow-up works |
 | T31 | Turn finishes before evidence capture finishes | `finalizing`; no continuation or conflicting writer admitted early |
@@ -862,9 +842,7 @@ A successful suite establishes compatibility for the tested environment, not uni
 
 ### 19.3 Quality evaluation
 
-Retain the twelve v1 diagnostic scenarios: narrow lookup, verbose-log investigation, retry clamp, coupled serialization, contradictory evidence, unsupported negative claim, stale snapshot, scope growth, dirty checkout, false completion, context reconciliation, and failed checks.
-
-Compare v1 and v2 with the same task packet, initial content, parent/worker models, provider destination, limits, and frozen acceptance criteria. Include a parent-only baseline when evaluating whether delegation itself helps.
+Run twelve v2 evaluation scenarios: narrow lookup, verbose-log investigation, retry clamp, coupled serialization, contradictory evidence, unsupported negative claim, stale snapshot, scope growth, dirty checkout, false completion, context reconciliation, and failed checks. Freeze each scenario's initial content, packet, model destination, limits, and acceptance criteria.
 
 Measure accepted deliverables, false acceptance, missing evidence, duplicate dispatch, recovery success, parent context consumed, total observed inference, elapsed time, and parent review effort. Distinguish measured usage from unavailable usage. Do not claim that persistent processes improve answer quality without evidence.
 
@@ -895,13 +873,13 @@ Implement SQLite storage, immutable artifacts, single supervisor ownership, idem
 
 Implement the ten tools and shared CLI services, bounded waits, cursors, error contracts, request replies, and cancellation reconciliation. Complete protocol and fault-injection tests.
 
-### Milestone 4 — Package the skill and complete migration
+### Milestone 4 — Package the v2 skill and runtime
 
-Update the Codex skill and templates, ship the bounded worker profiles, implement legacy inspection/import, and validate pinned installation from a read-only bundle and unrelated directory. Confirm that the parent toolkit cannot be recursively invoked by the worker profile.
+Update the Codex skill and templates, ship the bounded worker profiles, remove the old launcher and import surface, and validate pinned installation from a read-only bundle and unrelated directory. Confirm that the parent toolkit cannot be recursively invoked by the worker profile.
 
 ### Milestone 5 — Validate and release
 
-Run the authorized real-OpenCode suite, all supported-platform checks, and the preserved qualitative fixtures. Publish exact compatibility, limitations, migration/rollback steps, and benchmark conditions. Tag and distribute only after the gates below pass.
+Run the authorized real-OpenCode suite, all supported-platform checks, and the v2 evaluation fixtures. Publish exact compatibility, limitations, upgrade/rollback steps, and benchmark conditions. Tag and distribute only after the gates below pass.
 
 V2 is done when:
 
@@ -911,7 +889,6 @@ V2 is done when:
 - Cancellation uncertainty remains observable and retains relevant ownership.
 - Required missing evidence cannot become accepted by structural accident.
 - Runtime and skill install together without Python or runtime compilation.
-- The v1 history remains readable and unchanged.
 - Live validation evidence and platform limitations are included in release documentation.
 
 ## 21. Design decisions to preserve during implementation

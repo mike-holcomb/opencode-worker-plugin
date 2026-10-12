@@ -1,16 +1,553 @@
 #!/usr/bin/env node
+import { createRequire } from "node:module"; const require = createRequire(import.meta.url);
+var __create = Object.create;
 var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __require = /* @__PURE__ */ ((x) => typeof require !== "undefined" ? require : typeof Proxy !== "undefined" ? new Proxy(x, {
+  get: (a, b) => (typeof require !== "undefined" ? require : a)[b]
+}) : x)(function(x) {
+  if (typeof require !== "undefined") return require.apply(this, arguments);
+  throw Error('Dynamic require of "' + x + '" is not supported');
+});
+var __commonJS = (cb, mod) => function __require2() {
+  try {
+    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+  } catch (e) {
+    throw mod = 0, e;
+  }
+};
 var __export = (target, all) => {
   for (var name in all)
     __defProp(target, name, { get: all[name], enumerable: true });
 };
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+
+// node_modules/isexe/windows.js
+var require_windows = __commonJS({
+  "node_modules/isexe/windows.js"(exports, module) {
+    module.exports = isexe;
+    isexe.sync = sync;
+    var fs = __require("fs");
+    function checkPathExt(path, options) {
+      var pathext = options.pathExt !== void 0 ? options.pathExt : process.env.PATHEXT;
+      if (!pathext) {
+        return true;
+      }
+      pathext = pathext.split(";");
+      if (pathext.indexOf("") !== -1) {
+        return true;
+      }
+      for (var i = 0; i < pathext.length; i++) {
+        var p = pathext[i].toLowerCase();
+        if (p && path.substr(-p.length).toLowerCase() === p) {
+          return true;
+        }
+      }
+      return false;
+    }
+    function checkStat(stat, path, options) {
+      if (!stat.isSymbolicLink() && !stat.isFile()) {
+        return false;
+      }
+      return checkPathExt(path, options);
+    }
+    function isexe(path, options, cb) {
+      fs.stat(path, function(er, stat) {
+        cb(er, er ? false : checkStat(stat, path, options));
+      });
+    }
+    function sync(path, options) {
+      return checkStat(fs.statSync(path), path, options);
+    }
+  }
+});
+
+// node_modules/isexe/mode.js
+var require_mode = __commonJS({
+  "node_modules/isexe/mode.js"(exports, module) {
+    module.exports = isexe;
+    isexe.sync = sync;
+    var fs = __require("fs");
+    function isexe(path, options, cb) {
+      fs.stat(path, function(er, stat) {
+        cb(er, er ? false : checkStat(stat, options));
+      });
+    }
+    function sync(path, options) {
+      return checkStat(fs.statSync(path), options);
+    }
+    function checkStat(stat, options) {
+      return stat.isFile() && checkMode(stat, options);
+    }
+    function checkMode(stat, options) {
+      var mod = stat.mode;
+      var uid = stat.uid;
+      var gid = stat.gid;
+      var myUid = options.uid !== void 0 ? options.uid : process.getuid && process.getuid();
+      var myGid = options.gid !== void 0 ? options.gid : process.getgid && process.getgid();
+      var u = parseInt("100", 8);
+      var g = parseInt("010", 8);
+      var o = parseInt("001", 8);
+      var ug = u | g;
+      var ret = mod & o || mod & g && gid === myGid || mod & u && uid === myUid || mod & ug && myUid === 0;
+      return ret;
+    }
+  }
+});
+
+// node_modules/isexe/index.js
+var require_isexe = __commonJS({
+  "node_modules/isexe/index.js"(exports, module) {
+    var fs = __require("fs");
+    var core;
+    if (process.platform === "win32" || global.TESTING_WINDOWS) {
+      core = require_windows();
+    } else {
+      core = require_mode();
+    }
+    module.exports = isexe;
+    isexe.sync = sync;
+    function isexe(path, options, cb) {
+      if (typeof options === "function") {
+        cb = options;
+        options = {};
+      }
+      if (!cb) {
+        if (typeof Promise !== "function") {
+          throw new TypeError("callback not provided");
+        }
+        return new Promise(function(resolve5, reject) {
+          isexe(path, options || {}, function(er, is) {
+            if (er) {
+              reject(er);
+            } else {
+              resolve5(is);
+            }
+          });
+        });
+      }
+      core(path, options || {}, function(er, is) {
+        if (er) {
+          if (er.code === "EACCES" || options && options.ignoreErrors) {
+            er = null;
+            is = false;
+          }
+        }
+        cb(er, is);
+      });
+    }
+    function sync(path, options) {
+      try {
+        return core.sync(path, options || {});
+      } catch (er) {
+        if (options && options.ignoreErrors || er.code === "EACCES") {
+          return false;
+        } else {
+          throw er;
+        }
+      }
+    }
+  }
+});
+
+// node_modules/which/which.js
+var require_which = __commonJS({
+  "node_modules/which/which.js"(exports, module) {
+    var isWindows = process.platform === "win32" || process.env.OSTYPE === "cygwin" || process.env.OSTYPE === "msys";
+    var path = __require("path");
+    var COLON = isWindows ? ";" : ":";
+    var isexe = require_isexe();
+    var getNotFoundError = (cmd) => Object.assign(new Error(`not found: ${cmd}`), { code: "ENOENT" });
+    var getPathInfo = (cmd, opt) => {
+      const colon = opt.colon || COLON;
+      const pathEnv = cmd.match(/\//) || isWindows && cmd.match(/\\/) ? [""] : [
+        // windows always checks the cwd first
+        ...isWindows ? [process.cwd()] : [],
+        ...(opt.path || process.env.PATH || /* istanbul ignore next: very unusual */
+        "").split(colon)
+      ];
+      const pathExtExe = isWindows ? opt.pathExt || process.env.PATHEXT || ".EXE;.CMD;.BAT;.COM" : "";
+      const pathExt = isWindows ? pathExtExe.split(colon) : [""];
+      if (isWindows) {
+        if (cmd.indexOf(".") !== -1 && pathExt[0] !== "")
+          pathExt.unshift("");
+      }
+      return {
+        pathEnv,
+        pathExt,
+        pathExtExe
+      };
+    };
+    var which = (cmd, opt, cb) => {
+      if (typeof opt === "function") {
+        cb = opt;
+        opt = {};
+      }
+      if (!opt)
+        opt = {};
+      const { pathEnv, pathExt, pathExtExe } = getPathInfo(cmd, opt);
+      const found = [];
+      const step = (i) => new Promise((resolve5, reject) => {
+        if (i === pathEnv.length)
+          return opt.all && found.length ? resolve5(found) : reject(getNotFoundError(cmd));
+        const ppRaw = pathEnv[i];
+        const pathPart = /^".*"$/.test(ppRaw) ? ppRaw.slice(1, -1) : ppRaw;
+        const pCmd = path.join(pathPart, cmd);
+        const p = !pathPart && /^\.[\\\/]/.test(cmd) ? cmd.slice(0, 2) + pCmd : pCmd;
+        resolve5(subStep(p, i, 0));
+      });
+      const subStep = (p, i, ii) => new Promise((resolve5, reject) => {
+        if (ii === pathExt.length)
+          return resolve5(step(i + 1));
+        const ext = pathExt[ii];
+        isexe(p + ext, { pathExt: pathExtExe }, (er, is) => {
+          if (!er && is) {
+            if (opt.all)
+              found.push(p + ext);
+            else
+              return resolve5(p + ext);
+          }
+          return resolve5(subStep(p, i, ii + 1));
+        });
+      });
+      return cb ? step(0).then((res) => cb(null, res), cb) : step(0);
+    };
+    var whichSync = (cmd, opt) => {
+      opt = opt || {};
+      const { pathEnv, pathExt, pathExtExe } = getPathInfo(cmd, opt);
+      const found = [];
+      for (let i = 0; i < pathEnv.length; i++) {
+        const ppRaw = pathEnv[i];
+        const pathPart = /^".*"$/.test(ppRaw) ? ppRaw.slice(1, -1) : ppRaw;
+        const pCmd = path.join(pathPart, cmd);
+        const p = !pathPart && /^\.[\\\/]/.test(cmd) ? cmd.slice(0, 2) + pCmd : pCmd;
+        for (let j = 0; j < pathExt.length; j++) {
+          const cur = p + pathExt[j];
+          try {
+            const is = isexe.sync(cur, { pathExt: pathExtExe });
+            if (is) {
+              if (opt.all)
+                found.push(cur);
+              else
+                return cur;
+            }
+          } catch (ex) {
+          }
+        }
+      }
+      if (opt.all && found.length)
+        return found;
+      if (opt.nothrow)
+        return null;
+      throw getNotFoundError(cmd);
+    };
+    module.exports = which;
+    which.sync = whichSync;
+  }
+});
+
+// node_modules/path-key/index.js
+var require_path_key = __commonJS({
+  "node_modules/path-key/index.js"(exports, module) {
+    "use strict";
+    var pathKey = (options = {}) => {
+      const environment = options.env || process.env;
+      const platform = options.platform || process.platform;
+      if (platform !== "win32") {
+        return "PATH";
+      }
+      return Object.keys(environment).reverse().find((key) => key.toUpperCase() === "PATH") || "Path";
+    };
+    module.exports = pathKey;
+    module.exports.default = pathKey;
+  }
+});
+
+// node_modules/cross-spawn/lib/util/resolveCommand.js
+var require_resolveCommand = __commonJS({
+  "node_modules/cross-spawn/lib/util/resolveCommand.js"(exports, module) {
+    "use strict";
+    var path = __require("path");
+    var which = require_which();
+    var getPathKey = require_path_key();
+    function resolveCommandAttempt(parsed, withoutPathExt) {
+      const env = parsed.options.env || process.env;
+      const cwd = process.cwd();
+      const hasCustomCwd = parsed.options.cwd != null;
+      const shouldSwitchCwd = hasCustomCwd && process.chdir !== void 0 && !process.chdir.disabled;
+      if (shouldSwitchCwd) {
+        try {
+          process.chdir(parsed.options.cwd);
+        } catch (err) {
+        }
+      }
+      let resolved;
+      try {
+        resolved = which.sync(parsed.command, {
+          path: env[getPathKey({ env })],
+          pathExt: withoutPathExt ? path.delimiter : void 0
+        });
+      } catch (e) {
+      } finally {
+        if (shouldSwitchCwd) {
+          process.chdir(cwd);
+        }
+      }
+      if (resolved) {
+        resolved = path.resolve(hasCustomCwd ? parsed.options.cwd : "", resolved);
+      }
+      return resolved;
+    }
+    function resolveCommand(parsed) {
+      return resolveCommandAttempt(parsed) || resolveCommandAttempt(parsed, true);
+    }
+    module.exports = resolveCommand;
+  }
+});
+
+// node_modules/cross-spawn/lib/util/escape.js
+var require_escape = __commonJS({
+  "node_modules/cross-spawn/lib/util/escape.js"(exports, module) {
+    "use strict";
+    var metaCharsRegExp = /([()\][%!^"`<>&|;, *?])/g;
+    function escapeCommand(arg) {
+      arg = arg.replace(metaCharsRegExp, "^$1");
+      return arg;
+    }
+    function escapeArgument(arg, doubleEscapeMetaChars) {
+      arg = `${arg}`;
+      arg = arg.replace(/(?=(\\+?)?)\1"/g, '$1$1\\"');
+      arg = arg.replace(/(?=(\\+?)?)\1$/, "$1$1");
+      arg = `"${arg}"`;
+      arg = arg.replace(metaCharsRegExp, "^$1");
+      if (doubleEscapeMetaChars) {
+        arg = arg.replace(metaCharsRegExp, "^$1");
+      }
+      return arg;
+    }
+    module.exports.command = escapeCommand;
+    module.exports.argument = escapeArgument;
+  }
+});
+
+// node_modules/shebang-regex/index.js
+var require_shebang_regex = __commonJS({
+  "node_modules/shebang-regex/index.js"(exports, module) {
+    "use strict";
+    module.exports = /^#!(.*)/;
+  }
+});
+
+// node_modules/shebang-command/index.js
+var require_shebang_command = __commonJS({
+  "node_modules/shebang-command/index.js"(exports, module) {
+    "use strict";
+    var shebangRegex = require_shebang_regex();
+    module.exports = (string4 = "") => {
+      const match = string4.match(shebangRegex);
+      if (!match) {
+        return null;
+      }
+      const [path, argument] = match[0].replace(/#! ?/, "").split(" ");
+      const binary = path.split("/").pop();
+      if (binary === "env") {
+        return argument;
+      }
+      return argument ? `${binary} ${argument}` : binary;
+    };
+  }
+});
+
+// node_modules/cross-spawn/lib/util/readShebang.js
+var require_readShebang = __commonJS({
+  "node_modules/cross-spawn/lib/util/readShebang.js"(exports, module) {
+    "use strict";
+    var fs = __require("fs");
+    var shebangCommand = require_shebang_command();
+    function readShebang(command) {
+      const size = 150;
+      const buffer = Buffer.alloc(size);
+      let fd;
+      try {
+        fd = fs.openSync(command, "r");
+        fs.readSync(fd, buffer, 0, size, 0);
+        fs.closeSync(fd);
+      } catch (e) {
+      }
+      return shebangCommand(buffer.toString());
+    }
+    module.exports = readShebang;
+  }
+});
+
+// node_modules/cross-spawn/lib/parse.js
+var require_parse = __commonJS({
+  "node_modules/cross-spawn/lib/parse.js"(exports, module) {
+    "use strict";
+    var path = __require("path");
+    var resolveCommand = require_resolveCommand();
+    var escape2 = require_escape();
+    var readShebang = require_readShebang();
+    var isWin = process.platform === "win32";
+    var isExecutableRegExp = /\.(?:com|exe)$/i;
+    var isCmdShimRegExp = /node_modules[\\/].bin[\\/][^\\/]+\.cmd$/i;
+    function detectShebang(parsed) {
+      parsed.file = resolveCommand(parsed);
+      const shebang = parsed.file && readShebang(parsed.file);
+      if (shebang) {
+        parsed.args.unshift(parsed.file);
+        parsed.command = shebang;
+        return resolveCommand(parsed);
+      }
+      return parsed.file;
+    }
+    function parseNonShell(parsed) {
+      if (!isWin) {
+        return parsed;
+      }
+      const commandFile = detectShebang(parsed);
+      const needsShell = !isExecutableRegExp.test(commandFile);
+      if (parsed.options.forceShell || needsShell) {
+        const needsDoubleEscapeMetaChars = isCmdShimRegExp.test(commandFile);
+        parsed.command = path.normalize(parsed.command);
+        parsed.command = escape2.command(parsed.command);
+        parsed.args = parsed.args.map((arg) => escape2.argument(arg, needsDoubleEscapeMetaChars));
+        const shellCommand = [parsed.command].concat(parsed.args).join(" ");
+        parsed.args = ["/d", "/s", "/c", `"${shellCommand}"`];
+        parsed.command = process.env.comspec || "cmd.exe";
+        parsed.options.windowsVerbatimArguments = true;
+      }
+      return parsed;
+    }
+    function parse4(command, args, options) {
+      if (args && !Array.isArray(args)) {
+        options = args;
+        args = null;
+      }
+      args = args ? args.slice(0) : [];
+      options = Object.assign({}, options);
+      const parsed = {
+        command,
+        args,
+        options,
+        file: void 0,
+        original: {
+          command,
+          args
+        }
+      };
+      return options.shell ? parsed : parseNonShell(parsed);
+    }
+    module.exports = parse4;
+  }
+});
+
+// node_modules/cross-spawn/lib/enoent.js
+var require_enoent = __commonJS({
+  "node_modules/cross-spawn/lib/enoent.js"(exports, module) {
+    "use strict";
+    var isWin = process.platform === "win32";
+    function notFoundError(original, syscall) {
+      return Object.assign(new Error(`${syscall} ${original.command} ENOENT`), {
+        code: "ENOENT",
+        errno: "ENOENT",
+        syscall: `${syscall} ${original.command}`,
+        path: original.command,
+        spawnargs: original.args
+      });
+    }
+    function hookChildProcess(cp, parsed) {
+      if (!isWin) {
+        return;
+      }
+      const originalEmit = cp.emit;
+      cp.emit = function(name, arg1) {
+        if (name === "exit") {
+          const err = verifyENOENT(arg1, parsed);
+          if (err) {
+            return originalEmit.call(cp, "error", err);
+          }
+        }
+        return originalEmit.apply(cp, arguments);
+      };
+    }
+    function verifyENOENT(status, parsed) {
+      if (isWin && status === 1 && !parsed.file) {
+        return notFoundError(parsed.original, "spawn");
+      }
+      return null;
+    }
+    function verifyENOENTSync(status, parsed) {
+      if (isWin && status === 1 && !parsed.file) {
+        return notFoundError(parsed.original, "spawnSync");
+      }
+      return null;
+    }
+    module.exports = {
+      hookChildProcess,
+      verifyENOENT,
+      verifyENOENTSync,
+      notFoundError
+    };
+  }
+});
+
+// node_modules/cross-spawn/index.js
+var require_cross_spawn = __commonJS({
+  "node_modules/cross-spawn/index.js"(exports, module) {
+    "use strict";
+    var cp = __require("child_process");
+    var parse4 = require_parse();
+    var enoent = require_enoent();
+    function spawn3(command, args, options) {
+      const parsed = parse4(command, args, options);
+      const spawned = cp.spawn(parsed.command, parsed.args, parsed.options);
+      enoent.hookChildProcess(spawned, parsed);
+      return spawned;
+    }
+    function spawnSync3(command, args, options) {
+      const parsed = parse4(command, args, options);
+      const result2 = cp.spawnSync(parsed.command, parsed.args, parsed.options);
+      result2.error = result2.error || enoent.verifyENOENTSync(result2.status, parsed);
+      return result2;
+    }
+    module.exports = spawn3;
+    module.exports.spawn = spawn3;
+    module.exports.sync = spawnSync3;
+    module.exports._parse = parse4;
+    module.exports._enoent = enoent;
+  }
+});
+
+// src/cli.ts
+import { createHash as createHash10 } from "node:crypto";
+import { createWriteStream, rmSync as rmSync4 } from "node:fs";
+import { once as once2 } from "node:events";
 
 // src/doctor.ts
 import { spawnSync } from "node:child_process";
-import { existsSync as existsSync2, readFileSync as readFileSync2 } from "node:fs";
+import { existsSync as existsSync3, readFileSync as readFileSync5 } from "node:fs";
 
 // src/config.ts
-import { readFileSync } from "node:fs";
+import { readFileSync, realpathSync } from "node:fs";
 import { homedir } from "node:os";
 import { isAbsolute, join } from "node:path";
 
@@ -736,9 +1273,9 @@ function floatSafeRemainder(val, step) {
   return ratio - roundedRatio;
 }
 var EVALUATING = /* @__PURE__ */ Symbol("evaluating");
-function defineLazy(object2, key, getter) {
+function defineLazy(object3, key, getter) {
   let value = void 0;
-  Object.defineProperty(object2, key, {
+  Object.defineProperty(object3, key, {
     get() {
       if (value === EVALUATING) {
         return void 0;
@@ -750,7 +1287,7 @@ function defineLazy(object2, key, getter) {
       return value;
     },
     set(v) {
-      Object.defineProperty(object2, key, {
+      Object.defineProperty(object3, key, {
         value: v
         // configurable: true,
       });
@@ -1859,18 +2396,18 @@ var validateAsync = async (schema, value, _ctx) => {
   return result2.issues.length === 0;
 };
 var _encode = (_Err) => {
-  const parse3 = _parse(_Err);
+  const parse4 = _parse(_Err);
   const fn = (schema, value, _ctx, _params) => {
     const ctx = _ctx ? { ..._ctx, direction: "backward" } : { direction: "backward" };
-    return parse3(schema, value, ctx, finalizeParams(fn, _params));
+    return parse4(schema, value, ctx, finalizeParams(fn, _params));
   };
   return fn;
 };
 var encode = /* @__PURE__ */ _encode($ZodRealError);
 var _decode = (_Err) => {
-  const parse3 = _parse(_Err);
+  const parse4 = _parse(_Err);
   const fn = (schema, value, _ctx, _params) => {
-    return parse3(schema, value, _ctx, finalizeParams(fn, _params));
+    return parse4(schema, value, _ctx, finalizeParams(fn, _params));
   };
   return fn;
 };
@@ -5040,7 +5577,7 @@ var recursive = /* @__PURE__ */ new WeakMap();
 var NONE = 0;
 var ASSUMED = 1;
 var PROVEN = 2;
-function isRecursive(inst, stack, resolve3) {
+function isRecursive(inst, stack, resolve5) {
   const cached2 = recursive.get(inst);
   if (cached2 !== void 0)
     return cached2 ? PROVEN : NONE;
@@ -5050,7 +5587,7 @@ function isRecursive(inst, stack, resolve3) {
   let result2 = NONE;
   const check2 = (child) => {
     if (result2 !== PROVEN && child?._zod) {
-      const answer = isRecursive(child, stack, resolve3);
+      const answer = isRecursive(child, stack, resolve5);
       if (answer > result2)
         result2 = answer;
     }
@@ -5061,7 +5598,7 @@ function isRecursive(inst, stack, resolve3) {
       const desc = Object.getOwnPropertyDescriptor(sh, key);
       if (spread && !desc.enumerable)
         continue;
-      const child = desc.get ? ASSUMED : desc.value?._zod ? isRecursive(desc.value, stack, resolve3) : NONE;
+      const child = desc.get ? ASSUMED : desc.value?._zod ? isRecursive(desc.value, stack, resolve5) : NONE;
       if (child > answer)
         answer = child;
     }
@@ -5125,7 +5662,7 @@ function isRecursive(inst, stack, resolve3) {
       break;
     // `$ZodLazy` caches its inner on the def, so a resolved edge is followed exactly
     case "lazy": {
-      const inner = def._cachedInner ?? (resolve3 ? inst._zod.innerType : void 0);
+      const inner = def._cachedInner ?? (resolve5 ? inst._zod.innerType : void 0);
       merge2(inner ? isRecursive(inner, stack, false) : ASSUMED);
       break;
     }
@@ -15817,8 +16354,8 @@ function foldObjects(members2) {
   }
   const properties = {};
   const required2 = /* @__PURE__ */ new Set();
-  for (const object2 of objects) {
-    for (const key in object2.properties) {
+  for (const object3 of objects) {
+    for (const key in object3.properties) {
       if (Object.prototype.hasOwnProperty.call(properties, key))
         continue;
       const parts = [];
@@ -15832,18 +16369,18 @@ function foldObjects(members2) {
       const merged = parts.length === 1 ? parts[0] : foldObjects(parts) ?? { allOf: parts };
       assignProp(properties, key, merged);
     }
-    for (const key of object2.required ?? [])
+    for (const key of object3.required ?? [])
       required2.add(key);
   }
   const folded = { type: "object", properties };
   if (required2.size)
     folded.required = [...required2];
-  if (objects.every((object2) => object2.additionalProperties === false)) {
+  if (objects.every((object3) => object3.additionalProperties === false)) {
     folded.additionalProperties = false;
   } else {
     const constraints = [];
-    for (const object2 of objects) {
-      const constraint = undeclaredConstraint(object2);
+    for (const object3 of objects) {
+      const constraint = undeclaredConstraint(object3);
       if (constraint && !constraints.some((seen) => JSON.stringify(seen) === JSON.stringify(constraint)))
         constraints.push(constraint);
     }
@@ -15956,8 +16493,8 @@ function finalize(ctx, schema) {
         compactTypeUnion(entry[1].def ?? entry[1].schema);
       }
     }
-    for (const rewrite of ctx.deferred)
-      rewrite();
+    for (const rewrite2 of ctx.deferred)
+      rewrite2();
     if (ctx.intersections.length) {
       const carriers = /* @__PURE__ */ new Map();
       for (const seen of ctx.seen.values()) {
@@ -19684,11 +20221,25 @@ function date4(params) {
 
 // src/config.ts
 var AbsolutePath = external_exports.string().min(1).refine(isAbsolute, "must be absolute");
+var LoopbackEndpoint = external_exports.string().url().refine((value) => {
+  const url2 = new URL(value);
+  return url2.protocol === "http:" && (url2.hostname === "127.0.0.1" || url2.hostname === "[::1]") && Boolean(url2.port) && url2.pathname === "/" && !url2.search && !url2.hash && !url2.username && !url2.password;
+}, "must be a literal loopback HTTP origin with an explicit port");
 var UserConfigSchema = external_exports.object({
   schema_version: external_exports.literal(1),
   project_roots: external_exports.array(AbsolutePath).min(1),
   read_roots: external_exports.array(AbsolutePath),
   opencode_binary: AbsolutePath,
+  attached_backend: external_exports.object({
+    url: LoopbackEndpoint,
+    workspace: AbsolutePath,
+    storage_namespace: AbsolutePath,
+    password_env: external_exports.string().regex(/^[A-Za-z_][A-Za-z0-9_]*$/).optional()
+  }).strict().optional(),
+  development_execution: external_exports.object({
+    enabled: external_exports.literal(true),
+    trusted_workspaces: external_exports.array(AbsolutePath).min(1)
+  }).strict().optional(),
   models: external_exports.record(external_exports.string().min(1), external_exports.object({
     provider_id: external_exports.string().min(1),
     model_id: external_exports.string().min(1),
@@ -19698,9 +20249,26 @@ var UserConfigSchema = external_exports.object({
     concurrency: external_exports.number().int().min(1).max(16).default(2),
     queue_timeout_seconds: external_exports.number().int().positive().default(600),
     execution_timeout_seconds: external_exports.number().int().positive().default(1800),
+    finalization_timeout_seconds: external_exports.number().int().positive().default(60),
     artifact_bytes: external_exports.number().int().positive().default(50 * 1024 * 1024)
-  }).strict().default({ concurrency: 2, queue_timeout_seconds: 600, execution_timeout_seconds: 1800, artifact_bytes: 50 * 1024 * 1024 })
+  }).strict().default({
+    concurrency: 2,
+    queue_timeout_seconds: 600,
+    execution_timeout_seconds: 1800,
+    finalization_timeout_seconds: 60,
+    artifact_bytes: 50 * 1024 * 1024
+  })
 }).strict();
+function trustedDevelopmentWorkspace(config2, workspace) {
+  const optIn = config2.development_execution;
+  if (!optIn?.enabled) return false;
+  try {
+    const exact = realpathSync(workspace);
+    return optIn.trusted_workspaces.some((path) => realpathSync(path) === exact);
+  } catch {
+    return false;
+  }
+}
 function stateDirectory() {
   if (process.env.OPENCODE_AGENTS_STATE_DIR) return process.env.OPENCODE_AGENTS_STATE_DIR;
   if (process.platform === "darwin") return join(homedir(), "Library", "Application Support", "opencode-agents");
@@ -19713,15 +20281,6141 @@ function loadConfiguration(path = configurationPath()) {
   return UserConfigSchema.parse(JSON.parse(readFileSync(path, "utf8")));
 }
 
+// src/attached.ts
+import { createHash as createHash3 } from "node:crypto";
+import { readFileSync as readFileSync4 } from "node:fs";
+
+// src/managed-server.ts
+import { randomBytes, randomUUID } from "node:crypto";
+import { execFile, spawn } from "node:child_process";
+import { once } from "node:events";
+import { existsSync as existsSync2, readFileSync as readFileSync3, readdirSync } from "node:fs";
+import { homedir as homedir2 } from "node:os";
+import { isDeepStrictEqual } from "node:util";
+import { promisify } from "node:util";
+import { dirname, isAbsolute as isAbsolute2, join as join2, parse as parse3, relative, resolve } from "node:path";
+
+// src/backend.ts
+function executionPairAllowed(inspection, trustedDevelopmentOptIn) {
+  return inspection.supportedForExecution || trustedDevelopmentOptIn && inspection.exactPairRecognized === true && inspection.version === "1.18.35";
+}
+
+// src/launch-config.ts
+import { createHash } from "node:crypto";
+function canonical(value) {
+  if (value === null || typeof value !== "object") return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(canonical).join(",")}]`;
+  const record2 = value;
+  return `{${Object.keys(record2).sort().map((key) => `${JSON.stringify(key)}:${canonical(record2[key])}`).join(",")}}`;
+}
+function effectiveConfigHash(value) {
+  return createHash("sha256").update(canonical(value)).digest("hex");
+}
+function policyNeutralConfigHash(contract) {
+  const config2 = JSON.parse(contract.configContent);
+  const agents = { ...config2.agent };
+  delete agents["bounded-inspect"];
+  delete agents["bounded-build"];
+  return effectiveConfigHash({ ...config2, agent: agents });
+}
+function assertFrozenEffectiveConfig(value, contract) {
+  if (effectiveConfigHash(value) !== contract.effectiveConfigSha256)
+    throw new Error("OpenCode effective configuration changed since task admission");
+}
+function assertSelectedModelDestination(model, contract) {
+  const config2 = JSON.parse(contract.configContent);
+  const providers = config2.provider;
+  const provider = providers?.[model.provider_id];
+  const options = provider?.options;
+  const baseURL = options?.baseURL ?? options?.baseUrl ?? provider?.baseURL;
+  if (typeof baseURL !== "string") throw new Error(`provider ${model.provider_id} has no frozen destination URL`);
+  let actual;
+  try {
+    actual = new URL(baseURL);
+  } catch {
+    throw new Error(`provider ${model.provider_id} has an invalid destination URL`);
+  }
+  if (model.destination === "local") {
+    if (actual.protocol !== "http:" || !["127.0.0.1", "[::1]", "localhost"].includes(actual.hostname))
+      throw new Error(`provider ${model.provider_id} is not routed to the declared local destination`);
+  } else {
+    let declared;
+    try {
+      declared = new URL(model.destination);
+    } catch {
+      throw new Error("model destination must be 'local' or an exact URL");
+    }
+    if (actual.href.replace(/\/$/, "") !== declared.href.replace(/\/$/, ""))
+      throw new Error(`provider ${model.provider_id} route differs from the declared destination`);
+  }
+  const models = provider?.models;
+  if (models && typeof models === "object" && !Array.isArray(models) && !Object.hasOwn(models, model.model_id))
+    throw new Error(`model ${model.provider_id}/${model.model_id} is absent from frozen provider configuration`);
+}
+
+// src/opencode-backend.ts
+import { createHash as createHash2 } from "node:crypto";
+import { readFileSync as readFileSync2 } from "node:fs";
+
 // src/resources.ts
 import { existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 function compatibilityPath() {
-  for (const relative2 of ["../../compatibility.json", "../compatibility.json"]) {
-    const path = fileURLToPath(new URL(relative2, import.meta.url));
+  for (const relative3 of ["../../compatibility.json", "../compatibility.json"]) {
+    const path = fileURLToPath(new URL(relative3, import.meta.url));
     if (existsSync(path)) return path;
   }
   throw new Error("bundled compatibility.json is missing");
+}
+function workerProfilePath(profile) {
+  for (const relative3 of [`../../worker/${profile}.md`, `../worker/${profile}.md`]) {
+    const path = fileURLToPath(new URL(relative3, import.meta.url));
+    if (existsSync(path)) return path;
+  }
+  throw new Error(`bundled worker profile is missing: ${profile}`);
+}
+
+// node_modules/@opencode-ai/sdk/dist/v2/gen/core/serverSentEvents.gen.js
+var createSseClient = ({ onRequest, onSseError, onSseEvent, responseTransformer, responseValidator, sseDefaultRetryDelay, sseMaxRetryAttempts, sseMaxRetryDelay, sseSleepFn, url: url2, ...options }) => {
+  let lastEventId;
+  const sleep2 = sseSleepFn ?? ((ms) => new Promise((resolve5) => setTimeout(resolve5, ms)));
+  const createStream = async function* () {
+    let retryDelay = sseDefaultRetryDelay ?? 3e3;
+    let attempt = 0;
+    const signal = options.signal ?? new AbortController().signal;
+    while (true) {
+      if (signal.aborted)
+        break;
+      attempt++;
+      const headers = options.headers instanceof Headers ? options.headers : new Headers(options.headers);
+      if (lastEventId !== void 0) {
+        headers.set("Last-Event-ID", lastEventId);
+      }
+      try {
+        const requestInit = {
+          redirect: "follow",
+          ...options,
+          body: options.serializedBody,
+          headers,
+          signal
+        };
+        let request = new Request(url2, requestInit);
+        if (onRequest) {
+          request = await onRequest(url2, requestInit);
+        }
+        const _fetch = options.fetch ?? globalThis.fetch;
+        const response = await _fetch(request);
+        if (!response.ok)
+          throw new Error(`SSE failed: ${response.status} ${response.statusText}`);
+        if (!response.body)
+          throw new Error("No body in SSE response");
+        const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
+        let buffer = "";
+        const abortHandler = () => {
+          try {
+            reader.cancel();
+          } catch {
+          }
+        };
+        signal.addEventListener("abort", abortHandler);
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done)
+              break;
+            buffer += value;
+            buffer = buffer.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+            const chunks = buffer.split("\n\n");
+            buffer = chunks.pop() ?? "";
+            for (const chunk of chunks) {
+              const lines = chunk.split("\n");
+              const dataLines = [];
+              let eventName;
+              for (const line of lines) {
+                if (line.startsWith("data:")) {
+                  dataLines.push(line.replace(/^data:\s*/, ""));
+                } else if (line.startsWith("event:")) {
+                  eventName = line.replace(/^event:\s*/, "");
+                } else if (line.startsWith("id:")) {
+                  lastEventId = line.replace(/^id:\s*/, "");
+                } else if (line.startsWith("retry:")) {
+                  const parsed = Number.parseInt(line.replace(/^retry:\s*/, ""), 10);
+                  if (!Number.isNaN(parsed)) {
+                    retryDelay = parsed;
+                  }
+                }
+              }
+              let data;
+              let parsedJson = false;
+              if (dataLines.length) {
+                const rawData = dataLines.join("\n");
+                try {
+                  data = JSON.parse(rawData);
+                  parsedJson = true;
+                } catch {
+                  data = rawData;
+                }
+              }
+              if (parsedJson) {
+                if (responseValidator) {
+                  await responseValidator(data);
+                }
+                if (responseTransformer) {
+                  data = await responseTransformer(data);
+                }
+              }
+              onSseEvent?.({
+                data,
+                event: eventName,
+                id: lastEventId,
+                retry: retryDelay
+              });
+              if (dataLines.length) {
+                yield data;
+              }
+            }
+          }
+        } finally {
+          signal.removeEventListener("abort", abortHandler);
+          reader.releaseLock();
+        }
+        break;
+      } catch (error62) {
+        onSseError?.(error62);
+        if (sseMaxRetryAttempts !== void 0 && attempt >= sseMaxRetryAttempts) {
+          break;
+        }
+        const backoff = Math.min(retryDelay * 2 ** (attempt - 1), sseMaxRetryDelay ?? 3e4);
+        await sleep2(backoff);
+      }
+    }
+  };
+  const stream = createStream();
+  return { stream };
+};
+
+// node_modules/@opencode-ai/sdk/dist/v2/gen/core/pathSerializer.gen.js
+var separatorArrayExplode = (style) => {
+  switch (style) {
+    case "label":
+      return ".";
+    case "matrix":
+      return ";";
+    case "simple":
+      return ",";
+    default:
+      return "&";
+  }
+};
+var separatorArrayNoExplode = (style) => {
+  switch (style) {
+    case "form":
+      return ",";
+    case "pipeDelimited":
+      return "|";
+    case "spaceDelimited":
+      return "%20";
+    default:
+      return ",";
+  }
+};
+var separatorObjectExplode = (style) => {
+  switch (style) {
+    case "label":
+      return ".";
+    case "matrix":
+      return ";";
+    case "simple":
+      return ",";
+    default:
+      return "&";
+  }
+};
+var serializeArrayParam = ({ allowReserved, explode, name, style, value }) => {
+  if (!explode) {
+    const joinedValues2 = (allowReserved ? value : value.map((v) => encodeURIComponent(v))).join(separatorArrayNoExplode(style));
+    switch (style) {
+      case "label":
+        return `.${joinedValues2}`;
+      case "matrix":
+        return `;${name}=${joinedValues2}`;
+      case "simple":
+        return joinedValues2;
+      default:
+        return `${name}=${joinedValues2}`;
+    }
+  }
+  const separator = separatorArrayExplode(style);
+  const joinedValues = value.map((v) => {
+    if (style === "label" || style === "simple") {
+      return allowReserved ? v : encodeURIComponent(v);
+    }
+    return serializePrimitiveParam({
+      allowReserved,
+      name,
+      value: v
+    });
+  }).join(separator);
+  return style === "label" || style === "matrix" ? separator + joinedValues : joinedValues;
+};
+var serializePrimitiveParam = ({ allowReserved, name, value }) => {
+  if (value === void 0 || value === null) {
+    return "";
+  }
+  if (typeof value === "object") {
+    throw new Error("Deeply-nested arrays/objects aren\u2019t supported. Provide your own `querySerializer()` to handle these.");
+  }
+  return `${name}=${allowReserved ? value : encodeURIComponent(value)}`;
+};
+var serializeObjectParam = ({ allowReserved, explode, name, style, value, valueOnly }) => {
+  if (value instanceof Date) {
+    return valueOnly ? value.toISOString() : `${name}=${value.toISOString()}`;
+  }
+  if (style !== "deepObject" && !explode) {
+    let values = [];
+    Object.entries(value).forEach(([key, v]) => {
+      values = [...values, key, allowReserved ? v : encodeURIComponent(v)];
+    });
+    const joinedValues2 = values.join(",");
+    switch (style) {
+      case "form":
+        return `${name}=${joinedValues2}`;
+      case "label":
+        return `.${joinedValues2}`;
+      case "matrix":
+        return `;${name}=${joinedValues2}`;
+      default:
+        return joinedValues2;
+    }
+  }
+  const separator = separatorObjectExplode(style);
+  const joinedValues = Object.entries(value).map(([key, v]) => serializePrimitiveParam({
+    allowReserved,
+    name: style === "deepObject" ? `${name}[${key}]` : key,
+    value: v
+  })).join(separator);
+  return style === "label" || style === "matrix" ? separator + joinedValues : joinedValues;
+};
+
+// node_modules/@opencode-ai/sdk/dist/v2/gen/core/utils.gen.js
+var PATH_PARAM_RE = /\{[^{}]+\}/g;
+var defaultPathSerializer = ({ path, url: _url2 }) => {
+  let url2 = _url2;
+  const matches = _url2.match(PATH_PARAM_RE);
+  if (matches) {
+    for (const match of matches) {
+      let explode = false;
+      let name = match.substring(1, match.length - 1);
+      let style = "simple";
+      if (name.endsWith("*")) {
+        explode = true;
+        name = name.substring(0, name.length - 1);
+      }
+      if (name.startsWith(".")) {
+        name = name.substring(1);
+        style = "label";
+      } else if (name.startsWith(";")) {
+        name = name.substring(1);
+        style = "matrix";
+      }
+      const value = path[name];
+      if (value === void 0 || value === null) {
+        continue;
+      }
+      if (Array.isArray(value)) {
+        url2 = url2.replace(match, serializeArrayParam({ explode, name, style, value }));
+        continue;
+      }
+      if (typeof value === "object") {
+        url2 = url2.replace(match, serializeObjectParam({
+          explode,
+          name,
+          style,
+          value,
+          valueOnly: true
+        }));
+        continue;
+      }
+      if (style === "matrix") {
+        url2 = url2.replace(match, `;${serializePrimitiveParam({
+          name,
+          value
+        })}`);
+        continue;
+      }
+      const replaceValue = encodeURIComponent(style === "label" ? `.${value}` : value);
+      url2 = url2.replace(match, replaceValue);
+    }
+  }
+  return url2;
+};
+var getUrl = ({ baseUrl, path, query, querySerializer, url: _url2 }) => {
+  const pathUrl = _url2.startsWith("/") ? _url2 : `/${_url2}`;
+  let url2 = (baseUrl ?? "") + pathUrl;
+  if (path) {
+    url2 = defaultPathSerializer({ path, url: url2 });
+  }
+  let search = query ? querySerializer(query) : "";
+  if (search.startsWith("?")) {
+    search = search.substring(1);
+  }
+  if (search) {
+    url2 += `?${search}`;
+  }
+  return url2;
+};
+function getValidRequestBody(options) {
+  const hasBody = options.body !== void 0;
+  const isSerializedBody = hasBody && options.bodySerializer;
+  if (isSerializedBody) {
+    if ("serializedBody" in options) {
+      const hasSerializedBody = options.serializedBody !== void 0 && options.serializedBody !== "";
+      return hasSerializedBody ? options.serializedBody : null;
+    }
+    return options.body !== "" ? options.body : null;
+  }
+  if (hasBody) {
+    return options.body;
+  }
+  return void 0;
+}
+
+// node_modules/@opencode-ai/sdk/dist/v2/gen/core/auth.gen.js
+var getAuthToken = async (auth, callback) => {
+  const token = typeof callback === "function" ? await callback(auth) : callback;
+  if (!token) {
+    return;
+  }
+  if (auth.scheme === "bearer") {
+    return `Bearer ${token}`;
+  }
+  if (auth.scheme === "basic") {
+    return `Basic ${btoa(token)}`;
+  }
+  return token;
+};
+
+// node_modules/@opencode-ai/sdk/dist/v2/gen/core/bodySerializer.gen.js
+var jsonBodySerializer = {
+  bodySerializer: (body) => JSON.stringify(body, (_key, value) => typeof value === "bigint" ? value.toString() : value)
+};
+
+// node_modules/@opencode-ai/sdk/dist/v2/gen/client/utils.gen.js
+var createQuerySerializer = ({ parameters = {}, ...args } = {}) => {
+  const querySerializer = (queryParams) => {
+    const search = [];
+    if (queryParams && typeof queryParams === "object") {
+      for (const name in queryParams) {
+        const value = queryParams[name];
+        if (value === void 0 || value === null) {
+          continue;
+        }
+        const options = parameters[name] || args;
+        if (Array.isArray(value)) {
+          const serializedArray = serializeArrayParam({
+            allowReserved: options.allowReserved,
+            explode: true,
+            name,
+            style: "form",
+            value,
+            ...options.array
+          });
+          if (serializedArray)
+            search.push(serializedArray);
+        } else if (typeof value === "object") {
+          const serializedObject = serializeObjectParam({
+            allowReserved: options.allowReserved,
+            explode: true,
+            name,
+            style: "deepObject",
+            value,
+            ...options.object
+          });
+          if (serializedObject)
+            search.push(serializedObject);
+        } else {
+          const serializedPrimitive = serializePrimitiveParam({
+            allowReserved: options.allowReserved,
+            name,
+            value
+          });
+          if (serializedPrimitive)
+            search.push(serializedPrimitive);
+        }
+      }
+    }
+    return search.join("&");
+  };
+  return querySerializer;
+};
+var getParseAs = (contentType) => {
+  if (!contentType) {
+    return "stream";
+  }
+  const cleanContent = contentType.split(";")[0]?.trim();
+  if (!cleanContent) {
+    return;
+  }
+  if (cleanContent.startsWith("application/json") || cleanContent.endsWith("+json")) {
+    return "json";
+  }
+  if (cleanContent === "multipart/form-data") {
+    return "formData";
+  }
+  if (["application/", "audio/", "image/", "video/"].some((type) => cleanContent.startsWith(type))) {
+    return "blob";
+  }
+  if (cleanContent.startsWith("text/")) {
+    return "text";
+  }
+  return;
+};
+var checkForExistence = (options, name) => {
+  if (!name) {
+    return false;
+  }
+  if (options.headers.has(name) || options.query?.[name] || options.headers.get("Cookie")?.includes(`${name}=`)) {
+    return true;
+  }
+  return false;
+};
+var setAuthParams = async ({ security, ...options }) => {
+  for (const auth of security) {
+    if (checkForExistence(options, auth.name)) {
+      continue;
+    }
+    const token = await getAuthToken(auth, options.auth);
+    if (!token) {
+      continue;
+    }
+    const name = auth.name ?? "Authorization";
+    switch (auth.in) {
+      case "query":
+        if (!options.query) {
+          options.query = {};
+        }
+        options.query[name] = token;
+        break;
+      case "cookie":
+        options.headers.append("Cookie", `${name}=${token}`);
+        break;
+      case "header":
+      default:
+        options.headers.set(name, token);
+        break;
+    }
+  }
+};
+var buildUrl = (options) => getUrl({
+  baseUrl: options.baseUrl,
+  path: options.path,
+  query: options.query,
+  querySerializer: typeof options.querySerializer === "function" ? options.querySerializer : createQuerySerializer(options.querySerializer),
+  url: options.url
+});
+var mergeConfigs = (a, b) => {
+  const config2 = { ...a, ...b };
+  if (config2.baseUrl?.endsWith("/")) {
+    config2.baseUrl = config2.baseUrl.substring(0, config2.baseUrl.length - 1);
+  }
+  config2.headers = mergeHeaders(a.headers, b.headers);
+  return config2;
+};
+var headersEntries = (headers) => {
+  const entries = [];
+  headers.forEach((value, key) => {
+    entries.push([key, value]);
+  });
+  return entries;
+};
+var mergeHeaders = (...headers) => {
+  const mergedHeaders = new Headers();
+  for (const header of headers) {
+    if (!header) {
+      continue;
+    }
+    const iterator = header instanceof Headers ? headersEntries(header) : Object.entries(header);
+    for (const [key, value] of iterator) {
+      if (value === null) {
+        mergedHeaders.delete(key);
+      } else if (Array.isArray(value)) {
+        for (const v of value) {
+          mergedHeaders.append(key, v);
+        }
+      } else if (value !== void 0) {
+        mergedHeaders.set(key, typeof value === "object" ? JSON.stringify(value) : value);
+      }
+    }
+  }
+  return mergedHeaders;
+};
+var Interceptors = class {
+  fns = [];
+  clear() {
+    this.fns = [];
+  }
+  eject(id) {
+    const index = this.getInterceptorIndex(id);
+    if (this.fns[index]) {
+      this.fns[index] = null;
+    }
+  }
+  exists(id) {
+    const index = this.getInterceptorIndex(id);
+    return Boolean(this.fns[index]);
+  }
+  getInterceptorIndex(id) {
+    if (typeof id === "number") {
+      return this.fns[id] ? id : -1;
+    }
+    return this.fns.indexOf(id);
+  }
+  update(id, fn) {
+    const index = this.getInterceptorIndex(id);
+    if (this.fns[index]) {
+      this.fns[index] = fn;
+      return id;
+    }
+    return false;
+  }
+  use(fn) {
+    this.fns.push(fn);
+    return this.fns.length - 1;
+  }
+};
+var createInterceptors = () => ({
+  error: new Interceptors(),
+  request: new Interceptors(),
+  response: new Interceptors()
+});
+var defaultQuerySerializer = createQuerySerializer({
+  allowReserved: false,
+  array: {
+    explode: true,
+    style: "form"
+  },
+  object: {
+    explode: true,
+    style: "deepObject"
+  }
+});
+var defaultHeaders = {
+  "Content-Type": "application/json"
+};
+var createConfig = (override = {}) => ({
+  ...jsonBodySerializer,
+  headers: defaultHeaders,
+  parseAs: "auto",
+  querySerializer: defaultQuerySerializer,
+  ...override
+});
+
+// node_modules/@opencode-ai/sdk/dist/v2/gen/client/client.gen.js
+var createClient = (config2 = {}) => {
+  let _config = mergeConfigs(createConfig(), config2);
+  const getConfig = () => ({ ..._config });
+  const setConfig = (config3) => {
+    _config = mergeConfigs(_config, config3);
+    return getConfig();
+  };
+  const interceptors = createInterceptors();
+  const beforeRequest = async (options) => {
+    const opts = {
+      ..._config,
+      ...options,
+      fetch: options.fetch ?? _config.fetch ?? globalThis.fetch,
+      headers: mergeHeaders(_config.headers, options.headers),
+      serializedBody: void 0
+    };
+    if (opts.security) {
+      await setAuthParams({
+        ...opts,
+        security: opts.security
+      });
+    }
+    if (opts.requestValidator) {
+      await opts.requestValidator(opts);
+    }
+    if (opts.body !== void 0 && opts.bodySerializer) {
+      opts.serializedBody = opts.bodySerializer(opts.body);
+    }
+    if (opts.body === void 0 || opts.serializedBody === "") {
+      opts.headers.delete("Content-Type");
+    }
+    const url2 = buildUrl(opts);
+    return { opts, url: url2 };
+  };
+  const request = async (options) => {
+    const { opts, url: url2 } = await beforeRequest(options);
+    const requestInit = {
+      redirect: "follow",
+      ...opts,
+      body: getValidRequestBody(opts)
+    };
+    let request2 = new Request(url2, requestInit);
+    for (const fn of interceptors.request.fns) {
+      if (fn) {
+        request2 = await fn(request2, opts);
+      }
+    }
+    const _fetch = opts.fetch;
+    let response;
+    try {
+      response = await _fetch(request2);
+    } catch (error63) {
+      let finalError2 = error63;
+      for (const fn of interceptors.error.fns) {
+        if (fn) {
+          finalError2 = await fn(error63, void 0, request2, opts);
+        }
+      }
+      finalError2 = finalError2 || {};
+      if (opts.throwOnError) {
+        throw finalError2;
+      }
+      return opts.responseStyle === "data" ? void 0 : {
+        error: finalError2,
+        request: request2,
+        response: void 0
+      };
+    }
+    for (const fn of interceptors.response.fns) {
+      if (fn) {
+        response = await fn(response, request2, opts);
+      }
+    }
+    const result2 = {
+      request: request2,
+      response
+    };
+    if (response.ok) {
+      const parseAs = (opts.parseAs === "auto" ? getParseAs(response.headers.get("Content-Type")) : opts.parseAs) ?? "json";
+      if (response.status === 204 || response.headers.get("Content-Length") === "0") {
+        let emptyData;
+        switch (parseAs) {
+          case "arrayBuffer":
+          case "blob":
+          case "text":
+            emptyData = await response[parseAs]();
+            break;
+          case "formData":
+            emptyData = new FormData();
+            break;
+          case "stream":
+            emptyData = response.body;
+            break;
+          case "json":
+          default:
+            emptyData = {};
+            break;
+        }
+        return opts.responseStyle === "data" ? emptyData : {
+          data: emptyData,
+          ...result2
+        };
+      }
+      let data;
+      switch (parseAs) {
+        case "arrayBuffer":
+        case "blob":
+        case "formData":
+        case "text":
+          data = await response[parseAs]();
+          break;
+        case "json": {
+          const text = await response.text();
+          data = text ? JSON.parse(text) : {};
+          break;
+        }
+        case "stream":
+          return opts.responseStyle === "data" ? response.body : {
+            data: response.body,
+            ...result2
+          };
+      }
+      if (parseAs === "json") {
+        if (opts.responseValidator) {
+          await opts.responseValidator(data);
+        }
+        if (opts.responseTransformer) {
+          data = await opts.responseTransformer(data);
+        }
+      }
+      return opts.responseStyle === "data" ? data : {
+        data,
+        ...result2
+      };
+    }
+    const textError = await response.text();
+    let jsonError;
+    try {
+      jsonError = JSON.parse(textError);
+    } catch {
+    }
+    const error62 = jsonError ?? textError;
+    let finalError = error62;
+    for (const fn of interceptors.error.fns) {
+      if (fn) {
+        finalError = await fn(error62, response, request2, opts);
+      }
+    }
+    finalError = finalError || {};
+    if (opts.throwOnError) {
+      throw finalError;
+    }
+    return opts.responseStyle === "data" ? void 0 : {
+      error: finalError,
+      ...result2
+    };
+  };
+  const makeMethodFn = (method) => (options) => request({ ...options, method });
+  const makeSseFn = (method) => async (options) => {
+    const { opts, url: url2 } = await beforeRequest(options);
+    return createSseClient({
+      ...opts,
+      body: opts.body,
+      headers: opts.headers,
+      method,
+      onRequest: async (url3, init) => {
+        let request2 = new Request(url3, init);
+        for (const fn of interceptors.request.fns) {
+          if (fn) {
+            request2 = await fn(request2, opts);
+          }
+        }
+        return request2;
+      },
+      serializedBody: getValidRequestBody(opts),
+      url: url2
+    });
+  };
+  return {
+    buildUrl,
+    connect: makeMethodFn("CONNECT"),
+    delete: makeMethodFn("DELETE"),
+    get: makeMethodFn("GET"),
+    getConfig,
+    head: makeMethodFn("HEAD"),
+    interceptors,
+    options: makeMethodFn("OPTIONS"),
+    patch: makeMethodFn("PATCH"),
+    post: makeMethodFn("POST"),
+    put: makeMethodFn("PUT"),
+    request,
+    setConfig,
+    sse: {
+      connect: makeSseFn("CONNECT"),
+      delete: makeSseFn("DELETE"),
+      get: makeSseFn("GET"),
+      head: makeSseFn("HEAD"),
+      options: makeSseFn("OPTIONS"),
+      patch: makeSseFn("PATCH"),
+      post: makeSseFn("POST"),
+      put: makeSseFn("PUT"),
+      trace: makeSseFn("TRACE")
+    },
+    trace: makeMethodFn("TRACE")
+  };
+};
+
+// node_modules/@opencode-ai/sdk/dist/v2/gen/core/params.gen.js
+var extraPrefixesMap = {
+  $body_: "body",
+  $headers_: "headers",
+  $path_: "path",
+  $query_: "query"
+};
+var extraPrefixes = Object.entries(extraPrefixesMap);
+var buildKeyMap = (fields, map2) => {
+  if (!map2) {
+    map2 = /* @__PURE__ */ new Map();
+  }
+  for (const config2 of fields) {
+    if ("in" in config2) {
+      if (config2.key) {
+        map2.set(config2.key, {
+          in: config2.in,
+          map: config2.map
+        });
+      }
+    } else if ("key" in config2) {
+      map2.set(config2.key, {
+        map: config2.map
+      });
+    } else if (config2.args) {
+      buildKeyMap(config2.args, map2);
+    }
+  }
+  return map2;
+};
+var stripEmptySlots = (params) => {
+  for (const [slot, value] of Object.entries(params)) {
+    if (value && typeof value === "object" && !Object.keys(value).length) {
+      delete params[slot];
+    }
+  }
+};
+var buildClientParams = (args, fields) => {
+  const params = {
+    body: {},
+    headers: {},
+    path: {},
+    query: {}
+  };
+  const map2 = buildKeyMap(fields);
+  let config2;
+  for (const [index, arg] of args.entries()) {
+    if (fields[index]) {
+      config2 = fields[index];
+    }
+    if (!config2) {
+      continue;
+    }
+    if ("in" in config2) {
+      if (config2.key) {
+        const field = map2.get(config2.key);
+        const name = field.map || config2.key;
+        if (field.in) {
+          ;
+          params[field.in][name] = arg;
+        }
+      } else {
+        params.body = arg;
+      }
+    } else {
+      for (const [key, value] of Object.entries(arg ?? {})) {
+        const field = map2.get(key);
+        if (field) {
+          if (field.in) {
+            const name = field.map || key;
+            params[field.in][name] = value;
+          } else {
+            params[field.map] = value;
+          }
+        } else {
+          const extra = extraPrefixes.find(([prefix]) => key.startsWith(prefix));
+          if (extra) {
+            const [prefix, slot] = extra;
+            params[slot][key.slice(prefix.length)] = value;
+          } else if ("allowExtra" in config2 && config2.allowExtra) {
+            for (const [slot, allowed] of Object.entries(config2.allowExtra)) {
+              if (allowed) {
+                ;
+                params[slot][key] = value;
+                break;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  stripEmptySlots(params);
+  return params;
+};
+
+// node_modules/@opencode-ai/sdk/dist/v2/gen/client.gen.js
+var client = createClient(createConfig({ baseUrl: "http://localhost:4096" }));
+
+// node_modules/@opencode-ai/sdk/dist/v2/gen/sdk.gen.js
+var HeyApiClient = class {
+  client;
+  constructor(args) {
+    this.client = args?.client ?? client;
+  }
+};
+var HeyApiRegistry = class {
+  defaultKey = "default";
+  instances = /* @__PURE__ */ new Map();
+  get(key) {
+    const instance = this.instances.get(key ?? this.defaultKey);
+    if (!instance) {
+      throw new Error(`No SDK client found. Create one with "new OpencodeClient()" to fix this error.`);
+    }
+    return instance;
+  }
+  set(value, key) {
+    this.instances.set(key ?? this.defaultKey, value);
+  }
+};
+var Auth = class extends HeyApiClient {
+  /**
+   * Remove auth credentials
+   *
+   * Remove authentication credentials
+   */
+  remove(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "path", key: "providerID" }] }]);
+    return (options?.client ?? this.client).delete({
+      url: "/auth/{providerID}",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Set auth credentials
+   *
+   * Set authentication credentials
+   */
+  set(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "providerID" },
+          { key: "auth", map: "body" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).put({
+      url: "/auth/{providerID}",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+};
+var App = class extends HeyApiClient {
+  /**
+   * Write log
+   *
+   * Write a log entry to the server logs with specified level and metadata.
+   */
+  log(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "service" },
+          { in: "body", key: "level" },
+          { in: "body", key: "message" },
+          { in: "body", key: "extra" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/log",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * List agents
+   *
+   * Get a list of all available AI agents in the OpenCode system.
+   */
+  agents(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/agent",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * List skills
+   *
+   * Get a list of all available skills in the OpenCode system.
+   */
+  skills(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/skill",
+      ...options,
+      ...params
+    });
+  }
+};
+var ControlPlane = class extends HeyApiClient {
+  /**
+   * Move session
+   *
+   * Move a session to another project directory, optionally transferring local changes.
+   */
+  moveSession(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "body", key: "sessionID" },
+          { in: "body", key: "destination" },
+          { in: "body", key: "moveChanges" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/experimental/control-plane/move-session",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+};
+var Capabilities = class extends HeyApiClient {
+  /**
+   * Get experimental capabilities
+   *
+   * Get experimental features enabled on the OpenCode server.
+   */
+  get(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/experimental/capabilities",
+      ...options,
+      ...params
+    });
+  }
+};
+var Console = class extends HeyApiClient {
+  /**
+   * Get active Console provider metadata
+   *
+   * Get the active Console org name and the set of provider IDs managed by that Console org.
+   */
+  get(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/experimental/console",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * List switchable Console orgs
+   *
+   * Get the available Console orgs across logged-in accounts, including the current active org.
+   */
+  listOrgs(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/experimental/console/orgs",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Switch active Console org
+   *
+   * Persist a new active Console account/org selection for the current local OpenCode state.
+   */
+  switchOrg(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "accountID" },
+          { in: "body", key: "orgID" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/experimental/console/switch",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+};
+var Session = class extends HeyApiClient {
+  /**
+   * List sessions
+   *
+   * Get a list of all OpenCode sessions across projects, sorted by most recently updated. Archived sessions are excluded by default.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "query", key: "roots" },
+          { in: "query", key: "start" },
+          { in: "query", key: "cursor" },
+          { in: "query", key: "search" },
+          { in: "query", key: "limit" },
+          { in: "query", key: "archived" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/experimental/session",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Background subagents
+   *
+   * Detach any synchronous subagents currently blocking the session and continue them in the background.
+   */
+  background(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/experimental/session/{sessionID}/background",
+      ...options,
+      ...params
+    });
+  }
+};
+var Resource = class extends HeyApiClient {
+  /**
+   * Get MCP resources
+   *
+   * Get all available MCP resources from connected servers. Optionally filter by name.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/experimental/resource",
+      ...options,
+      ...params
+    });
+  }
+};
+var ProjectCopy = class extends HeyApiClient {
+  /**
+   * Generate project copy name
+   *
+   * Generate a short name for a project copy from task context.
+   */
+  generateName(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "projectID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "context" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/experimental/project/{projectID}/copy/generate-name",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+};
+var Adapter = class extends HeyApiClient {
+  /**
+   * List workspace adapters
+   *
+   * List all available workspace adapters for the current project.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/experimental/workspace/adapter",
+      ...options,
+      ...params
+    });
+  }
+};
+var Workspace = class extends HeyApiClient {
+  /**
+   * List workspaces
+   *
+   * List all workspaces.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/experimental/workspace",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Create workspace
+   *
+   * Create a workspace for the current project.
+   */
+  create(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "id" },
+          { in: "body", key: "type" },
+          { in: "body", key: "branch" },
+          { in: "body", key: "extra" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/experimental/workspace",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Sync workspace list
+   *
+   * Register missing workspaces returned by workspace adapters.
+   */
+  syncList(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/experimental/workspace/sync-list",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Workspace status
+   *
+   * Get connection status for workspaces in the current project.
+   */
+  status(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/experimental/workspace/status",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Remove workspace
+   *
+   * Remove an existing workspace.
+   */
+  remove(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "id" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).delete({
+      url: "/experimental/workspace/{id}",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Warp session into workspace
+   *
+   * Move a session's sync history into the target workspace, or detach it to the local project.
+   */
+  warp(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "id" },
+          { in: "body", key: "sessionID" },
+          { in: "body", key: "copyChanges" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/experimental/workspace/warp",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  _adapter;
+  get adapter() {
+    return this._adapter ??= new Adapter({ client: this.client });
+  }
+};
+var Experimental = class extends HeyApiClient {
+  _controlPlane;
+  get controlPlane() {
+    return this._controlPlane ??= new ControlPlane({ client: this.client });
+  }
+  _capabilities;
+  get capabilities() {
+    return this._capabilities ??= new Capabilities({ client: this.client });
+  }
+  _console;
+  get console() {
+    return this._console ??= new Console({ client: this.client });
+  }
+  _session;
+  get session() {
+    return this._session ??= new Session({ client: this.client });
+  }
+  _resource;
+  get resource() {
+    return this._resource ??= new Resource({ client: this.client });
+  }
+  _projectCopy;
+  get projectCopy() {
+    return this._projectCopy ??= new ProjectCopy({ client: this.client });
+  }
+  _workspace;
+  get workspace() {
+    return this._workspace ??= new Workspace({ client: this.client });
+  }
+};
+var Config = class extends HeyApiClient {
+  /**
+   * Get global configuration
+   *
+   * Retrieve the current global OpenCode configuration settings and preferences.
+   */
+  get(options) {
+    return (options?.client ?? this.client).get({
+      url: "/global/config",
+      ...options
+    });
+  }
+  /**
+   * Update global configuration
+   *
+   * Update global OpenCode configuration settings and preferences.
+   */
+  update(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ key: "config", map: "body" }] }]);
+    return (options?.client ?? this.client).patch({
+      url: "/global/config",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+};
+var Global = class extends HeyApiClient {
+  /**
+   * Get health
+   *
+   * Get health information about the OpenCode server.
+   */
+  health(options) {
+    return (options?.client ?? this.client).get({
+      url: "/global/health",
+      ...options
+    });
+  }
+  /**
+   * Get global events
+   *
+   * Subscribe to global events from the OpenCode system using server-sent events.
+   */
+  event(options) {
+    return (options?.client ?? this.client).sse.get({
+      url: "/global/event",
+      ...options
+    });
+  }
+  /**
+   * Dispose instance
+   *
+   * Clean up and dispose all OpenCode instances, releasing all resources.
+   */
+  dispose(options) {
+    return (options?.client ?? this.client).post({
+      url: "/global/dispose",
+      ...options
+    });
+  }
+  /**
+   * Upgrade opencode
+   *
+   * Upgrade opencode to the specified version.
+   */
+  upgrade(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "body", key: "target" }] }]);
+    return (options?.client ?? this.client).post({
+      url: "/global/upgrade",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  _config;
+  get config() {
+    return this._config ??= new Config({ client: this.client });
+  }
+};
+var Event = class extends HeyApiClient {
+  /**
+   * Subscribe to events
+   *
+   * Get events
+   */
+  subscribe(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).sse.get({
+      url: "/event",
+      ...options,
+      ...params
+    });
+  }
+};
+var Config2 = class extends HeyApiClient {
+  /**
+   * Get configuration
+   *
+   * Retrieve the current OpenCode configuration settings and preferences.
+   */
+  get(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/config",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Update configuration
+   *
+   * Update OpenCode configuration settings and preferences.
+   */
+  update(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { key: "config", map: "body" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).patch({
+      url: "/config",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * List config providers
+   *
+   * Get a list of all configured AI providers and their default models.
+   */
+  providers(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/config/providers",
+      ...options,
+      ...params
+    });
+  }
+};
+var Tool = class extends HeyApiClient {
+  /**
+   * List tools
+   *
+   * Get a list of available tools with their JSON schema parameters for a specific provider and model combination.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "query", key: "provider" },
+          { in: "query", key: "model" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/experimental/tool",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * List tool IDs
+   *
+   * Get a list of all available tool IDs, including both built-in tools and dynamically registered tools.
+   */
+  ids(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/experimental/tool/ids",
+      ...options,
+      ...params
+    });
+  }
+};
+var Worktree = class extends HeyApiClient {
+  /**
+   * Remove worktree
+   *
+   * Remove a git worktree and delete its branch.
+   */
+  remove(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { key: "worktreeRemoveInput", map: "body" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).delete({
+      url: "/experimental/worktree",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * List worktrees
+   *
+   * List all sandbox worktrees for the current project.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/experimental/worktree",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Create worktree
+   *
+   * Create a new git worktree for the current project and run any configured startup scripts.
+   */
+  create(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { key: "worktreeCreateInput", map: "body" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/experimental/worktree",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Reset worktree
+   *
+   * Reset a worktree branch to the primary default branch.
+   */
+  reset(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { key: "worktreeResetInput", map: "body" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/experimental/worktree/reset",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+};
+var Find = class extends HeyApiClient {
+  /**
+   * Find text
+   *
+   * Search for text patterns across files in the project using ripgrep.
+   */
+  text(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "query", key: "pattern" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/find",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Find files
+   *
+   * Search for files or directories by name or pattern in the project directory.
+   */
+  files(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "query", key: "query" },
+          { in: "query", key: "dirs" },
+          { in: "query", key: "type" },
+          { in: "query", key: "limit" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/find/file",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Find symbols
+   *
+   * Search for workspace symbols like functions, classes, and variables using LSP.
+   */
+  symbols(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "query", key: "query" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/find/symbol",
+      ...options,
+      ...params
+    });
+  }
+};
+var File2 = class extends HeyApiClient {
+  /**
+   * List files
+   *
+   * List files and directories in a specified path.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "query", key: "path" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/file",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Read file
+   *
+   * Read the content of a specified file.
+   */
+  read(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "query", key: "path" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/file/content",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Get file status
+   *
+   * Get the git status of all files in the project.
+   */
+  status(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/file/status",
+      ...options,
+      ...params
+    });
+  }
+};
+var Instance = class extends HeyApiClient {
+  /**
+   * Dispose instance
+   *
+   * Clean up and dispose the current OpenCode instance, releasing all resources.
+   */
+  dispose(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/instance/dispose",
+      ...options,
+      ...params
+    });
+  }
+};
+var Path = class extends HeyApiClient {
+  /**
+   * Get paths
+   *
+   * Retrieve the current working directory and related path information for the OpenCode instance.
+   */
+  get(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/path",
+      ...options,
+      ...params
+    });
+  }
+};
+var Diff = class extends HeyApiClient {
+  /**
+   * Get raw VCS diff
+   *
+   * Retrieve a raw patch for current uncommitted changes.
+   */
+  raw(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/vcs/diff/raw",
+      ...options,
+      ...params
+    });
+  }
+};
+var Vcs = class extends HeyApiClient {
+  /**
+   * Get VCS info
+   *
+   * Retrieve version control system (VCS) information for the current project, such as git branch.
+   */
+  get(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/vcs",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Get VCS status
+   *
+   * Retrieve changed files in the current working tree without patches.
+   */
+  status(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/vcs/status",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Get VCS diff
+   *
+   * Retrieve the current git diff for the working tree or against the default branch.
+   */
+  diff(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "query", key: "mode" },
+          { in: "query", key: "context" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/vcs/diff",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Apply VCS patch
+   *
+   * Apply a raw patch to the current working tree.
+   */
+  apply(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "patch" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/vcs/apply",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  _diff;
+  get diff2() {
+    return this._diff ??= new Diff({ client: this.client });
+  }
+};
+var Command = class extends HeyApiClient {
+  /**
+   * List commands
+   *
+   * Get a list of all available commands in the OpenCode system.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/command",
+      ...options,
+      ...params
+    });
+  }
+};
+var Lsp = class extends HeyApiClient {
+  /**
+   * Get LSP status
+   *
+   * Get LSP server status
+   */
+  status(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/lsp",
+      ...options,
+      ...params
+    });
+  }
+};
+var Formatter = class extends HeyApiClient {
+  /**
+   * Get formatter status
+   *
+   * Get formatter status
+   */
+  status(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/formatter",
+      ...options,
+      ...params
+    });
+  }
+};
+var Auth2 = class extends HeyApiClient {
+  /**
+   * Remove MCP OAuth
+   *
+   * Remove OAuth credentials for an MCP server.
+   */
+  remove(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "name" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).delete({
+      url: "/mcp/{name}/auth",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Start MCP OAuth
+   *
+   * Start OAuth authentication flow for a Model Context Protocol (MCP) server.
+   */
+  start(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "name" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/mcp/{name}/auth",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Complete MCP OAuth
+   *
+   * Complete OAuth authentication for a Model Context Protocol (MCP) server using the authorization code.
+   */
+  callback(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "name" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "code" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/mcp/{name}/auth/callback",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Authenticate MCP OAuth
+   *
+   * Start OAuth flow and wait for callback (opens browser).
+   */
+  authenticate(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "name" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/mcp/{name}/auth/authenticate",
+      ...options,
+      ...params
+    });
+  }
+};
+var Mcp = class extends HeyApiClient {
+  /**
+   * Get MCP status
+   *
+   * Get the status of all Model Context Protocol (MCP) servers.
+   */
+  status(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/mcp",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Add MCP server
+   *
+   * Dynamically add a new Model Context Protocol (MCP) server to the system.
+   */
+  add(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "name" },
+          { in: "body", key: "config" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/mcp",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Connect an MCP server.
+   */
+  connect(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "name" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/mcp/{name}/connect",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Disconnect an MCP server.
+   */
+  disconnect(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "name" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/mcp/{name}/disconnect",
+      ...options,
+      ...params
+    });
+  }
+  _auth;
+  get auth() {
+    return this._auth ??= new Auth2({ client: this.client });
+  }
+};
+var Project = class extends HeyApiClient {
+  /**
+   * List all projects
+   *
+   * Get a list of projects that have been opened with OpenCode.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/project",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Get current project
+   *
+   * Retrieve the currently active project that OpenCode is working with.
+   */
+  current(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/project/current",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Initialize git repository
+   *
+   * Create a git repository for the current project and return the refreshed project info.
+   */
+  initGit(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/project/git/init",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Update project
+   *
+   * Update project properties such as name, icon, and commands.
+   */
+  update(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "projectID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "name" },
+          { in: "body", key: "icon" },
+          { in: "body", key: "commands" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).patch({
+      url: "/project/{projectID}",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * List project directories
+   *
+   * List known local absolute directories for a project.
+   */
+  directories(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "projectID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/project/{projectID}/directories",
+      ...options,
+      ...params
+    });
+  }
+};
+var Pty = class extends HeyApiClient {
+  /**
+   * List available shells
+   *
+   * Get a list of available shells on the system.
+   */
+  shells(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/pty/shells",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * List PTY sessions
+   *
+   * Get a list of all active pseudo-terminal (PTY) sessions managed by OpenCode.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/pty",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Create PTY session
+   *
+   * Create a new pseudo-terminal (PTY) session for running shell commands and processes.
+   */
+  create(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "command" },
+          { in: "body", key: "args" },
+          { in: "body", key: "cwd" },
+          { in: "body", key: "title" },
+          { in: "body", key: "env" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/pty",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Remove PTY session
+   *
+   * Remove and terminate a specific pseudo-terminal (PTY) session.
+   */
+  remove(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "ptyID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).delete({
+      url: "/pty/{ptyID}",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Get PTY session
+   *
+   * Retrieve detailed information about a specific pseudo-terminal (PTY) session.
+   */
+  get(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "ptyID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/pty/{ptyID}",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Update PTY session
+   *
+   * Update properties of an existing pseudo-terminal (PTY) session.
+   */
+  update(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "ptyID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "title" },
+          { in: "body", key: "size" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).put({
+      url: "/pty/{ptyID}",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Create PTY WebSocket token
+   *
+   * Create a short-lived ticket for opening a PTY WebSocket connection.
+   */
+  connectToken(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "ptyID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/pty/{ptyID}/connect-token",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Connect to PTY session
+   *
+   * Establish a WebSocket connection to interact with a pseudo-terminal (PTY) session in real-time.
+   */
+  connect(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "ptyID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "query", key: "cursor" },
+          { in: "query", key: "ticket" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/pty/{ptyID}/connect",
+      ...options,
+      ...params
+    });
+  }
+};
+var Question = class extends HeyApiClient {
+  /**
+   * List pending questions
+   *
+   * Get all pending question requests across all sessions.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/question",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Reply to question request
+   *
+   * Provide answers to a question request from the AI assistant.
+   */
+  reply(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "requestID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "answers" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/question/{requestID}/reply",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Reject question request
+   *
+   * Reject a question request from the AI assistant.
+   */
+  reject(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "requestID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/question/{requestID}/reject",
+      ...options,
+      ...params
+    });
+  }
+};
+var Permission = class extends HeyApiClient {
+  /**
+   * List pending permissions
+   *
+   * Get all pending permission requests across all sessions.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/permission",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Respond to permission request
+   *
+   * Approve or deny a permission request from the AI assistant.
+   */
+  reply(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "requestID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "reply" },
+          { in: "body", key: "message" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/permission/{requestID}/reply",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Respond to permission
+   *
+   * Approve or deny a permission request from the AI assistant.
+   *
+   * @deprecated
+   */
+  respond(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "path", key: "permissionID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "response" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/session/{sessionID}/permissions/{permissionID}",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+};
+var Oauth = class extends HeyApiClient {
+  /**
+   * Start OAuth authorization
+   *
+   * Start the OAuth authorization flow for a provider.
+   */
+  authorize(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "providerID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "method" },
+          { in: "body", key: "inputs" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/provider/{providerID}/oauth/authorize",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Handle OAuth callback
+   *
+   * Handle the OAuth callback from a provider after user authorization.
+   */
+  callback(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "providerID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "method" },
+          { in: "body", key: "code" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/provider/{providerID}/oauth/callback",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+};
+var Provider = class extends HeyApiClient {
+  /**
+   * List providers
+   *
+   * Get a list of all available AI providers, including both available and connected ones.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/provider",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Get provider auth methods
+   *
+   * Retrieve available authentication methods for all AI providers.
+   */
+  auth(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/provider/auth",
+      ...options,
+      ...params
+    });
+  }
+  _oauth;
+  get oauth() {
+    return this._oauth ??= new Oauth({ client: this.client });
+  }
+};
+var Session2 = class extends HeyApiClient {
+  /**
+   * List sessions
+   *
+   * Get a list of all OpenCode sessions, sorted by most recently updated.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "query", key: "scope" },
+          { in: "query", key: "path" },
+          { in: "query", key: "roots" },
+          { in: "query", key: "start" },
+          { in: "query", key: "search" },
+          { in: "query", key: "limit" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/session",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Create session
+   *
+   * Create a new OpenCode session for interacting with AI assistants and managing conversations.
+   */
+  create(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "parentID" },
+          { in: "body", key: "title" },
+          { in: "body", key: "agent" },
+          { in: "body", key: "model" },
+          { in: "body", key: "metadata" },
+          { in: "body", key: "permission" },
+          { in: "body", key: "workspaceID" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/session",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Get session status
+   *
+   * Retrieve the current status of all sessions, including active, idle, and completed states.
+   */
+  status(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/session/status",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Delete session
+   *
+   * Delete a session and permanently remove all associated data, including messages and history.
+   */
+  delete(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).delete({
+      url: "/session/{sessionID}",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Get session
+   *
+   * Retrieve detailed information about a specific OpenCode session.
+   */
+  get(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/session/{sessionID}",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Update session
+   *
+   * Update properties of an existing session, such as title or other metadata.
+   */
+  update(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "title" },
+          { in: "body", key: "metadata" },
+          { in: "body", key: "permission" },
+          { in: "body", key: "time" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).patch({
+      url: "/session/{sessionID}",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Get session children
+   *
+   * Retrieve all child sessions that were forked from the specified parent session.
+   */
+  children(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/session/{sessionID}/children",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Get session todos
+   *
+   * Retrieve the todo list associated with a specific session, showing tasks and action items.
+   */
+  todo(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/session/{sessionID}/todo",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Get message diff
+   *
+   * Get the file changes (diff) that resulted from a specific user message in the session.
+   */
+  diff(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "query", key: "messageID" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/session/{sessionID}/diff",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Get session messages
+   *
+   * Retrieve all messages in a session, including user prompts and AI responses.
+   */
+  messages(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "query", key: "limit" },
+          { in: "query", key: "before" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/session/{sessionID}/message",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Send message
+   *
+   * Create and send a new message to a session, streaming the AI response.
+   */
+  prompt(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "messageID" },
+          { in: "body", key: "model" },
+          { in: "body", key: "agent" },
+          { in: "body", key: "noReply" },
+          { in: "body", key: "tools" },
+          { in: "body", key: "format" },
+          { in: "body", key: "system" },
+          { in: "body", key: "variant" },
+          { in: "body", key: "parts" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/session/{sessionID}/message",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Delete message
+   *
+   * Permanently delete a specific message and all of its parts from a session without reverting file changes.
+   */
+  deleteMessage(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "path", key: "messageID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).delete({
+      url: "/session/{sessionID}/message/{messageID}",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Get message
+   *
+   * Retrieve a specific message from a session by its message ID.
+   */
+  message(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "path", key: "messageID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/session/{sessionID}/message/{messageID}",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Fork session
+   *
+   * Create a new session by forking an existing session at a specific message point.
+   */
+  fork(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "messageID" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/session/{sessionID}/fork",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Abort session
+   *
+   * Abort an active session and stop any ongoing AI processing or command execution.
+   */
+  abort(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/session/{sessionID}/abort",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Initialize session
+   *
+   * Analyze the current application and create an AGENTS.md file with project-specific agent configurations.
+   */
+  init(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "modelID" },
+          { in: "body", key: "providerID" },
+          { in: "body", key: "messageID" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/session/{sessionID}/init",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Unshare session
+   *
+   * Remove the shareable link for a session, making it private again.
+   */
+  unshare(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).delete({
+      url: "/session/{sessionID}/share",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Share session
+   *
+   * Create a shareable link for a session, allowing others to view the conversation.
+   */
+  share(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/session/{sessionID}/share",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Summarize session
+   *
+   * Generate a concise summary of the session using AI compaction to preserve key information.
+   */
+  summarize(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "providerID" },
+          { in: "body", key: "modelID" },
+          { in: "body", key: "auto" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/session/{sessionID}/summarize",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Send async message
+   *
+   * Create and send a new message to a session asynchronously, starting the session if needed and returning immediately.
+   */
+  promptAsync(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "messageID" },
+          { in: "body", key: "model" },
+          { in: "body", key: "agent" },
+          { in: "body", key: "noReply" },
+          { in: "body", key: "tools" },
+          { in: "body", key: "format" },
+          { in: "body", key: "system" },
+          { in: "body", key: "variant" },
+          { in: "body", key: "parts" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/session/{sessionID}/prompt_async",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Send command
+   *
+   * Send a new command to a session for execution by the AI assistant.
+   */
+  command(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "messageID" },
+          { in: "body", key: "agent" },
+          { in: "body", key: "model" },
+          { in: "body", key: "arguments" },
+          { in: "body", key: "command" },
+          { in: "body", key: "variant" },
+          { in: "body", key: "parts" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/session/{sessionID}/command",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Run shell command
+   *
+   * Execute a shell command within the session context and return the AI's response.
+   */
+  shell(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "messageID" },
+          { in: "body", key: "agent" },
+          { in: "body", key: "model" },
+          { in: "body", key: "command" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/session/{sessionID}/shell",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Revert message
+   *
+   * Revert a specific message in a session, undoing its effects and restoring the previous state.
+   */
+  revert(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "messageID" },
+          { in: "body", key: "partID" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/session/{sessionID}/revert",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Restore reverted messages
+   *
+   * Restore all previously reverted messages in a session.
+   */
+  unrevert(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/session/{sessionID}/unrevert",
+      ...options,
+      ...params
+    });
+  }
+};
+var Part = class extends HeyApiClient {
+  /**
+   * Delete a part from a message.
+   */
+  delete(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "path", key: "messageID" },
+          { in: "path", key: "partID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).delete({
+      url: "/session/{sessionID}/message/{messageID}/part/{partID}",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Update a part in a message.
+   */
+  update(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "path", key: "messageID" },
+          { in: "path", key: "partID" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { key: "part", map: "body" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).patch({
+      url: "/session/{sessionID}/message/{messageID}/part/{partID}",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+};
+var History = class extends HeyApiClient {
+  /**
+   * List sync events
+   *
+   * List sync events for all aggregates. Keys are aggregate IDs the client already knows about, values are the last known sequence ID. Events with seq > value are returned for those aggregates. Aggregates not listed in the input get their full history.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { key: "body", map: "body" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/sync/history",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+};
+var Sync = class extends HeyApiClient {
+  /**
+   * Start workspace sync
+   *
+   * Start sync loops for workspaces in the current project that have active sessions.
+   */
+  start(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/sync/start",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Replay sync events
+   *
+   * Validate and replay a complete sync event history.
+   */
+  replay(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          {
+            in: "query",
+            key: "query_directory",
+            map: "directory"
+          },
+          { in: "query", key: "workspace" },
+          {
+            in: "body",
+            key: "body_directory",
+            map: "directory"
+          },
+          { in: "body", key: "events" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/sync/replay",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Steal session into workspace
+   *
+   * Update a session to belong to the current workspace through the sync event system.
+   */
+  steal(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "sessionID" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/sync/steal",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  _history;
+  get history() {
+    return this._history ??= new History({ client: this.client });
+  }
+};
+var Control = class extends HeyApiClient {
+  /**
+   * Get next TUI request
+   *
+   * Retrieve the next TUI request from the queue for processing.
+   */
+  next(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/tui/control/next",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Submit TUI response
+   *
+   * Submit a response to the TUI request queue to complete a pending request.
+   */
+  response(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { key: "body", map: "body" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/tui/control/response",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+};
+var Tui = class extends HeyApiClient {
+  /**
+   * Append TUI prompt
+   *
+   * Append prompt to the TUI.
+   */
+  appendPrompt(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "text" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/tui/append-prompt",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Open help dialog
+   *
+   * Open the help dialog in the TUI to display user assistance information.
+   */
+  openHelp(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/tui/open-help",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Open sessions dialog
+   *
+   * Open the session dialog.
+   */
+  openSessions(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/tui/open-sessions",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Open themes dialog
+   *
+   * Open the theme dialog.
+   */
+  openThemes(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/tui/open-themes",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Open models dialog
+   *
+   * Open the model dialog.
+   */
+  openModels(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/tui/open-models",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Submit TUI prompt
+   *
+   * Submit the prompt.
+   */
+  submitPrompt(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/tui/submit-prompt",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Clear TUI prompt
+   *
+   * Clear the prompt.
+   */
+  clearPrompt(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/tui/clear-prompt",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Execute TUI command
+   *
+   * Execute a TUI command.
+   */
+  executeCommand(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "command" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/tui/execute-command",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Show TUI toast
+   *
+   * Show a toast notification in the TUI.
+   */
+  showToast(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "title" },
+          { in: "body", key: "message" },
+          { in: "body", key: "variant" },
+          { in: "body", key: "duration" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/tui/show-toast",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Publish TUI event
+   *
+   * Publish a TUI event.
+   */
+  publish(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { key: "body", map: "body" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/tui/publish",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Select session
+   *
+   * Navigate the TUI to display the specified session.
+   */
+  selectSession(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "directory" },
+          { in: "query", key: "workspace" },
+          { in: "body", key: "sessionID" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/tui/select-session",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  _control;
+  get control() {
+    return this._control ??= new Control({ client: this.client });
+  }
+};
+var Health = class extends HeyApiClient {
+  /**
+   * Check server health
+   *
+   * Check whether the API server is ready to accept requests.
+   */
+  get(options) {
+    return (options?.client ?? this.client).get({
+      url: "/api/health",
+      ...options
+    });
+  }
+};
+var Location = class extends HeyApiClient {
+  /**
+   * Get location
+   *
+   * Resolve the requested location or the server default location.
+   */
+  get(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "query", key: "location" }] }]);
+    return (options?.client ?? this.client).get({
+      url: "/api/location",
+      ...options,
+      ...params
+    });
+  }
+};
+var Agent = class extends HeyApiClient {
+  /**
+   * List agents
+   *
+   * Retrieve currently registered agents.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "query", key: "location" }] }]);
+    return (options?.client ?? this.client).get({
+      url: "/api/agent",
+      ...options,
+      ...params
+    });
+  }
+};
+var Revert = class extends HeyApiClient {
+  /**
+   * Stage session revert
+   *
+   * Stage or move a reversible session boundary and optionally apply its file changes.
+   */
+  stage(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "body", key: "messageID" },
+          { in: "body", key: "files" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/api/session/{sessionID}/revert/stage",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Clear staged revert
+   */
+  clear(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "path", key: "sessionID" }] }]);
+    return (options?.client ?? this.client).post({
+      url: "/api/session/{sessionID}/revert/clear",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Commit staged revert
+   */
+  commit(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "path", key: "sessionID" }] }]);
+    return (options?.client ?? this.client).post({
+      url: "/api/session/{sessionID}/revert/commit",
+      ...options,
+      ...params
+    });
+  }
+};
+var Permission2 = class extends HeyApiClient {
+  /**
+   * List session permission requests
+   *
+   * Retrieve pending permission requests owned by a session.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "path", key: "sessionID" }] }]);
+    return (options?.client ?? this.client).get({
+      url: "/api/session/{sessionID}/permission",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Create permission request
+   *
+   * Evaluate and, when approval is required, create a permission request for a session.
+   */
+  create(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "body", key: "id" },
+          { in: "body", key: "action" },
+          { in: "body", key: "resources" },
+          { in: "body", key: "save" },
+          { in: "body", key: "metadata" },
+          { in: "body", key: "source" },
+          { in: "body", key: "agent" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/api/session/{sessionID}/permission",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Get permission request
+   *
+   * Retrieve a pending permission request owned by a session.
+   */
+  get(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "path", key: "requestID" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/api/session/{sessionID}/permission/{requestID}",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Reply to pending permission request
+   *
+   * Respond to a pending permission request owned by a session.
+   */
+  reply(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "path", key: "requestID" },
+          { in: "body", key: "reply" },
+          { in: "body", key: "message" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/api/session/{sessionID}/permission/{requestID}/reply",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+};
+var Question2 = class extends HeyApiClient {
+  /**
+   * List session question requests
+   *
+   * Retrieve pending question requests owned by a session.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "path", key: "sessionID" }] }]);
+    return (options?.client ?? this.client).get({
+      url: "/api/session/{sessionID}/question",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Reply to pending question request
+   *
+   * Answer a pending question request owned by a session.
+   */
+  reply(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "path", key: "requestID" },
+          { key: "questionV2Reply", map: "body" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/api/session/{sessionID}/question/{requestID}/reply",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Reject pending question request
+   *
+   * Reject a pending question request owned by a session.
+   */
+  reject(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "path", key: "requestID" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/api/session/{sessionID}/question/{requestID}/reject",
+      ...options,
+      ...params
+    });
+  }
+};
+var Session3 = class extends HeyApiClient {
+  /**
+   * List sessions
+   *
+   * Retrieve sessions in the requested order. Items keep that order across pages; use cursor.next or cursor.previous to move through the ordered list.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "workspace" },
+          { in: "query", key: "limit" },
+          { in: "query", key: "order" },
+          { in: "query", key: "search" },
+          { in: "query", key: "directory" },
+          { in: "query", key: "project" },
+          { in: "query", key: "subpath" },
+          { in: "query", key: "cursor" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/api/session",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Create session
+   *
+   * Create a session at the requested location.
+   */
+  create(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "body", key: "id" },
+          { in: "body", key: "agent" },
+          { in: "body", key: "model" },
+          { in: "body", key: "location" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/api/session",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * List active sessions
+   *
+   * Retrieve foreground Session drains currently owned by this OpenCode process. Sessions absent from the result are inactive.
+   */
+  active(options) {
+    return (options?.client ?? this.client).get({
+      url: "/api/session/active",
+      ...options
+    });
+  }
+  /**
+   * Get session
+   *
+   * Retrieve a session by ID.
+   */
+  get(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "path", key: "sessionID" }] }]);
+    return (options?.client ?? this.client).get({
+      url: "/api/session/{sessionID}",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Switch session agent
+   *
+   * Switch the agent used by subsequent provider turns.
+   */
+  switchAgent(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "body", key: "agent" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/api/session/{sessionID}/agent",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Switch session model
+   *
+   * Switch the model used by subsequent provider turns.
+   */
+  switchModel(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "body", key: "model" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/api/session/{sessionID}/model",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Send message
+   *
+   * Durably admit one session input and schedule agent-loop execution unless resume is false.
+   */
+  prompt(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "body", key: "id" },
+          { in: "body", key: "prompt" },
+          { in: "body", key: "delivery" },
+          { in: "body", key: "resume" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/api/session/{sessionID}/prompt",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Compact session
+   *
+   * Compact a session conversation.
+   */
+  compact(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "path", key: "sessionID" }] }]);
+    return (options?.client ?? this.client).post({
+      url: "/api/session/{sessionID}/compact",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Wait for session
+   *
+   * Wait for a session agent loop to become idle.
+   */
+  wait(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "path", key: "sessionID" }] }]);
+    return (options?.client ?? this.client).post({
+      url: "/api/session/{sessionID}/wait",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Get session context
+   *
+   * Retrieve the active context messages for a session (all messages after the last compaction).
+   */
+  context(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "path", key: "sessionID" }] }]);
+    return (options?.client ?? this.client).get({
+      url: "/api/session/{sessionID}/context",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Get session history
+   *
+   * Read one finite page of public durable Session events after an exclusive aggregate sequence. Newly committed events may appear on later pages.
+   */
+  history(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "limit" },
+          { in: "query", key: "after" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/api/session/{sessionID}/history",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Subscribe to session events
+   *
+   * Replay durable events after an aggregate sequence, then continue with new durable events.
+   */
+  events(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "after" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).sse.get({
+      url: "/api/session/{sessionID}/event",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Interrupt session execution
+   *
+   * Interrupt active execution owned by this OpenCode process. Idle interruption is a no-op.
+   */
+  interrupt(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "path", key: "sessionID" }] }]);
+    return (options?.client ?? this.client).post({
+      url: "/api/session/{sessionID}/interrupt",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Get session message
+   *
+   * Retrieve one projected message owned by the Session.
+   */
+  message(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "path", key: "messageID" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/api/session/{sessionID}/message/{messageID}",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Get session messages
+   *
+   * Retrieve projected messages for a session. Items keep the requested order across pages; use cursor.next or cursor.previous to move through the ordered timeline.
+   */
+  messages(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "sessionID" },
+          { in: "query", key: "limit" },
+          { in: "query", key: "order" },
+          { in: "query", key: "cursor" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/api/session/{sessionID}/message",
+      ...options,
+      ...params
+    });
+  }
+  _revert;
+  get revert() {
+    return this._revert ??= new Revert({ client: this.client });
+  }
+  _permission;
+  get permission() {
+    return this._permission ??= new Permission2({ client: this.client });
+  }
+  _question;
+  get question() {
+    return this._question ??= new Question2({ client: this.client });
+  }
+};
+var Model = class extends HeyApiClient {
+  /**
+   * List models
+   *
+   * Retrieve available models ordered by release date.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "query", key: "location" }] }]);
+    return (options?.client ?? this.client).get({
+      url: "/api/model",
+      ...options,
+      ...params
+    });
+  }
+};
+var Provider2 = class extends HeyApiClient {
+  /**
+   * List providers
+   *
+   * Retrieve active AI providers so clients can show provider availability and configuration.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "query", key: "location" }] }]);
+    return (options?.client ?? this.client).get({
+      url: "/api/provider",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Get provider
+   *
+   * Retrieve a single AI provider so clients can inspect its availability and endpoint settings.
+   */
+  get(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "providerID" },
+          { in: "query", key: "location" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/api/provider/{providerID}",
+      ...options,
+      ...params
+    });
+  }
+};
+var Connect = class extends HeyApiClient {
+  /**
+   * Connect with key
+   *
+   * Run a key authentication method and store the resulting credential.
+   */
+  key(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "integrationID" },
+          { in: "query", key: "location" },
+          { in: "body", key: "key" },
+          { in: "body", key: "label" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/api/integration/{integrationID}/connect/key",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Begin OAuth connection
+   *
+   * Start an OAuth attempt and return the authorization details.
+   */
+  oauth(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "integrationID" },
+          { in: "query", key: "location" },
+          { in: "body", key: "methodID" },
+          { in: "body", key: "inputs" },
+          { in: "body", key: "label" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/api/integration/{integrationID}/connect/oauth",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+};
+var Attempt = class extends HeyApiClient {
+  /**
+   * Cancel OAuth connection
+   *
+   * Cancel an OAuth attempt and release its resources.
+   */
+  cancel(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "attemptID" },
+          { in: "query", key: "location" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).delete({
+      url: "/api/integration/attempt/{attemptID}",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Get OAuth attempt status
+   *
+   * Poll the current status of an OAuth attempt.
+   */
+  status(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "attemptID" },
+          { in: "query", key: "location" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/api/integration/attempt/{attemptID}",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Complete OAuth connection
+   *
+   * Complete a code-based OAuth attempt and store the resulting credential.
+   */
+  complete(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "attemptID" },
+          { in: "query", key: "location" },
+          { in: "body", key: "code" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/api/integration/attempt/{attemptID}/complete",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+};
+var Integration = class extends HeyApiClient {
+  /**
+   * List integrations
+   *
+   * Retrieve available integrations and their authentication methods.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "query", key: "location" }] }]);
+    return (options?.client ?? this.client).get({
+      url: "/api/integration",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Get integration
+   *
+   * Retrieve one integration and its authentication methods.
+   */
+  get(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "integrationID" },
+          { in: "query", key: "location" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/api/integration/{integrationID}",
+      ...options,
+      ...params
+    });
+  }
+  _connect;
+  get connect() {
+    return this._connect ??= new Connect({ client: this.client });
+  }
+  _attempt;
+  get attempt() {
+    return this._attempt ??= new Attempt({ client: this.client });
+  }
+};
+var Credential = class extends HeyApiClient {
+  /**
+   * Remove credential
+   *
+   * Remove a stored integration credential.
+   */
+  remove(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "credentialID" },
+          { in: "query", key: "location" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).delete({
+      url: "/api/credential/{credentialID}",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Update credential
+   *
+   * Update a stored credential label.
+   */
+  update(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "credentialID" },
+          { in: "query", key: "location" },
+          { in: "body", key: "label" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).patch({
+      url: "/api/credential/{credentialID}",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+};
+var Request2 = class extends HeyApiClient {
+  /**
+   * List pending permission requests
+   *
+   * Retrieve pending permission requests for a location.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "query", key: "location" }] }]);
+    return (options?.client ?? this.client).get({
+      url: "/api/permission/request",
+      ...options,
+      ...params
+    });
+  }
+};
+var Saved = class extends HeyApiClient {
+  /**
+   * List saved permissions
+   *
+   * Retrieve saved permissions, optionally filtered by project.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "query", key: "projectID" }] }]);
+    return (options?.client ?? this.client).get({
+      url: "/api/permission/saved",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Remove saved permission
+   *
+   * Remove a saved permission by ID.
+   */
+  remove(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "path", key: "id" }] }]);
+    return (options?.client ?? this.client).delete({
+      url: "/api/permission/saved/{id}",
+      ...options,
+      ...params
+    });
+  }
+};
+var Permission3 = class extends HeyApiClient {
+  _request;
+  get request() {
+    return this._request ??= new Request2({ client: this.client });
+  }
+  _saved;
+  get saved() {
+    return this._saved ??= new Saved({ client: this.client });
+  }
+};
+var Fs = class extends HeyApiClient {
+  /**
+   * Read file
+   *
+   * Serve one file relative to the requested location.
+   */
+  read(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "query", key: "location" }] }]);
+    return (options?.client ?? this.client).get({
+      url: "/api/fs/read/*",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * List directory
+   *
+   * List direct children of one directory relative to the requested location.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "location" },
+          { in: "query", key: "path" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/api/fs/list",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Find files
+   *
+   * Find recursively ranked filesystem entries relative to the requested location.
+   */
+  find(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "location" },
+          { in: "query", key: "query" },
+          { in: "query", key: "type" },
+          { in: "query", key: "limit" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/api/fs/find",
+      ...options,
+      ...params
+    });
+  }
+};
+var Command2 = class extends HeyApiClient {
+  /**
+   * List commands
+   *
+   * Retrieve currently registered commands.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "query", key: "location" }] }]);
+    return (options?.client ?? this.client).get({
+      url: "/api/command",
+      ...options,
+      ...params
+    });
+  }
+};
+var Skill = class extends HeyApiClient {
+  /**
+   * List skills
+   *
+   * Retrieve currently registered skills.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "query", key: "location" }] }]);
+    return (options?.client ?? this.client).get({
+      url: "/api/skill",
+      ...options,
+      ...params
+    });
+  }
+};
+var Event2 = class extends HeyApiClient {
+  /**
+   * Subscribe to events
+   *
+   * Subscribe to native event payloads for the server.
+   */
+  subscribe(options) {
+    return (options?.client ?? this.client).sse.get({
+      url: "/api/event",
+      ...options
+    });
+  }
+};
+var Pty2 = class extends HeyApiClient {
+  /**
+   * List PTY sessions
+   *
+   * List PTY sessions for a location, including exited sessions retained until removal.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "query", key: "location" }] }]);
+    return (options?.client ?? this.client).get({
+      url: "/api/pty",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Create PTY session
+   *
+   * Create a pseudo-terminal session for a location.
+   */
+  create(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "query", key: "location" },
+          { in: "body", key: "command" },
+          { in: "body", key: "args" },
+          { in: "body", key: "cwd" },
+          { in: "body", key: "title" },
+          { in: "body", key: "env" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/api/pty",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Remove PTY session
+   *
+   * Terminate and remove one PTY session.
+   */
+  remove(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "ptyID" },
+          { in: "query", key: "location" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).delete({
+      url: "/api/pty/{ptyID}",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Get PTY session
+   *
+   * Get one PTY session, including its exit code once exited.
+   */
+  get(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "ptyID" },
+          { in: "query", key: "location" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/api/pty/{ptyID}",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Update PTY session
+   *
+   * Update the title or viewport size of one PTY session.
+   */
+  update(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "ptyID" },
+          { in: "query", key: "location" },
+          { in: "body", key: "title" },
+          { in: "body", key: "size" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).put({
+      url: "/api/pty/{ptyID}",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  /**
+   * Create PTY WebSocket token
+   *
+   * Create a short-lived single-use ticket for opening a PTY WebSocket connection.
+   */
+  connectToken(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "ptyID" },
+          { in: "query", key: "location" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/api/pty/{ptyID}/connect-token",
+      ...options,
+      ...params
+    });
+  }
+  /**
+   * Connect to PTY session
+   *
+   * Establish a WebSocket connection streaming PTY output and accepting terminal input.
+   */
+  connect(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "ptyID" },
+          { in: "query", key: "location[directory]" },
+          { in: "query", key: "location[workspace]" },
+          { in: "query", key: "cursor" },
+          { in: "query", key: "ticket" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).get({
+      url: "/api/pty/{ptyID}/connect",
+      ...options,
+      ...params
+    });
+  }
+};
+var Request22 = class extends HeyApiClient {
+  /**
+   * List pending question requests
+   *
+   * Retrieve pending question requests for a location.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "query", key: "location" }] }]);
+    return (options?.client ?? this.client).get({
+      url: "/api/question/request",
+      ...options,
+      ...params
+    });
+  }
+};
+var Question3 = class extends HeyApiClient {
+  _request;
+  get request() {
+    return this._request ??= new Request22({ client: this.client });
+  }
+};
+var Reference = class extends HeyApiClient {
+  /**
+   * List references
+   *
+   * List references available in the requested location.
+   */
+  list(parameters, options) {
+    const params = buildClientParams([parameters], [{ args: [{ in: "query", key: "location" }] }]);
+    return (options?.client ?? this.client).get({
+      url: "/api/reference",
+      ...options,
+      ...params
+    });
+  }
+};
+var ProjectCopy2 = class extends HeyApiClient {
+  remove(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "projectID" },
+          { in: "query", key: "location" },
+          { in: "body", key: "directory" },
+          { in: "body", key: "force" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).delete({
+      url: "/experimental/project/{projectID}/copy",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  create(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "projectID" },
+          { in: "query", key: "location" },
+          { in: "body", key: "strategy" },
+          { in: "body", key: "directory" },
+          { in: "body", key: "name" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/experimental/project/{projectID}/copy",
+      ...options,
+      ...params,
+      headers: {
+        "Content-Type": "application/json",
+        ...options?.headers,
+        ...params.headers
+      }
+    });
+  }
+  refresh(parameters, options) {
+    const params = buildClientParams([parameters], [
+      {
+        args: [
+          { in: "path", key: "projectID" },
+          { in: "query", key: "location" }
+        ]
+      }
+    ]);
+    return (options?.client ?? this.client).post({
+      url: "/experimental/project/{projectID}/copy/refresh",
+      ...options,
+      ...params
+    });
+  }
+};
+var V2 = class extends HeyApiClient {
+  _health;
+  get health() {
+    return this._health ??= new Health({ client: this.client });
+  }
+  _location;
+  get location() {
+    return this._location ??= new Location({ client: this.client });
+  }
+  _agent;
+  get agent() {
+    return this._agent ??= new Agent({ client: this.client });
+  }
+  _session;
+  get session() {
+    return this._session ??= new Session3({ client: this.client });
+  }
+  _model;
+  get model() {
+    return this._model ??= new Model({ client: this.client });
+  }
+  _provider;
+  get provider() {
+    return this._provider ??= new Provider2({ client: this.client });
+  }
+  _integration;
+  get integration() {
+    return this._integration ??= new Integration({ client: this.client });
+  }
+  _credential;
+  get credential() {
+    return this._credential ??= new Credential({ client: this.client });
+  }
+  _permission;
+  get permission() {
+    return this._permission ??= new Permission3({ client: this.client });
+  }
+  _fs;
+  get fs() {
+    return this._fs ??= new Fs({ client: this.client });
+  }
+  _command;
+  get command() {
+    return this._command ??= new Command2({ client: this.client });
+  }
+  _skill;
+  get skill() {
+    return this._skill ??= new Skill({ client: this.client });
+  }
+  _event;
+  get event() {
+    return this._event ??= new Event2({ client: this.client });
+  }
+  _pty;
+  get pty() {
+    return this._pty ??= new Pty2({ client: this.client });
+  }
+  _question;
+  get question() {
+    return this._question ??= new Question3({ client: this.client });
+  }
+  _reference;
+  get reference() {
+    return this._reference ??= new Reference({ client: this.client });
+  }
+  _projectCopy;
+  get projectCopy() {
+    return this._projectCopy ??= new ProjectCopy2({ client: this.client });
+  }
+};
+var OpencodeClient = class _OpencodeClient extends HeyApiClient {
+  static __registry = new HeyApiRegistry();
+  constructor(args) {
+    super(args);
+    _OpencodeClient.__registry.set(this, args?.key);
+  }
+  _auth;
+  get auth() {
+    return this._auth ??= new Auth({ client: this.client });
+  }
+  _app;
+  get app() {
+    return this._app ??= new App({ client: this.client });
+  }
+  _experimental;
+  get experimental() {
+    return this._experimental ??= new Experimental({ client: this.client });
+  }
+  _global;
+  get global() {
+    return this._global ??= new Global({ client: this.client });
+  }
+  _event;
+  get event() {
+    return this._event ??= new Event({ client: this.client });
+  }
+  _config;
+  get config() {
+    return this._config ??= new Config2({ client: this.client });
+  }
+  _tool;
+  get tool() {
+    return this._tool ??= new Tool({ client: this.client });
+  }
+  _worktree;
+  get worktree() {
+    return this._worktree ??= new Worktree({ client: this.client });
+  }
+  _find;
+  get find() {
+    return this._find ??= new Find({ client: this.client });
+  }
+  _file;
+  get file() {
+    return this._file ??= new File2({ client: this.client });
+  }
+  _instance;
+  get instance() {
+    return this._instance ??= new Instance({ client: this.client });
+  }
+  _path;
+  get path() {
+    return this._path ??= new Path({ client: this.client });
+  }
+  _vcs;
+  get vcs() {
+    return this._vcs ??= new Vcs({ client: this.client });
+  }
+  _command;
+  get command() {
+    return this._command ??= new Command({ client: this.client });
+  }
+  _lsp;
+  get lsp() {
+    return this._lsp ??= new Lsp({ client: this.client });
+  }
+  _formatter;
+  get formatter() {
+    return this._formatter ??= new Formatter({ client: this.client });
+  }
+  _mcp;
+  get mcp() {
+    return this._mcp ??= new Mcp({ client: this.client });
+  }
+  _project;
+  get project() {
+    return this._project ??= new Project({ client: this.client });
+  }
+  _pty;
+  get pty() {
+    return this._pty ??= new Pty({ client: this.client });
+  }
+  _question;
+  get question() {
+    return this._question ??= new Question({ client: this.client });
+  }
+  _permission;
+  get permission() {
+    return this._permission ??= new Permission({ client: this.client });
+  }
+  _provider;
+  get provider() {
+    return this._provider ??= new Provider({ client: this.client });
+  }
+  _session;
+  get session() {
+    return this._session ??= new Session2({ client: this.client });
+  }
+  _part;
+  get part() {
+    return this._part ??= new Part({ client: this.client });
+  }
+  _sync;
+  get sync() {
+    return this._sync ??= new Sync({ client: this.client });
+  }
+  _tui;
+  get tui() {
+    return this._tui ??= new Tui({ client: this.client });
+  }
+  _v2;
+  get v2() {
+    return this._v2 ??= new V2({ client: this.client });
+  }
+};
+
+// node_modules/@opencode-ai/sdk/dist/error-interceptor.js
+function wrapClientError(error62, response, request, opts) {
+  if (!opts?.throwOnError)
+    return error62;
+  if (error62 instanceof Error)
+    return error62;
+  if (typeof error62 === "object" && error62 !== null && Object.keys(error62).length > 0) {
+    const obj = error62;
+    const message = typeof obj.data?.message === "string" && obj.data.message || typeof obj.message === "string" && obj.message || typeof obj.name === "string" && obj.name || describe3(request, response);
+    return new Error(message, { cause: { body: error62, status: response?.status } });
+  }
+  if (typeof error62 === "string" && error62.length > 0) {
+    return new Error(error62, { cause: { body: error62, status: response?.status } });
+  }
+  const reason = response ? "(empty response body)" : "network error (no response)";
+  return new Error(`opencode server ${describe3(request, response)}: ${reason}`, {
+    cause: { body: error62, status: response?.status }
+  });
+}
+function describe3(request, response) {
+  const method = request?.method ?? "?";
+  const url2 = request?.url ?? "?";
+  const status = response?.status;
+  const statusText = response?.statusText;
+  return `${method} ${url2}${status ? " \u2192 " + status : ""}${statusText ? " " + statusText : ""}`;
+}
+
+// node_modules/@opencode-ai/sdk/dist/v2/client.js
+function pick2(value, fallback, encode3) {
+  if (!value)
+    return;
+  if (!fallback)
+    return value;
+  if (value === fallback)
+    return fallback;
+  if (encode3 && value === encode3(fallback))
+    return fallback;
+  return value;
+}
+function rewrite(request, values) {
+  if (request.method !== "GET" && request.method !== "HEAD")
+    return request;
+  const url2 = new URL(request.url);
+  let changed = false;
+  for (const [name, key] of [
+    ["x-opencode-directory", "directory"],
+    ["x-opencode-workspace", "workspace"]
+  ]) {
+    const value = pick2(request.headers.get(name), key === "directory" ? values.directory : values.workspace, key === "directory" ? encodeURIComponent : void 0);
+    if (!value)
+      continue;
+    for (const query of url2.pathname.startsWith("/api/") ? [key, `location[${key}]`] : [key]) {
+      if (!url2.searchParams.has(query)) {
+        url2.searchParams.set(query, value);
+      }
+    }
+    changed = true;
+  }
+  if (!changed)
+    return request;
+  const next = new Request(url2, request);
+  next.headers.delete("x-opencode-directory");
+  next.headers.delete("x-opencode-workspace");
+  return next;
+}
+function createOpencodeClient(config2) {
+  if (!config2?.fetch) {
+    const customFetch = (req) => {
+      req.timeout = false;
+      return fetch(req);
+    };
+    config2 = {
+      ...config2,
+      fetch: customFetch
+    };
+  }
+  if (config2?.directory) {
+    config2.headers = {
+      ...config2.headers,
+      "x-opencode-directory": encodeURIComponent(config2.directory)
+    };
+  }
+  if (config2?.experimental_workspaceID) {
+    config2.headers = {
+      ...config2.headers,
+      "x-opencode-workspace": config2.experimental_workspaceID
+    };
+  }
+  const client2 = createClient(config2);
+  client2.interceptors.request.use((request) => rewrite(request, {
+    directory: config2?.directory,
+    workspace: config2?.experimental_workspaceID
+  }));
+  client2.interceptors.response.use((response) => {
+    const contentType = response.headers.get("content-type");
+    if (contentType === "text/html")
+      throw new Error("Request is not supported by this version of OpenCode Server (Server responded with text/html)");
+    return response;
+  });
+  client2.interceptors.error.use(wrapClientError);
+  return new OpencodeClient({ client: client2 });
+}
+
+// node_modules/@opencode-ai/sdk/dist/v2/server.js
+var import_cross_spawn = __toESM(require_cross_spawn(), 1);
+
+// src/opencode-backend.ts
+function signalFor(control) {
+  if (!control?.timeoutMs) return control?.signal ?? null;
+  const timeout = AbortSignal.timeout(control.timeoutMs);
+  return control.signal ? AbortSignal.any([control.signal, timeout]) : timeout;
+}
+function requireData(result2, operation) {
+  if (result2.error || result2.data === void 0) {
+    throw new Error(`${operation}: ${JSON.stringify(result2.error ?? "missing response data")}`);
+  }
+  return result2.data;
+}
+var SdkOpenCodeBackend = class {
+  constructor(baseUrl, workspace, backendId, headers) {
+    this.baseUrl = baseUrl;
+    this.workspace = workspace;
+    this.backendId = backendId;
+    this.headers = headers ?? {};
+    this.client = createOpencodeClient({ baseUrl, directory: workspace, headers });
+  }
+  baseUrl;
+  workspace;
+  backendId;
+  client;
+  headers;
+  identity(id) {
+    return { id, backendId: this.backendId, workspace: this.workspace };
+  }
+  async effectiveConfiguration(control) {
+    return requireData(await this.client.config.get(
+      { directory: this.workspace },
+      { signal: signalFor(control) }
+    ), "backend config");
+  }
+  async inspectBackend(control) {
+    const signal = signalFor(control);
+    const health = requireData(await this.client.global.health({ signal }), "backend health");
+    const path = requireData(await this.client.path.get({ directory: this.workspace }, { signal }), "backend path");
+    if (path.directory !== this.workspace) throw new Error(`backend workspace mismatch: ${path.directory}`);
+    const config2 = requireData(await this.client.config.get({ directory: this.workspace }, { signal }), "backend config");
+    const configurationDigest = createHash2("sha256").update(JSON.stringify(config2)).digest("hex");
+    const doc = await fetch(new URL("/doc", this.baseUrl), { headers: this.headers, signal });
+    if (!doc.ok) throw new Error(`backend OpenAPI document unavailable: ${doc.status}`);
+    const openapiDigest = createHash2("sha256").update(Buffer.from(await doc.arrayBuffer())).digest("hex");
+    const manifest = JSON.parse(readFileSync2(compatibilityPath(), "utf8"));
+    const pair = manifest.pairs.find((item) => item.binary_version === health.version && item.sdk_version === "1.18.35" && item.openapi_sha256 === openapiDigest);
+    return {
+      version: health.version,
+      openapiDigest,
+      backendId: this.backendId,
+      workspace: this.workspace,
+      configurationDigest,
+      supportedForExecution: pair?.execution_supported ?? false,
+      exactPairRecognized: pair !== void 0,
+      capabilities: pair?.capabilities ?? {
+        callerAssignedMessageId: false,
+        permissionRequests: false,
+        questionRequests: false,
+        structuredOutput: false,
+        sessionRecovery: false
+      }
+    };
+  }
+  async createSession(marker, control) {
+    const session = requireData(await this.client.session.create(
+      { directory: this.workspace, title: marker, metadata: { opencodeAgentsMarker: marker } },
+      { signal: signalFor(control) }
+    ), "create session");
+    return this.identity(session.id);
+  }
+  async findCreatedSession(marker, control) {
+    const sessions = requireData(await this.client.session.list(
+      { directory: this.workspace, search: marker, limit: 100 },
+      { signal: signalFor(control) }
+    ), "find session");
+    const exact = sessions.filter((session) => session.title === marker && session.metadata?.opencodeAgentsMarker === marker);
+    if (exact.length > 1) throw new Error("ambiguous session creation");
+    return exact[0] ? this.identity(exact[0].id) : null;
+  }
+  async submitTurn(input2, control) {
+    const result2 = await this.client.session.promptAsync({
+      sessionID: input2.sessionId,
+      directory: this.workspace,
+      messageID: input2.messageId,
+      model: { providerID: input2.providerId, modelID: input2.modelId },
+      agent: input2.agent,
+      parts: [{ type: "text", text: input2.prompt }],
+      ...input2.structuredOutputSchema ? { format: { type: "json_schema", schema: input2.structuredOutputSchema } } : {}
+    }, { signal: signalFor(control) });
+    if (result2.error) throw new Error(`submit turn: ${JSON.stringify(result2.error)}`);
+  }
+  async inspectTurn(sessionId, messageId, control) {
+    const signal = signalFor(control);
+    const [messagesResult, statusResult, permissionsResult, questionsResult, v2PermissionsResult, v2QuestionsResult] = await Promise.all([
+      this.client.session.messages({ sessionID: sessionId, directory: this.workspace, limit: 200 }, { signal }),
+      this.client.session.status({ directory: this.workspace }, { signal }),
+      this.client.permission.list({ directory: this.workspace }, { signal }),
+      this.client.question.list({ directory: this.workspace }, { signal }),
+      this.client.v2.session.permission.list({ sessionID: sessionId }, { signal }),
+      this.client.v2.session.question.list({ sessionID: sessionId }, { signal })
+    ]);
+    const messages = requireData(messagesResult, "inspect messages");
+    const statuses = requireData(statusResult, "inspect status");
+    const permissions = requireData(permissionsResult, "inspect permissions");
+    const questions = requireData(questionsResult, "inspect questions");
+    const v2Permissions = requireData(v2PermissionsResult, "inspect v2 permissions").data;
+    const v2Questions = requireData(v2QuestionsResult, "inspect v2 questions").data;
+    const submitted = messages.some(({ info }) => info.id === messageId && info.role === "user");
+    const assistants = messages.filter(({ info }) => info.role === "assistant" && info.parentID === messageId);
+    const activeTools = assistants.flatMap(({ parts }) => parts).filter(
+      (part) => part.type === "tool" && (part.state.status === "pending" || part.state.status === "running")
+    ).length;
+    const pendingRequests = [
+      ...permissions.filter((request) => request.sessionID === sessionId).map((request) => ({
+        id: request.id,
+        sessionId,
+        type: "permission",
+        api: "legacy",
+        detail: request
+      })),
+      ...questions.filter((request) => request.sessionID === sessionId).map((request) => ({
+        id: request.id,
+        sessionId,
+        type: "question",
+        api: "legacy",
+        detail: request
+      })),
+      ...v2Permissions.map((request) => ({
+        id: request.id,
+        sessionId,
+        type: "permission",
+        api: "v2",
+        detail: request
+      })),
+      ...v2Questions.map((request) => ({
+        id: request.id,
+        sessionId,
+        type: "question",
+        api: "v2",
+        detail: request
+      }))
+    ];
+    const terminalAssistant = assistants.find(({ info }) => info.role === "assistant" && Boolean(info.error || info.finish === "stop" || info.finish === "length"));
+    const upstreamStatus = statuses[sessionId]?.type;
+    const status = upstreamStatus === "busy" || upstreamStatus === "idle" || upstreamStatus === "retry" ? upstreamStatus : terminalAssistant ? "idle" : "unknown";
+    const error62 = terminalAssistant?.info.role === "assistant" && terminalAssistant.info.error ? JSON.stringify(terminalAssistant.info.error) : null;
+    return {
+      submitted,
+      assistantMessageIds: assistants.map(({ info }) => info.id),
+      activeTools,
+      status,
+      statusOmitted: !Object.hasOwn(statuses, sessionId),
+      pendingRequests,
+      finished: submitted && Boolean(terminalAssistant) && status === "idle" && activeTools === 0 && pendingRequests.length === 0,
+      error: error62
+    };
+  }
+  async *subscribeEvents(control) {
+    const { stream } = await this.client.event.subscribe({ directory: this.workspace }, { signal: signalFor(control) });
+    for await (const event of stream) {
+      const data = event;
+      const record2 = data && typeof data === "object" ? data : {};
+      const properties = record2.properties && typeof record2.properties === "object" ? record2.properties : {};
+      const sessionId = typeof properties.sessionID === "string" ? properties.sessionID : void 0;
+      yield { type: typeof record2.type === "string" ? record2.type : "unknown", data, ...sessionId ? { sessionId } : {} };
+    }
+  }
+  async replyToRequest(request, reply, control) {
+    const signal = signalFor(control);
+    if (request.type === "permission") {
+      if (Array.isArray(reply)) throw new Error("permission reply must be allow_once or deny");
+      if (request.api === "v2") {
+        requireData(await this.client.v2.session.permission.reply({
+          sessionID: request.sessionId,
+          requestID: request.id,
+          reply: reply === "allow_once" ? "once" : "reject"
+        }, { signal }), "v2 permission reply");
+      } else {
+        requireData(await this.client.permission.reply({
+          requestID: request.id,
+          directory: this.workspace,
+          reply: reply === "allow_once" ? "once" : "reject"
+        }, { signal }), "permission reply");
+      }
+      return;
+    }
+    if (!Array.isArray(reply)) {
+      if (reply !== "deny") throw new Error("question reply must supply answers or deny");
+      if (request.api === "v2") {
+        requireData(await this.client.v2.session.question.reject({ sessionID: request.sessionId, requestID: request.id }, { signal }), "v2 question reject");
+      } else {
+        requireData(await this.client.question.reject({ requestID: request.id, directory: this.workspace }, { signal }), "question reject");
+      }
+      return;
+    }
+    if (request.api === "v2") {
+      requireData(await this.client.v2.session.question.reply({
+        sessionID: request.sessionId,
+        requestID: request.id,
+        questionV2Reply: { answers: reply }
+      }, { signal }), "v2 question reply");
+    } else {
+      requireData(await this.client.question.reply({ requestID: request.id, directory: this.workspace, answers: reply }, { signal }), "question reply");
+    }
+  }
+  async abortSession(sessionId, control) {
+    const result2 = await this.client.session.abort({ sessionID: sessionId, directory: this.workspace }, { signal: signalFor(control) });
+    return requireData(result2, "abort session");
+  }
+  async readResult(sessionId, messageId, control) {
+    const messages = requireData(await this.client.session.messages(
+      { sessionID: sessionId, directory: this.workspace, limit: 200 },
+      { signal: signalFor(control) }
+    ), "read result");
+    const assistants = messages.filter(({ info }) => info.role === "assistant" && info.parentID === messageId);
+    const structuredAssistant = assistants.find(({ info }) => info.role === "assistant" && info.structured !== void 0);
+    return {
+      text: assistants.flatMap(({ parts }) => parts).filter((part) => part.type === "text").map((part) => part.text).join("\n"),
+      structured: structuredAssistant?.info.role === "assistant" ? structuredAssistant.info.structured ?? null : null
+    };
+  }
+};
+
+// src/managed-server.ts
+var LISTENING = /opencode server listening on (http:\/\/127\.0\.0\.1:\d+)/;
+var execFileAsync = promisify(execFile);
+function object2(value) {
+  if (!value || typeof value !== "object" || Array.isArray(value)) throw new Error("OpenCode configuration must be an object");
+  return value;
+}
+function assertNoLocalPlugins(workspace, env) {
+  const fromWorker = (path) => resolve(workspace, path);
+  const roots = /* @__PURE__ */ new Set();
+  const documents = /* @__PURE__ */ new Set();
+  let current = resolve(workspace);
+  while (true) {
+    roots.add(join2(current, ".opencode"));
+    documents.add(join2(current, "opencode.json"));
+    documents.add(join2(current, "opencode.jsonc"));
+    const parent = dirname(current);
+    if (parent === current) break;
+    current = parent;
+  }
+  const workerHome = env.HOME ?? homedir2();
+  const globalConfig2 = fromWorker(join2(env.XDG_CONFIG_HOME ?? join2(workerHome, ".config"), "opencode"));
+  roots.add(globalConfig2);
+  roots.add(fromWorker(env.OPENCODE_CONFIG_DIR ?? globalConfig2));
+  roots.add(fromWorker(join2(env.OPENCODE_TEST_HOME ?? workerHome, ".opencode")));
+  roots.add(fromWorker(join2(env.XDG_DATA_HOME ?? join2(workerHome, ".local", "share"), "opencode")));
+  for (const root of roots) {
+    documents.add(join2(root, "opencode.json"));
+    documents.add(join2(root, "opencode.jsonc"));
+    documents.add(join2(root, "config.json"));
+    for (const name of ["plugin", "plugins"]) {
+      const location = join2(root, name);
+      if (existsSync2(location) && readdirSync(location).length > 0)
+        throw new Error(`OpenCode local plugins present at ${location}; server-mode --pure does not suppress them reliably`);
+    }
+  }
+  if (env.OPENCODE_CONFIG) documents.add(fromWorker(env.OPENCODE_CONFIG));
+  if (env.OPENCODE_CONFIG_CONTENT) assertNoPluginKeys(JSON.parse(env.OPENCODE_CONFIG_CONTENT), "OPENCODE_CONFIG_CONTENT");
+  for (const file2 of documents) {
+    if (!existsSync2(file2)) continue;
+    let config2;
+    try {
+      config2 = parseJsoncConfig(readFileSync3(file2, "utf8"));
+    } catch {
+      throw new Error(`OpenCode config document at ${file2} cannot be checked for V2 plugins`);
+    }
+    assertNoPluginKeys(config2, file2);
+  }
+}
+function parseJsoncConfig(input2) {
+  let withoutComments = "";
+  let quoted = false;
+  let escaped = false;
+  for (let i = 0; i < input2.length; i++) {
+    const char = input2[i];
+    if (quoted) {
+      withoutComments += char;
+      if (escaped) escaped = false;
+      else if (char === "\\") escaped = true;
+      else if (char === '"') quoted = false;
+      continue;
+    }
+    if (char === '"') {
+      quoted = true;
+      withoutComments += char;
+      continue;
+    }
+    if (char === "/" && input2[i + 1] === "/") {
+      withoutComments += "  ";
+      i++;
+      while (i + 1 < input2.length && input2[i + 1] !== "\n" && input2[i + 1] !== "\r") {
+        withoutComments += " ";
+        i++;
+      }
+      continue;
+    }
+    if (char === "/" && input2[i + 1] === "*") {
+      withoutComments += "  ";
+      i++;
+      let closed = false;
+      while (i + 1 < input2.length) {
+        i++;
+        if (input2[i] === "*" && input2[i + 1] === "/") {
+          withoutComments += "  ";
+          i++;
+          closed = true;
+          break;
+        }
+        withoutComments += input2[i] === "\n" || input2[i] === "\r" ? input2[i] : " ";
+      }
+      if (!closed) throw new Error("unterminated JSONC comment");
+      continue;
+    }
+    withoutComments += char;
+  }
+  let normalized = "";
+  quoted = false;
+  escaped = false;
+  for (let i = 0; i < withoutComments.length; i++) {
+    const char = withoutComments[i];
+    if (quoted) {
+      normalized += char;
+      if (escaped) escaped = false;
+      else if (char === "\\") escaped = true;
+      else if (char === '"') quoted = false;
+      continue;
+    }
+    if (char === '"') {
+      quoted = true;
+      normalized += char;
+      continue;
+    }
+    if (char === ",") {
+      let next = i + 1;
+      while (/\s/.test(withoutComments[next] ?? "") && next < withoutComments.length) next++;
+      if (withoutComments[next] === "}" || withoutComments[next] === "]") {
+        normalized += " ";
+        continue;
+      }
+    }
+    normalized += char;
+  }
+  return JSON.parse(normalized);
+}
+function assertNoPluginKeys(config2, source) {
+  const parsed = object2(config2);
+  if (Object.hasOwn(parsed, "plugin") || Object.hasOwn(parsed, "plugins"))
+    throw new Error(`OpenCode plugin configuration present at ${source}; server-mode --pure does not suppress V2 plugins reliably`);
+}
+async function worktreeRoot(workspace, env) {
+  try {
+    const { stdout } = await execFileAsync(
+      "git",
+      ["-C", workspace, "rev-parse", "--show-toplevel"],
+      { env, timeout: 5e3, maxBuffer: 4096 }
+    );
+    return resolve(stdout.trim());
+  } catch (error62) {
+    const failure2 = error62;
+    if (typeof failure2.stderr === "string" && /not a git repository/i.test(failure2.stderr))
+      return parse3(resolve(workspace)).root;
+    throw new Error(`cannot establish OpenCode worktree root: ${String(error62)}`);
+  }
+}
+function workerPolicy(reportPath, worktree) {
+  if (!isAbsolute2(reportPath)) throw new Error("assigned report path must be absolute");
+  const absoluteReport = resolve(reportPath);
+  const reportEditPattern = `${relative(worktree, absoluteReport).replaceAll("\\", "/")}/*`;
+  const reportExternalPattern = `${absoluteReport}/*`;
+  const common = {
+    read: "allow",
+    glob: "allow",
+    grep: "allow",
+    list: "allow",
+    external_directory: { "*": "deny", [reportExternalPattern]: "allow" },
+    task: "deny",
+    question: "deny",
+    skill: "deny"
+  };
+  return {
+    reportEditPattern,
+    profiles: {
+      "bounded-inspect": { mode: "primary", permission: {
+        ...common,
+        edit: { "*": "deny", [reportEditPattern]: "allow" },
+        bash: "deny",
+        webfetch: "deny",
+        websearch: "deny"
+      } },
+      "bounded-build": { mode: "primary", permission: {
+        ...common,
+        edit: { "*": "ask", [reportEditPattern]: "allow" },
+        bash: "ask",
+        webfetch: "ask",
+        websearch: "ask"
+      } }
+    }
+  };
+}
+function assertWorkerPolicy(config2, profiles) {
+  const effective = object2(config2);
+  if (!Array.isArray(effective.plugin) || effective.plugin.length !== 0)
+    throw new Error("OpenCode external plugins are not suppressed");
+  const mcp = object2(effective.mcp ?? {});
+  for (const [name, entry] of Object.entries(mcp)) {
+    if (object2(entry).enabled !== false) throw new Error(`OpenCode MCP server ${name} is enabled for workers`);
+  }
+  const agents = object2(effective.agent ?? {});
+  for (const [name, expected] of Object.entries(profiles)) {
+    const actual = object2(agents[name]);
+    if (actual.mode !== expected.mode || !isDeepStrictEqual(actual.permission, expected.permission))
+      throw new Error(`OpenCode worker policy mismatch for ${name}`);
+  }
+}
+async function launchEnvironment(options) {
+  const baseEnv = { ...process.env, ...options.env };
+  assertNoLocalPlugins(options.workspace, baseEnv);
+  const supplied = options.launchContract ? object2(JSON.parse(options.launchContract.configContent)) : baseEnv.OPENCODE_CONFIG_CONTENT ? object2(JSON.parse(baseEnv.OPENCODE_CONFIG_CONTENT)) : {};
+  const { stdout } = await execFileAsync(options.binary, ["debug", "config", "--pure"], {
+    cwd: options.workspace,
+    env: options.launchContract ? { ...baseEnv, OPENCODE_CONFIG_CONTENT: options.launchContract.configContent } : baseEnv,
+    timeout: 15e3,
+    maxBuffer: 5 * 1024 * 1024
+  });
+  const resolved = object2(JSON.parse(stdout));
+  if (options.launchContract) assertFrozenEffectiveConfig(resolved, options.launchContract);
+  const inheritedMcp = object2(resolved.mcp ?? {});
+  const disabledMcp = Object.fromEntries(Object.keys(inheritedMcp).map((name) => [name, { enabled: false }]));
+  if (options.launchContract && !options.launchContract.reportPath)
+    throw new Error("frozen execution report path is missing");
+  const reportPath = options.launchContract?.reportPath;
+  if (!reportPath) throw new Error("managed worker requires an assigned execution report path");
+  const { profiles } = workerPolicy(reportPath, await worktreeRoot(options.workspace, baseEnv));
+  if (options.launchContract) assertWorkerPolicy(resolved, profiles);
+  const overlay = options.launchContract ? supplied : {
+    ...supplied,
+    mcp: { ...object2(supplied.mcp ?? {}), ...disabledMcp },
+    agent: { ...object2(supplied.agent ?? {}), ...profiles }
+  };
+  return { env: { ...baseEnv, OPENCODE_CONFIG_CONTENT: JSON.stringify(overlay) }, profiles };
+}
+async function startManagedServer(options) {
+  const password = randomBytes(32).toString("hex");
+  const { env, profiles } = await launchEnvironment(options);
+  const child = spawn(options.binary, ["serve", "--pure", "--hostname", "127.0.0.1", "--port", "0"], {
+    cwd: options.workspace,
+    env: { ...env, OPENCODE_SERVER_PASSWORD: password },
+    stdio: ["ignore", "pipe", "pipe"]
+  });
+  child.stderr.on("data", (bytes) => {
+    try {
+      options.onDiagnostic?.(bytes);
+    } catch {
+    }
+  });
+  let baseUrl;
+  try {
+    baseUrl = await waitForServerUrl(child, options.startupTimeoutMs ?? 15e3);
+  } catch (error62) {
+    await stopOwnedChild(child);
+    throw error62;
+  }
+  const backendId = options.backendId ?? `backend_${randomUUID()}`;
+  const token = Buffer.from(`opencode:${password}`).toString("base64");
+  const backend = new SdkOpenCodeBackend(baseUrl, options.workspace, backendId, { Authorization: `Basic ${token}` });
+  try {
+    const effective = await backend.effectiveConfiguration({ timeoutMs: 5e3 });
+    assertWorkerPolicy(effective, profiles);
+    if (options.launchContract) assertFrozenEffectiveConfig(effective, options.launchContract);
+    const inspected = await backend.inspectBackend({ timeoutMs: 5e3 });
+    const developmentTrusted = trustedDevelopmentWorkspace(
+      { development_execution: options.developmentExecution },
+      options.workspace
+    );
+    if (!executionPairAllowed(inspected, developmentTrusted))
+      throw new Error(`OpenCode ${inspected.version} is neither certified nor development-enabled for this exact workspace and pair`);
+    if (inspected.version !== "1.18.35") throw new Error(`OpenCode ${inspected.version} has no certified abort-stop proof`);
+  } catch (error62) {
+    await stopOwnedChild(child);
+    throw error62;
+  }
+  return {
+    backendId,
+    baseUrl,
+    backend,
+    confirmAbortStopped: async (sessionId, messageId) => {
+      if (child.killed || child.exitCode !== null || child.signalCode !== null) return false;
+      const observed = await backend.inspectTurn(sessionId, messageId, { timeoutMs: 5e3 });
+      return !child.killed && child.exitCode === null && child.signalCode === null && observed.submitted && !observed.finished && observed.statusOmitted === true && observed.activeTools === 0 && observed.pendingRequests.length === 0;
+    },
+    close: () => stopOwnedChild(child)
+  };
+}
+async function freezeManagedLaunch(binary, workspace, reportPath, env = process.env) {
+  if (!isAbsolute2(reportPath)) throw new Error("assigned report path must be absolute");
+  const baseEnv = { ...env };
+  assertNoLocalPlugins(workspace, baseEnv);
+  const { stdout } = await execFileAsync(binary, ["debug", "config", "--pure"], {
+    cwd: workspace,
+    env: baseEnv,
+    timeout: 15e3,
+    maxBuffer: 5 * 1024 * 1024
+  });
+  const resolved = object2(JSON.parse(stdout));
+  const inheritedMcp = object2(resolved.mcp ?? {});
+  const disabledMcp = Object.fromEntries(Object.keys(inheritedMcp).map((name) => [name, { enabled: false }]));
+  const { profiles } = workerPolicy(reportPath, await worktreeRoot(workspace, baseEnv));
+  const content = JSON.stringify({
+    ...resolved,
+    plugin: [],
+    mcp: { ...inheritedMcp, ...disabledMcp },
+    agent: { ...object2(resolved.agent ?? {}), ...profiles }
+  });
+  const frozenEnv = { ...baseEnv, OPENCODE_CONFIG_CONTENT: content };
+  const expected = await execFileAsync(binary, ["debug", "config", "--pure"], {
+    cwd: workspace,
+    env: frozenEnv,
+    timeout: 15e3,
+    maxBuffer: 5 * 1024 * 1024
+  });
+  const effective = object2(JSON.parse(expected.stdout));
+  assertWorkerPolicy(effective, profiles);
+  return { configContent: content, effectiveConfigSha256: effectiveConfigHash(effective), reportPath };
+}
+function waitForServerUrl(child, timeoutMs) {
+  return new Promise((resolve5, reject) => {
+    let settled = false;
+    let output2 = "";
+    const finish = (error62, url2) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      child.stdout.off("data", onData);
+      child.off("exit", onExit);
+      child.off("error", onError);
+      if (error62) reject(error62);
+      else resolve5(url2);
+    };
+    const onData = (chunk) => {
+      output2 = (output2 + chunk.toString("utf8")).slice(-4096);
+      const match = LISTENING.exec(output2);
+      if (match?.[1]) finish(void 0, match[1]);
+    };
+    const onExit = (code) => finish(new Error(`OpenCode server exited during startup (${code ?? "signal"})`));
+    const onError = (error62) => finish(error62);
+    const timer = setTimeout(() => finish(new Error("OpenCode server startup timed out")), timeoutMs);
+    child.stdout.on("data", onData);
+    child.on("exit", onExit);
+    child.on("error", onError);
+  });
+}
+async function stopOwnedChild(child) {
+  if (child.exitCode !== null || child.signalCode !== null) return;
+  const exited = once(child, "exit").then(() => void 0);
+  child.kill("SIGTERM");
+  await Promise.race([exited, new Promise((resolve5) => setTimeout(resolve5, 5e3))]);
+  if (child.exitCode === null && child.signalCode === null) {
+    child.kill("SIGKILL");
+    await exited;
+  }
+}
+
+// src/attached.ts
+async function boundedBytes(response, maxBytes) {
+  if (!response.ok) throw new Error(`HTTP ${response.status}`);
+  if (!response.body) throw new Error("empty HTTP response");
+  const reader = response.body.getReader();
+  const parts = [];
+  let size = 0;
+  while (true) {
+    const next = await reader.read();
+    if (next.done) break;
+    size += next.value.byteLength;
+    if (size > maxBytes) {
+      await reader.cancel();
+      throw new Error("diagnostic response exceeds size limit");
+    }
+    parts.push(Buffer.from(next.value));
+  }
+  return Buffer.concat(parts);
+}
+async function inspectAttached(config2) {
+  const base = {
+    status: "unreachable",
+    endpoint: config2.url,
+    workspace: config2.workspace,
+    storageNamespace: config2.storage_namespace,
+    version: null,
+    openapiSha256: null,
+    configurationSha256: null,
+    executionSupported: false,
+    message: "attached endpoint has not been inspected"
+  };
+  const password = config2.password_env ? process.env[config2.password_env] : void 0;
+  if (config2.password_env && !password) return { ...base, message: `credential environment variable ${config2.password_env} is not set` };
+  const headers = password ? { Authorization: `Basic ${Buffer.from(`opencode:${password}`).toString("base64")}` } : {};
+  const get = async (path, maxBytes = 1024 * 1024) => boundedBytes(await fetch(
+    new URL(path, config2.url),
+    { method: "GET", headers, redirect: "error", signal: AbortSignal.timeout(2e3) }
+  ), maxBytes);
+  try {
+    const health = JSON.parse((await get("/global/health")).toString("utf8"));
+    if (health.healthy !== true || typeof health.version !== "string")
+      return { ...base, status: "unsupported", message: "attached health response lacks a healthy server identity" };
+    base.version = health.version;
+    const query = encodeURIComponent(config2.workspace);
+    const path = JSON.parse((await get(`/path?directory=${query}`)).toString("utf8"));
+    if (path.directory !== config2.workspace) return {
+      ...base,
+      status: "workspace_mismatch",
+      message: `attached workspace routing returned ${String(path.directory)}`
+    };
+    if (path.state !== config2.storage_namespace) return {
+      ...base,
+      status: "storage_mismatch",
+      message: `attached state namespace returned ${String(path.state)}`
+    };
+    const configuration = JSON.parse((await get(`/config?directory=${query}`)).toString("utf8"));
+    base.configurationSha256 = createHash3("sha256").update(JSON.stringify(configuration)).digest("hex");
+    let policyMessage = null;
+    try {
+      if (typeof path.worktree !== "string" || !path.worktree.startsWith("/")) throw new Error("attached worktree identity is missing");
+      assertWorkerPolicy(configuration, workerPolicy(`${stateDirectory()}/reports`, path.worktree).profiles);
+    } catch (error62) {
+      policyMessage = String(error62);
+    }
+    const openapi = await get("/doc", 5 * 1024 * 1024);
+    base.openapiSha256 = createHash3("sha256").update(openapi).digest("hex");
+    if (policyMessage) return { ...base, status: "policy_mismatch", message: policyMessage };
+    const manifest = JSON.parse(readFileSync4(compatibilityPath(), "utf8"));
+    const knownPair = manifest.pairs.some((pair) => pair.binary_version === base.version && pair.sdk_version === "1.18.35" && pair.openapi_sha256 === base.openapiSha256);
+    return { ...base, status: "unsupported", message: knownPair ? "attached process identity and effective config match, but plugin suppression and session ownership are not certified for dispatch" : "attached OpenCode version/OpenAPI pair is not in the certified manifest" };
+  } catch (error62) {
+    return { ...base, status: "unreachable", message: `attached read-only probe failed: ${String(error62)}`.slice(0, 500) };
+  }
 }
 
 // src/doctor.ts
@@ -19731,17 +26425,26 @@ function doctor() {
   const result2 = {
     runtime: { node: process.versions.node, supportedNode: major === 24 && minor >= 15, toolkit: "2.0.0-dev.0" },
     configuration: { path: configurationPath(), status: "missing" },
-    backend: { binary: null, version: null, configuredModels: [], certifiedPairs: [], executionTested: false },
-    storage: { path: stateDirectory(), exists: existsSync2(stateDirectory()) }
+    backend: { mode: "managed", binary: null, version: null, configuredModels: [], certifiedPairs: [], executionTested: false },
+    storage: { path: stateDirectory(), exists: existsSync3(stateDirectory()) }
   };
-  const manifest = JSON.parse(readFileSync2(compatibilityPath(), "utf8"));
+  const manifest = JSON.parse(readFileSync5(compatibilityPath(), "utf8"));
   result2.backend.certifiedPairs = manifest.pairs.filter((pair) => pair.execution_supported).map((pair) => `${pair.binary_version}/${pair.sdk_version}`);
-  if (!existsSync2(result2.configuration.path)) return result2;
+  if (!existsSync3(result2.configuration.path)) return result2;
   try {
     const config2 = loadConfiguration(result2.configuration.path);
     result2.configuration.status = "valid";
     result2.backend.binary = config2.opencode_binary;
     result2.backend.configuredModels = Object.keys(config2.models);
+    if (config2.attached_backend) {
+      result2.backend.mode = "attached";
+      result2.backend.attached = {
+        status: "configured",
+        endpoint: config2.attached_backend.url,
+        message: "read-only attached endpoint probe has not run; dispatch is disabled"
+      };
+      return result2;
+    }
     const command = spawnSync(config2.opencode_binary, ["--version"], { encoding: "utf8", timeout: 5e3 });
     if (command.status === 0) result2.backend.version = command.stdout.trim();
     result2.backend.executionTested = Boolean(result2.backend.version && manifest.pairs.some(
@@ -19753,14 +26456,21 @@ function doctor() {
   }
   return result2;
 }
+async function doctorWithAttached() {
+  const result2 = doctor();
+  if (result2.configuration.status !== "valid" || result2.backend.mode !== "attached") return result2;
+  const config2 = loadConfiguration(result2.configuration.path);
+  if (config2.attached_backend) result2.backend.attached = await inspectAttached(config2.attached_backend);
+  return result2;
+}
 
 // node_modules/@modelcontextprotocol/server/dist/chunk-Br0eD_fh.mjs
-var __create = Object.create;
+var __create2 = Object.create;
 var __defProp2 = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __getOwnPropDesc2 = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames2 = Object.getOwnPropertyNames;
+var __getProtoOf2 = Object.getPrototypeOf;
+var __hasOwnProp2 = Object.prototype.hasOwnProperty;
 var __commonJSMin = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
 var __exportAll = (all, symbols) => {
   let target = {};
@@ -19775,21 +26485,21 @@ var __exportAll = (all, symbols) => {
   }
   return target;
 };
-var __copyProps = (to, from, except, desc) => {
+var __copyProps2 = (to, from, except, desc) => {
   if (from && typeof from === "object" || typeof from === "function") {
-    for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
+    for (var keys = __getOwnPropNames2(from), i = 0, n = keys.length, key; i < n; i++) {
       key = keys[i];
-      if (!__hasOwnProp.call(to, key) && key !== except) {
+      if (!__hasOwnProp2.call(to, key) && key !== except) {
         __defProp2(to, key, {
           get: ((k) => from[k]).bind(null, key),
-          enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable
+          enumerable: !(desc = __getOwnPropDesc2(from, key)) || desc.enumerable
         });
       }
     }
   }
   return to;
 };
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp2(target, "default", {
+var __toESM2 = (mod, isNodeMode, target) => (target = mod != null ? __create2(__getProtoOf2(mod)) : {}, __copyProps2(isNodeMode || !mod || !mod.__esModule ? __defProp2(target, "default", {
   value: mod,
   enumerable: true
 }) : target, mod));
@@ -24118,14 +30828,14 @@ function inputRequiredRoundsExceededMessage(method, maxRounds) {
   return `Multi-round-trip request '${method}' still required input after ${maxRounds} rounds (inputRequired.maxRounds)`;
 }
 function sleep(ms, signal) {
-  return new Promise((resolve3, reject) => {
+  return new Promise((resolve5, reject) => {
     if (signal?.aborted) {
       reject(signal.reason instanceof SdkError ? signal.reason : new SdkError(SdkErrorCode.RequestTimeout, String(signal.reason)));
       return;
     }
     const timer = setTimeout(() => {
       signal?.removeEventListener("abort", onAbort);
-      resolve3();
+      resolve5();
     }, ms);
     const onAbort = () => {
       clearTimeout(timer);
@@ -24921,7 +31631,7 @@ var Protocol = class {
     const flowStartedAt = Date.now();
     let onAbort;
     let cleanupMessageId;
-    return new Promise((resolve3, reject) => {
+    return new Promise((resolve5, reject) => {
       const earlyReject = (error62) => {
         reject(error62);
       };
@@ -24990,7 +31700,7 @@ var Protocol = class {
         }
         if (decoded.kind === "invalid") return reject(decoded.error);
         if (decoded.kind === "input_required") {
-          if (options?.allowInputRequired === true) return resolve3(manualInputRequiredValue(decoded));
+          if (options?.allowInputRequired === true) return resolve5(manualInputRequiredValue(decoded));
           const flow = {
             codec: codec2,
             request,
@@ -25002,11 +31712,11 @@ var Protocol = class {
               params
             }, resultSchema, legOptions)
           };
-          return resolve3(this._resolveNonCompleteResult(decoded, flow));
+          return resolve5(this._resolveNonCompleteResult(decoded, flow));
         }
         const result2 = decoded.result;
         validateStandardSchema(resultSchema, result2).then((parseResult) => {
-          if (parseResult.success) resolve3(parseResult.data);
+          if (parseResult.success) resolve5(parseResult.data);
           else reject(new SdkError(SdkErrorCode.InvalidResult, `Invalid result for ${request.method}: ${parseResult.error}`));
         }, reject);
       });
@@ -25205,8 +31915,8 @@ var require_content_type = /* @__PURE__ */ __commonJSMin(((exports) => {
   var PARAM_REGEXP = /; *([!#$%&'*+.^_`|~0-9A-Za-z-]+) *= *("(?:[\u000b\u0020\u0021\u0023-\u005b\u005d-\u007e\u0080-\u00ff]|\\[\u000b\u0020-\u00ff])*"|[!#$%&'*+.^_`|~0-9A-Za-z-]+) */g;
   var QESC_REGEXP = /\\([\u000b\u0020-\u00ff])/g;
   var TYPE_REGEXP = /^[!#$%&'*+.^_`|~0-9A-Za-z-]+\/[!#$%&'*+.^_`|~0-9A-Za-z-]+$/;
-  exports.parse = parse3;
-  function parse3(string4) {
+  exports.parse = parse4;
+  function parse4(string4) {
     if (!string4) throw new TypeError("argument string is required");
     var header = typeof string4 === "object" ? getcontenttype(string4) : string4;
     if (typeof header !== "string") throw new TypeError("argument string is required to be a string");
@@ -25246,7 +31956,7 @@ var require_content_type = /* @__PURE__ */ __commonJSMin(((exports) => {
     this.type = type;
   }
 }));
-var import_content_type = /* @__PURE__ */ __toESM(require_content_type(), 1);
+var import_content_type = /* @__PURE__ */ __toESM2(require_content_type(), 1);
 var STDIO_DEFAULT_MAX_BUFFER_SIZE = 10 * 1024 * 1024;
 var ReadBuffer = class {
   _buffer;
@@ -25730,9 +32440,9 @@ var require_codegen = /* @__PURE__ */ __commonJSMin(((exports) => {
       const rhs = this.rhs === void 0 ? "" : ` = ${this.rhs}`;
       return `${varKind} ${this.name}${rhs};` + _n;
     }
-    optimizeNames(names, constants2) {
+    optimizeNames(names, constants3) {
       if (!names[this.name.str]) return;
-      if (this.rhs) this.rhs = optimizeExpr(this.rhs, names, constants2);
+      if (this.rhs) this.rhs = optimizeExpr(this.rhs, names, constants3);
       return this;
     }
     get names() {
@@ -25749,9 +32459,9 @@ var require_codegen = /* @__PURE__ */ __commonJSMin(((exports) => {
     render({ _n }) {
       return `${this.lhs} = ${this.rhs};` + _n;
     }
-    optimizeNames(names, constants2) {
+    optimizeNames(names, constants3) {
       if (this.lhs instanceof code_1.Name && !names[this.lhs.str] && !this.sideEffects) return;
-      this.rhs = optimizeExpr(this.rhs, names, constants2);
+      this.rhs = optimizeExpr(this.rhs, names, constants3);
       return this;
     }
     get names() {
@@ -25810,8 +32520,8 @@ var require_codegen = /* @__PURE__ */ __commonJSMin(((exports) => {
     optimizeNodes() {
       return `${this.code}` ? this : void 0;
     }
-    optimizeNames(names, constants2) {
-      this.code = optimizeExpr(this.code, names, constants2);
+    optimizeNames(names, constants3) {
+      this.code = optimizeExpr(this.code, names, constants3);
       return this;
     }
     get names() {
@@ -25837,12 +32547,12 @@ var require_codegen = /* @__PURE__ */ __commonJSMin(((exports) => {
       }
       return nodes.length > 0 ? this : void 0;
     }
-    optimizeNames(names, constants2) {
+    optimizeNames(names, constants3) {
       const { nodes } = this;
       let i = nodes.length;
       while (i--) {
         const n = nodes[i];
-        if (n.optimizeNames(names, constants2)) continue;
+        if (n.optimizeNames(names, constants3)) continue;
         subtractNames(names, n.names);
         nodes.splice(i, 1);
       }
@@ -25889,11 +32599,11 @@ var require_codegen = /* @__PURE__ */ __commonJSMin(((exports) => {
       if (cond === false || !this.nodes.length) return void 0;
       return this;
     }
-    optimizeNames(names, constants2) {
+    optimizeNames(names, constants3) {
       var _a3;
-      this.else = (_a3 = this.else) === null || _a3 === void 0 ? void 0 : _a3.optimizeNames(names, constants2);
-      if (!(super.optimizeNames(names, constants2) || this.else)) return;
-      this.condition = optimizeExpr(this.condition, names, constants2);
+      this.else = (_a3 = this.else) === null || _a3 === void 0 ? void 0 : _a3.optimizeNames(names, constants3);
+      if (!(super.optimizeNames(names, constants3) || this.else)) return;
+      this.condition = optimizeExpr(this.condition, names, constants3);
       return this;
     }
     get names() {
@@ -25915,9 +32625,9 @@ var require_codegen = /* @__PURE__ */ __commonJSMin(((exports) => {
     render(opts) {
       return `for(${this.iteration})` + super.render(opts);
     }
-    optimizeNames(names, constants2) {
-      if (!super.optimizeNames(names, constants2)) return;
-      this.iteration = optimizeExpr(this.iteration, names, constants2);
+    optimizeNames(names, constants3) {
+      if (!super.optimizeNames(names, constants3)) return;
+      this.iteration = optimizeExpr(this.iteration, names, constants3);
       return this;
     }
     get names() {
@@ -25952,9 +32662,9 @@ var require_codegen = /* @__PURE__ */ __commonJSMin(((exports) => {
     render(opts) {
       return `for(${this.varKind} ${this.name} ${this.loop} ${this.iterable})` + super.render(opts);
     }
-    optimizeNames(names, constants2) {
-      if (!super.optimizeNames(names, constants2)) return;
-      this.iterable = optimizeExpr(this.iterable, names, constants2);
+    optimizeNames(names, constants3) {
+      if (!super.optimizeNames(names, constants3)) return;
+      this.iterable = optimizeExpr(this.iterable, names, constants3);
       return this;
     }
     get names() {
@@ -25993,11 +32703,11 @@ var require_codegen = /* @__PURE__ */ __commonJSMin(((exports) => {
       (_b = this.finally) === null || _b === void 0 || _b.optimizeNodes();
       return this;
     }
-    optimizeNames(names, constants2) {
+    optimizeNames(names, constants3) {
       var _a3, _b;
-      super.optimizeNames(names, constants2);
-      (_a3 = this.catch) === null || _a3 === void 0 || _a3.optimizeNames(names, constants2);
-      (_b = this.finally) === null || _b === void 0 || _b.optimizeNames(names, constants2);
+      super.optimizeNames(names, constants3);
+      (_a3 = this.catch) === null || _a3 === void 0 || _a3.optimizeNames(names, constants3);
+      (_b = this.finally) === null || _b === void 0 || _b.optimizeNames(names, constants3);
       return this;
     }
     get names() {
@@ -26246,7 +32956,7 @@ var require_codegen = /* @__PURE__ */ __commonJSMin(((exports) => {
   function addExprNames(names, from) {
     return from instanceof code_1._CodeOrName ? addNames(names, from.names) : names;
   }
-  function optimizeExpr(expr, names, constants2) {
+  function optimizeExpr(expr, names, constants3) {
     if (expr instanceof code_1.Name) return replaceName(expr);
     if (!canOptimize(expr)) return expr;
     return new code_1._Code(expr._items.reduce((items, c) => {
@@ -26256,13 +32966,13 @@ var require_codegen = /* @__PURE__ */ __commonJSMin(((exports) => {
       return items;
     }, []));
     function replaceName(n) {
-      const c = constants2[n.str];
+      const c = constants3[n.str];
       if (c === void 0 || names[n.str] !== 1) return n;
       delete names[n.str];
       return c;
     }
     function canOptimize(e) {
-      return e instanceof code_1._Code && e._items.some((c) => c instanceof code_1.Name && names[c.str] === 1 && constants2[c.str] !== void 0);
+      return e instanceof code_1._Code && e._items.some((c) => c instanceof code_1.Name && names[c.str] === 1 && constants3[c.str] !== void 0);
     }
   }
   function subtractNames(names, from) {
@@ -27922,7 +34632,7 @@ var require_compile = /* @__PURE__ */ __commonJSMin(((exports) => {
     ref = (0, resolve_1.resolveUrl)(this.opts.uriResolver, baseId, ref);
     const schOrFunc = root.refs[ref];
     if (schOrFunc) return schOrFunc;
-    let _sch = resolve3.call(this, root, ref);
+    let _sch = resolve5.call(this, root, ref);
     if (_sch === void 0) {
       const schema = (_a3 = root.localRefs) === null || _a3 === void 0 ? void 0 : _a3[ref];
       const { schemaId } = this.opts;
@@ -27948,7 +34658,7 @@ var require_compile = /* @__PURE__ */ __commonJSMin(((exports) => {
   function sameSchemaEnv(s1, s2) {
     return s1.schema === s2.schema && s1.root === s2.root && s1.baseId === s2.baseId;
   }
-  function resolve3(root, ref) {
+  function resolve5(root, ref) {
     let sch;
     while (typeof (sch = this.refs[ref]) == "string") ref = sch;
     return sch || this.schemas[ref] || resolveSchema.call(this, root, ref);
@@ -28394,51 +35104,51 @@ var require_fast_uri = /* @__PURE__ */ __commonJSMin(((exports, module) => {
   const { normalizeIPv6, removeDotSegments, recomposeAuthority, normalizeComponentEncoding, isIPv4, nonSimpleDomain } = require_utils();
   const { SCHEMES, getSchemeHandler } = require_schemes();
   function normalize(uri, options) {
-    if (typeof uri === "string") uri = serialize(parse3(uri, options), options);
-    else if (typeof uri === "object") uri = parse3(serialize(uri, options), options);
+    if (typeof uri === "string") uri = serialize(parse4(uri, options), options);
+    else if (typeof uri === "object") uri = parse4(serialize(uri, options), options);
     return uri;
   }
-  function resolve3(baseURI, relativeURI, options) {
+  function resolve5(baseURI, relativeURI, options) {
     const schemelessOptions = options ? Object.assign({ scheme: "null" }, options) : { scheme: "null" };
-    const resolved = resolveComponent(parse3(baseURI, schemelessOptions), parse3(relativeURI, schemelessOptions), schemelessOptions, true);
+    const resolved = resolveComponent(parse4(baseURI, schemelessOptions), parse4(relativeURI, schemelessOptions), schemelessOptions, true);
     schemelessOptions.skipEscape = true;
     return serialize(resolved, schemelessOptions);
   }
-  function resolveComponent(base, relative2, options, skipNormalization) {
+  function resolveComponent(base, relative3, options, skipNormalization) {
     const target = {};
     if (!skipNormalization) {
-      base = parse3(serialize(base, options), options);
-      relative2 = parse3(serialize(relative2, options), options);
+      base = parse4(serialize(base, options), options);
+      relative3 = parse4(serialize(relative3, options), options);
     }
     options = options || {};
-    if (!options.tolerant && relative2.scheme) {
-      target.scheme = relative2.scheme;
-      target.userinfo = relative2.userinfo;
-      target.host = relative2.host;
-      target.port = relative2.port;
-      target.path = removeDotSegments(relative2.path || "");
-      target.query = relative2.query;
+    if (!options.tolerant && relative3.scheme) {
+      target.scheme = relative3.scheme;
+      target.userinfo = relative3.userinfo;
+      target.host = relative3.host;
+      target.port = relative3.port;
+      target.path = removeDotSegments(relative3.path || "");
+      target.query = relative3.query;
     } else {
-      if (relative2.userinfo !== void 0 || relative2.host !== void 0 || relative2.port !== void 0) {
-        target.userinfo = relative2.userinfo;
-        target.host = relative2.host;
-        target.port = relative2.port;
-        target.path = removeDotSegments(relative2.path || "");
-        target.query = relative2.query;
+      if (relative3.userinfo !== void 0 || relative3.host !== void 0 || relative3.port !== void 0) {
+        target.userinfo = relative3.userinfo;
+        target.host = relative3.host;
+        target.port = relative3.port;
+        target.path = removeDotSegments(relative3.path || "");
+        target.query = relative3.query;
       } else {
-        if (!relative2.path) {
+        if (!relative3.path) {
           target.path = base.path;
-          if (relative2.query !== void 0) target.query = relative2.query;
+          if (relative3.query !== void 0) target.query = relative3.query;
           else target.query = base.query;
         } else {
-          if (relative2.path[0] === "/") target.path = removeDotSegments(relative2.path);
+          if (relative3.path[0] === "/") target.path = removeDotSegments(relative3.path);
           else {
-            if ((base.userinfo !== void 0 || base.host !== void 0 || base.port !== void 0) && !base.path) target.path = "/" + relative2.path;
-            else if (!base.path) target.path = relative2.path;
-            else target.path = base.path.slice(0, base.path.lastIndexOf("/") + 1) + relative2.path;
+            if ((base.userinfo !== void 0 || base.host !== void 0 || base.port !== void 0) && !base.path) target.path = "/" + relative3.path;
+            else if (!base.path) target.path = relative3.path;
+            else target.path = base.path.slice(0, base.path.lastIndexOf("/") + 1) + relative3.path;
             target.path = removeDotSegments(target.path);
           }
-          target.query = relative2.query;
+          target.query = relative3.query;
         }
         target.userinfo = base.userinfo;
         target.host = base.host;
@@ -28446,13 +35156,13 @@ var require_fast_uri = /* @__PURE__ */ __commonJSMin(((exports, module) => {
       }
       target.scheme = base.scheme;
     }
-    target.fragment = relative2.fragment;
+    target.fragment = relative3.fragment;
     return target;
   }
   function equal(uriA, uriB, options) {
     if (typeof uriA === "string") {
       uriA = unescape(uriA);
-      uriA = serialize(normalizeComponentEncoding(parse3(uriA, options), true), {
+      uriA = serialize(normalizeComponentEncoding(parse4(uriA, options), true), {
         ...options,
         skipEscape: true
       });
@@ -28462,7 +35172,7 @@ var require_fast_uri = /* @__PURE__ */ __commonJSMin(((exports, module) => {
     });
     if (typeof uriB === "string") {
       uriB = unescape(uriB);
-      uriB = serialize(normalizeComponentEncoding(parse3(uriB, options), true), {
+      uriB = serialize(normalizeComponentEncoding(parse4(uriB, options), true), {
         ...options,
         skipEscape: true
       });
@@ -28515,7 +35225,7 @@ var require_fast_uri = /* @__PURE__ */ __commonJSMin(((exports, module) => {
     return uriTokens.join("");
   }
   const URI_PARSE = /^(?:([^#/:?]+):)?(?:\/\/((?:([^#/?@]*)@)?(\[[^#/?\]]+\]|[^#/:?]*)(?::(\d*))?))?([^#?]*)(?:\?([^#]*))?(?:#((?:.|[\n\r])*))?/u;
-  function parse3(uri, opts) {
+  function parse4(uri, opts) {
     const options = Object.assign({}, opts);
     const parsed = {
       scheme: void 0,
@@ -28572,11 +35282,11 @@ var require_fast_uri = /* @__PURE__ */ __commonJSMin(((exports, module) => {
   const fastUri = {
     SCHEMES,
     normalize,
-    resolve: resolve3,
+    resolve: resolve5,
     resolveComponent,
     equal,
     serialize,
-    parse: parse3
+    parse: parse4
   };
   module.exports = fastUri;
   module.exports.default = fastUri;
@@ -32289,7 +38999,7 @@ var require_dist = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 var import_ajv = require_ajv();
 var import__2019 = require__2019();
 var import__2020 = require__2020();
-var import_dist = /* @__PURE__ */ __toESM(require_dist(), 1);
+var import_dist = /* @__PURE__ */ __toESM2(require_dist(), 1);
 var addFormats = import_dist.default;
 function createDefaultAjvInstance(engineClass) {
   const ajv = new engineClass({
@@ -33847,7 +40557,7 @@ var StdioServerTransport = class {
   }
   send(message) {
     if (this._closed) return Promise.reject(/* @__PURE__ */ new Error("StdioServerTransport is closed"));
-    return new Promise((resolve3, reject) => {
+    return new Promise((resolve5, reject) => {
       const json2 = serializeMessage(message);
       let settled = false;
       const onError = (error62) => {
@@ -33862,14 +40572,14 @@ var StdioServerTransport = class {
         settled = true;
         this._stdout.off("error", onError);
         this._stdout.off("drain", onDrain);
-        resolve3();
+        resolve5();
       };
       this._stdout.once("error", onError);
       if (this._stdout.write(json2)) {
         if (settled) return;
         settled = true;
         this._stdout.off("error", onError);
-        resolve3();
+        resolve5();
       } else if (!settled) this._stdout.once("drain", onDrain);
     });
   }
@@ -33987,14 +40697,14 @@ var ReviewSchema = external_exports.object({
 }).strict();
 
 // src/rpc.ts
-import { randomBytes, randomUUID, timingSafeEqual } from "node:crypto";
+import { randomBytes as randomBytes2, randomUUID as randomUUID2, timingSafeEqual } from "node:crypto";
 import { createServer, createConnection } from "node:net";
-import { chmodSync, existsSync as existsSync3, mkdirSync, readFileSync as readFileSync3, renameSync, rmSync, writeFileSync } from "node:fs";
-import { join as join2 } from "node:path";
+import { chmodSync, existsSync as existsSync4, mkdirSync, readFileSync as readFileSync6, renameSync, rmSync, writeFileSync } from "node:fs";
+import { join as join3 } from "node:path";
 var MAX_REQUEST_BYTES = 128 * 1024;
 var MAX_RESPONSE_BYTES = 8 * 1024 * 1024;
 function paths(stateDir) {
-  return { socket: join2(stateDir, "supervisor.sock"), connection: join2(stateDir, "connection.json") };
+  return { socket: join3(stateDir, "supervisor.sock"), connection: join3(stateDir, "connection.json") };
 }
 function equalToken(left, right) {
   const a = Buffer.from(left);
@@ -34005,16 +40715,16 @@ async function startRpcServer(stateDir, handler) {
   mkdirSync(stateDir, { recursive: true, mode: 448 });
   chmodSync(stateDir, 448);
   const { socket, connection } = paths(stateDir);
-  if (existsSync3(socket)) throw new Error("socket already exists; reconcile the recorded supervisor before removal");
-  const generation = randomUUID();
-  const token = randomBytes(32).toString("hex");
-  const server = createServer((client) => serveClient(client, token, handler));
+  if (existsSync4(socket)) throw new Error("socket already exists; reconcile the recorded supervisor before removal");
+  const generation = randomUUID2();
+  const token = randomBytes2(32).toString("hex");
+  const server = createServer((client2) => serveClient(client2, token, handler));
   try {
-    await new Promise((resolve3, reject) => {
+    await new Promise((resolve5, reject) => {
       server.once("error", reject);
       server.listen(socket, () => {
         server.off("error", reject);
-        resolve3();
+        resolve5();
       });
     });
     chmodSync(socket, 384);
@@ -34024,13 +40734,13 @@ async function startRpcServer(stateDir, handler) {
     chmodSync(connection, 384);
   } catch (error62) {
     server.close();
-    if (existsSync3(socket)) rmSync(socket);
+    if (existsSync4(socket)) rmSync(socket);
     throw error62;
   }
   return {
     generation,
     close: async () => {
-      await new Promise((resolve3) => server.close(() => resolve3()));
+      await new Promise((resolve5) => server.close(() => resolve5()));
       const current = readConnection(stateDir);
       if (current?.generation === generation) {
         rmSync(connection, { force: true });
@@ -34039,52 +40749,58 @@ async function startRpcServer(stateDir, handler) {
     }
   };
 }
-function serveClient(client, token, handler) {
+function serveClient(client2, token, handler) {
   let input2 = "";
-  client.setEncoding("utf8");
-  client.on("data", (chunk) => {
+  client2.setEncoding("utf8");
+  client2.on("data", (chunk) => {
     input2 += chunk;
     if (Buffer.byteLength(input2, "utf8") > MAX_REQUEST_BYTES) {
-      client.destroy();
+      client2.destroy();
       return;
     }
     const newline = input2.indexOf("\n");
     if (newline < 0) return;
     const line = input2.slice(0, newline);
-    client.removeAllListeners("data");
+    client2.removeAllListeners("data");
     let request;
     try {
       request = JSON.parse(line);
     } catch {
-      client.end(`${JSON.stringify({ id: "", error: { code: "INVALID_INPUT", message: "invalid JSON" } })}
+      client2.end(`${JSON.stringify({ id: "", error: { code: "INVALID_INPUT", message: "invalid JSON" } })}
 `);
       return;
     }
     if (!request || typeof request.id !== "string" || typeof request.method !== "string" || typeof request.token !== "string") {
-      client.end(`${JSON.stringify({ id: "", error: { code: "INVALID_INPUT", message: "invalid request" } })}
+      client2.end(`${JSON.stringify({ id: "", error: { code: "INVALID_INPUT", message: "invalid request" } })}
 `);
       return;
     }
     if (!equalToken(request.token, token)) {
-      client.end(`${JSON.stringify({ id: request.id, error: { code: "UNAUTHORIZED", message: "invalid local token" } })}
+      client2.end(`${JSON.stringify({ id: request.id, error: { code: "UNAUTHORIZED", message: "invalid local token" } })}
 `);
       return;
     }
     handler(request.method, request.params).then((result2) => {
       const response = { id: request.id, result: result2 };
-      client.end(`${JSON.stringify(response)}
+      client2.end(`${JSON.stringify(response)}
 `);
     }).catch((error62) => {
-      const response = { id: request.id, error: { code: "INTERNAL", message: String(error62) } };
-      client.end(`${JSON.stringify(response)}
+      const known = error62 && typeof error62 === "object" ? error62 : null;
+      const response = { id: request.id, error: {
+        code: typeof known?.code === "string" ? known.code : "INTERNAL",
+        message: typeof known?.message === "string" ? known.message : String(error62),
+        ...typeof known?.retry === "string" ? { retry: known.retry } : {},
+        ...known?.details !== void 0 ? { details: known.details } : {}
+      } };
+      client2.end(`${JSON.stringify(response)}
 `);
     });
   });
 }
 function readConnection(stateDir) {
   const { connection } = paths(stateDir);
-  if (!existsSync3(connection)) return null;
-  const value = JSON.parse(readFileSync3(connection, "utf8"));
+  if (!existsSync4(connection)) return null;
+  const value = JSON.parse(readFileSync6(connection, "utf8"));
   if (!value || typeof value.generation !== "string" || typeof value.token !== "string" || value.socket !== paths(stateDir).socket) {
     throw new Error("invalid supervisor connection record");
   }
@@ -34093,29 +40809,35 @@ function readConnection(stateDir) {
 async function rpcRequest(stateDir, method, params, timeoutMs = 3e4) {
   const connection = readConnection(stateDir);
   if (!connection) throw new Error("supervisor is not running");
-  const id = randomUUID();
-  return await new Promise((resolve3, reject) => {
-    const client = createConnection(connection.socket);
+  const id = randomUUID2();
+  return await new Promise((resolve5, reject) => {
+    const client2 = createConnection(connection.socket);
     let response = "";
-    const timer = setTimeout(() => client.destroy(new Error("supervisor request timed out")), timeoutMs);
-    client.setEncoding("utf8");
-    client.once("connect", () => client.write(`${JSON.stringify({ id, token: connection.token, method, params })}
+    const timer = setTimeout(() => client2.destroy(new Error("supervisor request timed out")), timeoutMs);
+    client2.setEncoding("utf8");
+    client2.once("connect", () => client2.write(`${JSON.stringify({ id, token: connection.token, method, params })}
 `));
-    client.on("data", (chunk) => {
+    client2.on("data", (chunk) => {
       response += chunk;
-      if (Buffer.byteLength(response, "utf8") > MAX_RESPONSE_BYTES) client.destroy(new Error("supervisor response too large"));
+      if (Buffer.byteLength(response, "utf8") > MAX_RESPONSE_BYTES) client2.destroy(new Error("supervisor response too large"));
     });
-    client.once("error", (error62) => {
+    client2.once("error", (error62) => {
       clearTimeout(timer);
       reject(error62);
     });
-    client.once("end", () => {
+    client2.once("end", () => {
       clearTimeout(timer);
       try {
         const parsed = JSON.parse(response.trim());
         if (parsed.id !== id) throw new Error("supervisor response ID mismatch");
-        if (parsed.error) throw new Error(`${parsed.error.code}: ${parsed.error.message}`);
-        resolve3(parsed.result);
+        if (parsed.error) {
+          const error62 = new Error(`${parsed.error.code}: ${parsed.error.message}`);
+          error62.code = parsed.error.code;
+          if (parsed.error.retry) error62.retry = parsed.error.retry;
+          if (parsed.error.details !== void 0) error62.details = parsed.error.details;
+          throw error62;
+        }
+        resolve5(parsed.result);
       } catch (error62) {
         reject(error62);
       }
@@ -34124,20 +40846,20 @@ async function rpcRequest(stateDir, method, params, timeoutMs = 3e4) {
 }
 
 // src/daemon.ts
-import { spawn } from "node:child_process";
-import { join as join4 } from "node:path";
+import { spawn as spawn2 } from "node:child_process";
+import { join as join8 } from "node:path";
 import { fileURLToPath as fileURLToPath2 } from "node:url";
 
 // src/artifacts.ts
-import { createHash, randomUUID as randomUUID2 } from "node:crypto";
-import { closeSync, existsSync as existsSync4, fsyncSync, lstatSync, mkdirSync as mkdirSync2, openSync, readFileSync as readFileSync4, readdirSync, renameSync as renameSync2, rmSync as rmSync2, writeSync, constants } from "node:fs";
-import { basename, join as join3, resolve } from "node:path";
+import { createHash as createHash4, randomUUID as randomUUID3 } from "node:crypto";
+import { closeSync, existsSync as existsSync5, fsyncSync, lstatSync, mkdirSync as mkdirSync2, openSync, readFileSync as readFileSync7, readdirSync as readdirSync2, renameSync as renameSync2, rmSync as rmSync2, writeSync, constants } from "node:fs";
+import { basename, join as join4, resolve as resolve2 } from "node:path";
 var ArtifactStore = class {
   constructor(root, maxBytes = 50 * 1024 * 1024) {
     this.root = root;
     this.maxBytes = maxBytes;
-    this.staging = join3(root, "staging");
-    this.objects = join3(root, "objects");
+    this.staging = join4(root, "staging");
+    this.objects = join4(root, "objects");
     mkdirSync2(this.staging, { recursive: true, mode: 448 });
     mkdirSync2(this.objects, { recursive: true, mode: 448 });
   }
@@ -34147,10 +40869,10 @@ var ArtifactStore = class {
   objects;
   captureBytes(executionId, bytes, mediaType, register2) {
     if (bytes.byteLength > this.maxBytes) throw new Error(`artifact exceeds ${this.maxBytes} bytes`);
-    const sha256 = createHash("sha256").update(bytes).digest("hex");
-    const artifactId = `artifact_${randomUUID2()}`;
-    const stagedPath = join3(this.staging, `${artifactId}.tmp`);
-    const finalPath = join3(this.objects, sha256);
+    const sha256 = createHash4("sha256").update(bytes).digest("hex");
+    const artifactId = `artifact_${randomUUID3()}`;
+    const stagedPath = join4(this.staging, `${artifactId}.tmp`);
+    const finalPath = join4(this.objects, sha256);
     const fd = openSync(stagedPath, constants.O_CREAT | constants.O_EXCL | constants.O_WRONLY, 384);
     try {
       let offset = 0;
@@ -34162,8 +40884,8 @@ var ArtifactStore = class {
     const entry = { artifactId, executionId, sha256, byteLength: bytes.byteLength, mediaType, path: finalPath };
     try {
       register2(entry);
-      if (existsSync4(finalPath)) {
-        if (createHash("sha256").update(readFileSync4(finalPath)).digest("hex") !== sha256) throw new Error("artifact hash collision or corrupt object");
+      if (existsSync5(finalPath)) {
+        if (createHash4("sha256").update(readFileSync7(finalPath)).digest("hex") !== sha256) throw new Error("artifact hash collision or corrupt object");
         rmSync2(stagedPath);
       } else {
         renameSync2(stagedPath, finalPath);
@@ -34171,7 +40893,7 @@ var ArtifactStore = class {
       }
       return entry;
     } catch (error62) {
-      if (existsSync4(stagedPath)) rmSync2(stagedPath);
+      if (existsSync5(stagedPath)) rmSync2(stagedPath);
       throw error62;
     }
   }
@@ -34179,17 +40901,57 @@ var ArtifactStore = class {
     if (!Number.isSafeInteger(offset) || offset < 0 || !Number.isSafeInteger(maxBytes) || maxBytes < 1 || maxBytes > 65536) {
       throw new RangeError("invalid artifact read range");
     }
-    if (resolve(entry.path) !== join3(this.objects, entry.sha256) || basename(entry.path) !== entry.sha256) throw new Error("artifact path is outside store");
+    if (resolve2(entry.path) !== join4(this.objects, entry.sha256) || basename(entry.path) !== entry.sha256) throw new Error("artifact path is outside store");
     const stat = lstatSync(entry.path);
     if (!stat.isFile() || stat.isSymbolicLink() || stat.size !== entry.byteLength) throw new Error("artifact changed");
-    const all = readFileSync4(entry.path);
-    if (createHash("sha256").update(all).digest("hex") !== entry.sha256) throw new Error("artifact changed");
+    const all = readFileSync7(entry.path);
+    if (createHash4("sha256").update(all).digest("hex") !== entry.sha256) throw new Error("artifact changed");
     const bytes = all.subarray(offset, offset + maxBytes);
     const nextOffset = offset + bytes.byteLength < all.byteLength ? offset + bytes.byteLength : null;
     return { bytes, nextOffset };
   }
   stagedFiles() {
-    return readdirSync(this.staging).filter((name) => name.endsWith(".tmp"));
+    return readdirSync2(this.staging).filter((name) => name.endsWith(".tmp"));
+  }
+  /** Reconcile the file/SQLite publication window before admitting new work. */
+  reconcile(lookup, registered = []) {
+    const published = [];
+    const removed = [];
+    for (const name of this.stagedFiles()) {
+      const artifactId = name.slice(0, -4);
+      const path = join4(this.staging, name);
+      const entry = lookup(artifactId);
+      if (!entry) {
+        rmSync2(path);
+        removed.push(artifactId);
+        continue;
+      }
+      if (resolve2(entry.path) !== join4(this.objects, entry.sha256)) throw new Error(`artifact path mismatch: ${artifactId}`);
+      const staged = readFileSync7(path);
+      if (staged.byteLength !== entry.byteLength || createHash4("sha256").update(staged).digest("hex") !== entry.sha256)
+        throw new Error(`staged artifact differs from committed registration: ${artifactId}`);
+      if (existsSync5(entry.path)) {
+        const final = readFileSync7(entry.path);
+        if (final.byteLength !== entry.byteLength || createHash4("sha256").update(final).digest("hex") !== entry.sha256)
+          throw new Error(`published artifact differs from committed registration: ${artifactId}`);
+        rmSync2(path);
+      } else {
+        renameSync2(path, entry.path);
+        this.syncDirectory(this.objects);
+      }
+      published.push(artifactId);
+    }
+    for (const entry of registered) {
+      if (resolve2(entry.path) !== join4(this.objects, entry.sha256)) throw new Error(`registered artifact path mismatch: ${entry.artifactId}`);
+      try {
+        const stat = lstatSync(entry.path);
+        if (!stat.isFile() || stat.isSymbolicLink() || stat.size !== entry.byteLength)
+          throw new Error("not a regular file with recorded size");
+      } catch {
+        throw new Error(`registered artifact is missing or changed: ${entry.artifactId}`);
+      }
+    }
+    return { published, removed };
   }
   syncDirectory(path) {
     const fd = openSync(path, constants.O_RDONLY);
@@ -34201,11 +40963,21 @@ var ArtifactStore = class {
   }
 };
 
+// src/coordinator.ts
+import { createHash as createHash7, randomUUID as randomUUID4 } from "node:crypto";
+import { mkdirSync as mkdirSync3 } from "node:fs";
+
+// src/evidence.ts
+import { createHash as createHash6 } from "node:crypto";
+import { execFileSync as execFileSync2 } from "node:child_process";
+import { closeSync as closeSync3, constants as constants2, existsSync as existsSync7, fstatSync as fstatSync2, lstatSync as lstatSync3, openSync as openSync3, readFileSync as readFileSync9 } from "node:fs";
+import { join as join5, resolve as resolve4, sep as sep2 } from "node:path";
+
 // src/workspace.ts
-import { createHash as createHash2 } from "node:crypto";
+import { createHash as createHash5 } from "node:crypto";
 import { execFileSync, spawnSync as spawnSync2 } from "node:child_process";
-import { existsSync as existsSync5, lstatSync as lstatSync2, readFileSync as readFileSync5, realpathSync, statSync } from "node:fs";
-import { dirname, isAbsolute as isAbsolute2, relative, resolve as resolve2, sep } from "node:path";
+import { closeSync as closeSync2, existsSync as existsSync6, fstatSync, lstatSync as lstatSync2, openSync as openSync2, readFileSync as readFileSync8, readdirSync as readdirSync3, readlinkSync, readSync, realpathSync as realpathSync2, statSync } from "node:fs";
+import { dirname as dirname2, isAbsolute as isAbsolute3, relative as relative2, resolve as resolve3, sep } from "node:path";
 var WorkspaceError = class extends Error {
   constructor(code, message) {
     super(message);
@@ -34214,23 +40986,23 @@ var WorkspaceError = class extends Error {
   code;
 };
 function hash2(data) {
-  return createHash2("sha256").update(data).digest("hex");
+  return createHash5("sha256").update(data).digest("hex");
 }
 function inside(path, root) {
   return path === root || path.startsWith(root + sep);
 }
 function nearestExisting(path) {
   let candidate = path;
-  while (!existsSync5(candidate)) {
-    const parent = dirname(candidate);
+  while (!existsSync6(candidate)) {
+    const parent = dirname2(candidate);
     if (parent === candidate) throw new WorkspaceError("INVALID_INPUT", `no existing ancestor for ${path}`);
     candidate = parent;
   }
-  return realpathSync(candidate);
+  return realpathSync2(candidate);
 }
 function canonicalPath(path) {
-  if (!isAbsolute2(path)) throw new WorkspaceError("INVALID_INPUT", "workspace and configured roots must be absolute");
-  return realpathSync(path);
+  if (!isAbsolute3(path)) throw new WorkspaceError("INVALID_INPUT", "workspace and configured roots must be absolute");
+  return realpathSync2(path);
 }
 function canonicalWorkspace(path, projectRoots) {
   if (!projectRoots.length) throw new WorkspaceError("OUTSIDE_CONFIGURED_ROOT", "no permitted project roots configured");
@@ -34241,12 +41013,12 @@ function canonicalWorkspace(path, projectRoots) {
   return workspace;
 }
 function resolveDeclaredPath(workspace, path, roots) {
-  const absolute = isAbsolute2(path) ? resolve2(path) : resolve2(workspace, path);
+  const absolute = isAbsolute3(path) ? resolve3(path) : resolve3(workspace, path);
   const existing = nearestExisting(absolute);
   if (!roots.some((root) => inside(existing, root) && inside(absolute, root))) {
     throw new WorkspaceError("OUTSIDE_CONFIGURED_ROOT", `declared path escapes configured roots: ${path}`);
   }
-  if (existsSync5(absolute)) return realpathSync(absolute);
+  if (existsSync6(absolute)) return realpathSync2(absolute);
   return absolute;
 }
 function git(workspace, args) {
@@ -34267,10 +41039,107 @@ function isGitWorkspace(workspace) {
 function isTracked(workspace, path) {
   const result2 = spawnSync2(
     "git",
-    ["-C", workspace, "ls-files", "--error-unmatch", "--", relative(workspace, path)],
+    ["-C", workspace, "ls-files", "--error-unmatch", "--", relative2(workspace, path)],
     { encoding: "utf8", stdio: ["ignore", "ignore", "ignore"] }
   );
   return result2.status === 0;
+}
+function hashRegularFile(path) {
+  const fd = openSync2(path, "r");
+  try {
+    const before = fstatSync(fd);
+    if (!before.isFile()) throw new Error("not a regular file");
+    const digest = createHash5("sha256");
+    const chunk = Buffer.allocUnsafe(1024 * 1024);
+    let size = 0;
+    while (true) {
+      const count = readSync(fd, chunk, 0, chunk.byteLength, null);
+      if (!count) break;
+      digest.update(chunk.subarray(0, count));
+      size += count;
+    }
+    const after = fstatSync(fd);
+    if (size !== before.size || after.size !== before.size || after.mtimeMs !== before.mtimeMs || after.ino !== before.ino)
+      throw new Error("file changed during evidence scan");
+    return { sha256: digest.digest("hex"), byteLength: size };
+  } finally {
+    closeSync2(fd);
+  }
+}
+function captureEvidenceIndex(workspace, writeTargets, gitWorkspace) {
+  const entries = /* @__PURE__ */ new Map();
+  const gaps = [];
+  const coverageLimits = gitWorkspace ? ["Ignored workspace content outside declared write targets is not change indexed."] : ["Non-Git change indexing covers declared write targets only; other workspace paths are not swept."];
+  const maxEntries = 1e5;
+  let limitHit = false;
+  const add = (path) => {
+    const name = relative2(workspace, path);
+    if (name === ".." || name.startsWith(`..${sep}`)) {
+      gaps.push(`evidence path outside workspace: ${path}`);
+      return;
+    }
+    if (entries.has(name)) return;
+    if (entries.size >= maxEntries) {
+      if (!limitHit) gaps.push(`evidence index exceeds ${maxEntries} entries`);
+      limitHit = true;
+      return;
+    }
+    try {
+      let stat;
+      try {
+        stat = lstatSync2(path);
+      } catch (error62) {
+        if (error62.code === "ENOENT") {
+          entries.set(name, { path: name, kind: "absent", sha256: null, byteLength: null });
+          return;
+        }
+        throw error62;
+      }
+      if (stat.isFile()) {
+        const file2 = hashRegularFile(path);
+        entries.set(name, { path: name, kind: "file", ...file2 });
+      } else if (stat.isDirectory()) entries.set(name, { path: name, kind: "directory", sha256: null, byteLength: null });
+      else if (stat.isSymbolicLink()) {
+        const target = readlinkSync(path);
+        entries.set(name, { path: name, kind: "symlink", sha256: hash2(target), byteLength: Buffer.byteLength(target) });
+      } else entries.set(name, { path: name, kind: "other", sha256: null, byteLength: null });
+    } catch (error62) {
+      gaps.push(`cannot index ${name}: ${String(error62)}`);
+    }
+  };
+  const walk = (path) => {
+    if (limitHit) return;
+    add(path);
+    const name = relative2(workspace, path);
+    if (entries.get(name)?.kind !== "directory") return;
+    try {
+      for (const child of readdirSync3(path).sort()) {
+        if (limitHit) break;
+        if (path === workspace && child === ".git") continue;
+        walk(resolve3(path, child));
+      }
+    } catch (error62) {
+      gaps.push(`cannot enumerate ${name}: ${String(error62)}`);
+    }
+  };
+  if (gitWorkspace) {
+    try {
+      const paths2 = git(workspace, ["ls-files", "--cached", "--others", "--exclude-standard", "-z", "--"]).toString("utf8").split("\0").filter(Boolean);
+      for (const name of paths2) add(resolve3(workspace, name));
+    } catch (error62) {
+      gaps.push(`cannot enumerate Git tracked and untracked paths: ${String(error62)}`);
+    }
+  }
+  for (const target of writeTargets) {
+    if (target.kind === "directory") walk(target.path);
+    else add(target.path);
+  }
+  return {
+    entries: [...entries.values()].sort((a, b) => a.path.localeCompare(b.path)),
+    complete: gaps.length === 0,
+    gaps,
+    coverageLimits
+  };
 }
 function captureBaseline(input2) {
   const workspace = canonicalWorkspace(input2.workspace, input2.projectRoots);
@@ -34280,15 +41149,15 @@ function captureBaseline(input2) {
   const writeTargets = input2.packet.allowed_writes.map((item) => resolveDeclaredPath(workspace, item.path, [workspace]));
   const writeTargetState = writeTargets.map((path, index) => {
     const kind = input2.packet.allowed_writes[index].kind;
-    const existed = existsSync5(path);
-    const sha256 = existed && kind === "file" && lstatSync2(path).isFile() ? hash2(readFileSync5(path)) : null;
+    const existed = existsSync6(path);
+    const sha256 = existed && kind === "file" && lstatSync2(path).isFile() ? hash2(readFileSync8(path)) : null;
     return { path, kind, existed, sha256 };
   });
   const gitWorkspace = isGitWorkspace(workspace);
   const files = inputFiles.map((path) => {
     const stat = lstatSync2(path);
     if (!stat.isFile() || stat.isSymbolicLink()) throw new WorkspaceError("INVALID_INPUT", `declared input is not a regular file: ${path}`);
-    const bytes = readFileSync5(path);
+    const bytes = readFileSync8(path);
     let untracked = false;
     if (gitWorkspace && inside(path, workspace)) {
       untracked = !isTracked(workspace, path);
@@ -34305,22 +41174,1956 @@ function captureBaseline(input2) {
       stagedDiffSha256: hash2(git(workspace, ["diff", "--cached", "--binary", "--"]))
     };
   }
-  const coverageLimits = ["Only declared file inputs and write targets are individually hashed; ignored and undeclared content is not swept."];
-  if (writeTargetState.some((target) => target.kind === "directory")) coverageLimits.push("Declared write directories are not recursively snapshotted.");
-  if (!gitWorkspace) coverageLimits.push("Non-Git baseline has no repository-wide tracked-change snapshot.");
-  const manifest = { workspace, projectRoots, readRoots, inputFiles, writeTargets, writeTargetState, files, git: gitState, coverageLimits };
+  const evidenceIndex = captureEvidenceIndex(workspace, writeTargetState, gitWorkspace);
+  const coverageLimits = [...evidenceIndex.coverageLimits, ...evidenceIndex.gaps];
+  const manifest = {
+    workspace,
+    projectRoots,
+    readRoots,
+    inputFiles,
+    writeTargets,
+    writeTargetState,
+    files,
+    git: gitState,
+    evidenceIndex,
+    coverageLimits
+  };
   return { ...manifest, sha256: hash2(JSON.stringify(manifest)) };
+}
+function compareBaseline(baseline) {
+  const changed = [];
+  if (!baseline.evidenceIndex?.complete) changed.push("evidence:baseline-index-incomplete");
+  for (const file2 of baseline.files) {
+    try {
+      const stat = lstatSync2(file2.path);
+      if (!stat.isFile() || stat.isSymbolicLink() || hash2(readFileSync8(file2.path)) !== file2.sha256) changed.push(file2.path);
+    } catch {
+      changed.push(file2.path);
+    }
+  }
+  for (const target of baseline.writeTargetState) {
+    const exists = existsSync6(target.path);
+    if (exists !== target.existed) {
+      changed.push(target.path);
+      continue;
+    }
+    if (exists && target.sha256 !== null) {
+      try {
+        const stat = lstatSync2(target.path);
+        if (!stat.isFile() || stat.isSymbolicLink() || hash2(readFileSync8(target.path)) !== target.sha256) changed.push(target.path);
+      } catch {
+        changed.push(target.path);
+      }
+    }
+  }
+  const directories = baseline.writeTargetState.filter((target) => target.kind === "directory");
+  if (directories.length && baseline.evidenceIndex) {
+    const current = captureEvidenceIndex(baseline.workspace, directories, false);
+    if (!current.complete) changed.push("evidence:directory-scan-incomplete");
+    const relevant = (entry) => directories.some((target) => inside(resolve3(baseline.workspace, entry.path), target.path));
+    const before = new Map(baseline.evidenceIndex.entries.filter(relevant).map((entry) => [entry.path, entry]));
+    const after = new Map(current.entries.map((entry) => [entry.path, entry]));
+    for (const path of /* @__PURE__ */ new Set([...before.keys(), ...after.keys()])) {
+      const previous = before.get(path);
+      const latest = after.get(path);
+      if (!previous || !latest || previous.kind !== latest.kind || previous.sha256 !== latest.sha256 || previous.byteLength !== latest.byteLength) changed.push(resolve3(baseline.workspace, path));
+    }
+  }
+  if (baseline.git) {
+    try {
+      if (git(baseline.workspace, ["rev-parse", "HEAD"]).toString("utf8").trim() !== baseline.git.head) changed.push("git:HEAD");
+      if (hash2(git(baseline.workspace, ["diff", "--binary", "HEAD", "--"])) !== baseline.git.trackedDiffSha256) changed.push("git:tracked-diff");
+      if (hash2(git(baseline.workspace, ["diff", "--cached", "--binary", "--"])) !== baseline.git.stagedDiffSha256) changed.push("git:staged-diff");
+    } catch {
+      changed.push("git:unavailable");
+    }
+  }
+  const unique = [...new Set(changed)];
+  return { fresh: unique.length === 0, changed: unique, code: unique.length ? "STALE_INPUT" : "CURRENT" };
+}
+
+// src/evidence.ts
+function sha(bytes) {
+  return createHash6("sha256").update(bytes).digest("hex");
+}
+function inside2(path, root) {
+  return path === root || path.startsWith(root + sep2);
+}
+function git2(workspace, args) {
+  try {
+    return execFileSync2("git", ["-C", workspace, ...args], { maxBuffer: 50 * 1024 * 1024, stdio: ["ignore", "pipe", "ignore"] });
+  } catch {
+    return null;
+  }
+}
+function sameEntry(before, after) {
+  return before.kind === after.kind && before.sha256 === after.sha256 && before.byteLength === after.byteLength;
+}
+function regularBytes(path, expected) {
+  const fd = openSync3(path, constants2.O_RDONLY | constants2.O_NOFOLLOW);
+  try {
+    const stat = lstatSync3(path);
+    if (!stat.isFile() || stat.isSymbolicLink() || stat.size !== expected.byteLength)
+      throw new Error("file changed type or size before capture");
+    const bytes = readFileSync9(fd);
+    if (sha(bytes) !== expected.sha256) throw new Error("file changed after final index");
+    return bytes;
+  } finally {
+    closeSync3(fd);
+  }
+}
+function safeRegularBytes(path, maxBytes) {
+  const fd = openSync3(path, constants2.O_RDONLY | constants2.O_NOFOLLOW);
+  try {
+    const before = fstatSync2(fd);
+    const namedBefore = lstatSync3(path);
+    if (!before.isFile() || !namedBefore.isFile() || namedBefore.isSymbolicLink() || namedBefore.ino !== before.ino || before.size > maxBytes)
+      throw new Error("not a regular file within the snapshot limit");
+    const bytes = readFileSync9(fd);
+    const after = fstatSync2(fd);
+    const namedAfter = lstatSync3(path);
+    if (after.size !== before.size || after.mtimeMs !== before.mtimeMs || after.ino !== before.ino || namedAfter.ino !== before.ino || bytes.byteLength !== before.size)
+      throw new Error("file changed during capture");
+    return bytes;
+  } finally {
+    closeSync3(fd);
+  }
+}
+function captureEvidence(input2) {
+  const { taskId, executionId, outputDirectory, baseline, store, artifacts } = input2;
+  const workspace = baseline.workspace;
+  const registered = store.artifactsForExecution(executionId);
+  const captured = [];
+  const gaps = [];
+  const maxSnapshotBytes = input2.maxSnapshotBytes ?? 50 * 1024 * 1024;
+  if (!Number.isSafeInteger(maxSnapshotBytes) || maxSnapshotBytes <= 0)
+    throw new Error("invalid per-execution snapshot limit");
+  let capturedBytes = registered.reduce((sum, artifact) => sum + artifact.byteLength, 0);
+  if (capturedBytes > maxSnapshotBytes) gaps.push("previously registered artifacts exceed the per-execution evidence snapshot limit");
+  const identity = (digest, length, mediaType) => JSON.stringify([digest, length, mediaType]);
+  const existingByIdentity = new Map(registered.map((entry) => [identity(entry.sha256, entry.byteLength, entry.mediaType), entry]));
+  const include = (entry) => {
+    if (!captured.some((item) => item.artifactId === entry.artifactId)) captured.push(entry);
+  };
+  const capture = (bytes, mediaType, label) => {
+    const key = identity(sha(bytes), bytes.byteLength, mediaType);
+    const existing = existingByIdentity.get(key);
+    if (existing) {
+      artifacts.read(existing, 0, 1);
+      include(existing);
+      return existing;
+    }
+    if (bytes.byteLength > artifacts.maxBytes || capturedBytes + bytes.byteLength > maxSnapshotBytes) {
+      gaps.push(`${label} exceeds the per-execution evidence snapshot limit (${maxSnapshotBytes} bytes)`);
+      return null;
+    }
+    const entry = artifacts.captureBytes(executionId, bytes, mediaType, (value) => store.registerArtifact(value));
+    capturedBytes += bytes.byteLength;
+    existingByIdentity.set(key, entry);
+    include(entry);
+    return entry;
+  };
+  const reportPath = join5(outputDirectory, "result.json");
+  let reportBytes = null;
+  if (input2.structuredReport !== void 0 && input2.structuredReport !== null) {
+    reportBytes = Buffer.from(JSON.stringify(input2.structuredReport));
+  } else if (existsSync7(reportPath)) {
+    try {
+      reportBytes = safeRegularBytes(reportPath, maxSnapshotBytes);
+    } catch (error62) {
+      gaps.push(`result.json cannot be captured safely: ${String(error62)}`);
+    }
+  }
+  let reportValidity = "missing";
+  if (reportBytes) {
+    if (capture(reportBytes, "application/json", "result.json")) {
+      try {
+        const report = WorkerReportSchema.parse(JSON.parse(reportBytes.toString("utf8")));
+        reportValidity = report.task_id === taskId && report.execution_id === executionId ? "valid" : "invalid";
+        if (reportValidity === "invalid") gaps.push("report identity does not match execution");
+      } catch {
+        reportValidity = "invalid";
+        gaps.push("result.json is malformed or fails WorkerReport schema");
+      }
+    } else reportValidity = "invalid";
+  } else gaps.push("result.json is missing or not capturable");
+  const summaryPath = join5(outputDirectory, "summary.md");
+  if (existsSync7(summaryPath)) {
+    try {
+      if (!capture(safeRegularBytes(summaryPath, maxSnapshotBytes), "text/markdown", "summary.md") && reportValidity === "valid")
+        reportValidity = "invalid";
+    } catch (error62) {
+      gaps.push(`summary.md cannot be captured safely: ${String(error62)}`);
+      if (reportValidity === "valid") reportValidity = "invalid";
+    }
+  } else {
+    gaps.push("summary.md is missing");
+    if (reportValidity === "valid") reportValidity = "invalid";
+  }
+  const tracked = baseline.git ? git2(workspace, ["diff", "--binary", "HEAD", "--"]) : null;
+  const staged = baseline.git ? git2(workspace, ["diff", "--cached", "--binary", "--"]) : null;
+  if (baseline.git && tracked === null) gaps.push("Git tracked diff could not be captured");
+  if (baseline.git && staged === null) gaps.push("Git staged diff could not be captured");
+  if (tracked) capture(tracked, "text/x-diff", "Git worktree diff");
+  if (staged) capture(staged, "text/x-diff", "Git staged diff");
+  const initial = baseline.evidenceIndex;
+  if (!initial?.complete) gaps.push(...initial?.gaps ?? ["frozen baseline has no change index"]);
+  const final = captureEvidenceIndex(workspace, baseline.writeTargetState, Boolean(baseline.git));
+  if (!final.complete) gaps.push(...final.gaps);
+  const before = new Map((initial?.entries ?? []).map((entry) => [entry.path, entry]));
+  const after = new Map(final.entries.map((entry) => [entry.path, entry]));
+  const absent = (path) => ({ path, kind: "absent", sha256: null, byteLength: null });
+  const changes = [];
+  for (const path of [.../* @__PURE__ */ new Set([...before.keys(), ...after.keys()])].sort()) {
+    const prior = before.get(path) ?? absent(path);
+    const current = after.get(path) ?? absent(path);
+    if (sameEntry(prior, current)) continue;
+    const absolute = resolve4(workspace, path);
+    if (inside2(absolute, outputDirectory)) continue;
+    const declared = baseline.writeTargetState.some((target) => target.kind === "file" ? absolute === target.path : inside2(absolute, target.path));
+    if (!declared) gaps.push(`workspace changed outside declared writes: ${path}`);
+    const change = prior.kind === "absent" ? "added" : current.kind === "absent" ? "deleted" : prior.kind !== current.kind ? "type_changed" : "modified";
+    let artifactId = null;
+    if (current.kind === "file") {
+      try {
+        if (current.byteLength === null) gaps.push(`changed file has no captured byte length: ${path}`);
+        else artifactId = capture(regularBytes(absolute, current), "application/octet-stream", `changed file ${path}`)?.artifactId ?? null;
+      } catch (error62) {
+        gaps.push(`changed file could not be captured: ${path}: ${String(error62)}`);
+      }
+    } else if (current.kind === "symlink" || current.kind === "other") {
+      gaps.push(`changed non-regular path cannot be accepted as complete file evidence: ${path}`);
+    }
+    changes.push({ path, change, before: prior, after: current, artifact_id: artifactId, declared });
+  }
+  if (gaps.length && reportValidity === "valid") reportValidity = "invalid";
+  const manifest = {
+    task_id: taskId,
+    execution_id: executionId,
+    workspace,
+    starting_state_sha256: baseline.sha256,
+    baseline_index_complete: initial?.complete ?? false,
+    final_index_complete: final.complete,
+    tracked_diff_to_head_sha256: tracked ? sha(tracked) : null,
+    staged_diff_sha256: staged ? sha(staged) : null,
+    changes,
+    coverage_limits: [.../* @__PURE__ */ new Set([...baseline.coverageLimits ?? [], ...final.coverageLimits])],
+    report_validity: reportValidity,
+    snapshot_bytes: captured.reduce((sum, artifact) => sum + artifact.byteLength, 0),
+    snapshot_limit_bytes: maxSnapshotBytes,
+    artifacts: captured.map(({ artifactId, sha256, byteLength, mediaType }) => ({ artifact_id: artifactId, sha256, byte_length: byteLength, media_type: mediaType })),
+    gaps
+  };
+  const manifestBytes = Buffer.from(JSON.stringify(manifest));
+  const manifestEntry = capture(manifestBytes, "application/json", "final change manifest");
+  if (!manifestEntry) reportValidity = "invalid";
+  return { reportValidity, finalManifestHash: manifestEntry ? sha(manifestBytes) : null, artifacts: captured, gaps };
+}
+
+// src/coordinator.ts
+var defaultOpener = async ({ backendId, workspace, config: config2, launchContract, onDiagnostic }) => {
+  if (config2.attached_backend) throw new Error("attached backend dispatch is not certified");
+  if (!launchContract) throw new Error("frozen OpenCode launch configuration is missing");
+  return startManagedServer({
+    binary: config2.opencode_binary,
+    workspace,
+    backendId,
+    launchContract,
+    ...config2.development_execution ? { developmentExecution: config2.development_execution } : {},
+    ...onDiagnostic ? { onDiagnostic } : {}
+  });
+};
+function backendIdentity(task, config2) {
+  return `backend_${createHash7("sha256").update(JSON.stringify({
+    workspace: task.workspace,
+    binary: config2.opencode_binary,
+    models: config2.models,
+    attachedBackend: config2.attached_backend ?? null,
+    developmentExecution: config2.development_execution ?? null,
+    effectiveConfigSha256: task.launchContract?.effectiveConfigSha256 ?? null
+  })).digest("hex").slice(0, 32)}`;
+}
+function expired(value) {
+  return Boolean(value && Date.now() >= Date.parse(value));
+}
+function isCorrelatedAbort(error62) {
+  if (!error62) return false;
+  try {
+    return JSON.parse(error62).name === "MessageAbortedError";
+  } catch {
+    return false;
+  }
+}
+function resourceKeys(task) {
+  const keys = [`workspace:${task.workspace}`];
+  const packet = task.packet;
+  for (const resource of packet.shared_resources ?? []) if (resource.access === "write") keys.push(`shared:${resource.key}`);
+  return keys;
+}
+var ExecutionCoordinator = class {
+  constructor(store, artifacts, opener = defaultOpener) {
+    this.store = store;
+    this.artifacts = artifacts;
+    this.opener = opener;
+  }
+  store;
+  artifacts;
+  opener;
+  backends = /* @__PURE__ */ new Map();
+  streams = /* @__PURE__ */ new Map();
+  freshAbortAcks = /* @__PURE__ */ new Map();
+  timer = null;
+  working = false;
+  again = false;
+  stopping = false;
+  async start() {
+    if (this.timer) return;
+    await this.run();
+    this.timer = setInterval(() => this.kick(), 500);
+  }
+  kick() {
+    if (this.stopping) return;
+    if (this.working) {
+      this.again = true;
+      return;
+    }
+    void this.run();
+  }
+  async close() {
+    this.stopping = true;
+    if (this.timer) clearInterval(this.timer);
+    this.timer = null;
+    for (const stream of this.streams.values()) stream.abort();
+    this.streams.clear();
+    this.freshAbortAcks.clear();
+    while (this.working) await new Promise((resolve5) => setTimeout(resolve5, 20));
+    await Promise.allSettled([...this.backends.values()].map((lease) => lease.close()));
+    this.backends.clear();
+  }
+  async replyToRequest(task, request, reply) {
+    if (!task.sessionId || !task.userMessageId || request.sessionId !== task.sessionId) {
+      throw new Error("input request is not bound to the recorded session");
+    }
+    try {
+      const { backend } = await this.backendFor(task);
+      await backend.replyToRequest(request, reply, { timeoutMs: 5e3 });
+      this.store.acknowledgeInputResponse(task.executionId, request.id);
+    } catch (error62) {
+      try {
+        const { backend } = await this.backendFor(task);
+        const observed = await backend.inspectTurn(task.sessionId, task.userMessageId, { timeoutMs: 5e3 });
+        this.updateRequests(task, observed);
+        if (observed.pendingRequests.some((item) => item.id === request.id))
+          this.markUnknown(task, `reply delivery is uncertain: ${String(error62)}`);
+        else this.store.resolveUnconfirmedInputResponse(task.executionId, request.id);
+      } catch (inspectionError) {
+        this.markUnknown(task, `reply and exact-request observation are uncertain: ${String(inspectionError)}`);
+      }
+    }
+    this.kick();
+  }
+  async run() {
+    this.working = true;
+    try {
+      do {
+        this.again = false;
+        for (const task of this.store.unresolved()) {
+          if (this.stopping) break;
+          try {
+            await this.reconcile(task);
+          } catch (error62) {
+            this.handleFailure(task, error62);
+          }
+        }
+      } while (this.again && !this.stopping);
+    } finally {
+      this.working = false;
+    }
+  }
+  async backendFor(task) {
+    const config2 = task.backendConfig;
+    if (!config2) throw new Error("recorded backend launch configuration is missing");
+    if (!task.reportPath || task.launchContract?.reportPath !== task.reportPath)
+      throw new Error("frozen execution report path differs from recorded launch policy");
+    const id = backendIdentity(task, config2);
+    if (task.backendId && task.backendId !== id) throw new Error("recorded backend identity differs from frozen launch configuration");
+    const cached2 = this.backends.get(id);
+    if (cached2) return cached2;
+    const lease = await this.opener({
+      backendId: id,
+      workspace: task.workspace,
+      config: config2,
+      launchContract: task.launchContract,
+      ...process.env.OPENCODE_AGENTS_CAPTURE_DIAGNOSTICS === "1" ? { onDiagnostic: (bytes) => this.store.appendDiagnostic(task.executionId, bytes) } : {}
+    });
+    const inspection = await lease.backend.inspectBackend({ timeoutMs: 5e3 });
+    if (!executionPairAllowed(inspection, trustedDevelopmentWorkspace(config2, task.workspace)) || !inspection.capabilities.callerAssignedMessageId || !inspection.capabilities.permissionRequests || !inspection.capabilities.sessionRecovery || inspection.workspace !== task.workspace) {
+      await lease.close();
+      throw new Error("backend version, workspace, or required capabilities are not certified");
+    }
+    this.store.registerBackendInstance(id, task.workspace, inspection.configurationDigest, {
+      version: inspection.version,
+      openapiDigest: inspection.openapiDigest,
+      workspace: inspection.workspace
+    });
+    this.backends.set(id, lease);
+    this.watchEvents(lease);
+    return lease;
+  }
+  watchEvents(lease) {
+    if (this.streams.has(lease.backendId)) return;
+    const controller = new AbortController();
+    this.streams.set(lease.backendId, controller);
+    void (async () => {
+      let delay = 1e3;
+      while (!controller.signal.aborted && !this.stopping) {
+        try {
+          for await (const _event of lease.backend.subscribeEvents({ signal: controller.signal })) {
+            if (controller.signal.aborted) break;
+            this.kick();
+          }
+        } catch {
+        }
+        if (controller.signal.aborted || this.stopping) break;
+        for (const task of this.store.unresolved()) {
+          if (task.backendId !== lease.backendId || task.observation !== "current") continue;
+          try {
+            this.store.transition(
+              task.scopeId,
+              task.taskId,
+              task.revision,
+              task.phase,
+              "reconciling",
+              { reason: "event stream disconnected; authoritative snapshot required" }
+            );
+          } catch {
+          }
+        }
+        this.kick();
+        await new Promise((resolve5) => setTimeout(resolve5, delay));
+        delay = Math.min(delay * 2, 15e3);
+      }
+    })();
+  }
+  async reconcile(snapshot) {
+    let task = this.store.get(snapshot.scopeId, snapshot.taskId);
+    if (!task || task.executionId !== snapshot.executionId) return;
+    if (task.phase === "queued") {
+      if (expired(task.queueDeadlineAt)) {
+        this.store.transition(task.scopeId, task.taskId, task.revision, "timed_out", "current", { reason: "queue deadline" });
+        return;
+      }
+      const config2 = loadConfiguration();
+      const active = this.store.unresolved().filter((item) => item.admittedAt && item.phase !== "queued").length;
+      if (active >= config2.limits.concurrency) return;
+      const fresh = task.frozenBaseline ? compareBaseline(task.frozenBaseline) : { fresh: false, changed: ["missing baseline"] };
+      if (!fresh.fresh) {
+        this.store.transition(task.scopeId, task.taskId, task.revision, "failed", "current", { code: "STALE_INPUT", changed: fresh.changed });
+        return;
+      }
+      task = this.store.admit(task.scopeId, task.taskId, task.revision, resourceKeys(task));
+      if (!task) return;
+    }
+    if (["dispatching", "running", "waiting_input"].includes(task.phase) && expired(task.executionDeadlineAt) && !task.cancellationIntent) {
+      this.store.cancelTask({
+        scopeId: task.scopeId,
+        taskId: task.taskId,
+        executionId: task.executionId,
+        expectedRevision: task.revision,
+        idempotencyKey: `deadline-${task.executionId}`,
+        reason: "execution deadline",
+        requester: "supervisor",
+        ...task.executionDeadlineAt ? { deadlineOrigin: task.executionDeadlineAt } : {}
+      });
+      return;
+    }
+    if (task.phase === "dispatching") {
+      await this.dispatch(task);
+      return;
+    }
+    if (task.phase === "running" || task.phase === "waiting_input") {
+      await this.observe(task);
+      return;
+    }
+    if (task.phase === "cancelling") {
+      await this.reconcileCancellation(task);
+      return;
+    }
+    if (task.phase === "finalizing") {
+      await this.finalize(task);
+    }
+  }
+  async dispatch(input2) {
+    let task = input2;
+    const lease = await this.backendFor(task);
+    if (task.contextMode === "resume" && !task.sessionId) throw new Error("recorded follow-up session is missing");
+    if (task.contextMode === "resume" && !task.backendId) {
+      if (!task.predecessorExecutionId) throw new Error("resume predecessor is missing");
+      const predecessor = this.store.getExecution(task.scopeId, task.taskId, task.predecessorExecutionId);
+      if (!predecessor || predecessor.sessionId !== task.sessionId || !predecessor.userMessageId)
+        throw new Error("resume session lacks an exact predecessor turn");
+      const observed = await lease.backend.inspectTurn(task.sessionId, predecessor.userMessageId, { timeoutMs: 5e3 });
+      if (!observed.submitted || !observed.finished)
+        throw new Error("recorded resume session was not recovered in the scoped worker");
+      task = this.store.bindSession(task.scopeId, task.taskId, task.revision, lease.backendId, task.sessionId);
+    }
+    if (!task.sessionId) {
+      if (task.creationIntent) {
+        const found = await lease.backend.findCreatedSession(task.creationIntent.marker, { timeoutMs: 5e3 });
+        if (!found || found.backendId !== lease.backendId || found.workspace !== task.workspace) {
+          this.markUnknown(task, "session creation remains ambiguous");
+          return;
+        }
+        task = this.store.bindSession(task.scopeId, task.taskId, task.revision, lease.backendId, found.id);
+      } else {
+        const marker = `opencode-agents:${task.executionId}`;
+        task = this.store.recordCreationIntent(task.scopeId, task.taskId, task.revision, lease.backendId, marker);
+        const found = await lease.backend.findCreatedSession(marker, { timeoutMs: 5e3 });
+        const session = found ?? await lease.backend.createSession(marker, { timeoutMs: 1e4 });
+        if (session.backendId !== lease.backendId || session.workspace !== task.workspace) throw new Error("session binding mismatch");
+        task = this.store.bindSession(task.scopeId, task.taskId, task.revision, lease.backendId, session.id);
+      }
+    }
+    const intent = this.store.dispatchIntent(task.executionId);
+    if (intent) {
+      const observed = await lease.backend.inspectTurn(intent.sessionId, intent.messageId, { timeoutMs: 5e3 });
+      if (!observed.submitted) {
+        this.markUnknown(task, "recorded prompt delivery is ambiguous");
+        return;
+      }
+      if (!intent.acknowledged) this.store.acknowledgeDispatch(task.executionId);
+      this.store.transition(task.scopeId, task.taskId, task.revision, observed.pendingRequests.length ? "waiting_input" : "running", "current");
+      return;
+    }
+    if (!task.sessionId) throw new Error("session not bound");
+    if (!task.reportPath) throw new Error("frozen report path is missing");
+    mkdirSync3(task.reportPath, { recursive: true, mode: 448 });
+    const sessionId = task.sessionId;
+    const messageId = `msg_${randomUUID4()}`;
+    task = this.store.recordDispatchIntent(task.scopeId, task.taskId, task.revision, lease.backendId, sessionId, messageId);
+    const slash = task.model.indexOf("/");
+    const providerId = slash < 0 ? "" : task.model.slice(0, slash);
+    const modelId = slash < 0 ? "" : task.model.slice(slash + 1);
+    if (!providerId || !modelId) throw new Error("recorded model is invalid");
+    await lease.backend.submitTurn({
+      sessionId,
+      messageId,
+      prompt: task.frozenPrompt,
+      providerId,
+      modelId,
+      agent: task.profile
+    }, { timeoutMs: 1e4 });
+    this.store.acknowledgeDispatch(task.executionId);
+    this.store.transition(task.scopeId, task.taskId, task.revision, "running", "current", { messageId });
+  }
+  async observe(task) {
+    if (!task.sessionId || !task.userMessageId) {
+      this.markUnknown(task, "missing exact turn identity");
+      return;
+    }
+    const { backend } = await this.backendFor(task);
+    const observed = await backend.inspectTurn(task.sessionId, task.userMessageId, { timeoutMs: 5e3 });
+    this.updateRequests(task, observed);
+    task = this.store.get(task.scopeId, task.taskId);
+    if (observed.finished) {
+      this.store.beginFinalization(
+        task.scopeId,
+        task.taskId,
+        task.revision,
+        observed.error ? "failed" : "completed",
+        { error: observed.error }
+      );
+      return;
+    }
+    const phase = observed.pendingRequests.length ? "waiting_input" : "running";
+    const uncertainReply = task.pendingRequests.some((request) => ["responding", "unconfirmed", "responded"].includes(request.status) && observed.pendingRequests.some((pending) => pending.id === request.requestId));
+    const observation = uncertainReply ? "unknown" : "current";
+    if (task.phase !== phase || task.observation !== observation)
+      this.store.transition(
+        task.scopeId,
+        task.taskId,
+        task.revision,
+        phase,
+        observation,
+        uncertainReply ? { reason: "recorded input response may or may not have reached upstream; operator action required" } : {}
+      );
+  }
+  updateRequests(task, observed) {
+    for (const request of observed.pendingRequests) {
+      if (request.sessionId !== task.sessionId) throw new Error("upstream request belongs to another session");
+      this.store.upsertInputRequest(
+        task.scopeId,
+        task.taskId,
+        task.executionId,
+        request.id,
+        request.type,
+        request
+      );
+    }
+    this.store.expireMissingInputRequests(task.executionId, observed.pendingRequests.map((request) => request.id));
+  }
+  async reconcileCancellation(task) {
+    if (!task.userMessageId) {
+      if (this.store.dispatchIntent(task.executionId)) {
+        this.markUnknown(task, "cancellation lacks recorded message identity");
+        return;
+      }
+      if (!task.sessionId && task.creationIntent) {
+        const { backend: backend2 } = await this.backendFor(task);
+        const found = await backend2.findCreatedSession(task.creationIntent.marker, { timeoutMs: 5e3 });
+        if (!found) {
+          this.markUnknown(task, "session creation remains ambiguous during cancellation");
+          return;
+        }
+        if (found.backendId !== task.creationIntent.backendId || found.workspace !== task.workspace)
+          throw new Error("recovered session binding mismatch during cancellation");
+        task = this.store.bindSession(task.scopeId, task.taskId, task.revision, found.backendId, found.id);
+      }
+      this.store.beginFinalization(
+        task.scopeId,
+        task.taskId,
+        task.revision,
+        task.cancellationIntent?.deadlineOrigin ? "timed_out" : "cancelled",
+        { promptSubmitted: false }
+      );
+      return;
+    }
+    if (!task.sessionId) {
+      this.markUnknown(task, "cancellation lacks exact session identity");
+      return;
+    }
+    const lease = await this.backendFor(task);
+    const { backend } = lease;
+    const before = await backend.inspectTurn(task.sessionId, task.userMessageId, { timeoutMs: 5e3 });
+    if (before.finished) {
+      this.freshAbortAcks.delete(task.executionId);
+      const abortApplied = Boolean(task.cancellationIntent?.abortAcknowledged && isCorrelatedAbort(before.error));
+      this.store.beginFinalization(
+        task.scopeId,
+        task.taskId,
+        task.revision,
+        abortApplied ? task.cancellationIntent?.deadlineOrigin ? "timed_out" : "cancelled" : before.error ? "failed" : "completed",
+        { cancelEffect: abortApplied ? "applied" : "not_applied" }
+      );
+      return;
+    }
+    let acknowledged = Boolean(task.cancellationIntent?.abortAcknowledged);
+    if (!acknowledged) {
+      acknowledged = await backend.abortSession(task.sessionId, { timeoutMs: 5e3 });
+      if (acknowledged) {
+        this.store.acknowledgeAbort(task.executionId);
+        this.freshAbortAcks.set(task.executionId, { lease, sessionId: task.sessionId, messageId: task.userMessageId });
+      }
+    }
+    const after = await backend.inspectTurn(task.sessionId, task.userMessageId, { timeoutMs: 5e3 });
+    if (after.finished) {
+      this.freshAbortAcks.delete(task.executionId);
+      const abortApplied = Boolean(acknowledged && isCorrelatedAbort(after.error));
+      this.store.beginFinalization(
+        task.scopeId,
+        task.taskId,
+        task.revision,
+        abortApplied ? task.cancellationIntent?.deadlineOrigin ? "timed_out" : "cancelled" : after.error ? "failed" : "completed",
+        { cancelEffect: abortApplied ? "applied" : "not_applied" }
+      );
+    } else if (acknowledged && lease.confirmAbortStopped && this.freshAbortAcks.get(task.executionId)?.lease === lease && this.freshAbortAcks.get(task.executionId)?.sessionId === task.sessionId && this.freshAbortAcks.get(task.executionId)?.messageId === task.userMessageId && await lease.confirmAbortStopped(task.sessionId, task.userMessageId)) {
+      this.freshAbortAcks.delete(task.executionId);
+      this.store.beginFinalization(
+        task.scopeId,
+        task.taskId,
+        task.revision,
+        task.cancellationIntent?.deadlineOrigin ? "timed_out" : "cancelled",
+        { cancelEffect: "applied" }
+      );
+    } else this.markUnknown(task, "stop has not been confirmed");
+  }
+  async finalize(task) {
+    const outcome = task.intendedOutcome ?? "failed";
+    try {
+      if (!task.reportPath || !task.frozenBaseline) throw new Error("frozen report path or baseline missing");
+      mkdirSync3(task.reportPath, { recursive: true, mode: 448 });
+      let structuredReport;
+      if (task.sessionId && task.userMessageId) {
+        try {
+          structuredReport = (await (await this.backendFor(task)).backend.readResult(task.sessionId, task.userMessageId, { timeoutMs: 5e3 })).structured;
+        } catch {
+        }
+      }
+      const evidence = captureEvidence({
+        taskId: task.taskId,
+        executionId: task.executionId,
+        workspace: task.workspace,
+        outputDirectory: task.reportPath,
+        packet: task.packet,
+        baseline: task.frozenBaseline,
+        store: this.store,
+        artifacts: this.artifacts,
+        structuredReport,
+        ...task.backendConfig ? { maxSnapshotBytes: task.backendConfig.limits.artifact_bytes } : {}
+      });
+      this.store.finalize(task.scopeId, task.taskId, task.revision, outcome, evidence.reportValidity, evidence.finalManifestHash);
+      this.store.release(task.executionId);
+    } catch (error62) {
+      if (!expired(task.finalizationDeadlineAt)) {
+        this.markUnknown(task, `evidence capture: ${String(error62)}`);
+        return;
+      }
+      this.store.finalize(task.scopeId, task.taskId, task.revision, outcome, "invalid", null);
+      this.store.release(task.executionId);
+    }
+  }
+  markUnknown(task, reason) {
+    const current = this.store.get(task.scopeId, task.taskId);
+    if (current && current.executionId === task.executionId && current.observation !== "unknown")
+      this.store.transition(task.scopeId, task.taskId, current.revision, current.phase, "unknown", { reason });
+  }
+  handleFailure(task, error62) {
+    const current = this.store.get(task.scopeId, task.taskId);
+    if (!current || current.executionId !== task.executionId) return;
+    if (current.phase === "queued" || current.phase === "dispatching" && !current.creationIntent && !this.store.dispatchIntent(current.executionId)) {
+      this.store.transition(current.scopeId, current.taskId, current.revision, "failed", "current", { error: String(error62) });
+      this.store.release(current.executionId);
+    } else this.markUnknown(current, String(error62));
+  }
+};
+
+// src/service.ts
+import { randomUUID as randomUUID6 } from "node:crypto";
+import { join as join7 } from "node:path";
+
+// src/store.ts
+import { createHash as createHash8, randomUUID as randomUUID5 } from "node:crypto";
+import { chmodSync as chmodSync2, closeSync as closeSync4, existsSync as existsSync8, fsyncSync as fsyncSync2, mkdirSync as mkdirSync4, openSync as openSync4, rmSync as rmSync3 } from "node:fs";
+import { dirname as dirname3, join as join6 } from "node:path";
+import { DatabaseSync } from "node:sqlite";
+var StoreConflict = class extends Error {
+  constructor(code) {
+    super(code);
+    this.code = code;
+  }
+  code;
+};
+function canonical2(value) {
+  if (value === null || typeof value !== "object") return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map((item) => item === void 0 ? "null" : canonical2(item)).join(",")}]`;
+  const object3 = value;
+  return `{${Object.keys(object3).filter((key) => object3[key] !== void 0).sort().map((key) => `${JSON.stringify(key)}:${canonical2(object3[key])}`).join(",")}}`;
+}
+function hashPayload(value) {
+  return createHash8("sha256").update(canonical2(value)).digest("hex");
+}
+function now() {
+  return (/* @__PURE__ */ new Date()).toISOString();
+}
+function deadline(start, seconds) {
+  return new Date(Date.parse(start) + seconds * 1e3).toISOString();
+}
+var terminalPhases = /* @__PURE__ */ new Set(["completed", "failed", "cancelled", "timed_out"]);
+var diagnosticCaptureLimit = 64 * 1024;
+var diagnosticChunkLimit = 2 * 1024;
+var diagnosticRetentionMs = 7 * 24 * 60 * 60 * 1e3;
+function startSemanticHash(input2) {
+  return hashPayload({
+    workspace: input2.requestWorkspace ?? input2.workspace,
+    workspaceAccess: input2.workspaceAccess ?? "exclusive",
+    packet: input2.packet,
+    model: input2.requestModel ?? input2.model,
+    profile: input2.profile,
+    queueTimeoutSeconds: input2.queueTimeoutSeconds ?? 600,
+    executionTimeoutSeconds: input2.executionTimeoutSeconds ?? 1800
+  });
+}
+function continueSemanticHash(input2) {
+  return hashPayload({
+    taskId: input2.taskId,
+    predecessorExecutionId: input2.predecessorExecutionId,
+    packet: input2.packet,
+    contextMode: input2.contextMode
+  });
+}
+function cancelSemanticHash(input2) {
+  return hashPayload({
+    taskId: input2.taskId,
+    executionId: input2.executionId,
+    reason: input2.reason,
+    requester: input2.requester,
+    deadlineOrigin: input2.deadlineOrigin ?? null
+  });
+}
+function replySemanticHash(input2) {
+  return hashPayload({
+    taskId: input2.taskId,
+    executionId: input2.executionId,
+    requestId: input2.requestId,
+    requestRevision: input2.requestRevision,
+    reply: input2.reply,
+    authorizationBasis: input2.authorizationBasis
+  });
+}
+var SqliteTaskStore = class {
+  db;
+  saturatedDiagnostics = /* @__PURE__ */ new Set();
+  overflowRecordedDiagnostics = /* @__PURE__ */ new Set();
+  pendingDiagnosticBytes = /* @__PURE__ */ new Map();
+  diagnosticFlushTimer = null;
+  diagnosticMaintenanceTimer;
+  constructor(filename, options = {}) {
+    const existingDatabase = existsSync8(filename);
+    mkdirSync4(dirname3(filename), { recursive: true, mode: 448 });
+    this.db = new DatabaseSync(filename);
+    const versionTable = this.db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='schema_version'").get();
+    let schemaVersion = null;
+    if (versionTable) {
+      const version2 = this.db.prepare("SELECT MAX(version) AS version FROM schema_version").get();
+      schemaVersion = version2.version;
+      if (version2.version !== null && version2.version > 3) {
+        this.db.close();
+        throw new Error(`store schema version ${version2.version} is newer than this runtime supports`);
+      }
+    }
+    this.db.exec("PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL;");
+    chmodSync2(filename, 384);
+    for (const suffix of ["-wal", "-shm"]) if (existsSync8(filename + suffix)) chmodSync2(filename + suffix, 384);
+    const objects = new Set(this.db.prepare("SELECT name FROM sqlite_master WHERE type IN ('table','index')").all().map((row) => row.name));
+    const requiredObjects = [
+      "schema_version",
+      "scopes",
+      "tasks",
+      "executions",
+      "unresolved_session_owner",
+      "backend_instances",
+      "operations",
+      "dispatch_intents",
+      "creation_intents",
+      "cancellation_intents",
+      "resource_reservations",
+      "input_requests",
+      "artifacts",
+      "reviews",
+      "events",
+      "diagnostic_logs"
+    ];
+    const missingColumn = (table, required2) => {
+      const columns2 = new Set(this.db.prepare(`PRAGMA table_info(${table})`).all().map((row) => row.name));
+      return required2.some((name) => !columns2.has(name));
+    };
+    const schemaNeedsUpgrade = schemaVersion !== 3 || requiredObjects.some((name) => !objects.has(name)) || missingColumn("executions", [
+      "packet_json",
+      "frozen_prompt",
+      "frozen_baseline_json",
+      "report_path",
+      "queue_deadline_at",
+      "admitted_at",
+      "execution_deadline_at",
+      "finalization_deadline_at",
+      "intended_outcome",
+      "execution_timeout_seconds",
+      "context_mode",
+      "backend_config_json",
+      "launch_contract_json"
+    ]) || missingColumn("tasks", ["workspace_access", "request_model_json"]) || missingColumn("input_requests", ["created_at", "response_json", "authorization_basis_json"]) || missingColumn("cancellation_intents", ["abort_acknowledged"]);
+    if (existingDatabase && schemaNeedsUpgrade) {
+      const backupDirectory = join6(dirname3(filename), "backups");
+      let backupPath = null;
+      try {
+        mkdirSync4(backupDirectory, { recursive: true, mode: 448 });
+        backupPath = join6(
+          backupDirectory,
+          `${(/* @__PURE__ */ new Date()).toISOString().replaceAll(":", "-")}-schema-${schemaVersion ?? "unknown"}-to-3-${randomUUID5()}.sqlite`
+        );
+        closeSync4(openSync4(backupPath, "wx", 384));
+        this.db.prepare("VACUUM INTO ?").run(backupPath);
+        const backupFd = openSync4(backupPath, "r");
+        try {
+          fsyncSync2(backupFd);
+        } finally {
+          closeSync4(backupFd);
+        }
+        const directoryFd = openSync4(backupDirectory, "r");
+        try {
+          fsyncSync2(directoryFd);
+        } finally {
+          closeSync4(directoryFd);
+        }
+      } catch (error62) {
+        if (backupPath) rmSync3(backupPath, { force: true });
+        this.db.close();
+        throw new Error(`pre-migration database backup failed: ${String(error62)}`);
+      }
+    }
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS schema_version(version INTEGER NOT NULL);
+      INSERT INTO schema_version(version) SELECT 1 WHERE NOT EXISTS(SELECT 1 FROM schema_version);
+      CREATE TABLE IF NOT EXISTS scopes(scope_id TEXT PRIMARY KEY, created_at TEXT NOT NULL);
+      CREATE TABLE IF NOT EXISTS tasks(
+        task_id TEXT PRIMARY KEY, scope_id TEXT NOT NULL REFERENCES scopes(scope_id),
+        workspace TEXT NOT NULL, packet_json TEXT NOT NULL, model TEXT NOT NULL, profile TEXT NOT NULL,
+        current_execution_id TEXT NOT NULL, created_at TEXT NOT NULL,
+        workspace_access TEXT, request_model_json TEXT
+      );
+      CREATE TABLE IF NOT EXISTS executions(
+        execution_id TEXT PRIMARY KEY, task_id TEXT NOT NULL REFERENCES tasks(task_id),
+        predecessor_execution_id TEXT REFERENCES executions(execution_id),
+        revision INTEGER NOT NULL, phase TEXT NOT NULL, observation TEXT NOT NULL,
+        backend_id TEXT, session_id TEXT, user_message_id TEXT,
+        baseline_hash TEXT NOT NULL, prompt_hash TEXT NOT NULL,
+        report_validity TEXT NOT NULL DEFAULT 'pending', review_status TEXT NOT NULL DEFAULT 'pending',
+        final_manifest_hash TEXT,
+        created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
+        packet_json TEXT, frozen_prompt TEXT, frozen_baseline_json TEXT, report_path TEXT,
+        queue_deadline_at TEXT, admitted_at TEXT, execution_deadline_at TEXT,
+        finalization_deadline_at TEXT, intended_outcome TEXT, execution_timeout_seconds INTEGER,
+        context_mode TEXT, backend_config_json TEXT, launch_contract_json TEXT
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS unresolved_session_owner ON executions(backend_id,session_id)
+        WHERE session_id IS NOT NULL AND phase NOT IN ('completed','failed','cancelled','timed_out');
+      CREATE TABLE IF NOT EXISTS backend_instances(
+        backend_id TEXT PRIMARY KEY, workspace TEXT NOT NULL, config_digest TEXT NOT NULL,
+        identity_json TEXT NOT NULL, created_at TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS operations(
+        operation_id TEXT PRIMARY KEY, scope_id TEXT NOT NULL REFERENCES scopes(scope_id),
+        operation TEXT NOT NULL, idempotency_key TEXT NOT NULL, payload_hash TEXT NOT NULL,
+        result_json TEXT NOT NULL, created_at TEXT NOT NULL,
+        UNIQUE(scope_id,operation,idempotency_key)
+      );
+      CREATE TABLE IF NOT EXISTS dispatch_intents(
+        execution_id TEXT PRIMARY KEY REFERENCES executions(execution_id),
+        backend_id TEXT NOT NULL, session_id TEXT NOT NULL, user_message_id TEXT NOT NULL,
+        prompt_hash TEXT NOT NULL, acknowledged INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS creation_intents(
+        execution_id TEXT PRIMARY KEY REFERENCES executions(execution_id),
+        backend_id TEXT NOT NULL, marker TEXT NOT NULL UNIQUE, session_id TEXT,
+        created_at TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS cancellation_intents(
+        execution_id TEXT PRIMARY KEY REFERENCES executions(execution_id),
+        reason TEXT NOT NULL, requester TEXT NOT NULL, deadline_origin TEXT,
+        created_at TEXT NOT NULL, abort_acknowledged INTEGER NOT NULL DEFAULT 0
+      );
+      CREATE TABLE IF NOT EXISTS resource_reservations(
+        resource_key TEXT PRIMARY KEY, execution_id TEXT NOT NULL REFERENCES executions(execution_id),
+        acquired_at TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS input_requests(
+        request_id TEXT PRIMARY KEY, execution_id TEXT NOT NULL REFERENCES executions(execution_id),
+        kind TEXT NOT NULL, revision INTEGER NOT NULL, detail_json TEXT NOT NULL, status TEXT NOT NULL,
+        created_at TEXT, response_json TEXT, authorization_basis_json TEXT
+      );
+      CREATE TABLE IF NOT EXISTS artifacts(
+        artifact_id TEXT PRIMARY KEY, execution_id TEXT NOT NULL REFERENCES executions(execution_id),
+        sha256 TEXT NOT NULL, byte_length INTEGER NOT NULL, media_type TEXT NOT NULL,
+        path TEXT NOT NULL, created_at TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS reviews(
+        review_id TEXT PRIMARY KEY, execution_id TEXT NOT NULL REFERENCES executions(execution_id),
+        disposition TEXT NOT NULL, record_json TEXT NOT NULL, created_at TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS events(
+        sequence INTEGER PRIMARY KEY AUTOINCREMENT, execution_id TEXT NOT NULL REFERENCES executions(execution_id),
+        kind TEXT NOT NULL, detail_json TEXT NOT NULL, created_at TEXT NOT NULL
+      );
+      CREATE TABLE IF NOT EXISTS diagnostic_logs(
+        execution_id TEXT PRIMARY KEY REFERENCES executions(execution_id),
+        content_blob BLOB NOT NULL, original_bytes INTEGER NOT NULL,
+        updated_at TEXT NOT NULL
+      );
+    `);
+    const columns = new Set(this.db.prepare("PRAGMA table_info(executions)").all().map((row) => row.name));
+    for (const [name, definition] of Object.entries({
+      packet_json: "TEXT",
+      frozen_prompt: "TEXT",
+      frozen_baseline_json: "TEXT",
+      report_path: "TEXT",
+      queue_deadline_at: "TEXT",
+      admitted_at: "TEXT",
+      execution_deadline_at: "TEXT",
+      finalization_deadline_at: "TEXT",
+      intended_outcome: "TEXT",
+      execution_timeout_seconds: "INTEGER",
+      context_mode: "TEXT",
+      backend_config_json: "TEXT",
+      launch_contract_json: "TEXT"
+    })) {
+      if (!columns.has(name)) this.db.exec(`ALTER TABLE executions ADD COLUMN ${name} ${definition}`);
+    }
+    const taskColumns = new Set(this.db.prepare("PRAGMA table_info(tasks)").all().map((row) => row.name));
+    for (const [name, definition] of Object.entries({ workspace_access: "TEXT", request_model_json: "TEXT" })) {
+      if (!taskColumns.has(name)) this.db.exec(`ALTER TABLE tasks ADD COLUMN ${name} ${definition}`);
+    }
+    const requestColumns = new Set(this.db.prepare("PRAGMA table_info(input_requests)").all().map((row) => row.name));
+    for (const [name, definition] of Object.entries({ created_at: "TEXT", response_json: "TEXT", authorization_basis_json: "TEXT" })) {
+      if (!requestColumns.has(name)) this.db.exec(`ALTER TABLE input_requests ADD COLUMN ${name} ${definition}`);
+    }
+    const cancellationColumns = new Set(this.db.prepare("PRAGMA table_info(cancellation_intents)").all().map((row) => row.name));
+    if (!cancellationColumns.has("abort_acknowledged")) this.db.exec("ALTER TABLE cancellation_intents ADD COLUMN abort_acknowledged INTEGER NOT NULL DEFAULT 0");
+    this.db.prepare("UPDATE schema_version SET version=3 WHERE version<3").run();
+    this.purgeExpiredDiagnostics();
+    const maintenanceInterval = options.diagnosticMaintenanceIntervalMs ?? 60 * 60 * 1e3;
+    if (!Number.isSafeInteger(maintenanceInterval) || maintenanceInterval <= 0)
+      throw new Error("diagnostic maintenance interval must be positive");
+    this.diagnosticMaintenanceTimer = setInterval(() => {
+      try {
+        this.purgeExpiredDiagnostics();
+      } catch {
+      }
+    }, maintenanceInterval);
+    this.diagnosticMaintenanceTimer.unref();
+  }
+  close() {
+    clearInterval(this.diagnosticMaintenanceTimer);
+    if (this.diagnosticFlushTimer) clearTimeout(this.diagnosticFlushTimer);
+    this.diagnosticFlushTimer = null;
+    this.flushPendingDiagnostics();
+    this.db.close();
+  }
+  flushPendingDiagnostics(executionId) {
+    const entries = executionId === void 0 ? [...this.pendingDiagnosticBytes] : [[executionId, this.pendingDiagnosticBytes.get(executionId) ?? 0]];
+    for (const [id, count] of entries) {
+      if (!count) continue;
+      this.db.prepare("UPDATE diagnostic_logs SET original_bytes=MIN(?,original_bytes+?),updated_at=? WHERE execution_id=?").run(Number.MAX_SAFE_INTEGER, count, now(), id);
+      this.pendingDiagnosticBytes.delete(id);
+    }
+  }
+  scheduleDiagnosticFlush() {
+    if (this.diagnosticFlushTimer) return;
+    this.diagnosticFlushTimer = setTimeout(() => {
+      this.diagnosticFlushTimer = null;
+      try {
+        this.flushPendingDiagnostics();
+      } catch {
+        this.scheduleDiagnosticFlush();
+      }
+    }, 1e3);
+    this.diagnosticFlushTimer.unref();
+  }
+  /** Optional private stderr capture. Raw bytes never enter material events. */
+  appendDiagnostic(executionId, chunk) {
+    if (chunk.byteLength === 0) return;
+    if (this.saturatedDiagnostics.has(executionId)) {
+      if (!this.overflowRecordedDiagnostics.has(executionId)) {
+        this.db.prepare("UPDATE diagnostic_logs SET original_bytes=MIN(?,original_bytes+?),updated_at=? WHERE execution_id=?").run(Number.MAX_SAFE_INTEGER, chunk.byteLength, now(), executionId);
+        this.overflowRecordedDiagnostics.add(executionId);
+        return;
+      }
+      this.pendingDiagnosticBytes.set(
+        executionId,
+        Math.min(Number.MAX_SAFE_INTEGER, (this.pendingDiagnosticBytes.get(executionId) ?? 0) + chunk.byteLength)
+      );
+      this.scheduleDiagnosticFlush();
+      return;
+    }
+    this.transaction(() => {
+      const row = this.db.prepare("SELECT content_blob,original_bytes FROM diagnostic_logs WHERE execution_id=?").get(executionId);
+      const retained = row ? Buffer.from(row.content_blob) : Buffer.alloc(0);
+      const incoming = Buffer.from(chunk);
+      const available = Math.max(0, diagnosticCaptureLimit - retained.byteLength);
+      const content = available ? Buffer.concat([retained, incoming.subarray(0, available)]) : retained;
+      const original = Math.min(Number.MAX_SAFE_INTEGER, (row?.original_bytes ?? 0) + incoming.byteLength);
+      this.db.prepare(`INSERT INTO diagnostic_logs(execution_id,content_blob,original_bytes,updated_at)
+        VALUES(?,?,?,?) ON CONFLICT(execution_id) DO UPDATE SET content_blob=excluded.content_blob,
+        original_bytes=excluded.original_bytes,updated_at=excluded.updated_at`).run(executionId, content, original, now());
+      if (content.byteLength === diagnosticCaptureLimit) {
+        this.saturatedDiagnostics.add(executionId);
+        if (original > diagnosticCaptureLimit) this.overflowRecordedDiagnostics.add(executionId);
+      }
+    });
+  }
+  purgeExpiredDiagnostics(at = /* @__PURE__ */ new Date()) {
+    this.flushPendingDiagnostics();
+    const cutoff = new Date(at.getTime() - diagnosticRetentionMs).toISOString();
+    const expired2 = this.db.prepare("SELECT execution_id FROM diagnostic_logs WHERE updated_at<?").all(cutoff);
+    const purged = Number(this.db.prepare("DELETE FROM diagnostic_logs WHERE updated_at<?").run(cutoff).changes);
+    for (const row of expired2) {
+      this.saturatedDiagnostics.delete(row.execution_id);
+      this.overflowRecordedDiagnostics.delete(row.execution_id);
+    }
+    return purged;
+  }
+  diagnosticChunk(executionId, opaqueCursor) {
+    this.purgeExpiredDiagnostics();
+    const row = this.db.prepare("SELECT content_blob,original_bytes FROM diagnostic_logs WHERE execution_id=?").get(executionId);
+    if (!row) return null;
+    const bytes = Buffer.from(row.content_blob);
+    const digest = createHash8("sha256").update(bytes).digest("hex");
+    let offset = 0;
+    if (opaqueCursor !== "start") {
+      let token;
+      try {
+        token = JSON.parse(Buffer.from(opaqueCursor, "base64url").toString("utf8"));
+      } catch {
+        throw new StoreConflict("INVALID_STATE");
+      }
+      if (!token || token.executionId !== executionId || !Number.isSafeInteger(token.offset) || typeof token.offset !== "number" || token.offset < 0 || token.offset > bytes.byteLength || token.sha256 !== digest) throw new StoreConflict("INVALID_STATE");
+      offset = token.offset;
+    }
+    const content = bytes.subarray(offset, offset + diagnosticChunkLimit);
+    const next = offset + content.byteLength;
+    return {
+      originalBytes: row.original_bytes,
+      capturedBytes: bytes.byteLength,
+      truncated: row.original_bytes > bytes.byteLength,
+      sha256: digest,
+      byteOffset: offset,
+      contentBase64: content.toString("base64"),
+      nextDiagnosticCursor: next < bytes.byteLength ? Buffer.from(JSON.stringify({ executionId, offset: next, sha256: digest })).toString("base64url") : null
+    };
+  }
+  transaction(run) {
+    this.db.exec("BEGIN IMMEDIATE");
+    try {
+      const result2 = run();
+      this.db.exec("COMMIT");
+      return result2;
+    } catch (error62) {
+      this.db.exec("ROLLBACK");
+      throw error62;
+    }
+  }
+  event(executionId, kind, detail) {
+    this.db.prepare("INSERT INTO events(execution_id,kind,detail_json,created_at) VALUES(?,?,?,?)").run(executionId, kind, canonical2(detail), now());
+  }
+  start(input2) {
+    const queueTimeoutSeconds = input2.queueTimeoutSeconds ?? 600;
+    const executionTimeoutSeconds = input2.executionTimeoutSeconds ?? 1800;
+    if (queueTimeoutSeconds <= 0 || executionTimeoutSeconds <= 0) throw new StoreConflict("INVALID_STATE");
+    const payloadHash = startSemanticHash(input2);
+    return this.transaction(() => {
+      this.db.prepare("INSERT OR IGNORE INTO scopes(scope_id,created_at) VALUES(?,?)").run(input2.scopeId, now());
+      const existing = this.db.prepare("SELECT payload_hash,result_json FROM operations WHERE scope_id=? AND operation='start' AND idempotency_key=?").get(input2.scopeId, input2.idempotencyKey);
+      if (existing) {
+        if (existing.payload_hash !== payloadHash) throw new StoreConflict("IDEMPOTENCY_CONFLICT");
+        const result2 = JSON.parse(existing.result_json);
+        const task2 = this.getExecution(input2.scopeId, result2.taskId, result2.executionId);
+        if (!task2) throw new Error("stored idempotency result is missing");
+        return task2;
+      }
+      const taskId = input2.taskId ?? `task_${randomUUID5()}`;
+      const executionId = input2.executionId ?? `exec_${randomUUID5()}`;
+      const created = now();
+      this.db.prepare("INSERT INTO tasks(task_id,scope_id,workspace,packet_json,model,profile,current_execution_id,created_at,workspace_access,request_model_json) VALUES(?,?,?,?,?,?,?,?,?,?)").run(
+        taskId,
+        input2.scopeId,
+        input2.workspace,
+        canonical2(input2.packet),
+        input2.model,
+        input2.profile,
+        executionId,
+        created,
+        input2.workspaceAccess ?? "exclusive",
+        input2.requestModel === void 0 ? null : canonical2(input2.requestModel)
+      );
+      this.db.prepare(`INSERT INTO executions(execution_id,task_id,revision,phase,observation,baseline_hash,prompt_hash,
+        packet_json,frozen_prompt,frozen_baseline_json,report_path,queue_deadline_at,execution_timeout_seconds,backend_config_json,launch_contract_json,created_at,updated_at)
+        VALUES(?,?,1,'queued','current',?,?,?,?,?,?,?,?,?,?,?,?)`).run(
+        executionId,
+        taskId,
+        input2.baselineHash,
+        input2.promptHash,
+        canonical2(input2.packet),
+        input2.frozenPrompt ?? "",
+        input2.frozenBaseline === void 0 ? null : canonical2(input2.frozenBaseline),
+        input2.reportPath ?? null,
+        deadline(created, queueTimeoutSeconds),
+        executionTimeoutSeconds,
+        input2.backendConfig === void 0 ? null : canonical2(input2.backendConfig),
+        input2.launchContract === void 0 ? null : canonical2(input2.launchContract),
+        created,
+        created
+      );
+      this.db.prepare("INSERT INTO operations VALUES(?,?,?,?,?,?,?)").run(`op_${randomUUID5()}`, input2.scopeId, "start", input2.idempotencyKey, payloadHash, canonical2({ taskId, executionId }), created);
+      this.event(executionId, "queued", { taskId });
+      const task = this.get(input2.scopeId, taskId);
+      if (!task) throw new Error("new task missing");
+      return task;
+    });
+  }
+  findStartByKey(scopeId, idempotencyKey, semanticInput) {
+    const row = this.db.prepare("SELECT payload_hash,result_json FROM operations WHERE scope_id=? AND operation='start' AND idempotency_key=?").get(scopeId, idempotencyKey);
+    if (!row) return null;
+    if (row.payload_hash !== startSemanticHash(semanticInput)) throw new StoreConflict("IDEMPOTENCY_CONFLICT");
+    const result2 = JSON.parse(row.result_json);
+    const task = this.getExecution(scopeId, result2.taskId, result2.executionId);
+    if (!task) throw new Error("stored start execution missing");
+    return task;
+  }
+  findContinueByKey(scopeId, idempotencyKey, semanticInput) {
+    const row = this.db.prepare("SELECT payload_hash,result_json FROM operations WHERE scope_id=? AND operation='continue' AND idempotency_key=?").get(scopeId, idempotencyKey);
+    if (!row) return null;
+    if (row.payload_hash !== continueSemanticHash(semanticInput)) throw new StoreConflict("IDEMPOTENCY_CONFLICT");
+    const result2 = JSON.parse(row.result_json);
+    const task = this.getExecution(scopeId, result2.taskId, result2.executionId);
+    if (!task) throw new Error("stored continuation execution missing");
+    return task;
+  }
+  get(scopeId, taskId) {
+    const current = this.db.prepare("SELECT current_execution_id FROM tasks WHERE scope_id=? AND task_id=?").get(scopeId, taskId);
+    return current ? this.getExecution(scopeId, taskId, current.current_execution_id) : null;
+  }
+  getExecution(scopeId, taskId, executionId) {
+    const row = this.db.prepare(`SELECT t.task_id,t.scope_id,t.workspace,t.workspace_access,t.request_model_json,t.packet_json AS task_packet_json,t.model,t.profile,
+      e.execution_id,e.predecessor_execution_id,e.context_mode,e.revision,e.phase,e.observation,e.backend_id,
+      e.session_id,e.user_message_id,e.report_validity,e.review_status,e.final_manifest_hash,e.backend_config_json,e.launch_contract_json,
+      e.baseline_hash,e.prompt_hash,e.frozen_prompt,e.frozen_baseline_json,e.report_path,
+      e.queue_deadline_at,e.admitted_at,e.execution_deadline_at,e.finalization_deadline_at,e.intended_outcome,
+      e.packet_json,e.created_at,e.updated_at
+      FROM tasks t JOIN executions e ON e.task_id=t.task_id
+      WHERE t.scope_id=? AND t.task_id=? AND e.execution_id=?`).get(scopeId, taskId, executionId);
+    if (!row) return null;
+    return {
+      taskId: row.task_id,
+      executionId: row.execution_id,
+      scopeId: row.scope_id,
+      revision: row.revision,
+      phase: row.phase,
+      observation: row.observation,
+      workspace: row.workspace,
+      packet: JSON.parse(row.packet_json ?? row.task_packet_json),
+      workspaceAccess: row.workspace_access ?? "exclusive",
+      requestModel: row.request_model_json ? JSON.parse(row.request_model_json) : null,
+      model: row.model,
+      profile: row.profile,
+      backendId: row.backend_id,
+      backendConfig: row.backend_config_json ? JSON.parse(row.backend_config_json) : null,
+      launchContract: row.launch_contract_json ? JSON.parse(row.launch_contract_json) : null,
+      sessionId: row.session_id,
+      userMessageId: row.user_message_id,
+      predecessorExecutionId: row.predecessor_execution_id,
+      contextMode: row.context_mode,
+      baselineHash: row.baseline_hash,
+      promptHash: row.prompt_hash,
+      frozenPrompt: row.frozen_prompt ?? "",
+      frozenBaseline: row.frozen_baseline_json ? JSON.parse(row.frozen_baseline_json) : null,
+      reportPath: row.report_path,
+      queueDeadlineAt: row.queue_deadline_at,
+      admittedAt: row.admitted_at,
+      executionDeadlineAt: row.execution_deadline_at,
+      finalizationDeadlineAt: row.finalization_deadline_at,
+      intendedOutcome: row.intended_outcome,
+      creationIntent: this.creationIntent(executionId),
+      cancellationIntent: this.cancellationIntent(executionId),
+      pendingRequests: this.inputRequests(executionId, true),
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+      reportValidity: row.report_validity,
+      finalManifestHash: row.final_manifest_hash,
+      reviewStatus: row.review_status
+    };
+  }
+  list(scopeId, limit = 20) {
+    return this.listPage(scopeId, { limit }).tasks;
+  }
+  listPage(scopeId, options = {}) {
+    const limit = options.limit ?? 20;
+    if (!Number.isInteger(limit) || limit < 1 || limit > 100) throw new StoreConflict("INVALID_STATE");
+    const states = options.states ?? [];
+    const stateHash = hashPayload([...states].sort());
+    let page = null;
+    if (options.cursor) {
+      try {
+        page = JSON.parse(Buffer.from(options.cursor, "base64url").toString("utf8"));
+      } catch {
+        throw new StoreConflict("INVALID_STATE");
+      }
+      if (!page || page.scopeId !== scopeId || page.stateHash !== stateHash || typeof page.createdAt !== "string" || typeof page.taskId !== "string") {
+        throw new StoreConflict("INVALID_STATE");
+      }
+    }
+    const filters = states.length ? `AND e.phase IN (${states.map(() => "?").join(",")})` : "";
+    const cursorFilter = page ? "AND (t.created_at<cursor_values.cursor_time OR (t.created_at=cursor_values.cursor_time AND t.task_id<cursor_values.cursor_task))" : "";
+    const rows = this.db.prepare(`WITH cursor_values(cursor_time,cursor_task) AS (SELECT ?,?)
+      SELECT t.task_id,t.created_at FROM tasks t JOIN executions e ON e.execution_id=t.current_execution_id
+      CROSS JOIN cursor_values WHERE t.scope_id=? ${filters} ${cursorFilter}
+      ORDER BY t.created_at DESC,t.task_id DESC LIMIT ?`).all(page?.createdAt ?? null, page?.taskId ?? null, scopeId, ...states, limit + 1);
+    const visible = rows.slice(0, limit);
+    const tasks = visible.flatMap(({ task_id }) => {
+      const task = this.get(scopeId, task_id);
+      return task ? [task] : [];
+    });
+    const last = visible.at(-1);
+    const nextCursor = rows.length > limit && last ? Buffer.from(JSON.stringify({ createdAt: last.created_at, taskId: last.task_id, scopeId, stateHash })).toString("base64url") : null;
+    return { tasks, nextCursor };
+  }
+  unresolved() {
+    const rows = this.db.prepare(`SELECT t.scope_id,t.task_id FROM tasks t JOIN executions e ON e.execution_id=t.current_execution_id
+      WHERE e.phase NOT IN ('completed','failed','cancelled','timed_out')
+        AND t.profile IN ('bounded-build','bounded-inspect') ORDER BY t.created_at`).all();
+    return rows.flatMap((row) => {
+      const task = this.get(row.scope_id, row.task_id);
+      return task ? [task] : [];
+    });
+  }
+  backendInstance(backendId) {
+    const row = this.db.prepare("SELECT * FROM backend_instances WHERE backend_id=?").get(backendId);
+    return row ? {
+      backendId: row.backend_id,
+      workspace: row.workspace,
+      configDigest: row.config_digest,
+      identity: JSON.parse(row.identity_json),
+      createdAt: row.created_at
+    } : null;
+  }
+  registerBackendInstance(backendId, workspace, configDigest, identity) {
+    this.transaction(() => {
+      const existing = this.backendInstance(backendId);
+      if (existing) {
+        if (existing.workspace !== workspace || existing.configDigest !== configDigest || hashPayload(existing.identity) !== hashPayload(identity)) {
+          throw new StoreConflict("INVALID_STATE");
+        }
+        return;
+      }
+      this.db.prepare("INSERT INTO backend_instances VALUES(?,?,?,?,?)").run(backendId, workspace, configDigest, canonical2(identity), now());
+    });
+  }
+  admit(scopeId, taskId, expectedRevision, resourceKeys2, executionTimeoutSeconds) {
+    return this.transaction(() => {
+      const task = this.get(scopeId, taskId);
+      if (!task) throw new Error("task not found");
+      if (task.revision !== expectedRevision) throw new StoreConflict("STALE_REVISION");
+      if (task.phase !== "queued") throw new StoreConflict("INVALID_STATE");
+      const instant = now();
+      if (task.queueDeadlineAt && instant >= task.queueDeadlineAt) throw new StoreConflict("INVALID_STATE");
+      const keys = [...new Set(resourceKeys2)].sort();
+      for (const key of keys) {
+        const owner = this.db.prepare("SELECT execution_id FROM resource_reservations WHERE resource_key=?").get(key);
+        if (owner && owner.execution_id !== task.executionId) return null;
+      }
+      for (const key of keys) this.db.prepare("INSERT OR IGNORE INTO resource_reservations VALUES(?,?,?)").run(key, task.executionId, instant);
+      const row = this.db.prepare("SELECT execution_timeout_seconds FROM executions WHERE execution_id=?").get(task.executionId);
+      const seconds = executionTimeoutSeconds ?? row.execution_timeout_seconds ?? 1800;
+      if (!Number.isInteger(seconds) || seconds <= 0) throw new StoreConflict("INVALID_STATE");
+      this.db.prepare("UPDATE executions SET phase='dispatching',admitted_at=?,execution_deadline_at=?,revision=revision+1,updated_at=? WHERE execution_id=?").run(instant, deadline(instant, seconds), instant, task.executionId);
+      this.event(task.executionId, "admitted", { resourceKeys: keys, executionDeadlineAt: deadline(instant, seconds) });
+      return this.get(scopeId, taskId);
+    });
+  }
+  creationIntent(executionId) {
+    const row = this.db.prepare("SELECT backend_id,marker,session_id,created_at FROM creation_intents WHERE execution_id=?").get(executionId);
+    return row ? { backendId: row.backend_id, marker: row.marker, sessionId: row.session_id, createdAt: row.created_at } : null;
+  }
+  getCreationIntent(executionId) {
+    return this.creationIntent(executionId);
+  }
+  recordCreationIntent(scopeId, taskId, expectedRevision, backendId, marker) {
+    return this.transaction(() => {
+      const task = this.get(scopeId, taskId);
+      if (!task) throw new Error("task not found");
+      if (task.revision !== expectedRevision) throw new StoreConflict("STALE_REVISION");
+      if (task.phase !== "dispatching" || task.sessionId || task.creationIntent) throw new StoreConflict("INVALID_STATE");
+      const instant = now();
+      this.db.prepare("INSERT INTO creation_intents(execution_id,backend_id,marker,created_at) VALUES(?,?,?,?)").run(task.executionId, backendId, marker, instant);
+      this.db.prepare("UPDATE executions SET backend_id=?,revision=revision+1,updated_at=? WHERE execution_id=?").run(backendId, instant, task.executionId);
+      this.event(task.executionId, "creation_intent", { backendId, marker });
+      return this.get(scopeId, taskId);
+    });
+  }
+  reserve(executionId, keys) {
+    return this.transaction(() => {
+      for (const key of [...new Set(keys)].sort()) {
+        const owner = this.db.prepare("SELECT execution_id FROM resource_reservations WHERE resource_key=?").get(key);
+        if (owner && owner.execution_id !== executionId) return false;
+      }
+      for (const key of [...new Set(keys)].sort()) {
+        this.db.prepare("INSERT OR IGNORE INTO resource_reservations VALUES(?,?,?)").run(key, executionId, now());
+      }
+      return true;
+    });
+  }
+  release(executionId) {
+    this.transaction(() => {
+      const row = this.db.prepare("SELECT phase FROM executions WHERE execution_id=?").get(executionId);
+      if (!row || !terminalPhases.has(row.phase)) throw new StoreConflict("INVALID_STATE");
+      this.db.prepare("DELETE FROM resource_reservations WHERE execution_id=?").run(executionId);
+    });
+  }
+  dispatchIntent(executionId) {
+    const row = this.db.prepare("SELECT backend_id,session_id,user_message_id,acknowledged FROM dispatch_intents WHERE execution_id=?").get(executionId);
+    return row ? { backendId: row.backend_id, sessionId: row.session_id, messageId: row.user_message_id, acknowledged: Boolean(row.acknowledged) } : null;
+  }
+  events(executionId, afterCursor = 0, limit = 100) {
+    const rows = this.db.prepare("SELECT sequence,kind,detail_json,created_at FROM events WHERE execution_id=? AND sequence>? ORDER BY sequence LIMIT ?").all(executionId, afterCursor, limit);
+    return rows.map((row) => ({ cursor: row.sequence, kind: row.kind, detail: JSON.parse(row.detail_json), createdAt: row.created_at }));
+  }
+  /** Public event page. A cursor advances only past events actually returned. */
+  eventPage(executionId, afterCursor = 0) {
+    const limit = 100;
+    const maxBytes = 4096;
+    const rows = this.db.prepare("SELECT sequence,kind,detail_json,created_at FROM events WHERE execution_id=? AND sequence>? ORDER BY sequence LIMIT ?").all(executionId, afterCursor, limit + 1);
+    const events = [];
+    let bytes = 2;
+    for (const row of rows.slice(0, limit)) {
+      const full = { cursor: row.sequence, kind: row.kind, detail: JSON.parse(row.detail_json), createdAt: row.created_at };
+      let event = full;
+      if (Buffer.byteLength(JSON.stringify(full)) > 1024) {
+        const source = full.detail && typeof full.detail === "object" && !Array.isArray(full.detail) ? full.detail : {};
+        const blockers = {};
+        for (const key of ["blocker", "reason", "error", "code", "message"]) {
+          if (source[key] === void 0) continue;
+          const value = typeof source[key] === "string" ? source[key] : JSON.stringify(source[key]);
+          blockers[key] = Buffer.from(value).subarray(0, 256).toString("utf8");
+        }
+        const digest = createHash8("sha256").update(row.detail_json).digest("hex");
+        const detailCursor = Buffer.from(JSON.stringify({
+          executionId,
+          sequence: row.sequence,
+          offset: 0,
+          sha256: digest
+        })).toString("base64url");
+        event = {
+          cursor: row.sequence,
+          kind: row.kind,
+          createdAt: row.created_at,
+          detail: { ...blockers, preview: Buffer.from(row.detail_json).subarray(0, 256).toString("utf8") },
+          detailTruncated: {
+            originalBytes: Buffer.byteLength(row.detail_json),
+            sha256: digest,
+            cursor: detailCursor
+          }
+        };
+        if (Buffer.byteLength(JSON.stringify(event)) > maxBytes - 2) {
+          event = {
+            cursor: row.sequence,
+            kind: row.kind.slice(0, 64),
+            createdAt: row.created_at,
+            detail: { truncated: true },
+            detailTruncated: event.detailTruncated
+          };
+        }
+      }
+      const eventBytes = Buffer.byteLength(JSON.stringify(event)) + (events.length ? 1 : 0);
+      if (bytes + eventBytes > maxBytes) break;
+      events.push(event);
+      bytes += eventBytes;
+    }
+    return { events, cursor: events.at(-1)?.cursor ?? afterCursor, hasMore: events.length < rows.length };
+  }
+  eventDetailChunk(executionId, opaqueCursor) {
+    let token;
+    try {
+      token = JSON.parse(Buffer.from(opaqueCursor, "base64url").toString("utf8"));
+    } catch {
+      throw new StoreConflict("INVALID_STATE");
+    }
+    if (!token || token.executionId !== executionId || !Number.isSafeInteger(token.sequence) || !Number.isSafeInteger(token.offset) || typeof token.offset !== "number" || token.offset < 0 || typeof token.sha256 !== "string" || !/^[0-9a-f]{64}$/.test(token.sha256)) throw new StoreConflict("INVALID_STATE");
+    const row = this.db.prepare("SELECT detail_json FROM events WHERE execution_id=? AND sequence=?").get(executionId, token.sequence);
+    if (!row) throw new StoreConflict("INVALID_STATE");
+    const bytes = Buffer.from(row.detail_json);
+    const digest = createHash8("sha256").update(bytes).digest("hex");
+    if (digest !== token.sha256 || token.offset > bytes.byteLength) throw new StoreConflict("INVALID_STATE");
+    const offset = token.offset;
+    const chunk = bytes.subarray(offset, offset + 2048);
+    const next = offset + chunk.byteLength;
+    return {
+      eventCursor: token.sequence,
+      sha256: digest,
+      originalBytes: bytes.byteLength,
+      byteOffset: offset,
+      contentBase64: chunk.toString("base64"),
+      nextDetailCursor: next < bytes.byteLength ? Buffer.from(JSON.stringify({ executionId, sequence: token.sequence, offset: next, sha256: digest })).toString("base64url") : null
+    };
+  }
+  transition(scopeId, taskId, expectedRevision, phase, observation, detail = {}) {
+    return this.transaction(() => {
+      const task = this.get(scopeId, taskId);
+      if (!task) throw new Error("task not found");
+      if (task.revision !== expectedRevision) throw new StoreConflict("STALE_REVISION");
+      const instant = now();
+      this.db.prepare("UPDATE executions SET phase=?,observation=?,finalization_deadline_at=CASE WHEN ?='finalizing' AND finalization_deadline_at IS NULL THEN ? ELSE finalization_deadline_at END,revision=revision+1,updated_at=? WHERE execution_id=?").run(phase, observation, phase, deadline(instant, task.backendConfig?.limits.finalization_timeout_seconds ?? 60), instant, task.executionId);
+      this.event(task.executionId, phase, detail);
+      return this.get(scopeId, taskId);
+    });
+  }
+  beginFinalization(scopeId, taskId, expectedRevision, intendedOutcome, detail = {}) {
+    return this.transaction(() => {
+      const task = this.get(scopeId, taskId);
+      if (!task) throw new Error("task not found");
+      if (task.revision !== expectedRevision) throw new StoreConflict("STALE_REVISION");
+      if (!["running", "waiting_input", "cancelling", "dispatching"].includes(task.phase)) throw new StoreConflict("INVALID_STATE");
+      const instant = now();
+      this.db.prepare("UPDATE executions SET phase='finalizing',observation='current',intended_outcome=?,finalization_deadline_at=?,revision=revision+1,updated_at=? WHERE execution_id=?").run(intendedOutcome, deadline(instant, task.backendConfig?.limits.finalization_timeout_seconds ?? 60), instant, task.executionId);
+      this.event(task.executionId, "finalizing", { intendedOutcome, detail });
+      return this.get(scopeId, taskId);
+    });
+  }
+  bindSession(scopeId, taskId, expectedRevision, backendId, sessionId) {
+    return this.transaction(() => {
+      const task = this.get(scopeId, taskId);
+      if (!task) throw new Error("task not found");
+      if (task.revision !== expectedRevision) throw new StoreConflict("STALE_REVISION");
+      if (task.sessionId) {
+        if (task.backendId === backendId && task.sessionId === sessionId) return task;
+        if (task.backendId !== null || task.contextMode !== "resume" || task.sessionId !== sessionId || !task.predecessorExecutionId) throw new StoreConflict("SESSION_BUSY");
+        const predecessor = this.getExecution(task.scopeId, task.taskId, task.predecessorExecutionId);
+        if (!predecessor || !terminalPhases.has(predecessor.phase) || predecessor.sessionId !== sessionId)
+          throw new StoreConflict("INVALID_STATE");
+      }
+      if (task.backendId && task.backendId !== backendId) throw new StoreConflict("INVALID_STATE");
+      if (task.creationIntent && task.creationIntent.backendId !== backendId) throw new StoreConflict("INVALID_STATE");
+      try {
+        this.db.prepare("UPDATE executions SET backend_id=?,session_id=?,revision=revision+1,updated_at=? WHERE execution_id=?").run(backendId, sessionId, now(), task.executionId);
+        this.db.prepare("UPDATE creation_intents SET session_id=? WHERE execution_id=?").run(sessionId, task.executionId);
+      } catch (error62) {
+        if (String(error62).includes("UNIQUE")) throw new StoreConflict("SESSION_BUSY");
+        throw error62;
+      }
+      this.event(task.executionId, "session_bound", { backendId, sessionId });
+      return this.get(scopeId, taskId);
+    });
+  }
+  recordDispatchIntent(scopeId, taskId, expectedRevision, backendId, sessionId, messageId) {
+    return this.transaction(() => {
+      const task = this.get(scopeId, taskId);
+      if (!task) throw new Error("task not found");
+      if (task.revision !== expectedRevision) throw new StoreConflict("STALE_REVISION");
+      if (task.backendId !== backendId || task.sessionId !== sessionId || !["queued", "dispatching"].includes(task.phase)) throw new StoreConflict("INVALID_STATE");
+      if (task.userMessageId || this.dispatchIntent(task.executionId)) throw new StoreConflict("INVALID_STATE");
+      const execution = this.db.prepare("SELECT prompt_hash FROM executions WHERE execution_id=?").get(task.executionId);
+      this.db.prepare("INSERT INTO dispatch_intents VALUES(?,?,?,?,?,0,?)").run(task.executionId, backendId, sessionId, messageId, execution.prompt_hash, now());
+      this.db.prepare("UPDATE executions SET user_message_id=?,phase='dispatching',revision=revision+1,updated_at=? WHERE execution_id=?").run(messageId, now(), task.executionId);
+      this.event(task.executionId, "dispatch_intent", { messageId });
+      return this.get(scopeId, taskId);
+    });
+  }
+  acknowledgeDispatch(executionId) {
+    this.transaction(() => {
+      const existing = this.dispatchIntent(executionId);
+      if (!existing) throw new StoreConflict("INVALID_STATE");
+      if (existing.acknowledged) return;
+      this.db.prepare("UPDATE dispatch_intents SET acknowledged=1 WHERE execution_id=?").run(executionId);
+      this.event(executionId, "dispatch_acknowledged", {});
+    });
+  }
+  finalize(scopeId, taskId, expectedRevision, outcome, reportValidity, finalManifestHash) {
+    return this.transaction(() => {
+      const task = this.get(scopeId, taskId);
+      if (!task) throw new Error("task not found");
+      if (task.revision !== expectedRevision) throw new StoreConflict("STALE_REVISION");
+      if (task.phase !== "finalizing") throw new StoreConflict("INVALID_STATE");
+      if (task.intendedOutcome && task.intendedOutcome !== outcome) throw new StoreConflict("INVALID_STATE");
+      this.db.prepare("UPDATE executions SET phase=?,report_validity=?,final_manifest_hash=?,revision=revision+1,updated_at=? WHERE execution_id=?").run(outcome, reportValidity, finalManifestHash, now(), task.executionId);
+      this.db.prepare("DELETE FROM resource_reservations WHERE execution_id=?").run(task.executionId);
+      this.db.prepare("UPDATE input_requests SET status='expired' WHERE execution_id=? AND status='pending'").run(task.executionId);
+      this.db.prepare("UPDATE input_requests SET status='unconfirmed' WHERE execution_id=? AND status='responding'").run(task.executionId);
+      this.event(task.executionId, "finalized", { outcome, reportValidity, finalManifestHash });
+      return this.get(scopeId, taskId);
+    });
+  }
+  continueTask(input2) {
+    const queueTimeoutSeconds = input2.queueTimeoutSeconds ?? 600;
+    const executionTimeoutSeconds = input2.executionTimeoutSeconds ?? 1800;
+    if (queueTimeoutSeconds <= 0 || executionTimeoutSeconds <= 0) throw new StoreConflict("INVALID_STATE");
+    const payloadHash = continueSemanticHash(input2);
+    return this.transaction(() => {
+      const existing = this.db.prepare("SELECT payload_hash,result_json FROM operations WHERE scope_id=? AND operation='continue' AND idempotency_key=?").get(input2.scopeId, input2.idempotencyKey);
+      if (existing) {
+        if (existing.payload_hash !== payloadHash) throw new StoreConflict("IDEMPOTENCY_CONFLICT");
+        const result2 = JSON.parse(existing.result_json);
+        const task = this.getExecution(input2.scopeId, result2.taskId, result2.executionId);
+        if (!task) throw new Error("stored continuation is missing");
+        return task;
+      }
+      const predecessor = this.get(input2.scopeId, input2.taskId);
+      if (!predecessor || predecessor.executionId !== input2.predecessorExecutionId) throw new StoreConflict("INVALID_STATE");
+      if (!["bounded-build", "bounded-inspect"].includes(predecessor.profile)) throw new StoreConflict("INVALID_STATE");
+      if (predecessor.revision !== input2.expectedRevision) throw new StoreConflict("STALE_REVISION");
+      if (!terminalPhases.has(predecessor.phase) || predecessor.pendingRequests.length > 0) throw new StoreConflict("INVALID_STATE");
+      const packet = input2.packet;
+      const original = this.db.prepare("SELECT packet_json FROM tasks WHERE task_id=?").get(input2.taskId);
+      const objective = JSON.parse(original.packet_json).objective;
+      if (packet.objective !== objective) throw new StoreConflict("INVALID_STATE");
+      if (input2.contextMode === "resume" && (!predecessor.backendId || !predecessor.sessionId)) throw new StoreConflict("INVALID_STATE");
+      const executionId = input2.executionId ?? `exec_${randomUUID5()}`;
+      const instant = now();
+      const backendId = null;
+      const sessionId = input2.contextMode === "resume" ? predecessor.sessionId : null;
+      this.db.prepare(`INSERT INTO executions(execution_id,task_id,predecessor_execution_id,revision,phase,observation,backend_id,session_id,
+        baseline_hash,prompt_hash,packet_json,frozen_prompt,frozen_baseline_json,report_path,queue_deadline_at,
+        execution_timeout_seconds,context_mode,backend_config_json,launch_contract_json,created_at,updated_at)
+        VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(
+        executionId,
+        input2.taskId,
+        predecessor.executionId,
+        1,
+        "queued",
+        "current",
+        backendId,
+        sessionId,
+        input2.baselineHash,
+        input2.promptHash,
+        canonical2(input2.packet),
+        input2.frozenPrompt,
+        input2.frozenBaseline === void 0 ? null : canonical2(input2.frozenBaseline),
+        input2.reportPath ?? null,
+        deadline(instant, queueTimeoutSeconds),
+        executionTimeoutSeconds,
+        input2.contextMode,
+        input2.backendConfig === void 0 ? null : canonical2(input2.backendConfig),
+        input2.launchContract === void 0 ? null : canonical2(input2.launchContract),
+        instant,
+        instant
+      );
+      this.db.prepare("UPDATE tasks SET current_execution_id=? WHERE task_id=?").run(executionId, input2.taskId);
+      this.db.prepare("INSERT INTO operations VALUES(?,?,?,?,?,?,?)").run(
+        `op_${randomUUID5()}`,
+        input2.scopeId,
+        "continue",
+        input2.idempotencyKey,
+        payloadHash,
+        canonical2({ taskId: input2.taskId, executionId }),
+        instant
+      );
+      this.event(executionId, "queued", { taskId: input2.taskId, predecessorExecutionId: predecessor.executionId, contextMode: input2.contextMode });
+      return this.get(input2.scopeId, input2.taskId);
+    });
+  }
+  cancellationIntent(executionId) {
+    const row = this.db.prepare("SELECT reason,requester,deadline_origin,created_at,abort_acknowledged FROM cancellation_intents WHERE execution_id=?").get(executionId);
+    return row ? {
+      reason: row.reason,
+      requester: row.requester,
+      deadlineOrigin: row.deadline_origin,
+      createdAt: row.created_at,
+      abortAcknowledged: Boolean(row.abort_acknowledged)
+    } : null;
+  }
+  acknowledgeAbort(executionId) {
+    this.transaction(() => {
+      const intent = this.cancellationIntent(executionId);
+      if (!intent) throw new StoreConflict("INVALID_STATE");
+      if (intent.abortAcknowledged) return;
+      this.db.prepare("UPDATE cancellation_intents SET abort_acknowledged=1 WHERE execution_id=?").run(executionId);
+      this.event(executionId, "abort_acknowledged", {});
+    });
+  }
+  cancelTask(input2) {
+    const payloadHash = cancelSemanticHash(input2);
+    return this.transaction(() => {
+      const candidate = this.getExecution(input2.scopeId, input2.taskId, input2.executionId);
+      if (candidate && !["bounded-build", "bounded-inspect"].includes(candidate.profile)) throw new StoreConflict("INVALID_STATE");
+      const existing = this.db.prepare("SELECT payload_hash,result_json FROM operations WHERE scope_id=? AND operation='cancel' AND idempotency_key=?").get(input2.scopeId, input2.idempotencyKey);
+      if (existing) {
+        if (existing.payload_hash !== payloadHash) throw new StoreConflict("IDEMPOTENCY_CONFLICT");
+        const original = JSON.parse(existing.result_json);
+        const task2 = this.getExecution(input2.scopeId, original.taskId, original.executionId);
+        if (!task2) throw new Error("cancelled execution missing");
+        return task2;
+      }
+      const task = this.get(input2.scopeId, input2.taskId);
+      if (!task || task.executionId !== input2.executionId) throw new StoreConflict("INVALID_STATE");
+      if (task.revision !== input2.expectedRevision) throw new StoreConflict("STALE_REVISION");
+      if (terminalPhases.has(task.phase) || task.phase === "finalizing" || task.cancellationIntent) throw new StoreConflict("INVALID_STATE");
+      const instant = now();
+      this.db.prepare("INSERT INTO cancellation_intents(execution_id,reason,requester,deadline_origin,created_at) VALUES(?,?,?,?,?)").run(task.executionId, input2.reason, input2.requester, input2.deadlineOrigin ?? null, instant);
+      const phase = task.phase === "queued" ? input2.deadlineOrigin ? "timed_out" : "cancelled" : "cancelling";
+      this.db.prepare("UPDATE executions SET phase=?,revision=revision+1,updated_at=? WHERE execution_id=?").run(phase, instant, task.executionId);
+      this.db.prepare("INSERT INTO operations VALUES(?,?,?,?,?,?,?)").run(
+        `op_${randomUUID5()}`,
+        input2.scopeId,
+        "cancel",
+        input2.idempotencyKey,
+        payloadHash,
+        canonical2({ taskId: input2.taskId, executionId: input2.executionId }),
+        instant
+      );
+      this.event(task.executionId, "cancellation_requested", { reason: input2.reason, requester: input2.requester, phase });
+      return this.get(input2.scopeId, input2.taskId);
+    });
+  }
+  findCancelByKey(scopeId, idempotencyKey, semanticInput) {
+    const row = this.db.prepare("SELECT payload_hash,result_json FROM operations WHERE scope_id=? AND operation='cancel' AND idempotency_key=?").get(scopeId, idempotencyKey);
+    if (!row) return null;
+    if (row.payload_hash !== cancelSemanticHash(semanticInput)) throw new StoreConflict("IDEMPOTENCY_CONFLICT");
+    const result2 = JSON.parse(row.result_json);
+    const task = this.getExecution(scopeId, result2.taskId, result2.executionId);
+    if (!task) throw new Error("stored cancellation execution missing");
+    return task;
+  }
+  inputRequests(executionId, pendingOnly = false) {
+    const rows = this.db.prepare(`SELECT * FROM input_requests WHERE execution_id=? ${pendingOnly ? "AND status IN ('pending','responding')" : ""} ORDER BY created_at,request_id`).all(executionId);
+    return rows.map((row) => ({
+      requestId: row.request_id,
+      executionId: row.execution_id,
+      kind: row.kind,
+      revision: row.revision,
+      detail: JSON.parse(row.detail_json),
+      status: row.status,
+      createdAt: row.created_at ?? "",
+      response: row.response_json ? JSON.parse(row.response_json) : null,
+      authorizationBasis: row.authorization_basis_json ? JSON.parse(row.authorization_basis_json) : null
+    }));
+  }
+  upsertInputRequest(scopeId, taskId, executionId, requestId, kind, detail) {
+    return this.transaction(() => {
+      const task = this.get(scopeId, taskId);
+      if (!task || task.executionId !== executionId || !["running", "waiting_input", "dispatching"].includes(task.phase)) {
+        throw new StoreConflict("INVALID_STATE");
+      }
+      const previous = this.inputRequests(executionId).find((request) => request.requestId === requestId);
+      if (previous && previous.kind === kind && hashPayload(previous.detail) === hashPayload(detail) && previous.status === "pending") return previous;
+      if (previous && previous.status !== "pending") return previous;
+      const instant = now();
+      if (previous) {
+        this.db.prepare("UPDATE input_requests SET revision=revision+1,detail_json=? WHERE request_id=?").run(canonical2(detail), requestId);
+      } else {
+        this.db.prepare("INSERT INTO input_requests(request_id,execution_id,kind,revision,detail_json,status,created_at) VALUES(?,?,?,1,?,'pending',?)").run(requestId, executionId, kind, canonical2(detail), instant);
+      }
+      this.db.prepare("UPDATE executions SET phase='waiting_input',revision=revision+1,updated_at=? WHERE execution_id=?").run(instant, executionId);
+      this.event(executionId, "input_request", { requestId, kind, revision: previous ? previous.revision + 1 : 1 });
+      return this.inputRequests(executionId).find((request) => request.requestId === requestId);
+    });
+  }
+  respondToRequest(input2) {
+    const payloadHash = replySemanticHash(input2);
+    return this.transaction(() => {
+      const candidate = this.getExecution(input2.scopeId, input2.taskId, input2.executionId);
+      if (candidate && !["bounded-build", "bounded-inspect"].includes(candidate.profile)) throw new StoreConflict("INVALID_STATE");
+      const existing = this.db.prepare("SELECT payload_hash,result_json FROM operations WHERE scope_id=? AND operation='respond' AND idempotency_key=?").get(input2.scopeId, input2.idempotencyKey);
+      if (existing) {
+        if (existing.payload_hash !== payloadHash) throw new StoreConflict("IDEMPOTENCY_CONFLICT");
+        const original = JSON.parse(existing.result_json);
+        const task2 = this.getExecution(input2.scopeId, original.taskId, original.executionId);
+        if (!task2) throw new Error("request response execution missing");
+        return task2;
+      }
+      const task = this.get(input2.scopeId, input2.taskId);
+      if (!task || task.executionId !== input2.executionId) throw new StoreConflict("INVALID_STATE");
+      if (task.revision !== input2.expectedRevision) throw new StoreConflict("STALE_REVISION");
+      if (task.phase !== "waiting_input") throw new StoreConflict("REQUEST_EXPIRED");
+      const request = this.inputRequests(input2.executionId).find((item) => item.requestId === input2.requestId);
+      if (!request || request.status !== "pending" || request.revision !== input2.requestRevision) throw new StoreConflict("REQUEST_EXPIRED");
+      const instant = now();
+      this.db.prepare("UPDATE input_requests SET status='responding',response_json=?,authorization_basis_json=? WHERE request_id=?").run(canonical2(input2.reply), canonical2(input2.authorizationBasis), input2.requestId);
+      this.db.prepare("UPDATE executions SET revision=revision+1,updated_at=? WHERE execution_id=?").run(instant, input2.executionId);
+      this.db.prepare("INSERT INTO operations VALUES(?,?,?,?,?,?,?)").run(
+        `op_${randomUUID5()}`,
+        input2.scopeId,
+        "respond",
+        input2.idempotencyKey,
+        payloadHash,
+        canonical2({ taskId: input2.taskId, executionId: input2.executionId, requestId: input2.requestId }),
+        instant
+      );
+      this.event(input2.executionId, "input_response_intent", { requestId: input2.requestId, requestRevision: input2.requestRevision });
+      return this.get(input2.scopeId, input2.taskId);
+    });
+  }
+  findResponseByKey(scopeId, idempotencyKey, semanticInput) {
+    const row = this.db.prepare("SELECT payload_hash,result_json FROM operations WHERE scope_id=? AND operation='respond' AND idempotency_key=?").get(scopeId, idempotencyKey);
+    if (!row) return null;
+    if (row.payload_hash !== replySemanticHash(semanticInput)) throw new StoreConflict("IDEMPOTENCY_CONFLICT");
+    const result2 = JSON.parse(row.result_json);
+    const task = this.getExecution(scopeId, result2.taskId, result2.executionId);
+    if (!task) throw new Error("stored response execution missing");
+    return task;
+  }
+  acknowledgeInputResponse(executionId, requestId) {
+    this.transaction(() => {
+      const request = this.inputRequests(executionId).find((item) => item.requestId === requestId);
+      if (!request || request.status !== "responding") throw new StoreConflict("REQUEST_EXPIRED");
+      this.db.prepare("UPDATE input_requests SET status='responded' WHERE request_id=?").run(requestId);
+      this.event(executionId, "input_response_acknowledged", { requestId });
+    });
+  }
+  /** The exact request vanished after a recorded reply intent, but delivery was never acknowledged. */
+  resolveUnconfirmedInputResponse(executionId, requestId) {
+    this.transaction(() => {
+      const request = this.inputRequests(executionId).find((item) => item.requestId === requestId);
+      if (!request || request.status !== "responding") return;
+      this.db.prepare("UPDATE input_requests SET status='unconfirmed' WHERE execution_id=? AND request_id=? AND status='responding'").run(executionId, requestId);
+      this.event(executionId, "input_response_unconfirmed", { requestId, reason: "request_absent_after_reply_intent" });
+    });
+  }
+  expireInputRequest(executionId, requestId) {
+    this.transaction(() => {
+      this.db.prepare("UPDATE input_requests SET status='expired' WHERE execution_id=? AND request_id=? AND status IN ('pending','responding')").run(executionId, requestId);
+      this.event(executionId, "input_request_expired", { requestId });
+    });
+  }
+  expireMissingInputRequests(executionId, pendingIds) {
+    return this.transaction(() => {
+      const known = new Set(pendingIds);
+      const expired2 = this.inputRequests(executionId, true).filter((request) => !known.has(request.requestId));
+      for (const request of expired2) {
+        const status = request.status === "responding" ? "unconfirmed" : "expired";
+        this.db.prepare("UPDATE input_requests SET status=? WHERE execution_id=? AND request_id=?").run(status, executionId, request.requestId);
+        this.event(
+          executionId,
+          status === "unconfirmed" ? "input_response_unconfirmed" : "input_request_expired",
+          { requestId: request.requestId, reason: "request_absent_in_exact_session_snapshot" }
+        );
+      }
+      return expired2.map((request) => request.requestId);
+    });
+  }
+  artifactsForExecution(executionId) {
+    const rows = this.db.prepare("SELECT artifact_id,execution_id,sha256,byte_length,media_type,path FROM artifacts WHERE execution_id=? ORDER BY created_at,artifact_id").all(executionId);
+    return rows.map((row) => ({
+      artifactId: row.artifact_id,
+      executionId: row.execution_id,
+      sha256: row.sha256,
+      byteLength: row.byte_length,
+      mediaType: row.media_type,
+      path: row.path
+    }));
+  }
+  registerArtifact(entry) {
+    this.transaction(() => {
+      this.db.prepare("INSERT INTO artifacts VALUES(?,?,?,?,?,?,?)").run(entry.artifactId, entry.executionId, entry.sha256, entry.byteLength, entry.mediaType, entry.path, now());
+      this.event(entry.executionId, "artifact_registered", { artifactId: entry.artifactId, sha256: entry.sha256 });
+    });
+  }
+  artifact(executionId, artifactId) {
+    const row = this.db.prepare("SELECT artifact_id,execution_id,sha256,byte_length,media_type,path FROM artifacts WHERE execution_id=? AND artifact_id=?").get(executionId, artifactId);
+    return row ? {
+      artifactId: row.artifact_id,
+      executionId: row.execution_id,
+      sha256: row.sha256,
+      byteLength: row.byte_length,
+      mediaType: row.media_type,
+      path: row.path
+    } : null;
+  }
+  artifactById(artifactId) {
+    const row = this.db.prepare("SELECT execution_id FROM artifacts WHERE artifact_id=?").get(artifactId);
+    return row ? this.artifact(row.execution_id, artifactId) : null;
+  }
+  allArtifacts() {
+    const rows = this.db.prepare("SELECT execution_id,artifact_id FROM artifacts ORDER BY created_at,artifact_id").all();
+    return rows.flatMap((row) => {
+      const entry = this.artifact(row.execution_id, row.artifact_id);
+      return entry ? [entry] : [];
+    });
+  }
+  recordReview(scopeId, taskId, expectedRevision, idempotencyKey, review, executionId) {
+    const selectedExecutionId = executionId ?? this.get(scopeId, taskId)?.executionId;
+    const payloadHash = hashPayload({ taskId, executionId: selectedExecutionId, review });
+    return this.transaction(() => {
+      const candidate = selectedExecutionId ? this.getExecution(scopeId, taskId, selectedExecutionId) : null;
+      if (candidate && !["bounded-build", "bounded-inspect"].includes(candidate.profile)) throw new StoreConflict("INVALID_STATE");
+      const existing = this.db.prepare("SELECT payload_hash,result_json FROM operations WHERE scope_id=? AND operation='review' AND idempotency_key=?").get(scopeId, idempotencyKey);
+      if (existing) {
+        if (existing.payload_hash !== payloadHash) throw new StoreConflict("IDEMPOTENCY_CONFLICT");
+        const original = JSON.parse(existing.result_json);
+        const task2 = this.getExecution(scopeId, original.taskId, original.executionId);
+        if (!task2) throw new Error("review task missing");
+        return task2;
+      }
+      const task = selectedExecutionId ? this.getExecution(scopeId, taskId, selectedExecutionId) : null;
+      if (!task) throw new Error("task not found");
+      if (task.revision !== expectedRevision) throw new StoreConflict("STALE_REVISION");
+      if (review.disposition === "pending") throw new StoreConflict("INVALID_STATE");
+      if (review.disposition === "accepted") {
+        if (task.phase !== "completed" || task.reportValidity !== "valid" || !task.finalManifestHash || task.finalManifestHash !== review.final_manifest_sha256 || task.baselineHash !== review.starting_state_sha256) {
+          throw new StoreConflict("INVALID_STATE");
+        }
+        const packet = task.packet;
+        const declared = /* @__PURE__ */ new Map();
+        for (const criterion of packet.acceptance_criteria ?? []) {
+          if (declared.has(criterion.id)) throw new StoreConflict("INVALID_STATE");
+          declared.set(criterion.id, criterion.required);
+        }
+        const artifacts = this.artifactsForExecution(task.executionId);
+        const byId = new Map(artifacts.map((entry) => [entry.artifactId, entry]));
+        if (!artifacts.some((entry) => entry.sha256 === task.finalManifestHash && entry.mediaType === "application/json") || artifacts.filter((entry) => entry.mediaType === "application/json").length < 2 || !artifacts.some((entry) => entry.mediaType === "text/markdown")) throw new StoreConflict("INVALID_STATE");
+        const reviewed = /* @__PURE__ */ new Set();
+        for (const criterion of review.criteria) {
+          if (!declared.has(criterion.id) || reviewed.has(criterion.id)) throw new StoreConflict("INVALID_STATE");
+          reviewed.add(criterion.id);
+          if (criterion.result === "satisfied" && criterion.evidence.length === 0) throw new StoreConflict("INVALID_STATE");
+          for (const reference of criterion.evidence) {
+            const match = /^artifact:([^@\s]+)@sha256:([0-9a-f]{64})$/.exec(reference);
+            if (!match || byId.get(match[1])?.sha256 !== match[2]) throw new StoreConflict("INVALID_STATE");
+          }
+        }
+        for (const [id, required2] of declared) {
+          if (!required2) continue;
+          const result2 = review.criteria.find((item) => item.id === id);
+          if (!result2 || result2.result !== "satisfied" || result2.evidence.length === 0) throw new StoreConflict("INVALID_STATE");
+        }
+      }
+      const created = now();
+      this.db.prepare("INSERT INTO reviews VALUES(?,?,?,?,?)").run(`review_${randomUUID5()}`, task.executionId, review.disposition, canonical2(review), created);
+      this.db.prepare("UPDATE executions SET review_status=?,revision=revision+1,updated_at=? WHERE execution_id=?").run(review.disposition, created, task.executionId);
+      this.db.prepare("INSERT INTO operations VALUES(?,?,?,?,?,?,?)").run(`op_${randomUUID5()}`, scopeId, "review", idempotencyKey, payloadHash, canonical2({ taskId, executionId: task.executionId }), created);
+      this.event(task.executionId, "review_recorded", { disposition: review.disposition });
+      return this.getExecution(scopeId, taskId, task.executionId);
+    });
+  }
+};
+
+// src/prompt.ts
+import { createHash as createHash9 } from "node:crypto";
+import { readFileSync as readFileSync10 } from "node:fs";
+function renderPrompt(input2) {
+  const { taskId, executionId, profile, packet, baseline, outputDirectory } = input2;
+  const profileText = readFileSync10(workerProfilePath(profile), "utf8");
+  const profileHash = createHash9("sha256").update(profileText).digest("hex");
+  const text = [
+    `# ${packet.title}`,
+    `Task ID: ${taskId}`,
+    `Execution ID: ${executionId}`,
+    `Profile: ${profile}`,
+    `Profile SHA-256: ${profileHash}`,
+    `Workspace: ${baseline.workspace}`,
+    `Starting state SHA-256: ${baseline.sha256}`,
+    "",
+    "## Worker profile",
+    profileText,
+    "",
+    "## Objective",
+    packet.objective,
+    "",
+    "## Authoritative inputs",
+    JSON.stringify(packet.authoritative_inputs, null, 2),
+    "",
+    "## Verified context",
+    JSON.stringify(packet.context, null, 2),
+    "",
+    "## Allowed project writes",
+    JSON.stringify(packet.allowed_writes, null, 2),
+    "",
+    "## Acceptance criteria and checks",
+    JSON.stringify({ acceptance_criteria: packet.acceptance_criteria, checks: packet.checks }, null, 2),
+    "",
+    "## Constraints and stop conditions",
+    JSON.stringify({ constraints: packet.constraints, stop_conditions: packet.stop_conditions }, null, 2),
+    "",
+    "## Output contract",
+    `Write a WorkerReport schema_version 2 as ${outputDirectory}/result.json and a readable summary as ${outputDirectory}/summary.md.`,
+    "The result.json must match this exact JSON Schema. Include every required field and no extra fields:",
+    JSON.stringify(external_exports.toJSONSchema(WorkerReportSchema)),
+    "Use the exact task and execution IDs above. Report failed or unrun checks, gaps, uncertainty, and blockers honestly.",
+    "The report is evidence for parent review; do not claim parent acceptance or invoke the parent-facing toolkit.",
+    ""
+  ].join("\n");
+  return { text, sha256: createHash9("sha256").update(text).digest("hex") };
 }
 
 // src/service.ts
 var Id2 = external_exports.string().min(1);
 var ScopeTask = external_exports.object({ scope_id: Id2, task_id: Id2 }).strict();
 function compactTask(task) {
-  const { packet: _packet, ...state } = task;
+  const {
+    packet: _packet,
+    frozenPrompt: _prompt,
+    frozenBaseline: _baseline,
+    backendConfig: _backendConfig,
+    launchContract: _launchContract,
+    ...state
+  } = task;
   return {
     ...state,
     terminal: ["completed", "failed", "cancelled", "timed_out"].includes(task.phase),
-    operationally_resolved: ["finalizing", "completed", "failed", "cancelled", "timed_out"].includes(task.phase)
+    operationally_resolved: ["completed", "failed", "cancelled", "timed_out"].includes(task.phase),
+    usage: {
+      input_tokens: null,
+      output_tokens: null,
+      cache_tokens: null,
+      reported_cost: null,
+      currency: null,
+      source: "not_captured"
+    }
   };
 }
 var ToolkitError = class extends Error {
@@ -34333,12 +43136,33 @@ var ToolkitError = class extends Error {
   retry;
 };
 var SupervisorService = class {
-  constructor(store, artifacts) {
+  constructor(store, artifacts, coordinator, freezeLaunch = freezeManagedLaunch) {
     this.store = store;
     this.artifacts = artifacts;
+    this.coordinator = coordinator;
+    this.freezeLaunch = freezeLaunch;
   }
   store;
   artifacts;
+  coordinator;
+  freezeLaunch;
+  assertExecutionAdmission(config2, workspace) {
+    const diagnostics = doctor();
+    if (!this.coordinator || !diagnostics.runtime.supportedNode || !(diagnostics.backend.executionTested || trustedDevelopmentWorkspace(config2, workspace)))
+      throw new ToolkitError(
+        "UNSUPPORTED_BACKEND",
+        "backend is not certified; development execution requires an operator opt-in for this exact trusted workspace"
+      );
+  }
+  async frozenLaunch(binary, workspace, reportPath, model) {
+    try {
+      const contract = await this.freezeLaunch(binary, workspace, reportPath);
+      assertSelectedModelDestination(model, contract);
+      return contract;
+    } catch (error62) {
+      throw new ToolkitError("POLICY_MISMATCH", `OpenCode launch policy or provider route could not be frozen: ${String(error62)}`);
+    }
+  }
   async handle(method, params) {
     switch (method) {
       case "health":
@@ -34356,17 +43180,19 @@ var SupervisorService = class {
       case "start_task":
         return this.startTask(params);
       case "continue_task":
+        return this.continueTask(params);
       case "cancel_task":
+        return this.cancelTask(params);
       case "respond_to_request":
-        throw new ToolkitError("UNSUPPORTED_BACKEND", "execution operations are not enabled in this development runtime");
+        return this.respondToRequest(params);
       default:
         throw new ToolkitError("INVALID_INPUT", `unknown operation ${method}`, "change_input");
     }
   }
-  health() {
+  async health() {
     const unresolved = this.store.unresolved();
     return {
-      ...doctor(),
+      ...await doctorWithAttached(),
       supervisor: {
         state: "running",
         queued: unresolved.filter((task) => task.phase === "queued").length,
@@ -34375,22 +43201,42 @@ var SupervisorService = class {
     };
   }
   getTask(params) {
-    const input2 = ScopeTask.extend({ execution_id: Id2.optional(), after_cursor: external_exports.number().int().min(0).default(0) }).parse(params);
-    const task = this.store.get(input2.scope_id, input2.task_id);
+    const input2 = ScopeTask.extend({
+      execution_id: Id2.optional(),
+      after_cursor: external_exports.number().int().min(0).default(0),
+      event_detail_cursor: external_exports.string().min(1).max(512).optional(),
+      diagnostic_cursor: external_exports.string().min(1).max(512).optional()
+    }).parse(params);
+    if (input2.event_detail_cursor && input2.diagnostic_cursor)
+      throw new ToolkitError("INVALID_INPUT", "choose one detail cursor", "change_input");
+    const task = input2.execution_id ? this.store.getExecution(input2.scope_id, input2.task_id, input2.execution_id) : this.store.get(input2.scope_id, input2.task_id);
     if (!task) throw new ToolkitError("INVALID_INPUT", "task not found", "change_input");
-    if (input2.execution_id && input2.execution_id !== task.executionId) throw new ToolkitError("INVALID_INPUT", "execution not found", "change_input");
-    const events = this.store.events(task.executionId, input2.after_cursor);
-    return {
+    const page = this.store.eventPage(task.executionId, input2.after_cursor);
+    const snapshot = {
       ...compactTask(task),
-      events,
-      cursor: events.at(-1)?.cursor ?? input2.after_cursor
+      events: page.events,
+      artifacts: this.store.artifactsForExecution(task.executionId).map(({ artifactId, sha256, byteLength, mediaType }) => ({ artifact_id: artifactId, sha256, byte_length: byteLength, media_type: mediaType })),
+      cursor: page.cursor,
+      has_more_events: page.hasMore
     };
+    if (input2.event_detail_cursor) return {
+      ...snapshot,
+      event_detail: this.store.eventDetailChunk(task.executionId, input2.event_detail_cursor)
+    };
+    if (input2.diagnostic_cursor) return {
+      ...snapshot,
+      diagnostic: this.store.diagnosticChunk(task.executionId, input2.diagnostic_cursor)
+    };
+    return snapshot;
   }
   listTasks(params) {
     const input2 = external_exports.object({ scope_id: Id2, limit: external_exports.number().int().min(1).max(100).default(20), states: external_exports.array(Id2).optional(), page_cursor: Id2.optional() }).strict().parse(params);
-    if (input2.page_cursor) throw new ToolkitError("INVALID_INPUT", "pagination is not available in this development runtime", "change_input");
-    const tasks = this.store.list(input2.scope_id, input2.limit).filter((task) => !input2.states || input2.states.includes(task.phase)).map(compactTask);
-    return { tasks, next_cursor: null };
+    const page = this.store.listPage(input2.scope_id, {
+      limit: input2.limit,
+      ...input2.states ? { states: input2.states } : {},
+      ...input2.page_cursor ? { cursor: input2.page_cursor } : {}
+    });
+    return { tasks: page.tasks.map(compactTask), next_cursor: page.nextCursor };
   }
   async waitTasks(params) {
     const input2 = external_exports.object({
@@ -34398,17 +43244,26 @@ var SupervisorService = class {
       targets: external_exports.array(external_exports.object({ task_id: Id2, after_cursor: external_exports.number().int().min(0).default(0) }).strict()).min(1).max(16),
       timeout_ms: external_exports.number().int().min(0).max(3e4).default(2e4)
     }).strict().parse(params);
-    const deadline = Date.now() + input2.timeout_ms;
+    const deadline2 = Date.now() + input2.timeout_ms;
     while (true) {
       const changed = input2.targets.flatMap((target) => {
         const task = this.store.get(input2.scope_id, target.task_id);
         if (!task) throw new ToolkitError("INVALID_INPUT", `task not found: ${target.task_id}`, "change_input");
-        const events = this.store.events(task.executionId, target.after_cursor);
-        return events.length ? [{ task: compactTask(task), events, cursor: events.at(-1).cursor }] : [];
+        const page = this.store.eventPage(task.executionId, target.after_cursor);
+        return page.events.length ? [{
+          task: compactTask(task),
+          events: page.events,
+          cursor: page.cursor,
+          has_more_events: page.hasMore
+        }] : [];
       });
-      if (changed.length) return { timed_out: false, changed };
-      if (Date.now() >= deadline) return { timed_out: true, changed: [] };
-      await new Promise((resolve3) => setTimeout(resolve3, Math.min(250, Math.max(1, deadline - Date.now()))));
+      if (changed.length) return {
+        timed_out: false,
+        changed: changed.slice(0, 1),
+        more_targets_ready: changed.length > 1
+      };
+      if (Date.now() >= deadline2) return { timed_out: true, changed: [] };
+      await new Promise((resolve5) => setTimeout(resolve5, Math.min(250, Math.max(1, deadline2 - Date.now()))));
     }
   }
   readArtifact(params) {
@@ -34418,8 +43273,8 @@ var SupervisorService = class {
       byte_offset: external_exports.number().int().min(0).default(0),
       max_bytes: external_exports.number().int().min(1).max(65536).default(16384)
     }).parse(params);
-    const task = this.store.get(input2.scope_id, input2.task_id);
-    if (!task || task.executionId !== input2.execution_id) throw new ToolkitError("INVALID_INPUT", "execution not found", "change_input");
+    const task = this.store.getExecution(input2.scope_id, input2.task_id, input2.execution_id);
+    if (!task) throw new ToolkitError("INVALID_INPUT", "execution not found", "change_input");
     const entry = this.store.artifact(input2.execution_id, input2.artifact_id);
     if (!entry) throw new ToolkitError("INVALID_INPUT", "artifact not found", "change_input");
     const range = this.artifacts.read(entry, input2.byte_offset, input2.max_bytes);
@@ -34430,16 +43285,34 @@ var SupervisorService = class {
       media_type: entry.mediaType,
       byte_offset: input2.byte_offset,
       next_offset: range.nextOffset,
-      content: entry.mediaType.startsWith("text/") || entry.mediaType === "application/json" ? Buffer.from(range.bytes).toString("utf8") : null
+      content: entry.mediaType.startsWith("text/") || entry.mediaType === "application/json" ? Buffer.from(range.bytes).toString("utf8") : null,
+      content_base64: Buffer.from(range.bytes).toString("base64")
     };
   }
   recordReview(params) {
     const input2 = ScopeTask.extend({ execution_id: Id2, expected_revision: external_exports.number().int().positive(), idempotency_key: external_exports.string().min(16).max(128), review: ReviewSchema }).parse(params);
-    const task = this.store.get(input2.scope_id, input2.task_id);
-    if (!task || task.executionId !== input2.execution_id) throw new ToolkitError("INVALID_INPUT", "execution not found", "change_input");
-    return compactTask(this.store.recordReview(input2.scope_id, input2.task_id, input2.expected_revision, input2.idempotency_key, input2.review));
+    const task = this.store.getExecution(input2.scope_id, input2.task_id, input2.execution_id);
+    if (!task) throw new ToolkitError("INVALID_INPUT", "execution not found", "change_input");
+    if (!["bounded-build", "bounded-inspect"].includes(task.profile)) throw new StoreConflict("INVALID_STATE");
+    if (input2.review.disposition === "accepted") {
+      for (const entry of this.store.artifactsForExecution(task.executionId)) {
+        try {
+          this.artifacts.read(entry, 0, 1);
+        } catch {
+          throw new ToolkitError("ARTIFACT_CHANGED", `artifact is missing or changed: ${entry.artifactId}`, "observe_first");
+        }
+      }
+    }
+    return compactTask(this.store.recordReview(
+      input2.scope_id,
+      input2.task_id,
+      input2.expected_revision,
+      input2.idempotency_key,
+      input2.review,
+      input2.execution_id
+    ));
   }
-  startTask(params) {
+  async startTask(params) {
     const input2 = external_exports.object({
       scope_id: Id2,
       idempotency_key: external_exports.string().min(16).max(128).optional(),
@@ -34452,6 +43325,20 @@ var SupervisorService = class {
     }).strict().parse(params);
     const packetBytes = Buffer.byteLength(JSON.stringify(input2.packet), "utf8");
     if (packetBytes > 128 * 1024) throw new ToolkitError("INVALID_INPUT", "packet exceeds 128 KiB", "change_input");
+    if (!input2.dry_run && input2.idempotency_key) {
+      const existing = this.store.findStartByKey(input2.scope_id, input2.idempotency_key, {
+        workspace: input2.workspace.path,
+        requestWorkspace: input2.workspace.path,
+        workspaceAccess: input2.workspace.access,
+        packet: input2.packet,
+        requestModel: input2.model,
+        model: "",
+        profile: input2.profile,
+        queueTimeoutSeconds: input2.limits.queue_timeout_seconds,
+        executionTimeoutSeconds: input2.limits.execution_timeout_seconds
+      });
+      if (existing) return compactTask(existing);
+    }
     const config2 = loadConfiguration();
     if (input2.limits.queue_timeout_seconds > config2.limits.queue_timeout_seconds || input2.limits.execution_timeout_seconds > config2.limits.execution_timeout_seconds) {
       throw new ToolkitError("INVALID_INPUT", "task limits exceed configured maxima", "change_input");
@@ -34484,316 +43371,218 @@ var SupervisorService = class {
       coverage_limits: baseline.coverageLimits
     };
     if (!input2.idempotency_key) throw new ToolkitError("INVALID_INPUT", "idempotency_key is required", "change_input");
-    throw new ToolkitError("UNSUPPORTED_BACKEND", "task execution is disabled until the backend compatibility and policy gates complete");
+    if (config2.attached_backend) throw new ToolkitError("UNSUPPORTED_BACKEND", "attached backend dispatch is not certified");
+    this.assertExecutionAdmission(config2, baseline.workspace);
+    const taskId = `task_${randomUUID6()}`;
+    const executionId = `exec_${randomUUID6()}`;
+    const reportPath = join7(stateDirectory(), "reports", executionId);
+    const launchContract = await this.frozenLaunch(config2.opencode_binary, baseline.workspace, reportPath, configuredModel);
+    const frozen = renderPrompt({
+      taskId,
+      executionId,
+      profile: input2.profile,
+      packet: input2.packet,
+      baseline,
+      outputDirectory: reportPath
+    });
+    const task = this.store.start({
+      taskId,
+      executionId,
+      scopeId: input2.scope_id,
+      idempotencyKey: input2.idempotency_key,
+      workspace: baseline.workspace,
+      requestWorkspace: input2.workspace.path,
+      packet: input2.packet,
+      model: `${configuredModel.provider_id}/${configuredModel.model_id}`,
+      profile: input2.profile,
+      requestModel: input2.model,
+      workspaceAccess: input2.workspace.access,
+      backendConfig: config2,
+      launchContract,
+      baselineHash: baseline.sha256,
+      promptHash: frozen.sha256,
+      frozenPrompt: frozen.text,
+      frozenBaseline: baseline,
+      reportPath,
+      queueTimeoutSeconds: input2.limits.queue_timeout_seconds,
+      executionTimeoutSeconds: input2.limits.execution_timeout_seconds
+    });
+    this.coordinator.kick();
+    return compactTask(task);
   }
-};
-
-// src/store.ts
-import { createHash as createHash3, randomUUID as randomUUID3 } from "node:crypto";
-import { mkdirSync as mkdirSync3 } from "node:fs";
-import { dirname as dirname2 } from "node:path";
-import { DatabaseSync } from "node:sqlite";
-var StoreConflict = class extends Error {
-  constructor(code) {
-    super(code);
-    this.code = code;
-  }
-  code;
-};
-function canonical(value) {
-  if (value === null || typeof value !== "object") return JSON.stringify(value);
-  if (Array.isArray(value)) return `[${value.map(canonical).join(",")}]`;
-  const object2 = value;
-  return `{${Object.keys(object2).sort().map((key) => `${JSON.stringify(key)}:${canonical(object2[key])}`).join(",")}}`;
-}
-function hashPayload(value) {
-  return createHash3("sha256").update(canonical(value)).digest("hex");
-}
-function now() {
-  return (/* @__PURE__ */ new Date()).toISOString();
-}
-var SqliteTaskStore = class {
-  db;
-  constructor(filename) {
-    mkdirSync3(dirname2(filename), { recursive: true, mode: 448 });
-    this.db = new DatabaseSync(filename);
-    this.db.exec("PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL;");
-    this.db.exec(`
-      CREATE TABLE IF NOT EXISTS schema_version(version INTEGER NOT NULL);
-      INSERT INTO schema_version(version) SELECT 1 WHERE NOT EXISTS(SELECT 1 FROM schema_version);
-      CREATE TABLE IF NOT EXISTS scopes(scope_id TEXT PRIMARY KEY, created_at TEXT NOT NULL);
-      CREATE TABLE IF NOT EXISTS tasks(
-        task_id TEXT PRIMARY KEY, scope_id TEXT NOT NULL REFERENCES scopes(scope_id),
-        workspace TEXT NOT NULL, packet_json TEXT NOT NULL, model TEXT NOT NULL, profile TEXT NOT NULL,
-        current_execution_id TEXT NOT NULL, created_at TEXT NOT NULL
-      );
-      CREATE TABLE IF NOT EXISTS executions(
-        execution_id TEXT PRIMARY KEY, task_id TEXT NOT NULL REFERENCES tasks(task_id),
-        predecessor_execution_id TEXT REFERENCES executions(execution_id),
-        revision INTEGER NOT NULL, phase TEXT NOT NULL, observation TEXT NOT NULL,
-        backend_id TEXT, session_id TEXT, user_message_id TEXT,
-        baseline_hash TEXT NOT NULL, prompt_hash TEXT NOT NULL,
-        report_validity TEXT NOT NULL DEFAULT 'pending', review_status TEXT NOT NULL DEFAULT 'pending',
-        final_manifest_hash TEXT,
-        created_at TEXT NOT NULL, updated_at TEXT NOT NULL
-      );
-      CREATE UNIQUE INDEX IF NOT EXISTS unresolved_session_owner ON executions(backend_id,session_id)
-        WHERE session_id IS NOT NULL AND phase NOT IN ('completed','failed','cancelled','timed_out');
-      CREATE TABLE IF NOT EXISTS backend_instances(
-        backend_id TEXT PRIMARY KEY, workspace TEXT NOT NULL, config_digest TEXT NOT NULL,
-        identity_json TEXT NOT NULL, created_at TEXT NOT NULL
-      );
-      CREATE TABLE IF NOT EXISTS operations(
-        operation_id TEXT PRIMARY KEY, scope_id TEXT NOT NULL REFERENCES scopes(scope_id),
-        operation TEXT NOT NULL, idempotency_key TEXT NOT NULL, payload_hash TEXT NOT NULL,
-        result_json TEXT NOT NULL, created_at TEXT NOT NULL,
-        UNIQUE(scope_id,operation,idempotency_key)
-      );
-      CREATE TABLE IF NOT EXISTS dispatch_intents(
-        execution_id TEXT PRIMARY KEY REFERENCES executions(execution_id),
-        backend_id TEXT NOT NULL, session_id TEXT NOT NULL, user_message_id TEXT NOT NULL,
-        prompt_hash TEXT NOT NULL, acknowledged INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL
-      );
-      CREATE TABLE IF NOT EXISTS resource_reservations(
-        resource_key TEXT PRIMARY KEY, execution_id TEXT NOT NULL REFERENCES executions(execution_id),
-        acquired_at TEXT NOT NULL
-      );
-      CREATE TABLE IF NOT EXISTS input_requests(
-        request_id TEXT PRIMARY KEY, execution_id TEXT NOT NULL REFERENCES executions(execution_id),
-        kind TEXT NOT NULL, revision INTEGER NOT NULL, detail_json TEXT NOT NULL, status TEXT NOT NULL
-      );
-      CREATE TABLE IF NOT EXISTS artifacts(
-        artifact_id TEXT PRIMARY KEY, execution_id TEXT NOT NULL REFERENCES executions(execution_id),
-        sha256 TEXT NOT NULL, byte_length INTEGER NOT NULL, media_type TEXT NOT NULL,
-        path TEXT NOT NULL, created_at TEXT NOT NULL
-      );
-      CREATE TABLE IF NOT EXISTS reviews(
-        review_id TEXT PRIMARY KEY, execution_id TEXT NOT NULL REFERENCES executions(execution_id),
-        disposition TEXT NOT NULL, record_json TEXT NOT NULL, created_at TEXT NOT NULL
-      );
-      CREATE TABLE IF NOT EXISTS events(
-        sequence INTEGER PRIMARY KEY AUTOINCREMENT, execution_id TEXT NOT NULL REFERENCES executions(execution_id),
-        kind TEXT NOT NULL, detail_json TEXT NOT NULL, created_at TEXT NOT NULL
-      );
-    `);
-  }
-  close() {
-    this.db.close();
-  }
-  transaction(run) {
-    this.db.exec("BEGIN IMMEDIATE");
-    try {
-      const result2 = run();
-      this.db.exec("COMMIT");
-      return result2;
-    } catch (error62) {
-      this.db.exec("ROLLBACK");
-      throw error62;
+  async continueTask(params) {
+    const input2 = ScopeTask.extend({
+      predecessor_execution_id: Id2,
+      expected_revision: external_exports.number().int().positive(),
+      idempotency_key: external_exports.string().min(16).max(128),
+      context_mode: external_exports.enum(["resume", "fresh"]),
+      packet: TaskPacketSchema
+    }).parse(params);
+    if (!this.coordinator) throw new ToolkitError("UNSUPPORTED_BACKEND", "execution coordinator is unavailable");
+    const repeated = this.store.findContinueByKey(input2.scope_id, input2.idempotency_key, {
+      taskId: input2.task_id,
+      predecessorExecutionId: input2.predecessor_execution_id,
+      packet: input2.packet,
+      contextMode: input2.context_mode
+    });
+    if (repeated) return compactTask(repeated);
+    const predecessor = this.store.getExecution(input2.scope_id, input2.task_id, input2.predecessor_execution_id);
+    const current = this.store.get(input2.scope_id, input2.task_id);
+    if (!predecessor || !current || current.executionId !== predecessor.executionId)
+      throw new ToolkitError("INVALID_INPUT", "predecessor execution is not current", "change_input");
+    if (!["bounded-build", "bounded-inspect"].includes(predecessor.profile)) throw new StoreConflict("INVALID_STATE");
+    if (predecessor.revision !== input2.expected_revision) throw new StoreConflict("STALE_REVISION");
+    if (!["completed", "failed", "cancelled", "timed_out"].includes(predecessor.phase) || predecessor.pendingRequests.length)
+      throw new StoreConflict("INVALID_STATE");
+    const priorPacket = predecessor.packet;
+    if (input2.packet.objective !== priorPacket.objective)
+      throw new ToolkitError("INVALID_INPUT", "follow-up cannot change the task objective", "change_input");
+    const config2 = loadConfiguration();
+    if (config2.attached_backend) throw new ToolkitError(
+      "UNSUPPORTED_BACKEND",
+      "attached backend is available for read-only diagnostics only"
+    );
+    this.assertExecutionAdmission(config2, current.workspace);
+    const freshModel = Object.values(config2.models).find((candidate) => `${candidate.provider_id}/${candidate.model_id}` === predecessor.model);
+    if (!freshModel) {
+      throw new ToolkitError("INVALID_INPUT", "recorded model is not configured for a follow-up", "change_input");
     }
-  }
-  event(executionId, kind, detail) {
-    this.db.prepare("INSERT INTO events(execution_id,kind,detail_json,created_at) VALUES(?,?,?,?)").run(executionId, kind, canonical(detail), now());
-  }
-  start(input2) {
-    const payloadHash = hashPayload(input2);
-    return this.transaction(() => {
-      this.db.prepare("INSERT OR IGNORE INTO scopes(scope_id,created_at) VALUES(?,?)").run(input2.scopeId, now());
-      const existing = this.db.prepare("SELECT payload_hash,result_json FROM operations WHERE scope_id=? AND operation='start' AND idempotency_key=?").get(input2.scopeId, input2.idempotencyKey);
-      if (existing) {
-        if (existing.payload_hash !== payloadHash) throw new StoreConflict("IDEMPOTENCY_CONFLICT");
-        const result2 = JSON.parse(existing.result_json);
-        const task2 = this.get(input2.scopeId, result2.taskId);
-        if (!task2) throw new Error("stored idempotency result is missing");
-        return task2;
-      }
-      const taskId = `task_${randomUUID3()}`;
-      const executionId = `exec_${randomUUID3()}`;
-      const created = now();
-      this.db.prepare("INSERT INTO tasks VALUES(?,?,?,?,?,?,?,?)").run(taskId, input2.scopeId, input2.workspace, canonical(input2.packet), input2.model, input2.profile, executionId, created);
-      this.db.prepare("INSERT INTO executions(execution_id,task_id,revision,phase,observation,baseline_hash,prompt_hash,created_at,updated_at) VALUES(?,?,1,'queued','current',?,?,?,?)").run(executionId, taskId, input2.baselineHash, input2.promptHash, created, created);
-      this.db.prepare("INSERT INTO operations VALUES(?,?,?,?,?,?,?)").run(`op_${randomUUID3()}`, input2.scopeId, "start", input2.idempotencyKey, payloadHash, canonical({ taskId, executionId }), created);
-      this.event(executionId, "queued", { taskId });
-      const task = this.get(input2.scopeId, taskId);
-      if (!task) throw new Error("new task missing");
-      return task;
+    const baseline = captureBaseline({
+      workspace: current.workspace,
+      projectRoots: config2.project_roots,
+      readRoots: config2.read_roots,
+      packet: input2.packet
     });
-  }
-  get(scopeId, taskId) {
-    const row = this.db.prepare(`SELECT t.task_id,t.scope_id,t.workspace,t.packet_json,t.model,t.profile,
-      e.execution_id,e.revision,e.phase,e.observation,e.session_id,e.user_message_id,e.report_validity,e.review_status,e.final_manifest_hash
-      FROM tasks t JOIN executions e ON e.execution_id=t.current_execution_id
-      WHERE t.scope_id=? AND t.task_id=?`).get(scopeId, taskId);
-    if (!row) return null;
-    return {
-      taskId: row.task_id,
-      executionId: row.execution_id,
-      scopeId: row.scope_id,
-      revision: row.revision,
-      phase: row.phase,
-      observation: row.observation,
-      workspace: row.workspace,
-      packet: JSON.parse(row.packet_json),
-      model: row.model,
-      profile: row.profile,
-      sessionId: row.session_id,
-      userMessageId: row.user_message_id,
-      reportValidity: row.report_validity,
-      finalManifestHash: row.final_manifest_hash,
-      reviewStatus: row.review_status
-    };
-  }
-  list(scopeId, limit = 20) {
-    const rows = this.db.prepare("SELECT task_id FROM tasks WHERE scope_id=? ORDER BY created_at DESC LIMIT ?").all(scopeId, limit);
-    return rows.flatMap(({ task_id }) => {
-      const task = this.get(scopeId, task_id);
-      return task ? [task] : [];
+    const executionId = `exec_${randomUUID6()}`;
+    const reportPath = join7(stateDirectory(), "reports", executionId);
+    if (!predecessor.launchContract) throw new ToolkitError("UNSUPPORTED_BACKEND", "predecessor launch configuration is missing");
+    if (predecessor.backendConfig?.opencode_binary !== config2.opencode_binary)
+      throw new ToolkitError("POLICY_MISMATCH", "follow-up changes the recorded OpenCode binary", "change_input");
+    const launchContract = await this.frozenLaunch(config2.opencode_binary, current.workspace, reportPath, freshModel);
+    if (policyNeutralConfigHash(launchContract) !== policyNeutralConfigHash(predecessor.launchContract))
+      throw new ToolkitError("POLICY_MISMATCH", "follow-up changes the recorded backend configuration", "change_input");
+    const frozen = renderPrompt({
+      taskId: current.taskId,
+      executionId,
+      profile: current.profile,
+      packet: input2.packet,
+      baseline,
+      outputDirectory: reportPath
     });
-  }
-  unresolved() {
-    const rows = this.db.prepare(`SELECT t.scope_id,t.task_id FROM tasks t JOIN executions e ON e.execution_id=t.current_execution_id
-      WHERE e.phase NOT IN ('completed','failed','cancelled','timed_out') ORDER BY t.created_at`).all();
-    return rows.flatMap((row) => {
-      const task = this.get(row.scope_id, row.task_id);
-      return task ? [task] : [];
+    const task = this.store.continueTask({
+      scopeId: input2.scope_id,
+      taskId: input2.task_id,
+      predecessorExecutionId: input2.predecessor_execution_id,
+      expectedRevision: input2.expected_revision,
+      idempotencyKey: input2.idempotency_key,
+      executionId,
+      packet: input2.packet,
+      contextMode: input2.context_mode,
+      baselineHash: baseline.sha256,
+      promptHash: frozen.sha256,
+      frozenPrompt: frozen.text,
+      frozenBaseline: baseline,
+      backendConfig: config2,
+      reportPath,
+      queueTimeoutSeconds: config2.limits.queue_timeout_seconds,
+      launchContract,
+      executionTimeoutSeconds: config2.limits.execution_timeout_seconds
     });
+    this.coordinator.kick();
+    return compactTask(task);
   }
-  reserve(executionId, keys) {
-    return this.transaction(() => {
-      for (const key of [...new Set(keys)].sort()) {
-        const owner = this.db.prepare("SELECT execution_id FROM resource_reservations WHERE resource_key=?").get(key);
-        if (owner && owner.execution_id !== executionId) return false;
-      }
-      for (const key of [...new Set(keys)].sort()) {
-        this.db.prepare("INSERT OR IGNORE INTO resource_reservations VALUES(?,?,?)").run(key, executionId, now());
-      }
-      return true;
+  cancelTask(params) {
+    const input2 = ScopeTask.extend({
+      execution_id: Id2,
+      reason: Id2,
+      expected_revision: external_exports.number().int().positive(),
+      idempotency_key: external_exports.string().min(16).max(128)
+    }).parse(params);
+    const candidate = this.store.getExecution(input2.scope_id, input2.task_id, input2.execution_id);
+    if (candidate && !["bounded-build", "bounded-inspect"].includes(candidate.profile)) throw new StoreConflict("INVALID_STATE");
+    const repeated = this.store.findCancelByKey(input2.scope_id, input2.idempotency_key, {
+      taskId: input2.task_id,
+      executionId: input2.execution_id,
+      reason: input2.reason,
+      requester: "parent"
     });
-  }
-  release(executionId) {
-    this.transaction(() => {
-      this.db.prepare("DELETE FROM resource_reservations WHERE execution_id=?").run(executionId);
+    if (repeated) return compactTask(repeated);
+    const task = this.store.cancelTask({
+      scopeId: input2.scope_id,
+      taskId: input2.task_id,
+      executionId: input2.execution_id,
+      expectedRevision: input2.expected_revision,
+      idempotencyKey: input2.idempotency_key,
+      reason: input2.reason,
+      requester: "parent"
     });
+    this.coordinator?.kick();
+    return compactTask(task);
   }
-  dispatchIntent(executionId) {
-    const row = this.db.prepare("SELECT backend_id,session_id,user_message_id,acknowledged FROM dispatch_intents WHERE execution_id=?").get(executionId);
-    return row ? { backendId: row.backend_id, sessionId: row.session_id, messageId: row.user_message_id, acknowledged: Boolean(row.acknowledged) } : null;
-  }
-  events(executionId, afterCursor = 0, limit = 100) {
-    const rows = this.db.prepare("SELECT sequence,kind,detail_json,created_at FROM events WHERE execution_id=? AND sequence>? ORDER BY sequence LIMIT ?").all(executionId, afterCursor, limit);
-    return rows.map((row) => ({ cursor: row.sequence, kind: row.kind, detail: JSON.parse(row.detail_json), createdAt: row.created_at }));
-  }
-  transition(scopeId, taskId, expectedRevision, phase, observation, detail = {}) {
-    return this.transaction(() => {
-      const task = this.get(scopeId, taskId);
-      if (!task) throw new Error("task not found");
-      if (task.revision !== expectedRevision) throw new StoreConflict("STALE_REVISION");
-      this.db.prepare("UPDATE executions SET phase=?,observation=?,revision=revision+1,updated_at=? WHERE execution_id=?").run(phase, observation, now(), task.executionId);
-      this.event(task.executionId, phase, detail);
-      return this.get(scopeId, taskId);
+  async respondToRequest(params) {
+    const input2 = ScopeTask.extend({
+      execution_id: Id2,
+      request_id: Id2,
+      request_revision: external_exports.number().int().positive(),
+      reply: external_exports.union([external_exports.enum(["allow_once", "deny"]), external_exports.array(external_exports.array(Id2))]),
+      authorization_basis: Id2,
+      idempotency_key: external_exports.string().min(16).max(128)
+    }).parse(params);
+    if (!this.coordinator) throw new ToolkitError("UNSUPPORTED_BACKEND", "execution coordinator is unavailable");
+    const candidate = this.store.getExecution(input2.scope_id, input2.task_id, input2.execution_id);
+    if (candidate && !["bounded-build", "bounded-inspect"].includes(candidate.profile)) throw new StoreConflict("INVALID_STATE");
+    const repeated = this.store.findResponseByKey(input2.scope_id, input2.idempotency_key, {
+      taskId: input2.task_id,
+      executionId: input2.execution_id,
+      requestId: input2.request_id,
+      requestRevision: input2.request_revision,
+      reply: input2.reply,
+      authorizationBasis: input2.authorization_basis
     });
-  }
-  bindSession(scopeId, taskId, expectedRevision, backendId, sessionId) {
-    return this.transaction(() => {
-      const task = this.get(scopeId, taskId);
-      if (!task) throw new Error("task not found");
-      if (task.revision !== expectedRevision) throw new StoreConflict("STALE_REVISION");
-      try {
-        this.db.prepare("UPDATE executions SET backend_id=?,session_id=?,revision=revision+1,updated_at=? WHERE execution_id=?").run(backendId, sessionId, now(), task.executionId);
-      } catch (error62) {
-        if (String(error62).includes("UNIQUE")) throw new StoreConflict("SESSION_BUSY");
-        throw error62;
-      }
-      this.event(task.executionId, "session_bound", { backendId, sessionId });
-      return this.get(scopeId, taskId);
+    if (repeated) {
+      this.coordinator.kick();
+      return compactTask(repeated);
+    }
+    const task = this.store.getExecution(input2.scope_id, input2.task_id, input2.execution_id);
+    if (!task) throw new ToolkitError("INVALID_INPUT", "execution not found", "change_input");
+    const request = task.pendingRequests.find((item) => item.requestId === input2.request_id);
+    if (!request) throw new ToolkitError("REQUEST_EXPIRED", "request is no longer pending", "observe_first");
+    const upstreamRequest = request.detail;
+    if (upstreamRequest.sessionId !== task.sessionId || upstreamRequest.type !== request.kind)
+      throw new ToolkitError("REQUEST_EXPIRED", "request binding does not match the execution", "observe_first");
+    if (request.kind === "permission" && Array.isArray(input2.reply) || request.kind === "question" && input2.reply === "allow_once")
+      throw new ToolkitError("INVALID_INPUT", "reply does not match request type", "change_input");
+    const updated = this.store.respondToRequest({
+      scopeId: input2.scope_id,
+      taskId: input2.task_id,
+      executionId: input2.execution_id,
+      expectedRevision: task.revision,
+      idempotencyKey: input2.idempotency_key,
+      requestId: input2.request_id,
+      requestRevision: input2.request_revision,
+      reply: input2.reply,
+      authorizationBasis: input2.authorization_basis
     });
-  }
-  recordDispatchIntent(scopeId, taskId, expectedRevision, backendId, sessionId, messageId) {
-    return this.transaction(() => {
-      const task = this.get(scopeId, taskId);
-      if (!task) throw new Error("task not found");
-      if (task.revision !== expectedRevision) throw new StoreConflict("STALE_REVISION");
-      const execution = this.db.prepare("SELECT prompt_hash FROM executions WHERE execution_id=?").get(task.executionId);
-      this.db.prepare("INSERT INTO dispatch_intents VALUES(?,?,?,?,?,0,?)").run(task.executionId, backendId, sessionId, messageId, execution.prompt_hash, now());
-      this.db.prepare("UPDATE executions SET user_message_id=?,phase='dispatching',revision=revision+1,updated_at=? WHERE execution_id=?").run(messageId, now(), task.executionId);
-      this.event(task.executionId, "dispatch_intent", { messageId });
-      return this.get(scopeId, taskId);
-    });
-  }
-  acknowledgeDispatch(executionId) {
-    this.transaction(() => {
-      this.db.prepare("UPDATE dispatch_intents SET acknowledged=1 WHERE execution_id=?").run(executionId);
-      this.event(executionId, "dispatch_acknowledged", {});
-    });
-  }
-  finalize(scopeId, taskId, expectedRevision, outcome, reportValidity, finalManifestHash) {
-    return this.transaction(() => {
-      const task = this.get(scopeId, taskId);
-      if (!task) throw new Error("task not found");
-      if (task.revision !== expectedRevision) throw new StoreConflict("STALE_REVISION");
-      if (task.phase !== "finalizing") throw new StoreConflict("INVALID_STATE");
-      this.db.prepare("UPDATE executions SET phase=?,report_validity=?,final_manifest_hash=?,revision=revision+1,updated_at=? WHERE execution_id=?").run(outcome, reportValidity, finalManifestHash, now(), task.executionId);
-      this.event(task.executionId, "finalized", { outcome, reportValidity, finalManifestHash });
-      return this.get(scopeId, taskId);
-    });
-  }
-  registerArtifact(entry) {
-    this.transaction(() => {
-      this.db.prepare("INSERT INTO artifacts VALUES(?,?,?,?,?,?,?)").run(entry.artifactId, entry.executionId, entry.sha256, entry.byteLength, entry.mediaType, entry.path, now());
-      this.event(entry.executionId, "artifact_registered", { artifactId: entry.artifactId, sha256: entry.sha256 });
-    });
-  }
-  artifact(executionId, artifactId) {
-    const row = this.db.prepare("SELECT artifact_id,execution_id,sha256,byte_length,media_type,path FROM artifacts WHERE execution_id=? AND artifact_id=?").get(executionId, artifactId);
-    return row ? {
-      artifactId: row.artifact_id,
-      executionId: row.execution_id,
-      sha256: row.sha256,
-      byteLength: row.byte_length,
-      mediaType: row.media_type,
-      path: row.path
-    } : null;
-  }
-  recordReview(scopeId, taskId, expectedRevision, idempotencyKey, review) {
-    const payloadHash = hashPayload({ taskId, review });
-    return this.transaction(() => {
-      const existing = this.db.prepare("SELECT payload_hash,result_json FROM operations WHERE scope_id=? AND operation='review' AND idempotency_key=?").get(scopeId, idempotencyKey);
-      if (existing) {
-        if (existing.payload_hash !== payloadHash) throw new StoreConflict("IDEMPOTENCY_CONFLICT");
-        const original = JSON.parse(existing.result_json);
-        const task2 = this.get(scopeId, original.taskId);
-        if (!task2) throw new Error("review task missing");
-        return task2;
-      }
-      const task = this.get(scopeId, taskId);
-      if (!task) throw new Error("task not found");
-      if (task.revision !== expectedRevision) throw new StoreConflict("STALE_REVISION");
-      if (review.disposition === "pending") throw new StoreConflict("INVALID_STATE");
-      if (review.disposition === "accepted") {
-        if (task.phase !== "completed" || task.reportValidity !== "valid" || !task.finalManifestHash || task.finalManifestHash !== review.final_manifest_sha256) {
-          throw new StoreConflict("INVALID_STATE");
-        }
-        const packet = task.packet;
-        for (const criterion of packet.acceptance_criteria ?? []) {
-          if (!criterion.required) continue;
-          const result2 = review.criteria.find((item) => item.id === criterion.id);
-          if (!result2 || result2.result !== "satisfied" || result2.evidence.length === 0) throw new StoreConflict("INVALID_STATE");
-        }
-      }
-      const created = now();
-      this.db.prepare("INSERT INTO reviews VALUES(?,?,?,?,?)").run(`review_${randomUUID3()}`, task.executionId, review.disposition, canonical(review), created);
-      this.db.prepare("UPDATE executions SET review_status=?,revision=revision+1,updated_at=? WHERE execution_id=?").run(review.disposition, created, task.executionId);
-      this.db.prepare("INSERT INTO operations VALUES(?,?,?,?,?,?,?)").run(`op_${randomUUID3()}`, scopeId, "review", idempotencyKey, payloadHash, canonical({ taskId, executionId: task.executionId }), created);
-      this.event(task.executionId, "review_recorded", { disposition: review.disposition });
-      return this.get(scopeId, taskId);
-    });
+    await this.coordinator.replyToRequest(updated, request.detail, input2.reply);
+    return compactTask(this.store.get(input2.scope_id, input2.task_id));
   }
 };
 
 // src/daemon.ts
 async function runDaemon() {
   const stateDir = stateDirectory();
-  const store = new SqliteTaskStore(join4(stateDir, "state.sqlite"));
-  const service = new SupervisorService(store, new ArtifactStore(join4(stateDir, "artifacts")));
+  const store = new SqliteTaskStore(join8(stateDir, "state.sqlite"));
+  const artifacts = new ArtifactStore(join8(stateDir, "artifacts"));
+  const coordinator = new ExecutionCoordinator(store, artifacts);
+  const service = new SupervisorService(store, artifacts, coordinator);
+  try {
+    artifacts.reconcile((artifactId) => store.artifactById(artifactId), store.allArtifacts());
+    await coordinator.start();
+  } catch (error62) {
+    await coordinator.close();
+    store.close();
+    throw error62;
+  }
   let lastRequest = Date.now();
   let closing = false;
   let server;
@@ -34802,6 +43591,7 @@ async function runDaemon() {
     closing = true;
     clearInterval(idleTimer);
     await server.close();
+    await coordinator.close();
     store.close();
   };
   try {
@@ -34818,6 +43608,7 @@ async function runDaemon() {
       return service.handle(method, params);
     });
   } catch (error62) {
+    await coordinator.close();
     store.close();
     throw error62;
   }
@@ -34839,11 +43630,11 @@ async function startDaemon(executable = fileURLToPath2(new URL("./cli.js", impor
   } catch (error62) {
     if (!String(error62).includes("not running")) throw error62;
   }
-  const child = spawn(process.execPath, [executable, "daemon", "run"], { detached: true, stdio: "ignore", env: process.env });
+  const child = spawn2(process.execPath, [executable, "daemon", "run"], { detached: true, stdio: "ignore", env: process.env });
   child.unref();
-  const deadline = Date.now() + 5e3;
-  while (Date.now() < deadline) {
-    await new Promise((resolve3) => setTimeout(resolve3, 100));
+  const deadline2 = Date.now() + 5e3;
+  while (Date.now() < deadline2) {
+    await new Promise((resolve5) => setTimeout(resolve5, 100));
     try {
       await rpcRequest(stateDir, "health", {}, 1e3);
       return { running: true, started: true };
@@ -34896,7 +43687,14 @@ function createMcpServer(call) {
   }, async (input2) => result(await call("start_task", input2)));
   server.registerTool("opencode_get_task", {
     description: "Read a compact task snapshot and material events.",
-    inputSchema: external_exports.object({ ...Scope, task_id: Id3, execution_id: Id3.optional(), after_cursor: external_exports.number().int().min(0).optional() }).strict(),
+    inputSchema: external_exports.object({
+      ...Scope,
+      task_id: Id3,
+      execution_id: Id3.optional(),
+      after_cursor: external_exports.number().int().min(0).optional(),
+      event_detail_cursor: Id3.optional(),
+      diagnostic_cursor: Id3.optional()
+    }).strict(),
     annotations: { readOnlyHint: true }
   }, async (input2) => result(await call("get_task", input2)));
   server.registerTool("opencode_list_tasks", {
@@ -34958,91 +43756,19 @@ function createMcpServer(call) {
 }
 async function runMcp() {
   await startDaemon(process.argv[1]);
-  const server = createMcpServer((method, params) => rpcRequest(stateDirectory(), method, params));
+  const server = createMcpServer((method, params) => rpcRequest(
+    stateDirectory(),
+    method,
+    params,
+    method === "wait_tasks" && params && typeof params === "object" && "timeout_ms" in params && typeof params.timeout_ms === "number" ? params.timeout_ms + 1500 : 3e4
+  ));
   await server.connect(new StdioServerTransport());
-}
-
-// src/legacy.ts
-import { createHash as createHash4 } from "node:crypto";
-import { lstatSync as lstatSync3, readFileSync as readFileSync6, realpathSync as realpathSync2 } from "node:fs";
-import { join as join5 } from "node:path";
-var RECORDS = ["job.json", "exit.json", "task.md", "events.jsonl", "stderr.log", "acceptance.md", "acceptance.json"];
-function readRecord(directory, name) {
-  const path = join5(directory, name);
-  let stat;
-  try {
-    stat = lstatSync3(path);
-  } catch (error62) {
-    if (error62.code === "ENOENT") return null;
-    throw error62;
-  }
-  if (stat.isSymbolicLink() || !stat.isFile()) throw new Error(`legacy record is not a regular file: ${name}`);
-  return readFileSync6(path);
-}
-function jsonObject(bytes, name, warnings) {
-  if (!bytes) return null;
-  try {
-    const value = JSON.parse(bytes.toString("utf8"));
-    if (value && typeof value === "object" && !Array.isArray(value)) return value;
-  } catch {
-  }
-  warnings.push(`${name} is malformed or not an object`);
-  return null;
-}
-function commandValue(value, flag) {
-  if (!Array.isArray(value) || !value.every((item) => typeof item === "string")) return null;
-  const index = value.indexOf(flag);
-  const candidate = index >= 0 ? value[index + 1] : null;
-  return typeof candidate === "string" ? candidate : null;
-}
-function inspectLegacyJob(directory) {
-  const canonicalDirectory = realpathSync2(directory);
-  if (!lstatSync3(canonicalDirectory).isDirectory()) throw new Error("legacy job path is not a directory");
-  const bytes = /* @__PURE__ */ new Map();
-  const records = [];
-  for (const name of RECORDS) {
-    const content = readRecord(canonicalDirectory, name);
-    if (!content) continue;
-    bytes.set(name, content);
-    records.push({ name, sha256: createHash4("sha256").update(content).digest("hex"), byteLength: content.byteLength });
-  }
-  const warnings = [];
-  const job = jsonObject(bytes.get("job.json") ?? null, "job.json", warnings);
-  const exit = jsonObject(bytes.get("exit.json") ?? null, "exit.json", warnings);
-  if (!job) warnings.push("job identity and original workspace are unverified");
-  if (!bytes.has("exit.json")) warnings.push("no exit record; saved PID is not stopping evidence and process outcome is unreconciled");
-  if (bytes.has("exit.json") && !exit) warnings.push("malformed exit record cannot establish an operational outcome");
-  const sessionIds = Array.isArray(exit?.session_ids) ? exit.session_ids.filter((id) => typeof id === "string") : [];
-  if (sessionIds.length) warnings.push("historical session IDs require backend, storage, and workspace verification before continuation");
-  const acceptancePresent = bytes.has("acceptance.md") || bytes.has("acceptance.json");
-  if (acceptancePresent) warnings.push("parent acceptance record is preserved but its authority and evidence have not been verified");
-  const terminal = Boolean(exit && typeof exit.state === "string" && typeof exit.returncode === "number");
-  return {
-    originalDirectory: directory,
-    canonicalDirectory,
-    records,
-    job: {
-      schemaVersion: typeof job?.schema_version === "number" ? job.schema_version : null,
-      cwd: typeof job?.cwd === "string" ? job.cwd : null,
-      taskSha256: typeof job?.task_sha256 === "string" ? job.task_sha256 : null,
-      model: commandValue(job?.command, "--model"),
-      sessionArgument: commandValue(job?.command, "--session")
-    },
-    operational: {
-      state: terminal ? exit.state : "unreconciled",
-      returnCode: terminal ? exit.returncode : null,
-      terminal,
-      sessionIds
-    },
-    parentReview: acceptancePresent ? "record_present_unverified" : "pending",
-    warnings
-  };
 }
 
 // src/cli.ts
 async function main(args) {
   if (args.length === 1 && args[0] === "doctor") {
-    process.stdout.write(`${JSON.stringify(doctor(), null, 2)}
+    process.stdout.write(`${JSON.stringify(await doctorWithAttached(), null, 2)}
 `);
     return 0;
   }
@@ -35062,11 +43788,6 @@ async function main(args) {
       return 0;
     }
   }
-  if (args[0] === "legacy" && args[1] === "inspect" && args.length === 3) {
-    process.stdout.write(`${JSON.stringify(inspectLegacyJob(args[2]), null, 2)}
-`);
-    return 0;
-  }
   if (args[0] === "tasks" && args[1] === "list" && args.length === 3) {
     process.stdout.write(`${JSON.stringify(await rpcRequest(stateDirectory(), "list_tasks", { scope_id: args[2] }), null, 2)}
 `);
@@ -35077,17 +43798,89 @@ async function main(args) {
 `);
     return 0;
   }
+  if (args[0] === "tasks" && args[1] === "diagnostics" && (args.length === 4 || args.length === 5)) {
+    process.stdout.write(`${JSON.stringify(await rpcRequest(stateDirectory(), "get_task", {
+      scope_id: args[2],
+      task_id: args[3],
+      diagnostic_cursor: args[4] ?? "start"
+    }), null, 2)}
+`);
+    return 0;
+  }
   if (args[0] === "tasks" && args[1] === "wait" && args.length === 5) {
     const timeout = Number(args[4]);
     process.stdout.write(`${JSON.stringify(await rpcRequest(stateDirectory(), "wait_tasks", {
       scope_id: args[2],
       targets: [{ task_id: args[3] }],
       timeout_ms: timeout
-    }), null, 2)}
+    }, timeout + 1500), null, 2)}
 `);
     return 0;
   }
-  process.stderr.write("Usage: opencode-agents doctor|mcp|daemon start|status|stop|tasks list|get|wait|legacy inspect\n");
+  if (args[0] === "tasks" && args[1] === "cancel" && args.length === 8) {
+    const revision = Number(args[5]);
+    if (!Number.isSafeInteger(revision) || revision < 1) throw new Error("expected_revision must be a positive integer");
+    const result2 = await rpcRequest(stateDirectory(), "cancel_task", {
+      scope_id: args[2],
+      task_id: args[3],
+      execution_id: args[4],
+      expected_revision: revision,
+      reason: args[6],
+      idempotency_key: args[7]
+    });
+    process.stdout.write(`${JSON.stringify(result2, null, 2)}
+`);
+    return 0;
+  }
+  if (args[0] === "artifacts" && args[1] === "read" && (args.length === 6 || args.length === 8)) {
+    const result2 = await rpcRequest(stateDirectory(), "read_artifact", {
+      scope_id: args[2],
+      task_id: args[3],
+      execution_id: args[4],
+      artifact_id: args[5],
+      ...args[6] ? { byte_offset: Number(args[6]) } : {},
+      ...args[7] ? { max_bytes: Number(args[7]) } : {}
+    });
+    process.stdout.write(`${JSON.stringify(result2, null, 2)}
+`);
+    return 0;
+  }
+  if (args[0] === "artifacts" && args[1] === "export" && args.length === 7) {
+    const output2 = createWriteStream(args[6], { flags: "wx", mode: 384 });
+    const hash3 = createHash10("sha256");
+    try {
+      let offset = 0;
+      let digest = null;
+      while (true) {
+        const result2 = await rpcRequest(stateDirectory(), "read_artifact", {
+          scope_id: args[2],
+          task_id: args[3],
+          execution_id: args[4],
+          artifact_id: args[5],
+          byte_offset: offset,
+          max_bytes: 65536
+        });
+        if (digest && result2.sha256 !== digest) throw new Error("artifact changed during export");
+        digest = result2.sha256;
+        const bytes = Buffer.from(result2.content_base64, "base64");
+        hash3.update(bytes);
+        if (!output2.write(bytes)) await once2(output2, "drain");
+        if (result2.next_offset === null) break;
+        offset = result2.next_offset;
+      }
+      output2.end();
+      await once2(output2, "finish");
+      if (hash3.digest("hex") !== digest) throw new Error("exported bytes do not match artifact hash");
+      process.stdout.write(`${JSON.stringify({ path: args[6], sha256: digest })}
+`);
+    } catch (error62) {
+      output2.destroy();
+      rmSync4(args[6], { force: true });
+      throw error62;
+    }
+    return 0;
+  }
+  process.stderr.write("Usage: opencode-agents doctor|mcp|daemon start|status|stop|tasks list|get|diagnostics|wait|cancel|artifacts read|export\n");
   return 2;
 }
 main(process.argv.slice(2)).then((code) => {

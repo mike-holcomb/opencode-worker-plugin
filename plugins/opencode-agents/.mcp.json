@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "opencode_agents": {
+      "command": "node",
+      "args": ["./bin/opencode-agents.mjs", "mcp"],
+      "cwd": "./"
+    }
+  }
+}

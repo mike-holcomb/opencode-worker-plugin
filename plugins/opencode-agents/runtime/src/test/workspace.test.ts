@@ -52,3 +52,20 @@ test("canonical root validation rejects symlink escapes and non-Git manifests st
     assert.ok(manifest.coverageLimits.some((limit) => limit.includes("Non-Git")));
   } finally { rmSync(root, { recursive: true, force: true }); rmSync(outside, { recursive: true, force: true }); }
 });
+
+test("a queued task sees changes inside a declared output directory before dispatch", () => {
+  const root = mkdtempSync(join(tmpdir(), "opencode-agents-workspace-"));
+  const workspace = join(root, "project");
+  mkdirSync(workspace);
+  mkdirSync(join(workspace, "out"));
+  try {
+    writeFileSync(join(workspace, "out", "existing.txt"), "before\n");
+    const baseline = captureBaseline({ workspace, projectRoots: [root], packet: {
+      authoritative_inputs: [], allowed_writes: [{ path: "out", kind: "directory", purpose: "Output" }],
+    } });
+    assert.equal(compareBaseline(baseline).fresh, true);
+    writeFileSync(join(workspace, "out", "new.txt"), "external\n");
+    assert.equal(compareBaseline(baseline).fresh, false);
+    assert.ok(compareBaseline(baseline).changed.some((path) => path.endsWith("out/new.txt")));
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});

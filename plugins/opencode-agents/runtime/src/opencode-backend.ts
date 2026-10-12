@@ -35,6 +35,12 @@ export class SdkOpenCodeBackend implements OpenCodeBackend {
     return { id, backendId: this.backendId, workspace: this.workspace };
   }
 
+  async effectiveConfiguration(control?: RequestControl): Promise<unknown> {
+    return requireData(await this.client.config.get(
+      { directory: this.workspace }, { signal: signalFor(control) },
+    ), "backend config");
+  }
+
   async inspectBackend(control?: RequestControl): Promise<BackendInspection> {
     const signal = signalFor(control);
     const health = requireData(await this.client.global.health({ signal }), "backend health");
@@ -57,6 +63,7 @@ export class SdkOpenCodeBackend implements OpenCodeBackend {
       workspace: this.workspace,
       configurationDigest,
       supportedForExecution: pair?.execution_supported ?? false,
+      exactPairRecognized: pair !== undefined,
       capabilities: pair?.capabilities ?? {
         callerAssignedMessageId: false,
         permissionRequests: false,
@@ -158,6 +165,7 @@ export class SdkOpenCodeBackend implements OpenCodeBackend {
       assistantMessageIds: assistants.map(({ info }) => info.id),
       activeTools,
       status,
+      statusOmitted: !Object.hasOwn(statuses, sessionId),
       pendingRequests,
       finished: submitted && Boolean(terminalAssistant) && status === "idle" && activeTools === 0 && pendingRequests.length === 0,
       error,

@@ -24,5 +24,6 @@ test("a denied tool-call step is not mistaken for a completed turn", async () =>
   const observation = await backend.inspectTurn("ses_test", userId);
   assert.equal(observation.submitted, true);
   assert.equal(observation.status, "unknown");
+  assert.equal(observation.statusOmitted, true);
   assert.equal(observation.finished, false);
 });

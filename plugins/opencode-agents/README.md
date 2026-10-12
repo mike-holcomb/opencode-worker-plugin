@@ -1,80 +1,34 @@
 # OpenCode Agents
 
-A Codex plugin for bounded delegation to an independently installed OpenCode CLI.
-The parent retains control and verifies deliverables; workers use separate sessions
-and durable private job artifacts. Runtime: Python 3.11+ standard library and POSIX.
-Publisher: Mike Holcomb. License: [MIT](LICENSE).
+A Codex plugin for bounded delegation through a durable local supervisor and an independently installed OpenCode backend. The v2 MCP runtime and skill ship together. The parent prepares the assignment, recovers exact task identities, inspects evidence, and records acceptance. Publisher: Mike Holcomb. License: [MIT](LICENSE).
 
-## Install
+## Current status
 
-```bash
-codex plugin marketplace add mike-holcomb/opencode-worker-plugin --ref v0.1.0
-codex plugin add opencode-agents@opencode-worker-plugin
-```
+Version `2.0.0-dev.0` is a development build. Consult the repository's `docs/v2-implementation.md` and bundled [compatibility](compatibility.json) before live execution. A working MCP connection or passing component tests alone does not certify the backend or release gates.
 
-Start a fresh Codex session, then select
-`opencode-agents:opencode-agents` (**OpenCode Agents**) from the skill picker.
-See [installation and updates](docs/installation.md) for pinning, upgrades,
-uninstall, and rollback.
+Known plugin boundary FIXME: OpenCode 1.18.35 can load a project plugin added after the worker's launch-time scan. The user accepted continued development with this limitation; use only trusted workspaces and do not treat bounded tool permissions as plugin containment. The source compatibility manifest remains execution-disabled while other release gates are incomplete.
 
 ## Use
 
-Install OpenCode independently, configure an authorized provider/model, and inspect
-`opencode run --help`. The wrapper neither selects an endpoint nor installs models.
-The tested versions and limits are recorded in [validation](docs/validation.md).
+Install a Node.js 24.15+ runtime in the 24.x line, OpenCode separately, and an authorized provider/model. Configure permitted workspace roots, model destinations, and limits outside the bundle. The `opencode-agents:opencode-agents` skill explains when to delegate, how to supply a typed packet, and how to review. The development plugin declares `node ./bin/opencode-agents.mjs mcp` as its MCP entry; installed-host resolution of that relative path is still a release gate. The runtime needs no startup `npm install`, TypeScript loader, or Python runner.
 
-The skill guides Codex through choosing whether to delegate, selecting a
-[lightweight](skills/opencode-agents/assets/task-lite.md),
-[standard](skills/opencode-agents/assets/task-template.md), or
-[full](skills/opencode-agents/assets/task-full.md) packet, previewing the job,
-monitoring its process, and independently accepting its result.
+Use `opencode_health` and `opencode_start_task` with `dry_run: true` for read-only setup checks. Live start requires either a certified backend or the [private development opt-in](docs/installation.md) for an exact trusted workspace, plus effective bounded policy and explicit task authorization. The development path does not certify the release. Keep the scope and idempotency key for recovery. A timeout does not authorize a new submission, and worker completion does not mean parent acceptance. See [installation and rollback](docs/installation.md).
 
-Read [operations](skills/opencode-agents/references/operations.md) for complete
-commands, path bases, exits, privacy, recovery and troubleshooting. Resolve the
-helper from the installed skill directory; use absolute task/output paths and an
-explicit consuming-project `--cwd`. Runtime files never belong in the plugin.
+## Build and verify
+
+From `plugins/opencode-agents`:
 
 ```bash
-python3 "$SKILL_DIR/scripts/opencode_agent.py" run \
-  --cwd "$PROJECT_DIR" --model "$MODEL" \
-  --task-file "$PRIVATE_DIR/tasks/check.md" --out "$PRIVATE_DIR/check-01"
+cd runtime
+npm ci
+npm run bundle
+cd ..
+node scripts/build_bundle.mjs --check
+node scripts/build_bundle.mjs --out /private/tmp/opencode-agents-v2.zip
+node scripts/smoke_installed_bundle.mjs /private/tmp/opencode-agents-v2.zip
+node --test tests/packaging.test.mjs
+node --test evaluation/harness.test.mjs
+node evaluation/harness.mjs validate
 ```
 
-Set the variables to actual absolute paths and a configured model first. This is a
-preview; add `--execute` within established authorization. The output directory must
-be new. Keep the foreground tool handle. `status --watch` expiration leaves the job
-running. Continue only an exact recorded session after process/write reconciliation.
-
-## Evidence and limits
-
-The 0.1.0 release preserves the original runner byte-for-byte and adds tiered
-handoffs, context/state guidance, and parent-owned acceptance. Synthetic tests,
-installed execution, real-CLI smoke work, and a 12-case A/B/C diagnostic pilot are
-documented in [validation](docs/validation.md) and [evaluation](docs/evaluation.md).
-The pilot supports conservative local-execution defaults; it does not establish
-universal quality, latency, context, or cost improvements.
-
-No queues, retries, automatic routing, worktree/sandbox management, distributed
-rate limiting, recursive delegation, messaging callbacks or Windows process
-management are included. Prompt write restrictions are not enforced isolation.
-OpenCode may store sessions/logs outside the job directory and configured providers
-control where prompts are sent. Exit success, worker assessment and parent
-acceptance are separate outcomes.
-
-## Development
-
-From the plugin directory (`plugins/opencode-agents` in the public repository):
-
-```bash
-python3 -m venv /absolute/development-environments/opencode-agents
-/absolute/development-environments/opencode-agents/bin/python -m pip install pytest PyYAML
-/absolute/development-environments/opencode-agents/bin/python -m pytest
-python3 scripts/build_bundle.py --check
-python3 scripts/build_bundle.py --out /absolute/new/opencode-agents-0.1.0.zip
-```
-
-Keep the development environment outside the plugin root. Release archives use
-the strict `bundle-files.txt` allowlist. Pytest and PyYAML are development-only;
-the runtime has no Python package dependency. The builder rejects missing runtime
-resources, unsafe links and paths, symlinks, and existing output files, then writes
-a deterministic archive for inspection.
+The archive is allowlisted and deterministic. The builder checks that the compiled executable matches the TypeScript source and writes `.manifest.json` with per-file SHA-256 values plus a `.sha256` sidecar for the archive and manifest. The installed smoke verifies those hashes, extracts the archive to a read-only path with spaces, runs diagnostics from an unrelated directory, starts the bundled MCP command with the plugin directory as its working directory, lists ten tools, and checks that runtime state stayed outside the bundle. Host plugin-relative MCP resolution remains unverified.

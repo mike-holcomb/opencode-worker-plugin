@@ -1,17 +1,5 @@
-# Lightweight task
+# Lightweight v2 task packet
 
-Tier: lightweight; context: fresh or exact-session continuation (name predecessor).
-Goal: one bounded deliverable and exclusions.
-Workdir and authoritative inputs: absolute paths/IDs; distinguish generated references.
-Constraints: applicable project rules and authorization; launch record defines model,
-provider, destination, execution limits.
-Allowed writes: exact deliverable and summary paths outside the installed bundle;
-preserve unrelated edits, helper records and parent acceptance.
-State, if mutable: relevant revision AND dirty snapshot/hash, read dependencies,
-interfaces/shared resources, freshness check.
-Check: observable acceptance, inspected bounds and direct evidence locations.
-Boundaries/stop: no extra agents, inference, network, commits or wider writes unless
-authorized; report missing inputs, stale assumptions, ambiguity or scope growth.
-Return: assigned summary path; outcome, coverage/gaps, findings/caveats, checks run
-or missing, evidence pointers and next action. Aim for 150 words; never truncate
-material blockers. Final text names summary path and blockers. Parent accepts separately.
+Use `tier: "lightweight"` for one focused lookup, check, or small change. Fill every required typed packet field even when its array is empty: `title`, `objective`, `authoritative_inputs`, `context`, `allowed_writes`, `acceptance_criteria`, `checks`, `constraints`, `stop_conditions`, and `shared_resources`.
+
+Name the exact source and deliverable, observable completion and evidence, project guidance, authorization constraints, starting revision and relevant dirty state, and a concrete stop condition. Use an empty `allowed_writes` array for a read-only task. The supervisor supplies report paths; do not add them as project writes. Return actual coverage, gaps, check results, and evidence, including a bounded no-finding statement when appropriate. The parent reviews separately.

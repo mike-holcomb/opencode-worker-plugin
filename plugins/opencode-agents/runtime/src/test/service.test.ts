@@ -44,3 +44,24 @@ test("dry-run checks configured model and baseline without admitting a task", as
     rmSync(root, { recursive: true, force: true });
   }
 });
+
+test("finalizing is ineligible for follow-up", async () => {
+  const root = mkdtempSync(join(tmpdir(), "opencode-agents-service-"));
+  const store = new SqliteTaskStore(join(root, "state.sqlite"));
+  try {
+    const service = new SupervisorService(store, new ArtifactStore(join(root, "artifacts")));
+    const task = store.start({ scopeId: "scope", idempotencyKey: "finalizing-key-12345", workspace: root,
+      packet: {}, model: "old/model", profile: "bounded-inspect", baselineHash: "a".repeat(64), promptHash: "b".repeat(64) });
+    const cursor = store.events(task.executionId).at(-1)!.cursor;
+    const wait = await service.handle("wait_tasks", { scope_id: "scope", targets: [{ task_id: task.taskId,
+      after_cursor: cursor }], timeout_ms: 15 }) as { timed_out: boolean };
+    assert.equal(wait.timed_out, true);
+    assert.equal(store.get("scope", task.taskId)?.phase, "queued");
+    store.transition("scope", task.taskId, task.revision, "finalizing", "current");
+    const projected = await service.handle("get_task", { scope_id: "scope", task_id: task.taskId }) as
+      { phase: string; terminal: boolean; operationally_resolved: boolean };
+    assert.equal(projected.phase, "finalizing");
+    assert.equal(projected.terminal, false);
+    assert.equal(projected.operationally_resolved, false);
+  } finally { store.close(); rmSync(root, { recursive: true, force: true }); }
+});

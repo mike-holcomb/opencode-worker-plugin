@@ -2,6 +2,7 @@ import { spawn } from "node:child_process";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { ArtifactStore } from "./artifacts.js";
+import { ExecutionCoordinator } from "./coordinator.js";
 import { stateDirectory } from "./config.js";
 import { rpcRequest, startRpcServer } from "./rpc.js";
 import { SupervisorService } from "./service.js";
@@ -10,7 +11,13 @@ import { SqliteTaskStore } from "./store.js";
 export async function runDaemon(): Promise<void> {
   const stateDir = stateDirectory();
   const store = new SqliteTaskStore(join(stateDir, "state.sqlite"));
-  const service = new SupervisorService(store, new ArtifactStore(join(stateDir, "artifacts")));
+  const artifacts = new ArtifactStore(join(stateDir, "artifacts"));
+  const coordinator = new ExecutionCoordinator(store, artifacts);
+  const service = new SupervisorService(store, artifacts, coordinator);
+  try {
+    artifacts.reconcile((artifactId) => store.artifactById(artifactId), store.allArtifacts());
+    await coordinator.start();
+  } catch (error) { await coordinator.close(); store.close(); throw error; }
   let lastRequest = Date.now();
   let closing = false;
   let server: Awaited<ReturnType<typeof startRpcServer>>;
@@ -19,6 +26,7 @@ export async function runDaemon(): Promise<void> {
     closing = true;
     clearInterval(idleTimer);
     await server.close();
+    await coordinator.close();
     store.close();
   };
   try {
@@ -32,7 +40,7 @@ export async function runDaemon(): Promise<void> {
       }
       return service.handle(method, params);
     });
-  } catch (error) { store.close(); throw error; }
+  } catch (error) { await coordinator.close(); store.close(); throw error; }
   const idleTimer = setInterval(() => {
     if (Date.now() - lastRequest >= 15 * 60_000 && store.unresolved().length === 0) void close();
   }, 60_000);

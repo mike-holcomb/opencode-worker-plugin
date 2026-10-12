@@ -10,6 +10,8 @@ export type BackendInspection = {
   workspace: string;
   configurationDigest: string;
   supportedForExecution: boolean;
+  /** Exact binary/SDK/OpenAPI manifest match, independent of release certification. */
+  exactPairRecognized?: boolean;
   capabilities: {
     callerAssignedMessageId: boolean;
     permissionRequests: boolean;
@@ -18,6 +20,12 @@ export type BackendInspection = {
     sessionRecovery: boolean;
   };
 };
+
+/** A private development opt-in never changes the pair's certified status. */
+export function executionPairAllowed(inspection: BackendInspection, trustedDevelopmentOptIn: boolean): boolean {
+  return inspection.supportedForExecution || (trustedDevelopmentOptIn &&
+    inspection.exactPairRecognized === true && inspection.version === "1.18.35");
+}
 
 export type SessionIdentity = {
   id: string;
@@ -38,6 +46,8 @@ export type TurnObservation = {
   assistantMessageIds: string[];
   activeTools: number;
   status: "busy" | "idle" | "retry" | "unknown";
+  /** True only when the exact session has no entry in OpenCode's status response. */
+  statusOmitted?: boolean;
   pendingRequests: PendingRequest[];
   finished: boolean;
   error: string | null;

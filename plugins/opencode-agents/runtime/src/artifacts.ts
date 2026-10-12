@@ -69,6 +69,42 @@ export class ArtifactStore {
     return readdirSync(this.staging).filter((name) => name.endsWith(".tmp"));
   }
 
+  /** Reconcile the file/SQLite publication window before admitting new work. */
+  reconcile(lookup: (artifactId: string) => ArtifactRegistration | null,
+    registered: ArtifactRegistration[] = []): { published: string[]; removed: string[] } {
+    const published: string[] = [];
+    const removed: string[] = [];
+    for (const name of this.stagedFiles()) {
+      const artifactId = name.slice(0, -4);
+      const path = join(this.staging, name);
+      const entry = lookup(artifactId);
+      if (!entry) { rmSync(path); removed.push(artifactId); continue; }
+      if (resolve(entry.path) !== join(this.objects, entry.sha256)) throw new Error(`artifact path mismatch: ${artifactId}`);
+      const staged = readFileSync(path);
+      if (staged.byteLength !== entry.byteLength || createHash("sha256").update(staged).digest("hex") !== entry.sha256)
+        throw new Error(`staged artifact differs from committed registration: ${artifactId}`);
+      if (existsSync(entry.path)) {
+        const final = readFileSync(entry.path);
+        if (final.byteLength !== entry.byteLength || createHash("sha256").update(final).digest("hex") !== entry.sha256)
+          throw new Error(`published artifact differs from committed registration: ${artifactId}`);
+        rmSync(path);
+      } else {
+        renameSync(path, entry.path);
+        this.syncDirectory(this.objects);
+      }
+      published.push(artifactId);
+    }
+    for (const entry of registered) {
+      if (resolve(entry.path) !== join(this.objects, entry.sha256)) throw new Error(`registered artifact path mismatch: ${entry.artifactId}`);
+      try {
+        const stat = lstatSync(entry.path);
+        if (!stat.isFile() || stat.isSymbolicLink() || stat.size !== entry.byteLength)
+          throw new Error("not a regular file with recorded size");
+      } catch { throw new Error(`registered artifact is missing or changed: ${entry.artifactId}`); }
+    }
+    return { published, removed };
+  }
+
   private syncDirectory(path: string): void {
     const fd = openSync(path, constants.O_RDONLY);
     try { fsyncSync(fd); } finally { closeSync(fd); }

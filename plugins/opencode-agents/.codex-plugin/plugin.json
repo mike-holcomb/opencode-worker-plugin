@@ -1,7 +1,7 @@
 {
   "name": "opencode-agents",
-  "version": "0.1.0",
-  "description": "Delegate bounded work to OpenCode CLI and verify durable results.",
+  "version": "2.0.0-dev.0",
+  "description": "Delegate bounded work through durable OpenCode tasks and verify evidence.",
   "author": {
     "name": "Mike Holcomb",
     "url": "https://github.com/mike-holcomb"
@@ -9,10 +9,11 @@
   "homepage": "https://github.com/mike-holcomb/opencode-worker-plugin",
   "repository": "https://github.com/mike-holcomb/opencode-worker-plugin",
   "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
   "interface": {
     "displayName": "OpenCode Agents",
     "shortDescription": "Delegate, monitor, and verify OpenCode work",
-    "longDescription": "Bounded OpenCode CLI jobs with tiered task handoffs, process reconciliation and independent parent verification.",
+    "longDescription": "Durable OpenCode tasks with bounded handoffs, exact-session recovery and independent parent verification.",
     "developerName": "Mike Holcomb",
     "category": "Productivity",
     "capabilities": [],

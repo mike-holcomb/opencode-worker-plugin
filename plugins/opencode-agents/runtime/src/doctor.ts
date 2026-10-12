@@ -1,12 +1,15 @@
 import { spawnSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import { configurationPath, loadConfiguration, stateDirectory } from "./config.js";
+import { inspectAttached, type AttachedDiagnostic } from "./attached.js";
 import { compatibilityPath } from "./resources.js";
 
 type DoctorResult = {
   runtime: { node: string; supportedNode: boolean; toolkit: string };
   configuration: { path: string; status: "missing" | "invalid" | "valid"; message?: string };
-  backend: { binary: string | null; version: string | null; configuredModels: string[]; certifiedPairs: string[]; executionTested: boolean };
+  backend: { mode: "managed" | "attached"; binary: string | null; version: string | null;
+    configuredModels: string[]; certifiedPairs: string[]; executionTested: boolean;
+    attached?: AttachedDiagnostic | { status: "configured"; endpoint: string; message: string } };
   storage: { path: string; exists: boolean };
 };
 
@@ -16,7 +19,7 @@ export function doctor(): DoctorResult {
   const result: DoctorResult = {
     runtime: { node: process.versions.node, supportedNode: major === 24 && minor >= 15, toolkit: "2.0.0-dev.0" },
     configuration: { path: configurationPath(), status: "missing" },
-    backend: { binary: null, version: null, configuredModels: [], certifiedPairs: [], executionTested: false },
+    backend: { mode: "managed", binary: null, version: null, configuredModels: [], certifiedPairs: [], executionTested: false },
     storage: { path: stateDirectory(), exists: existsSync(stateDirectory()) },
   };
   const manifest = JSON.parse(readFileSync(compatibilityPath(), "utf8")) as {
@@ -30,6 +33,12 @@ export function doctor(): DoctorResult {
     result.configuration.status = "valid";
     result.backend.binary = config.opencode_binary;
     result.backend.configuredModels = Object.keys(config.models);
+    if (config.attached_backend) {
+      result.backend.mode = "attached";
+      result.backend.attached = { status: "configured", endpoint: config.attached_backend.url,
+        message: "read-only attached endpoint probe has not run; dispatch is disabled" };
+      return result;
+    }
     const command = spawnSync(config.opencode_binary, ["--version"], { encoding: "utf8", timeout: 5000 });
     if (command.status === 0) result.backend.version = command.stdout.trim();
     result.backend.executionTested = Boolean(result.backend.version && manifest.pairs.some(
@@ -39,5 +48,13 @@ export function doctor(): DoctorResult {
     result.configuration.status = "invalid";
     result.configuration.message = String(error);
   }
+  return result;
+}
+
+export async function doctorWithAttached(): Promise<DoctorResult> {
+  const result = doctor();
+  if (result.configuration.status !== "valid" || result.backend.mode !== "attached") return result;
+  const config = loadConfiguration(result.configuration.path);
+  if (config.attached_backend) result.backend.attached = await inspectAttached(config.attached_backend);
   return result;
 }
