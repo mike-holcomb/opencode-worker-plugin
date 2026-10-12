@@ -62,6 +62,10 @@ export async function startRpcServer(stateDir: string, handler: RpcHandler): Pro
 
 function serveClient(client: Socket, token: string, handler: RpcHandler): void {
   let input = "";
+  // A timed-out/disconnected caller can close its socket while an admitted
+  // operation is still running. EPIPE/ECONNRESET belongs to this connection;
+  // it must not terminate the supervisor or cancel the durable operation.
+  client.on("error", () => client.destroy());
   client.setEncoding("utf8");
   client.on("data", (chunk: string) => {
     input += chunk;

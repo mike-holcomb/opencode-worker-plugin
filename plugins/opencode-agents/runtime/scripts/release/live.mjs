@@ -227,7 +227,7 @@ for (const id of cases) {
           reason:'Resolve the exact interrupted turn after backend restart without replay',idempotency_key:`release-cancel-${id}-0001`});
         decisions.push({reply:'cancel'}); log('cancel_requested',{});
       }
-      for(const request of final.pendingRequests.filter(r=>r.status==='pending')) {
+      for(const request of (final.phase==='waiting_input'?final.pendingRequests:[]).filter(r=>r.status==='pending')) {
         const detail=request.detail?.detail ?? {};
         const command=detail.metadata?.command;
         const patterns=detail.patterns ?? [];
@@ -250,9 +250,18 @@ for (const id of cases) {
         }
         const record={request_id:request.requestId,request_revision:request.revision,reply,authorization_basis:basis,permission:detail.permission,command,patterns}; decisions.push(record);
         log('permission',record);
-        await call('respond_to_request',{...refs(),execution_id:task.executionId,request_id:request.requestId,
-          request_revision:request.revision,reply,authorization_basis:basis,
-          idempotency_key:`release-reply-${request.requestId}`});
+        try {
+          await call('respond_to_request',{...refs(),execution_id:task.executionId,request_id:request.requestId,
+            request_revision:request.revision,reply,authorization_basis:basis,
+            idempotency_key:`release-reply-${request.requestId}`});
+          record.delivery='acknowledged';
+        } catch(error) {
+          if(!String(error).includes('REQUEST_EXPIRED'))throw error;
+          // A deadline can expire the request between the snapshot and reply.
+          // Refresh the exact task and preserve its outcome; never replay a reply.
+          record.delivery='expired';log('permission_expired',{request_id:request.requestId});
+          break;
+        }
       }
       await sleep(350);
     }

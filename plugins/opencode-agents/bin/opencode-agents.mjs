@@ -40756,6 +40756,7 @@ async function startRpcServer(stateDir, handler) {
 }
 function serveClient(client2, token, handler) {
   let input2 = "";
+  client2.on("error", () => client2.destroy());
   client2.setEncoding("utf8");
   client2.on("data", (chunk) => {
     input2 += chunk;

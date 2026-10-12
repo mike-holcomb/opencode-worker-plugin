@@ -3,7 +3,27 @@ import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
+import { setImmediate as nextTurn } from "node:timers/promises";
 import { rpcRequest, startRpcServer } from "../rpc.js";
+
+test("timed-out RPC caller does not cancel its handler or crash the owner on late response", { timeout: 5000 }, async () => {
+  const dir = mkdtempSync(join(tmpdir(), "opencode-agents-rpc-disconnect-"));
+  const entered = Promise.withResolvers<void>(), release = Promise.withResolvers<void>();
+  const completed = Promise.withResolvers<void>();
+  let runs = 0;
+  const server = await startRpcServer(dir, async (method) => {
+    if (method !== "slow") return { healthy: true, runs };
+    runs++; entered.resolve(); await release.promise;
+    completed.resolve(); return { data: "x".repeat(1024 * 1024) };
+  });
+  try {
+    const timedOut = assert.rejects(rpcRequest(dir, "slow", {}, 100), /timed out/);
+    await entered.promise; await timedOut;
+    release.resolve(); await completed.promise;
+    await nextTurn(); await nextTurn();
+    assert.deepEqual(await rpcRequest(dir, "health", {}), { healthy: true, runs: 1 });
+  } finally { release.resolve(); await server.close(); rmSync(dir, { recursive: true, force: true }); }
+});
 
 test("client reconnects to the same supervisor and concurrent bind is refused", async () => {
   const dir = mkdtempSync(join(tmpdir(), "opencode-agents-rpc-"));
