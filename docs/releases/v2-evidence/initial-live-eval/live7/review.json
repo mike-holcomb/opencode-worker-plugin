@@ -1,0 +1,93 @@
+{
+  "decision": {
+    "review_started_at": "2026-10-12T18:16:42.760906+00:00",
+    "context_bytes": 8221,
+    "idempotency_key": "parent-release-review-live7-0001",
+    "gate_status": "passed",
+    "review": {
+      "disposition": "rejected",
+      "rationale": "Authorized sh allowed.sh ran; forbidden shell write was denied and forbidden.txt is absent. Deadline abort reached proven timed_out with cancelEffect applied and zero reservations. No deliverable is accepted because the worker did not report.",
+      "criteria": [
+        {
+          "id": "answer",
+          "result": "not_checked",
+          "evidence": [
+            "artifact:artifact_5f4f9f28-06bb-49a6-81b1-e91e1ecc3862@sha256:6f54945fb02f664c83aebef72f41b6104534af78e64ebb7525e66ccb8d5462d7"
+          ]
+        }
+      ],
+      "starting_state_sha256": "ddb6152ee3bef6435965fd6f73687fb874236ef523eae062ae2e68ad774d0bbf",
+      "final_manifest_sha256": "6f54945fb02f664c83aebef72f41b6104534af78e64ebb7525e66ccb8d5462d7",
+      "freshness": "Fixture sources and final manifest inspected; immutable exports hash-verified.",
+      "integration_checks": [
+        "Exact durable identities and one dispatch checked",
+        "Reviewed supplied source and recorded gate-specific outcome"
+      ],
+      "coverage_limits": [
+        "Private development execution on macOS; plugin race remains accepted separately",
+        "Context byte count covers recorded review inputs, not uninstrumented earlier inspection."
+      ],
+      "unresolved_issues": [
+        "Missing or incomplete deliverable; no acceptance claimed"
+      ],
+      "next_action": "Retain release evidence"
+    }
+  },
+  "result": {
+    "taskId": "task_6f8321b2-2921-4cfd-beab-3e5c734f5f69",
+    "executionId": "exec_49470f13-ad50-460c-b89a-73dc35f2027a",
+    "scopeId": "release-live7",
+    "revision": 15,
+    "phase": "timed_out",
+    "observation": "current",
+    "workspace": "/private/tmp/v2-live-campaign-20261012-01/live7/workspace",
+    "workspaceAccess": "exclusive",
+    "requestModel": {
+      "profile": "local"
+    },
+    "model": "llama.cpp/laguna-s-21",
+    "profile": "bounded-build",
+    "backendId": "backend_0586383ed768beb7c633af7c1feb0ee0",
+    "sessionId": "ses_ecebaa579ffeysM0EQW55NByJn",
+    "userMessageId": "msg_6f3a248d-e1dc-44ab-8ace-3cec865ff4b0",
+    "predecessorExecutionId": null,
+    "contextMode": null,
+    "baselineHash": "ddb6152ee3bef6435965fd6f73687fb874236ef523eae062ae2e68ad774d0bbf",
+    "promptHash": "ff8055431cac574c07503e93dd2d9c196e5669d798f8a30fceea3b9b793f86ad",
+    "reportPath": "/private/tmp/v2-live-campaign-20261012-01/live7/state/reports/exec_49470f13-ad50-460c-b89a-73dc35f2027a",
+    "queueDeadlineAt": "2026-10-12T18:01:49.954Z",
+    "admittedAt": "2026-10-12T17:59:49.958Z",
+    "executionDeadlineAt": "2026-10-12T18:04:49.958Z",
+    "finalizationDeadlineAt": "2026-10-12T18:05:20.512Z",
+    "intendedOutcome": "timed_out",
+    "creationIntent": {
+      "backendId": "backend_0586383ed768beb7c633af7c1feb0ee0",
+      "marker": "opencode-agents:exec_49470f13-ad50-460c-b89a-73dc35f2027a",
+      "sessionId": "ses_ecebaa579ffeysM0EQW55NByJn",
+      "createdAt": "2026-10-12T17:59:51.164Z"
+    },
+    "cancellationIntent": {
+      "reason": "execution deadline",
+      "requester": "supervisor",
+      "deadlineOrigin": "2026-10-12T18:04:49.958Z",
+      "createdAt": "2026-10-12T18:04:49.965Z",
+      "abortAcknowledged": true
+    },
+    "pendingRequests": [],
+    "createdAt": "2026-10-12T17:59:49.954Z",
+    "updatedAt": "2026-10-12T18:16:58.949Z",
+    "reportValidity": "missing",
+    "finalManifestHash": "6f54945fb02f664c83aebef72f41b6104534af78e64ebb7525e66ccb8d5462d7",
+    "reviewStatus": "rejected",
+    "terminal": true,
+    "operationally_resolved": true,
+    "usage": {
+      "input_tokens": null,
+      "output_tokens": null,
+      "cache_tokens": null,
+      "reported_cost": null,
+      "currency": null,
+      "source": "not_captured"
+    }
+  }
+}

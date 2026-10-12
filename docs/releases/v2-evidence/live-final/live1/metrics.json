@@ -1,0 +1,24 @@
+{
+  "elapsed_ms": 11610,
+  "dispatches": 1,
+  "duplicate_dispatch": false,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "report_validity": "valid",
+  "terminal": true,
+  "phase": "completed",
+  "decisions": [],
+  "evaluation": null,
+  "overlap": null,
+  "status": "awaiting_parent_review",
+  "parent_review": "pending",
+  "parent_review_started_at": null,
+  "parent_review_elapsed_ms": null,
+  "parent_context_bytes": null
+}

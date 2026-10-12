@@ -1,0 +1,61 @@
+{
+  "review_started_at": "2026-10-12T18:35:56.672191+00:00",
+  "context_bytes": 767,
+  "idempotency_key": "parent-release-reject-failed-checks-0001",
+  "gate_status": "failed",
+  "review": {
+    "disposition": "rejected",
+    "rationale": "Existing model route failed with API connection errors; no report was produced. Preserve this infrastructure failure and rerun after route restoration.",
+    "criteria": [
+      {
+        "id": "fixture-check-fails",
+        "result": "not_checked",
+        "evidence": []
+      },
+      {
+        "id": "summary-exists",
+        "result": "not_checked",
+        "evidence": []
+      },
+      {
+        "id": "failed-status-visible",
+        "result": "not_checked",
+        "evidence": []
+      },
+      {
+        "id": "exit-status-visible",
+        "result": "not_checked",
+        "evidence": []
+      },
+      {
+        "id": "source-and-tests-unchanged",
+        "result": "not_checked",
+        "evidence": []
+      },
+      {
+        "id": "write-scope",
+        "result": "not_checked",
+        "evidence": []
+      },
+      {
+        "id": "parent-failure-review",
+        "result": "not_checked",
+        "evidence": []
+      }
+    ],
+    "starting_state_sha256": "f92eb9c5b387fad8cdbd37375e27cee5a8be202b300a0a6f0687e852760ca088",
+    "final_manifest_sha256": "7c99d5f6143bde353d42b1d171496eeada82ac73dc1cf61f6d8fe958826a0a0c",
+    "freshness": "Current terminal snapshot and recorded failure inspected.",
+    "integration_checks": [
+      "One dispatch recorded; missing report prevents acceptance."
+    ],
+    "coverage_limits": [
+      "Rejection based on terminal failure evidence; no successful qualitative source review claimed.",
+      "Context bytes measure the recorded rejection input only."
+    ],
+    "unresolved_issues": [
+      "Existing model route failed with API connection errors; no report was produced. Preserve this infrastructure failure and rerun after route restoration."
+    ],
+    "next_action": "Fresh isolated rerun; preserve this failed attempt."
+  }
+}

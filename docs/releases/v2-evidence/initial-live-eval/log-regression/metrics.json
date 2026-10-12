@@ -1,0 +1,36 @@
+{
+  "elapsed_ms": 119061,
+  "dispatches": 1,
+  "duplicate_dispatch": false,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "report_validity": "valid",
+  "terminal": true,
+  "phase": "completed",
+  "decisions": [],
+  "evaluation": {
+    "exit_code": 1
+  },
+  "status": "failed",
+  "parent_review": "needs_correction",
+  "parent_review_started_at": "2026-10-12T18:16:42.768115+00:00",
+  "parent_review_elapsed_ms": 19444,
+  "parent_context_bytes": 10079,
+  "observed_inference": {
+    "source": "opencode_1.18.35_exact_assistant_messages",
+    "session_id": "ses_eceaf802fffeohUKIwYG5UjKSR",
+    "user_message_id": "msg_49f5118b-7e78-4f54-bdf5-871156596934",
+    "input_tokens": 87405,
+    "output_tokens": 14736,
+    "total_tokens": 102141,
+    "assistant_messages": 7,
+    "reported_cost": null,
+    "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available."
+  }
+}

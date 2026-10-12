@@ -5,6 +5,12 @@ checkout and all evidence outside `/mnt/c`; this campaign certifies the native
 Linux filesystem in WSL2. Native Windows and Windows-mounted workspace paths are
 not covered. The runner verifies the WSL2 kernel and records it in `result.json`.
 
+Use branch `release-evidence/v2-20261012` from the repository, or the supplied
+Git bundle, and record `git rev-parse HEAD`. The prepared handoff bundle identifies
+commit `ceb4c272a91120baee02a995178e79ae7b558945` for the automated matrix.
+For live tests, use the latest evidence-branch commit containing parent permission decisions. See the [Linux live handoff](linux-release-check.md) for
+the private-state handling and parent-review requirements that also apply here.
+
 From the repository root, install the locked development dependencies once:
 
 ```sh
@@ -30,7 +36,7 @@ required check. Once OpenCode 1.18.35 and the authorized existing route at
 `http://127.0.0.1:8124/v1` are available in WSL2, the current live-gap runner is:
 
 ```sh
-node plugins/opencode-agents/runtime/scripts/release/live.mjs --execute --binary /absolute/path/to/opencode --out /tmp/v2-wsl2-live --cases live,t20
+node plugins/opencode-agents/runtime/scripts/release/live.mjs --execute --binary /absolute/path/to/opencode --out /tmp/v2-wsl2-live --cases live,t20 --permission-decisions /tmp/v2-parent-decisions.json
 ```
 
 The runner covers all ten live cases and the review-channel attempt. Parent
@@ -42,3 +48,7 @@ artifacts, not credentials or the complete private state directory.
 
 The development label and compatibility flag stay in place until the returned
 results and all remaining release gates have passed parent review.
+
+Watch for `parent_permission_needed` and record an explicit scoped decision as
+described in [additional permission requests](release-validation.md#additional-permission-requests).
+Do not approve an unfamiliar command merely to keep the suite moving.

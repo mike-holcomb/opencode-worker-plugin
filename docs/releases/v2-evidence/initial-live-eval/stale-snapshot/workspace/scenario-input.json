@@ -1,0 +1,14 @@
+{
+  "schema_version": 2,
+  "scenario_id": "stale-snapshot",
+  "run_id": "stale-snapshot-1791829658052",
+  "tier": "standard",
+  "context_mode": "fresh",
+  "context_basis": "ordinary fresh context",
+  "task_file": "task.md",
+  "fixture_files": [
+    "snapshot.json",
+    "current.json",
+    "README.txt"
+  ]
+}

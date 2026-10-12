@@ -11,7 +11,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { Client } from '@modelcontextprotocol/client';
 import { StdioClientTransport } from '@modelcontextprotocol/client/stdio';
 import { rpcRequest } from '../../dist/rpc.js';
-import { allowsDeclaredEdit } from './permissions.mjs';
+import { allowsDeclaredEdit, parentPermissionDecision } from './permissions.mjs';
 const args = process.argv.slice(2);
 const opt = (name, fallback) => args.includes(name) ? args[args.indexOf(name) + 1] : fallback;
 assert(args.includes('--execute'), 'Live inference requires --execute');
@@ -146,7 +146,7 @@ for (const id of cases) {
   async function call(name,params) { const r=await client.callTool({name:`opencode_${name}`,arguments:params});
     assert(!r.isError,JSON.stringify(r)); return r.structuredContent; }
   const refs=()=>({scope_id:scope,task_id:task.taskId});
-  const started=Date.now(); const decisions=[]; let identity, peer, peerFinal, predecessor, overlap=false;
+  const started=Date.now(); const decisions=[]; const awaitingDecisions=new Set(); let identity, peer, peerFinal, predecessor, overlap=false;
   try {
     daemon=await startDaemon(); await connect();
     assert.equal((await client.listTools()).tools.length,10);
@@ -228,18 +228,30 @@ for (const id of cases) {
         const commands=new Set((scenario?.frozen_checks??[]).filter(c=>c.kind==='command').map(c=>(c.argv??[]).join(' ')));
         if (id==='live7')commands.add('sh allowed.sh');
         if (id==='live8')commands.add('sh partial.sh');
-        const reply=(detail.permission==='bash'&&commands.has(command))||editAllowed?'allow_once':'deny';
-        const record={request_id:request.requestId,reply,permission:detail.permission,command,patterns}; decisions.push(record);
+        let reply=(detail.permission==='bash'&&commands.has(command))||editAllowed?'allow_once':'deny';
+        let basis=reply==='allow_once'?'Exact frozen fixture command or exact declared file edit within the authorized isolated evaluation.':'Outside this fixture authorization; do not retry or broaden scope.';
+        if(reply==='deny' && args.includes('--permission-decisions') && !['live7','t20'].includes(id)) {
+          const file=resolve(opt('--permission-decisions'));
+          const decisionsById=existsSync(file)?JSON.parse(readFileSync(file,'utf8')):{};
+          const decision=parentPermissionDecision(decisionsById,request);
+          if(!decision) {
+            if(!awaitingDecisions.has(request.requestId)){log('parent_permission_needed',{request_id:request.requestId,revision:request.revision,detail});awaitingDecisions.add(request.requestId);}
+            continue;
+          }
+          reply=decision.reply;basis=decision.authorization_basis;
+        }
+        const record={request_id:request.requestId,request_revision:request.revision,reply,authorization_basis:basis,permission:detail.permission,command,patterns}; decisions.push(record);
         log('permission',record);
         await call('respond_to_request',{...refs(),execution_id:task.executionId,request_id:request.requestId,
-          request_revision:request.revision,reply,authorization_basis:reply==='allow_once'?
-            'Exact frozen fixture command or exact declared file edit within the authorized isolated evaluation.':'Outside this fixture authorization; do not retry or broaden scope.',
+          request_revision:request.revision,reply,authorization_basis:basis,
           idempotency_key:`release-reply-${request.requestId}`});
       }
       await sleep(350);
     }
     assert(final,'no snapshot');
     writeFileSync(join(dir,'final.json'),JSON.stringify(final,null,2));
+    let assertionError=null;
+    try {
     if(continuation){assert.equal(final.sessionId,predecessor.sessionId);assert.notEqual(final.userMessageId,predecessor.userMessageId);}
     if(identity) for(const key of Object.keys(identity))assert.equal(final[key],identity[key]);
     if(id==='live2') {assert.equal(readFileSync(join(workspace,'answer.txt'),'utf8'),'violet\n');assert.equal(readFileSync(join(workspace,'dirty.txt'),'utf8'),'pre-existing user edit\n');}
@@ -255,6 +267,7 @@ for (const id of cases) {
           unresolved_issues:['Required orange check failed'],next_action:'Reject'}}});
       assert(attempted.isError,'false acceptance');log('acceptance_refused',{});
     }
+    } catch(error) {assertionError=String(error);process.exitCode=1;writeFileSync(join(dir,'assertion-error.json'),JSON.stringify({error:assertionError},null,2));}
     const db=new DatabaseSync(join(state,'state.sqlite'),{readOnly:true});
     const dispatches=db.prepare("SELECT COUNT(*) AS n FROM events WHERE execution_id=? AND kind='dispatch_intent'").get(task.executionId).n;
     const reviewCount=db.prepare('SELECT COUNT(*) AS n FROM reviews WHERE execution_id=?').get(task.executionId).n;
@@ -278,8 +291,8 @@ for (const id of cases) {
       evaluation={exit_code:checked.status};
     }
     const metrics={elapsed_ms:Date.now()-started,dispatches,duplicate_dispatch:dispatches!==1,usage:final.usage,
-      report_validity:final.reportValidity,terminal:final.terminal,phase:final.phase,decisions,evaluation,overlap:peer?overlap:null,
-      status:final.terminal?'awaiting_parent_review':'incomplete',parent_review:'pending',
+      report_validity:final.reportValidity,terminal:final.terminal,phase:final.phase,decisions,evaluation,assertion_error:assertionError,overlap:peer?overlap:null,
+      status:assertionError?'failed_fixture_assertion':final.terminal?'awaiting_parent_review':'incomplete',parent_review:'pending',
       parent_review_started_at:null,parent_review_elapsed_ms:null,parent_context_bytes:null};
     writeFileSync(join(dir,'metrics.json'),JSON.stringify(metrics,null,2)); log('result',metrics);
     if (final.terminal) { await client.close(); client=null; const result=await rpcRequest(state,'daemon_stop',{});

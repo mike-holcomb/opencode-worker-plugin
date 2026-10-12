@@ -1,0 +1,16 @@
+{
+  "schema_version": 2,
+  "scenario_id": "scope-growth",
+  "run_id": "scope-growth-1791829731397",
+  "prepared_workdir": "/private/tmp/v2-live-campaign-20261012-01/scope-growth/workspace",
+  "manifest_sha256": "d397b764ff5b88baa506ae6d73c3864ffc0683fe4f02b22b897013fc4d32c691",
+  "packet_schema_sha256": "d57a85f17494892fe59d470f3f0ed54071eed7dd33cee884f61d11f83506fd87",
+  "frozen_checks_sha256": "3883ee953fb5320b650ef2cc16405c869d8b3098f60badb5011747ca44e66a1c",
+  "initial_files": {
+    "adapter.py": "4193c6d00976515a94fe197b7939fe7cfde2060d06d37ed51f7c34babed1888d",
+    "CONTRACT.txt": "14b77840b18e161daf83a808f074da53ade6e4b150c8dfca46cc5eababb2bc75",
+    "feature.py": "5c076714e95a67ff7efa37107d240191a76976ce5dd0e794e3381d9500e25b57",
+    "scenario-input.json": "b37771b0dbd3b35ee5f4de3c85fc74818db207e0c71ba7653d45e0d02993ad90",
+    "task.md": "a9af855bdca6ed1097e454770c5280a450862279a98999e5f6eca8d1cfff689d"
+  }
+}

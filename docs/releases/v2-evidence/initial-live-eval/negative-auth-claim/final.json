@@ -1,0 +1,152 @@
+{
+  "taskId": "task_b185554b-9f33-4b79-8f75-28752a52fb6c",
+  "executionId": "exec_2471d211-0b90-41b9-b34c-1e85e3a54ff1",
+  "scopeId": "release-negative-auth-claim",
+  "revision": 8,
+  "phase": "failed",
+  "observation": "current",
+  "workspace": "/private/tmp/v2-live-campaign-20261012-01/negative-auth-claim/workspace",
+  "workspaceAccess": "exclusive",
+  "requestModel": {
+    "profile": "local"
+  },
+  "model": "llama.cpp/laguna-s-21",
+  "profile": "bounded-inspect",
+  "backendId": "backend_ff3059a75cfa9e7229417587131b4011",
+  "sessionId": "ses_ecea2484affeHbD4LUKMiLvFh6",
+  "userMessageId": "msg_43abfb17-eb2f-47df-85e2-38a3901622a1",
+  "predecessorExecutionId": null,
+  "contextMode": null,
+  "baselineHash": "6b7ddd70f7145bd2f7aebe04ddb48136b41609334b34101a3935904e31eb8733",
+  "promptHash": "c1cbd075778451986be36baade04d3e170e70eba83f27c420d3c0186b649a8e4",
+  "reportPath": "/private/tmp/v2-live-campaign-20261012-01/negative-auth-claim/state/reports/exec_2471d211-0b90-41b9-b34c-1e85e3a54ff1",
+  "queueDeadlineAt": "2026-10-12T18:28:26.682Z",
+  "admittedAt": "2026-10-12T18:26:26.685Z",
+  "executionDeadlineAt": "2026-10-12T18:31:26.685Z",
+  "finalizationDeadlineAt": "2026-10-12T18:28:03.011Z",
+  "intendedOutcome": "failed",
+  "creationIntent": {
+    "backendId": "backend_ff3059a75cfa9e7229417587131b4011",
+    "marker": "opencode-agents:exec_2471d211-0b90-41b9-b34c-1e85e3a54ff1",
+    "sessionId": "ses_ecea2484affeHbD4LUKMiLvFh6",
+    "createdAt": "2026-10-12T18:26:27.883Z"
+  },
+  "cancellationIntent": null,
+  "pendingRequests": [],
+  "createdAt": "2026-10-12T18:26:26.682Z",
+  "updatedAt": "2026-10-12T18:27:33.033Z",
+  "reportValidity": "missing",
+  "finalManifestHash": "6a457eca63f0aa5a150eb1c31f67bb2f4cd41ce2b883f3cbaded4daf5b36bd15",
+  "reviewStatus": "pending",
+  "terminal": true,
+  "operationally_resolved": true,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "events": [
+    {
+      "cursor": 1,
+      "kind": "queued",
+      "detail": {
+        "taskId": "task_b185554b-9f33-4b79-8f75-28752a52fb6c"
+      },
+      "createdAt": "2026-10-12T18:26:26.682Z"
+    },
+    {
+      "cursor": 2,
+      "kind": "admitted",
+      "detail": {
+        "executionDeadlineAt": "2026-10-12T18:31:26.685Z",
+        "resourceKeys": [
+          "workspace:/private/tmp/v2-live-campaign-20261012-01/negative-auth-claim/workspace"
+        ]
+      },
+      "createdAt": "2026-10-12T18:26:26.685Z"
+    },
+    {
+      "cursor": 3,
+      "kind": "creation_intent",
+      "detail": {
+        "backendId": "backend_ff3059a75cfa9e7229417587131b4011",
+        "marker": "opencode-agents:exec_2471d211-0b90-41b9-b34c-1e85e3a54ff1"
+      },
+      "createdAt": "2026-10-12T18:26:27.883Z"
+    },
+    {
+      "cursor": 4,
+      "kind": "session_bound",
+      "detail": {
+        "backendId": "backend_ff3059a75cfa9e7229417587131b4011",
+        "sessionId": "ses_ecea2484affeHbD4LUKMiLvFh6"
+      },
+      "createdAt": "2026-10-12T18:26:27.896Z"
+    },
+    {
+      "cursor": 5,
+      "kind": "dispatch_intent",
+      "detail": {
+        "messageId": "msg_43abfb17-eb2f-47df-85e2-38a3901622a1"
+      },
+      "createdAt": "2026-10-12T18:26:27.898Z"
+    },
+    {
+      "cursor": 6,
+      "kind": "dispatch_acknowledged",
+      "detail": {},
+      "createdAt": "2026-10-12T18:26:27.903Z"
+    },
+    {
+      "cursor": 7,
+      "kind": "running",
+      "detail": {
+        "messageId": "msg_43abfb17-eb2f-47df-85e2-38a3901622a1"
+      },
+      "createdAt": "2026-10-12T18:26:27.904Z"
+    },
+    {
+      "cursor": 8,
+      "kind": "finalizing",
+      "detail": {
+        "detail": {
+          "error": "{\"name\":\"APIError\",\"data\":{\"message\":\"Cannot connect to API: Unable to connect. Is the computer able to access the url?\",\"isRetryable\":true,\"metadata\":{\"url\":\"http://127.0.0.1:8124/v1/chat/completions\"}}}"
+        },
+        "intendedOutcome": "failed"
+      },
+      "createdAt": "2026-10-12T18:27:33.011Z"
+    },
+    {
+      "cursor": 9,
+      "kind": "artifact_registered",
+      "detail": {
+        "artifactId": "artifact_253f20bc-1b1f-4fa9-88d8-1af3ee3c3ce8",
+        "sha256": "6a457eca63f0aa5a150eb1c31f67bb2f4cd41ce2b883f3cbaded4daf5b36bd15"
+      },
+      "createdAt": "2026-10-12T18:27:33.026Z"
+    },
+    {
+      "cursor": 10,
+      "kind": "finalized",
+      "detail": {
+        "finalManifestHash": "6a457eca63f0aa5a150eb1c31f67bb2f4cd41ce2b883f3cbaded4daf5b36bd15",
+        "outcome": "failed",
+        "reportValidity": "missing"
+      },
+      "createdAt": "2026-10-12T18:27:33.033Z"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "artifact_253f20bc-1b1f-4fa9-88d8-1af3ee3c3ce8",
+      "sha256": "6a457eca63f0aa5a150eb1c31f67bb2f4cd41ce2b883f3cbaded4daf5b36bd15",
+      "byte_length": 713,
+      "media_type": "application/json"
+    }
+  ],
+  "cursor": 10,
+  "has_more_events": false
+}

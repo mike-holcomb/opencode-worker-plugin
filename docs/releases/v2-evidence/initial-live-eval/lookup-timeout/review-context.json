@@ -1,0 +1,56 @@
+{
+  "review_started_at": "2026-10-12T18:12:13.257Z",
+  "context_bytes": 20819,
+  "files": [
+    {
+      "path": "packet.json",
+      "sha256": "21c65b3704805cdd7bb556f7e1e22cd3b09e83925ab5e17ce8bee3c08e57e5f7",
+      "bytes": 2671
+    },
+    {
+      "path": "final.json",
+      "sha256": "250693d3db201a46e5cc55082d128bd908a6897c7292bc6454edea5336591567",
+      "bytes": 5784
+    },
+    {
+      "path": "exports.json",
+      "sha256": "eb43209698ca3850ecff1a1aa163ce5b8a3157fcf3349e83bad366b263730397",
+      "bytes": 820
+    },
+    {
+      "path": "summary.md",
+      "sha256": "3170e51b920003f4401ee621114b243975c8496ffb6ab99da5b589c067c992c0",
+      "bytes": 1630
+    },
+    {
+      "path": "artifact_ea8bd212-5dcc-4564-8392-7a678a8116fc.json",
+      "sha256": "ddca0eba5a2e8f2626a638fd7739082d77758ce45ca527ea293558fb79c98118",
+      "bytes": 7914
+    },
+    {
+      "path": "artifact_a10b3393-7f05-4c75-aac5-26c8935b8b8c.json",
+      "sha256": "257e16f7c2325e1c48cbc957f797ddb5c35e712adcbde21be88296e4f2951a84",
+      "bytes": 1078
+    },
+    {
+      "path": "workspace/client.py",
+      "sha256": "e552b0725b94bdcf604722d71108d6aec23a70ead22df1dbdb72f0951a659b19",
+      "bytes": 223
+    },
+    {
+      "path": "workspace/config.py",
+      "sha256": "9ff5fe7c175e8dd4159032e6cd3a77a016faefbb16fb61f18df59e26fef402dd",
+      "bytes": 129
+    },
+    {
+      "path": "workspace/scenario-input.json",
+      "sha256": "a2074e36c063cf1daa0e8243e51974794a1a634c81106890361c2b77242591f4",
+      "bytes": 287
+    },
+    {
+      "path": "workspace/task.md",
+      "sha256": "e542f62db3c863c35172ff4df1a91e2f35042a6c1614ef043e96dc9b61995422",
+      "bytes": 283
+    }
+  ]
+}

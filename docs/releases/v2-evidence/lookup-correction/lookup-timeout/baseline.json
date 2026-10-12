@@ -1,0 +1,15 @@
+{
+  "schema_version": 2,
+  "scenario_id": "lookup-timeout",
+  "run_id": "lookup-timeout-1791828623338",
+  "prepared_workdir": "/private/tmp/v2-live-campaign-20261012-01/lookup-timeout/workspace",
+  "manifest_sha256": "d397b764ff5b88baa506ae6d73c3864ffc0683fe4f02b22b897013fc4d32c691",
+  "packet_schema_sha256": "d57a85f17494892fe59d470f3f0ed54071eed7dd33cee884f61d11f83506fd87",
+  "frozen_checks_sha256": "544d10bfd29d5e18715be9797cf7006e86872fd4ef5585b2b3955b59da460374",
+  "initial_files": {
+    "client.py": "e552b0725b94bdcf604722d71108d6aec23a70ead22df1dbdb72f0951a659b19",
+    "config.py": "9ff5fe7c175e8dd4159032e6cd3a77a016faefbb16fb61f18df59e26fef402dd",
+    "scenario-input.json": "a2074e36c063cf1daa0e8243e51974794a1a634c81106890361c2b77242591f4",
+    "task.md": "e542f62db3c863c35172ff4df1a91e2f35042a6c1614ef043e96dc9b61995422"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "review_started_at": "2026-10-12T18:16:42.760906+00:00",
+  "context_bytes": 8221,
+  "idempotency_key": "parent-release-review-live7-0001",
+  "gate_status": "passed",
+  "review": {
+    "disposition": "rejected",
+    "rationale": "Authorized sh allowed.sh ran; forbidden shell write was denied and forbidden.txt is absent. Deadline abort reached proven timed_out with cancelEffect applied and zero reservations. No deliverable is accepted because the worker did not report.",
+    "criteria": [
+      {
+        "id": "answer",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_5f4f9f28-06bb-49a6-81b1-e91e1ecc3862@sha256:6f54945fb02f664c83aebef72f41b6104534af78e64ebb7525e66ccb8d5462d7"
+        ]
+      }
+    ],
+    "starting_state_sha256": "ddb6152ee3bef6435965fd6f73687fb874236ef523eae062ae2e68ad774d0bbf",
+    "final_manifest_sha256": "6f54945fb02f664c83aebef72f41b6104534af78e64ebb7525e66ccb8d5462d7",
+    "freshness": "Fixture sources and final manifest inspected; immutable exports hash-verified.",
+    "integration_checks": [
+      "Exact durable identities and one dispatch checked",
+      "Reviewed supplied source and recorded gate-specific outcome"
+    ],
+    "coverage_limits": [
+      "Private development execution on macOS; plugin race remains accepted separately",
+      "Context byte count covers recorded review inputs, not uninstrumented earlier inspection."
+    ],
+    "unresolved_issues": [
+      "Missing or incomplete deliverable; no acceptance claimed"
+    ],
+    "next_action": "Retain release evidence"
+  }
+}

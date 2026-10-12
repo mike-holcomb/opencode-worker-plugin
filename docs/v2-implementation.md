@@ -18,15 +18,56 @@ The implementation used bounded OpenCode code and review subagents with `llama.c
 
 Live probes against OpenCode 1.18.35 and the configured port-8124 Laguna endpoint verified exact session creation and lookup, caller-assigned message correlation, async turns, permission enumeration and `allow_once`, abort acknowledgement and completion races, SSE reconnect with snapshot recovery, effective bounded profile permissions, and external file reports. Structured output failed on message retrieval; native questions remain disabled. The user authorized use of the existing port forward but prohibited initiating SSH tunnels. An earlier `ssh -G` locally inspected SSH configuration without connecting; it was an unnecessary direct invocation and was not repeated. No test created or changed a tunnel. A listener inspection later confirmed an existing `ssh` process owned port 8124; the destination behind it was not independently verified.
 
-The plugin control boundary is an accepted known issue for now, with a FIXME in `managed-server.ts`. A disposable project plugin executed during a turn under `opencode serve --pure` even when `config.get` reported no plugins. Managed launch rejects plugin roots and JSON/JSONC declarations present at launch, disables inherited MCP entries, applies execution-specific bounded report permissions, freezes the effective provider route and policy at admission, and rejects later config drift. A plugin file introduced after preflight can still load lazily during inference. A local macOS sandbox probe showed that simple path read denial can be bypassed through a symlinked plugin directory; a private immutable sanitized configuration namespace or an upstream loader fix remains the later repair. The user authorized proceeding with this boundary documented; the execution flag remains false while the separate release checks below are incomplete. See [probe evidence](../.work/v2/compat-cert/summary.md) and [isolated v2 execution evidence](../.work/v2/live-2026-10-12/summary.md). Codex CLI 0.162.0 resolved the plugin-relative MCP command to its installed cache in an isolated local marketplace test; Git-backed tag installation remains unchecked.
+The plugin control boundary is an accepted known issue for now, with a FIXME in `managed-server.ts`. A disposable project plugin executed during a turn under `opencode serve --pure` even when `config.get` reported no plugins. Managed launch rejects plugin roots and JSON/JSONC declarations present at launch, disables inherited MCP entries, applies execution-specific bounded report permissions, freezes the effective provider route and policy at admission, and rejects later config drift. A plugin file introduced after preflight can still load lazily during inference. A local macOS sandbox probe showed that simple path read denial can be bypassed through a symlinked plugin directory; a private immutable sanitized configuration namespace or an upstream loader fix remains the later repair. The user authorized proceeding with this boundary documented; the execution flag remains false while the separate release checks below are incomplete. See [probe evidence](../.work/v2/compat-cert/summary.md) and [isolated v2 execution evidence](../.work/v2/live-2026-10-12/summary.md). Codex CLI 0.162.0 resolved the plugin-relative MCP command in a local marketplace test. The later campaign verified Git-backed installation of the historical pushed `v2.0.0-dev.0` tag using Codex 0.162.1; installation of the changed final candidate tag remains pending.
 
 An operator can now set `development_execution.enabled: true` with an exact canonical `trusted_workspaces` entry in the private runtime config. Admission and follow-ups require that match; managed launch and coordinator still require the recorded 1.18.35 binary/SDK/OpenAPI pair, required capabilities, and frozen effective policy. This development route does not alter `compatibility.json`, `doctor.backend.certifiedPairs`, or `doctor.backend.executionTested`. Removing the opt-in stops new admissions and follow-ups; already admitted executions retain their frozen config for recovery and cancellation. A public MCP [live opt-in probe](../.work/v2/live-2026-10-12/dev-opt-in.md) completed with a valid report and accepted review while the source manifest and doctor stayed uncertified.
 
 ## Verification and remaining release work
 
-The runtime build and all 87 automated runtime tests pass on Node 24.19.0/macOS arm64, including frozen configuration, execution-specific permissions, Git-root validation, correlated aborts, fresh same-server stop proof, the persisted-ACK restart guard, bounded private diagnostics, and pre-migration backup failures. Nine Node packaging tests and five evaluation harness tests pass. The 72-file deterministic bundle inventory, SHA-256 release sidecars, and relocated read-only smoke pass with ten MCP tools; the bundle stayed unchanged and state was written outside it. The v2 evaluation harness validates twelve scenarios, 69 frozen checks, and 31 fixture files without inference. Linux and WSL2 remain unchecked.
+The [release evidence campaign](release-validation.md) records the current results in
+[ledger.json](releases/v2-evidence/ledger.json). Commit `ceb4c27` passes 92 runtime
+tests, two release-runner permission tests, nine packaging tests, five evaluation
+harness tests, frozen-fixture validation, deterministic packaging, and relocated
+read-only installation on Node 24.15.0 and 24.21.0. Both local macOS arm64 runs and
+all four macOS 15/Ubuntu 24.04 CI jobs passed. This automated matrix does not
+certify live Linux execution or WSL2; those require separate operator evidence.
 
-The §19 fake-backend matrix is still incomplete: 29 of the 30 applicable cases have direct coverage, while T20 remains partial. The old T28 legacy-import case was removed with the v2-only scope. Integrated tests cover T01–T03, T05, T08, T13, T15–T17, T23–T24, T26–T27, T29, and T31. T26 exercises a separate capped private diagnostic-log path with cursor paging and material blocker retention. T20 needs an actual worker review-channel attempt under a certified server. T27 passed the read-only bundle smoke and Codex CLI 0.162.0 local marketplace command resolution; Git-backed tag installation remains unchecked. The authorized port-forwarded runs yielded passing observations for live §19.2 cases 1–5, 8, and 10. Case 6 proved exact reconciliation but ended with a missing report. Case 9 recovered the exact session/message with one dispatch after backend restart but remained unresolved; its reservation was preserved. Case 7 has scoped allow and deny observations but no complete denial outcome. The twelve v2 scenario runs, performance targets, and one-hour soak are not complete.
+All 30 applicable fault cases now have direct coverage under the configured
+trusted-workspace boundary. T20 includes a real worker request to execute the
+parent review probe, denied by the parent, with zero review mutations before the
+parent review. The configured worker MCP exclusion is separately tested. This is
+not plugin suppression or protection from hostile same-user operating-system
+access. T28 remains excluded from v2-only scope. The campaign also found and fixed
+idle backend retention, failure to replace a proven-dead owned backend, and a
+concurrent supervisor bind loser unlinking the winner's socket. Supervisor socket
+ownership is now elected before SQLite initialization or reconciliation.
+
+New live observations close the earlier incomplete outcomes: case 6 completed
+with a valid accepted report after supervisor restart; case 7 denied the forbidden
+command, then proved timeout cancellation and released ownership; case 9 recovered
+the exact session/message without replay, then proved cancellation and released
+ownership. Missing reports in cases 7 and 9 were rejected as deliverables while
+their specified operational outcomes passed. Restart checks still need repetition
+after the final supervisor election fix. Earlier cases 1–5, 8, and 10 are retained
+below as historical observations, not silently relabeled as new runs.
+
+The twelve evaluation scenarios have actual first-attempt records, but quality
+certification is incomplete. Lookup passed parent review after a same-session
+correction of invalid JSON; the failed predecessor is retained. Log investigation
+needs a bounded coverage correction. Two edit scenarios encountered a runner
+path-spelling bug, and eight later scenarios encountered an outage of the existing
+model route. Those attempts remain failed and unaccepted. Corrected-runner reruns
+are underway. Exact-turn OpenCode counters are retained where available; unknown
+usage and billing cost remain null. The one-hour/1,000-execution soak is running.
+
+Upgrade/rollback rehearsal passed with committed WAL data, historical task and
+artifact preservation, drained writers, matching-backup restoration, and refusal
+of newer schemas. Both selected runtimes use schema 3; migration snapshots and
+backup-failure paths have separate deterministic tests. Historical pushed-tag
+installation passed, but a changed candidate still needs its own immutable tag
+verification. WSL2 is assigned to the operator using the
+[prepared evidence runner](wsl2-release-check.md). Keep the development label and
+`execution_supported: false` until every remaining gate passes.
 
 The isolated 2026-10-12 test-only manifest enabled real v2 dispatch without changing the source compatibility gate. A read-only task and a declared-write task both completed with valid file reports and accepted parent reviews. The write used a scoped `allow_once` reply, changed only the declared target, and preserved pre-existing dirty content. A separate fixture ran two independent workspaces concurrently and recovered an active task with the same execution/session/message after an MCP client reconnect; both reports and parent reviews were valid. An exact-session correction produced a valid accepted follow-up while preserving the predecessor artifact. A controlled supervisor restart recovered the same active execution/session/message with one dispatch intent, but that worker finished without a report; an accepted review was correctly rejected. A fresh cancellation case used a same-server abort acknowledgement plus a separate exact-turn snapshot to prove stop, finalize `cancelled`, and release ownership. Another cancellation interrupted an active approved script, preserved its partial write, and captured that file as an immutable artifact. A backend restart recovered the exact recorded session/message with no observed replay, but remained unresolved and retained its reservation. An older denied-permission case also remains `cancelling/unknown` after a restart, with its reservation held. All fixture supervisors were stopped without clearing unresolved records or resubmitting prompts. The live run also found and fixed a non-Git report-permission root mismatch, a missing JSON Schema in the frozen prompt, and deadline-abort outcome classification. Exact IDs and artifacts are in the [first isolated run](../.work/v2/live-2026-10-12/summary.md), [concurrent and reconnect checks](../.work/v2/live-2026-10-12/extra.md), [correction and restart checks](../.work/v2/live-2026-10-12/extra2.md), and [cancellation and backend-restart checks](../.work/v2/live-2026-10-12/extra4.md).
 

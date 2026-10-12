@@ -1,0 +1,13 @@
+{
+  "schema_version": 2,
+  "scenario_id": "retry-clamp",
+  "run_id": "retry-clamp-1791828842155",
+  "tier": "standard",
+  "context_mode": "fresh",
+  "context_basis": "ordinary fresh context",
+  "task_file": "task.md",
+  "fixture_files": [
+    "retry.py",
+    "test_retry.py"
+  ]
+}

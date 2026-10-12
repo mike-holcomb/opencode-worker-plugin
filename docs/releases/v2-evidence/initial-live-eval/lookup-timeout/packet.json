@@ -1,0 +1,70 @@
+{
+  "title": "Locate the timeout definition and caller",
+  "objective": "Inspect config.py and client.py. Locate the request timeout definition and the caller that uses it. Write the assigned report summary.md with the defining path and symbol, one caller path and symbol, and any distinction between the default and an override. Do not edit source files.",
+  "tier": "lightweight",
+  "authoritative_inputs": [
+    {
+      "reference": "config.py",
+      "kind": "file",
+      "purpose": "Frozen evaluation fixture"
+    },
+    {
+      "reference": "client.py",
+      "kind": "file",
+      "purpose": "Frozen evaluation fixture"
+    }
+  ],
+  "context": {
+    "verified_facts": [],
+    "rejected_assumptions": [],
+    "exclusions": []
+  },
+  "allowed_writes": [],
+  "acceptance_criteria": [
+    {
+      "id": "summary-exists",
+      "requirement": "Preserve frozen file_exists check summary-exists",
+      "evidence_required": "Run the unchanged summary-exists evaluator check and retain its result",
+      "required": true
+    },
+    {
+      "id": "definition-cited",
+      "requirement": "Preserve frozen text_contains check definition-cited",
+      "evidence_required": "Run the unchanged definition-cited evaluator check and retain its result",
+      "required": true
+    },
+    {
+      "id": "caller-cited",
+      "requirement": "Preserve frozen text_contains check caller-cited",
+      "evidence_required": "Run the unchanged caller-cited evaluator check and retain its result",
+      "required": true
+    },
+    {
+      "id": "source-unchanged",
+      "requirement": "Preserve frozen unchanged_paths check source-unchanged",
+      "evidence_required": "Run the unchanged source-unchanged evaluator check and retain its result",
+      "required": true
+    },
+    {
+      "id": "write-scope",
+      "requirement": "Preserve frozen allowed_changed_paths check write-scope",
+      "evidence_required": "Run the unchanged write-scope evaluator check and retain its result",
+      "required": true
+    },
+    {
+      "id": "parent-lookup-review",
+      "requirement": "Verify the full supplied source was inspected, the defining symbol and caller are accurate, and default versus override is supported by the cited lines.",
+      "evidence_required": "Run the unchanged parent-lookup-review evaluator check and retain its result",
+      "required": true
+    }
+  ],
+  "checks": [],
+  "constraints": [
+    "Preserve the scenario's initial content and unrelated changes.",
+    "Report failed checks and limits without claiming parent acceptance."
+  ],
+  "stop_conditions": [
+    "Stop if a required action exceeds the declared allowed writes."
+  ],
+  "shared_resources": []
+}

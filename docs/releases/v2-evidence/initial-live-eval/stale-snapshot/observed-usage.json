@@ -1,0 +1,28 @@
+{
+  "source": "opencode_1.18.35_exact_assistant_messages",
+  "session_id": "ses_ecea1294fffefzfSFYjHMclDC7",
+  "user_message_id": "msg_dff84d93-5317-4037-bf21-dd2b1a5dce0c",
+  "input_tokens": null,
+  "output_tokens": null,
+  "total_tokens": null,
+  "assistant_messages": 1,
+  "reported_cost": null,
+  "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available.",
+  "messages": [
+    {
+      "id": "msg_1315ed780001T0D5Efbz11xBid",
+      "parent_id": "msg_dff84d93-5317-4037-bf21-dd2b1a5dce0c",
+      "finish": null,
+      "tokens": {
+        "input": 0,
+        "output": 0,
+        "reasoning": 0,
+        "cache": {
+          "read": 0,
+          "write": 0
+        }
+      },
+      "raw_cost": 0
+    }
+  ]
+}

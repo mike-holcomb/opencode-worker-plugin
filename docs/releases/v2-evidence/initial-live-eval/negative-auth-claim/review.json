@@ -1,0 +1,104 @@
+{
+  "decision": {
+    "review_started_at": "2026-10-12T18:35:56.657087+00:00",
+    "context_bytes": 703,
+    "idempotency_key": "parent-release-reject-negative-auth-claim-0001",
+    "gate_status": "failed",
+    "review": {
+      "disposition": "rejected",
+      "rationale": "Existing model route failed with API connection errors; no report was produced. Preserve this infrastructure failure and rerun after route restoration.",
+      "criteria": [
+        {
+          "id": "summary-exists",
+          "result": "not_checked",
+          "evidence": []
+        },
+        {
+          "id": "bounded-negative",
+          "result": "not_checked",
+          "evidence": []
+        },
+        {
+          "id": "bounds-and-gap",
+          "result": "not_checked",
+          "evidence": []
+        },
+        {
+          "id": "write-scope",
+          "result": "not_checked",
+          "evidence": []
+        },
+        {
+          "id": "parent-negative-review",
+          "result": "not_checked",
+          "evidence": []
+        }
+      ],
+      "starting_state_sha256": "6b7ddd70f7145bd2f7aebe04ddb48136b41609334b34101a3935904e31eb8733",
+      "final_manifest_sha256": "6a457eca63f0aa5a150eb1c31f67bb2f4cd41ce2b883f3cbaded4daf5b36bd15",
+      "freshness": "Current terminal snapshot and recorded failure inspected.",
+      "integration_checks": [
+        "One dispatch recorded; missing report prevents acceptance."
+      ],
+      "coverage_limits": [
+        "Rejection based on terminal failure evidence; no successful qualitative source review claimed.",
+        "Context bytes measure the recorded rejection input only."
+      ],
+      "unresolved_issues": [
+        "Existing model route failed with API connection errors; no report was produced. Preserve this infrastructure failure and rerun after route restoration."
+      ],
+      "next_action": "Fresh isolated rerun; preserve this failed attempt."
+    }
+  },
+  "result": {
+    "taskId": "task_b185554b-9f33-4b79-8f75-28752a52fb6c",
+    "executionId": "exec_2471d211-0b90-41b9-b34c-1e85e3a54ff1",
+    "scopeId": "release-negative-auth-claim",
+    "revision": 9,
+    "phase": "failed",
+    "observation": "current",
+    "workspace": "/private/tmp/v2-live-campaign-20261012-01/negative-auth-claim/workspace",
+    "workspaceAccess": "exclusive",
+    "requestModel": {
+      "profile": "local"
+    },
+    "model": "llama.cpp/laguna-s-21",
+    "profile": "bounded-inspect",
+    "backendId": "backend_ff3059a75cfa9e7229417587131b4011",
+    "sessionId": "ses_ecea2484affeHbD4LUKMiLvFh6",
+    "userMessageId": "msg_43abfb17-eb2f-47df-85e2-38a3901622a1",
+    "predecessorExecutionId": null,
+    "contextMode": null,
+    "baselineHash": "6b7ddd70f7145bd2f7aebe04ddb48136b41609334b34101a3935904e31eb8733",
+    "promptHash": "c1cbd075778451986be36baade04d3e170e70eba83f27c420d3c0186b649a8e4",
+    "reportPath": "/private/tmp/v2-live-campaign-20261012-01/negative-auth-claim/state/reports/exec_2471d211-0b90-41b9-b34c-1e85e3a54ff1",
+    "queueDeadlineAt": "2026-10-12T18:28:26.682Z",
+    "admittedAt": "2026-10-12T18:26:26.685Z",
+    "executionDeadlineAt": "2026-10-12T18:31:26.685Z",
+    "finalizationDeadlineAt": "2026-10-12T18:28:03.011Z",
+    "intendedOutcome": "failed",
+    "creationIntent": {
+      "backendId": "backend_ff3059a75cfa9e7229417587131b4011",
+      "marker": "opencode-agents:exec_2471d211-0b90-41b9-b34c-1e85e3a54ff1",
+      "sessionId": "ses_ecea2484affeHbD4LUKMiLvFh6",
+      "createdAt": "2026-10-12T18:26:27.883Z"
+    },
+    "cancellationIntent": null,
+    "pendingRequests": [],
+    "createdAt": "2026-10-12T18:26:26.682Z",
+    "updatedAt": "2026-10-12T18:36:17.894Z",
+    "reportValidity": "missing",
+    "finalManifestHash": "6a457eca63f0aa5a150eb1c31f67bb2f4cd41ce2b883f3cbaded4daf5b36bd15",
+    "reviewStatus": "rejected",
+    "terminal": true,
+    "operationally_resolved": true,
+    "usage": {
+      "input_tokens": null,
+      "output_tokens": null,
+      "cache_tokens": null,
+      "reported_cost": null,
+      "currency": null,
+      "source": "not_captured"
+    }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "review_started_at": "2026-10-12T18:39:48.631Z",
+  "context_bytes": 25838,
+  "files": [
+    {
+      "path": "packet.json",
+      "sha256": "cfc11ceb70010a1bd9deba48dbf89245c309544e323682e93eb534cab2ee040e",
+      "bytes": 4212
+    },
+    {
+      "path": "final.json",
+      "sha256": "a4d10426081c3af68828cbb417829625826c2cc34d7b9816bc6ecb5ee1c16497",
+      "bytes": 5430
+    },
+    {
+      "path": "exports.json",
+      "sha256": "b6d925831f4b1c3281f3a8a6a0585c99a1ae49eb9d411fb7a17a2815721e7c4f",
+      "bytes": 1015
+    },
+    {
+      "path": "summary.md",
+      "sha256": "419f29051461992cbaec54e27ab043439f7524b410fc485a522afd6bc01d22d2",
+      "bytes": 3436
+    },
+    {
+      "path": "artifact_12883167-7b23-479c-a61a-0e84a6dd7fc7.json",
+      "sha256": "c7e0a212e02b4a98c4a4dbb1267cc0581ea16fe4c51af066cb96750b00373ee6",
+      "bytes": 9524
+    },
+    {
+      "path": "artifact_c85f91d6-c279-4f09-af7e-a76f416458b1.json",
+      "sha256": "0310538bb032d605b941637a2c6db173faedda0e82b6b62ddf1bc134ee6b8da5",
+      "bytes": 1022
+    },
+    {
+      "path": "workspace/deployments.txt",
+      "sha256": "b6bbc30c9b8b3e6714b3bc5c7b184b084be51d4bcc887ff32766acb44b590910",
+      "bytes": 194
+    },
+    {
+      "path": "workspace/scenario-input.json",
+      "sha256": "7741f5d6d7a877a55fa262ec2f29db923e77d76fbaff2ee0008c75beb3ba8fa2",
+      "bytes": 292
+    },
+    {
+      "path": "workspace/service.log",
+      "sha256": "bd16226e787c3317f575106eb6b7a208c9dd933c38a4867c1be8c0ad92b5b613",
+      "bytes": 411
+    },
+    {
+      "path": "workspace/task.md",
+      "sha256": "7e03aca03a08142fa0ba8fddd7a3cfb0fa6ed0f2922cd3651399e8bb3c530c71",
+      "bytes": 302
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "schema_version": 2,
+  "scenario_id": "context-reconcile",
+  "run_id": "context-reconcile-1791829951376",
+  "tier": "full",
+  "context_mode": "fresh",
+  "context_basis": "simulated predecessor handoff; no real recorded session",
+  "task_file": "task.md",
+  "fixture_files": [
+    "handoff.md",
+    "source.py",
+    "decision-log.md"
+  ]
+}

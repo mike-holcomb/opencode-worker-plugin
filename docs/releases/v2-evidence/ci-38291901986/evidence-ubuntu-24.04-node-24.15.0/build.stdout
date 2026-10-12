@@ -1,0 +1,8 @@
+
+> @mike-holcomb/opencode-agents@2.0.0-dev.0 bundle
+> npm run build && node scripts/bundle.mjs
+
+
+> @mike-holcomb/opencode-agents@2.0.0-dev.0 build
+> tsc -p tsconfig.json
+

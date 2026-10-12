@@ -1,0 +1,93 @@
+{
+  "decision": {
+    "review_started_at": "2026-10-12T18:16:42.762595+00:00",
+    "context_bytes": 6744,
+    "idempotency_key": "parent-release-review-live9-0001",
+    "gate_status": "passed",
+    "review": {
+      "disposition": "rejected",
+      "rationale": "Killed only the owned backend; replacement reconciled the exact execution/session/message with one dispatch. Fresh acknowledged abort and independent stop proof finalized cancelled and released ownership. This is the agreed proven-terminal recovery outcome, not successful delivery.",
+      "criteria": [
+        {
+          "id": "answer",
+          "result": "not_checked",
+          "evidence": [
+            "artifact:artifact_b8a279d7-ff3a-4874-bce3-12ceffa1edec@sha256:7f028cdfecea79e37a880ed800b7f6c80de1b3f44c8e8837d586f63bc4f67abf"
+          ]
+        }
+      ],
+      "starting_state_sha256": "9ea3bb5aba180c62587bc91271f67f42bdc46352ffbe33cbaa92c630d8b3c690",
+      "final_manifest_sha256": "7f028cdfecea79e37a880ed800b7f6c80de1b3f44c8e8837d586f63bc4f67abf",
+      "freshness": "Fixture sources and final manifest inspected; immutable exports hash-verified.",
+      "integration_checks": [
+        "Exact durable identities and one dispatch checked",
+        "Reviewed supplied source and recorded gate-specific outcome"
+      ],
+      "coverage_limits": [
+        "Private development execution on macOS; plugin race remains accepted separately",
+        "Context byte count covers recorded review inputs, not uninstrumented earlier inspection."
+      ],
+      "unresolved_issues": [
+        "Missing or incomplete deliverable; no acceptance claimed"
+      ],
+      "next_action": "Retain release evidence"
+    }
+  },
+  "result": {
+    "taskId": "task_d57884e3-f0ac-4b32-af00-217b5a78ab70",
+    "executionId": "exec_fa333acc-d913-4e3d-973b-0d97388fa126",
+    "scopeId": "release-live9",
+    "revision": 12,
+    "phase": "cancelled",
+    "observation": "current",
+    "workspace": "/private/tmp/v2-live-campaign-20261012-01/live9/workspace",
+    "workspaceAccess": "exclusive",
+    "requestModel": {
+      "profile": "local"
+    },
+    "model": "llama.cpp/laguna-s-21",
+    "profile": "bounded-inspect",
+    "backendId": "backend_36260487e711603c27887e133dca10aa",
+    "sessionId": "ses_eceb5f1a9ffeuhG2kXaykrmRVX",
+    "userMessageId": "msg_e5850bdf-d0c7-4eca-8a6b-463d8efd2e44",
+    "predecessorExecutionId": null,
+    "contextMode": null,
+    "baselineHash": "9ea3bb5aba180c62587bc91271f67f42bdc46352ffbe33cbaa92c630d8b3c690",
+    "promptHash": "68d0a346e76c9bf5edd6cc690b32a9384e63b5d28b8e62a7ec4889f8ba019335",
+    "reportPath": "/private/tmp/v2-live-campaign-20261012-01/live9/state/reports/exec_fa333acc-d913-4e3d-973b-0d97388fa126",
+    "queueDeadlineAt": "2026-10-12T18:06:58.065Z",
+    "admittedAt": "2026-10-12T18:04:58.068Z",
+    "executionDeadlineAt": "2026-10-12T18:09:58.068Z",
+    "finalizationDeadlineAt": "2026-10-12T18:05:40.614Z",
+    "intendedOutcome": "cancelled",
+    "creationIntent": {
+      "backendId": "backend_36260487e711603c27887e133dca10aa",
+      "marker": "opencode-agents:exec_fa333acc-d913-4e3d-973b-0d97388fa126",
+      "sessionId": "ses_eceb5f1a9ffeuhG2kXaykrmRVX",
+      "createdAt": "2026-10-12T18:04:59.341Z"
+    },
+    "cancellationIntent": {
+      "reason": "Resolve the exact interrupted turn after backend restart without replay",
+      "requester": "parent",
+      "deadlineOrigin": null,
+      "createdAt": "2026-10-12T18:05:10.584Z",
+      "abortAcknowledged": true
+    },
+    "pendingRequests": [],
+    "createdAt": "2026-10-12T18:04:58.065Z",
+    "updatedAt": "2026-10-12T18:16:59.756Z",
+    "reportValidity": "missing",
+    "finalManifestHash": "7f028cdfecea79e37a880ed800b7f6c80de1b3f44c8e8837d586f63bc4f67abf",
+    "reviewStatus": "rejected",
+    "terminal": true,
+    "operationally_resolved": true,
+    "usage": {
+      "input_tokens": null,
+      "output_tokens": null,
+      "cache_tokens": null,
+      "reported_cost": null,
+      "currency": null,
+      "source": "not_captured"
+    }
+  }
+}

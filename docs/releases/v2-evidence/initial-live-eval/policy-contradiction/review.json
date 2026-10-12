@@ -1,0 +1,99 @@
+{
+  "decision": {
+    "review_started_at": "2026-10-12T18:35:56.654076+00:00",
+    "context_bytes": 686,
+    "idempotency_key": "parent-release-reject-policy-contradiction-0001",
+    "gate_status": "failed",
+    "review": {
+      "disposition": "rejected",
+      "rationale": "Existing model route failed with API connection errors; no report was produced. Preserve this infrastructure failure and rerun after route restoration.",
+      "criteria": [
+        {
+          "id": "summary-exists",
+          "result": "not_checked",
+          "evidence": []
+        },
+        {
+          "id": "coverage-recorded",
+          "result": "not_checked",
+          "evidence": []
+        },
+        {
+          "id": "write-scope",
+          "result": "not_checked",
+          "evidence": []
+        },
+        {
+          "id": "parent-qualitative-review",
+          "result": "not_checked",
+          "evidence": []
+        }
+      ],
+      "starting_state_sha256": "e202ef1dc6233c1005152e3c21c3a45712e1d6aae5eb2698cb2b8ce1ef4e7fc0",
+      "final_manifest_sha256": "2fe3e201da4236a2f829ed07a94ca58f190036993bd41a6af8ff8d90a2ae56a4",
+      "freshness": "Current terminal snapshot and recorded failure inspected.",
+      "integration_checks": [
+        "One dispatch recorded; missing report prevents acceptance."
+      ],
+      "coverage_limits": [
+        "Rejection based on terminal failure evidence; no successful qualitative source review claimed.",
+        "Context bytes measure the recorded rejection input only."
+      ],
+      "unresolved_issues": [
+        "Existing model route failed with API connection errors; no report was produced. Preserve this infrastructure failure and rerun after route restoration."
+      ],
+      "next_action": "Fresh isolated rerun; preserve this failed attempt."
+    }
+  },
+  "result": {
+    "taskId": "task_b1e650ef-82d2-45cb-9be0-b11164dd4580",
+    "executionId": "exec_6d71a409-3fed-450f-939c-6e1405c1f9b9",
+    "scopeId": "release-policy-contradiction",
+    "revision": 9,
+    "phase": "failed",
+    "observation": "current",
+    "workspace": "/private/tmp/v2-live-campaign-20261012-01/policy-contradiction/workspace",
+    "workspaceAccess": "exclusive",
+    "requestModel": {
+      "profile": "local"
+    },
+    "model": "llama.cpp/laguna-s-21",
+    "profile": "bounded-build",
+    "backendId": "backend_e0589029981ba60c51a794c082b4400f",
+    "sessionId": "ses_ecea43826ffeGeda3V624oFXrj",
+    "userMessageId": "msg_db8857be-e068-4de7-a769-0108a2e9225d",
+    "predecessorExecutionId": null,
+    "contextMode": null,
+    "baselineHash": "e202ef1dc6233c1005152e3c21c3a45712e1d6aae5eb2698cb2b8ce1ef4e7fc0",
+    "promptHash": "e4488a63f4499820c719ff7d8bb4876eaf96801ca7f0dd93db129b80672318b4",
+    "reportPath": "/private/tmp/v2-live-campaign-20261012-01/policy-contradiction/state/reports/exec_6d71a409-3fed-450f-939c-6e1405c1f9b9",
+    "queueDeadlineAt": "2026-10-12T18:26:19.748Z",
+    "admittedAt": "2026-10-12T18:24:19.753Z",
+    "executionDeadlineAt": "2026-10-12T18:29:19.753Z",
+    "finalizationDeadlineAt": "2026-10-12T18:26:49.467Z",
+    "intendedOutcome": "failed",
+    "creationIntent": {
+      "backendId": "backend_e0589029981ba60c51a794c082b4400f",
+      "marker": "opencode-agents:exec_6d71a409-3fed-450f-939c-6e1405c1f9b9",
+      "sessionId": "ses_ecea43826ffeGeda3V624oFXrj",
+      "createdAt": "2026-10-12T18:24:20.943Z"
+    },
+    "cancellationIntent": null,
+    "pendingRequests": [],
+    "createdAt": "2026-10-12T18:24:19.748Z",
+    "updatedAt": "2026-10-12T18:36:17.174Z",
+    "reportValidity": "missing",
+    "finalManifestHash": "2fe3e201da4236a2f829ed07a94ca58f190036993bd41a6af8ff8d90a2ae56a4",
+    "reviewStatus": "rejected",
+    "terminal": true,
+    "operationally_resolved": true,
+    "usage": {
+      "input_tokens": null,
+      "output_tokens": null,
+      "cache_tokens": null,
+      "reported_cost": null,
+      "currency": null,
+      "source": "not_captured"
+    }
+  }
+}

@@ -1,0 +1,1 @@
+Inspect config.py and client.py. Locate the request timeout definition and the caller that uses it. Write the assigned report summary.md with the defining path and symbol, one caller path and symbol, and any distinction between the default and an override. Do not edit source files.

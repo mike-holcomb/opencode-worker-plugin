@@ -1,0 +1,13 @@
+{
+  "schema_version": 2,
+  "scenario_id": "lookup-timeout",
+  "run_id": "lookup-timeout-1791828623338",
+  "tier": "lightweight",
+  "context_mode": "fresh",
+  "context_basis": "ordinary fresh context",
+  "task_file": "task.md",
+  "fixture_files": [
+    "config.py",
+    "client.py"
+  ]
+}

@@ -3,7 +3,10 @@
   "campaign": "2026-10-12",
   "release_ready": false,
   "supported_mode": "managed, trusted workspaces only",
-  "node_versions": ["24.15.0", "24.21.0"],
+  "node_versions": [
+    "24.15.0",
+    "24.21.0"
+  ],
   "opencode_version": "1.18.35",
   "model": "llama.cpp/laguna-s-21",
   "destination": "http://127.0.0.1:8124/v1",
@@ -11,18 +14,98 @@
     "Project plugins introduced after preflight can load lazily. This is not a passing plugin-suppression test or an untrusted-workspace security boundary."
   ],
   "gates": {
-    "fault_matrix": {"status": "in_progress", "applicable_cases": 30, "excluded": ["T28"], "pending": ["T20 parent review of live attempt"]},
-    "live_macos": {"status": "in_progress", "pending": ["parent review", "rerun restart cases after daemon election fix"]},
-    "evaluation": {"status": "in_progress", "required_scenarios": 12, "required_false_acceptances": 0, "required_duplicate_dispatches": 0},
-    "performance_soak": {"status": "running", "count": 1000, "duration_seconds": 3600},
-    "macos_node_matrix": {"status": "in_progress"},
-    "linux_node_matrix": {"status": "pending_ci"},
-    "linux_live": {"status": "pending_authorized_endpoint_on_linux"},
-    "wsl2_node_matrix": {"status": "awaiting_operator", "instructions": "../../wsl2-release-check.md"},
-    "wsl2_live": {"status": "awaiting_operator"},
-    "tag_install": {"status": "passed_historical_tag_only", "tag": "v2.0.0-dev.0", "codex": "0.162.1", "pending": ["final candidate tag"]},
-    "upgrade_rollback": {"status": "in_progress"},
-    "final_release": {"status": "blocked_by_incomplete_gates"}
+    "fault_matrix": {
+      "status": "passed_configured_boundary",
+      "applicable_cases": 30,
+      "excluded": [
+        "T28"
+      ],
+      "evidence": "initial-live-eval/t20/",
+      "limits": [
+        "Actual worker shell attempt denied; parent MCP excluded and zero review mutations before parent review. Not plugin suppression or hostile same-user OS isolation."
+      ]
+    },
+    "live_macos": {
+      "status": "in_progress",
+      "pending": [
+        "parent review",
+        "rerun restart cases after daemon election fix"
+      ],
+      "completed_gap_observations": [
+        "6 supervisor restart completed with valid accepted report",
+        "7 exact denial with proven timeout stop and released reservation",
+        "9 backend restart with exact lookup, no replay, proven cancellation, released reservation"
+      ],
+      "evidence": "initial-live-eval/"
+    },
+    "evaluation": {
+      "status": "in_progress",
+      "required_scenarios": 12,
+      "required_false_acceptances": 0,
+      "required_duplicate_dispatches": 0,
+      "accepted_scenarios": [
+        "lookup-timeout",
+        "log-regression"
+      ],
+      "preserved_failed_attempts": 12,
+      "reruns": "running after model route restored",
+      "evidence": [
+        "initial-live-eval/",
+        "lookup-correction/"
+      ]
+    },
+    "performance_soak": {
+      "status": "running",
+      "count": 1000,
+      "duration_seconds": 3600
+    },
+    "macos_node_matrix": {
+      "status": "passed",
+      "revision": "ceb4c272a91120baee02a995178e79ae7b558945",
+      "evidence": [
+        "macos-local-24.15.0/",
+        "macos-local-24.21.0/",
+        "ci-38291901986/"
+      ]
+    },
+    "linux_node_matrix": {
+      "status": "passed",
+      "platform": "Ubuntu 24.04 x64",
+      "evidence": "ci-38291901986/",
+      "ci_url": "https://github.com/mike-holcomb/opencode-worker-plugin/actions/runs/38291901986"
+    },
+    "linux_live": {
+      "status": "operator_handoff",
+      "instructions": "../../linux-release-check.md"
+    },
+    "wsl2_node_matrix": {
+      "status": "awaiting_operator",
+      "instructions": "../../wsl2-release-check.md"
+    },
+    "wsl2_live": {
+      "status": "awaiting_operator"
+    },
+    "tag_install": {
+      "status": "passed_historical_tag_only",
+      "tag": "v2.0.0-dev.0",
+      "codex": "0.162.1",
+      "pending": [
+        "final candidate tag"
+      ]
+    },
+    "upgrade_rollback": {
+      "status": "passed",
+      "evidence": "upgrade-rollback/result.json",
+      "limits": [
+        "Same schema 3; migration backup and failure paths tested separately."
+      ]
+    },
+    "final_release": {
+      "status": "blocked_by_incomplete_gates"
+    }
   },
-  "disabled_features": ["attached execution", "native questions"]
+  "disabled_features": [
+    "attached execution",
+    "native questions"
+  ]
 }

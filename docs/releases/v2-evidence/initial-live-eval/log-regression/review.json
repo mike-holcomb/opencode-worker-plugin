@@ -1,0 +1,161 @@
+{
+  "decision": {
+    "review_started_at": "2026-10-12T18:16:42.768115+00:00",
+    "context_bytes": 10079,
+    "idempotency_key": "parent-release-review-log-regression-0001",
+    "gate_status": "failed",
+    "review": {
+      "disposition": "needs_correction",
+      "rationale": "Three timeout requests and deployment correlation are accurately identified, but the frozen bounded-window text check fails because the summary omits the full supplied log window endpoint at 10:05. Preserve frozen checks and correct the report.",
+      "criteria": [
+        {
+          "id": "summary-exists",
+          "result": "satisfied",
+          "evidence": [
+            "artifact:artifact_f6527560-4baa-47fa-bfc3-d20fa5cde8cc@sha256:fa94a70c5c56f7407e7de7759d236bf0fa0ba10f0f4a079b5724245747598991",
+            "artifact:artifact_3648ff4b-3762-4637-9fb6-ac4f65c66d43@sha256:04e32398b01df4070ad4c3fb4433bae75a3733a35bfd1cc45fd0b89bc9b99e23",
+            "artifact:artifact_3fe61477-6923-40c5-8d85-90f4f0cecbc2@sha256:9dabb8d1095318df563a6ad80219587a41671effd58c286fb7a4b962e3859e9f"
+          ]
+        },
+        {
+          "id": "affected-requests",
+          "result": "satisfied",
+          "evidence": [
+            "artifact:artifact_f6527560-4baa-47fa-bfc3-d20fa5cde8cc@sha256:fa94a70c5c56f7407e7de7759d236bf0fa0ba10f0f4a079b5724245747598991",
+            "artifact:artifact_3648ff4b-3762-4637-9fb6-ac4f65c66d43@sha256:04e32398b01df4070ad4c3fb4433bae75a3733a35bfd1cc45fd0b89bc9b99e23",
+            "artifact:artifact_3fe61477-6923-40c5-8d85-90f4f0cecbc2@sha256:9dabb8d1095318df563a6ad80219587a41671effd58c286fb7a4b962e3859e9f"
+          ]
+        },
+        {
+          "id": "bounded-window",
+          "result": "unsatisfied",
+          "evidence": [
+            "artifact:artifact_f6527560-4baa-47fa-bfc3-d20fa5cde8cc@sha256:fa94a70c5c56f7407e7de7759d236bf0fa0ba10f0f4a079b5724245747598991",
+            "artifact:artifact_3648ff4b-3762-4637-9fb6-ac4f65c66d43@sha256:04e32398b01df4070ad4c3fb4433bae75a3733a35bfd1cc45fd0b89bc9b99e23",
+            "artifact:artifact_3fe61477-6923-40c5-8d85-90f4f0cecbc2@sha256:9dabb8d1095318df563a6ad80219587a41671effd58c286fb7a4b962e3859e9f"
+          ]
+        },
+        {
+          "id": "timeout-count-recorded",
+          "result": "satisfied",
+          "evidence": [
+            "artifact:artifact_f6527560-4baa-47fa-bfc3-d20fa5cde8cc@sha256:fa94a70c5c56f7407e7de7759d236bf0fa0ba10f0f4a079b5724245747598991",
+            "artifact:artifact_3648ff4b-3762-4637-9fb6-ac4f65c66d43@sha256:04e32398b01df4070ad4c3fb4433bae75a3733a35bfd1cc45fd0b89bc9b99e23",
+            "artifact:artifact_3fe61477-6923-40c5-8d85-90f4f0cecbc2@sha256:9dabb8d1095318df563a6ad80219587a41671effd58c286fb7a4b962e3859e9f"
+          ]
+        },
+        {
+          "id": "correlation-labeled",
+          "result": "satisfied",
+          "evidence": [
+            "artifact:artifact_f6527560-4baa-47fa-bfc3-d20fa5cde8cc@sha256:fa94a70c5c56f7407e7de7759d236bf0fa0ba10f0f4a079b5724245747598991",
+            "artifact:artifact_3648ff4b-3762-4637-9fb6-ac4f65c66d43@sha256:04e32398b01df4070ad4c3fb4433bae75a3733a35bfd1cc45fd0b89bc9b99e23",
+            "artifact:artifact_3fe61477-6923-40c5-8d85-90f4f0cecbc2@sha256:9dabb8d1095318df563a6ad80219587a41671effd58c286fb7a4b962e3859e9f"
+          ]
+        },
+        {
+          "id": "evidence-paths",
+          "result": "satisfied",
+          "evidence": [
+            "artifact:artifact_f6527560-4baa-47fa-bfc3-d20fa5cde8cc@sha256:fa94a70c5c56f7407e7de7759d236bf0fa0ba10f0f4a079b5724245747598991",
+            "artifact:artifact_3648ff4b-3762-4637-9fb6-ac4f65c66d43@sha256:04e32398b01df4070ad4c3fb4433bae75a3733a35bfd1cc45fd0b89bc9b99e23",
+            "artifact:artifact_3fe61477-6923-40c5-8d85-90f4f0cecbc2@sha256:9dabb8d1095318df563a6ad80219587a41671effd58c286fb7a4b962e3859e9f"
+          ]
+        },
+        {
+          "id": "source-unchanged",
+          "result": "satisfied",
+          "evidence": [
+            "artifact:artifact_f6527560-4baa-47fa-bfc3-d20fa5cde8cc@sha256:fa94a70c5c56f7407e7de7759d236bf0fa0ba10f0f4a079b5724245747598991",
+            "artifact:artifact_3648ff4b-3762-4637-9fb6-ac4f65c66d43@sha256:04e32398b01df4070ad4c3fb4433bae75a3733a35bfd1cc45fd0b89bc9b99e23",
+            "artifact:artifact_3fe61477-6923-40c5-8d85-90f4f0cecbc2@sha256:9dabb8d1095318df563a6ad80219587a41671effd58c286fb7a4b962e3859e9f"
+          ]
+        },
+        {
+          "id": "write-scope",
+          "result": "satisfied",
+          "evidence": [
+            "artifact:artifact_f6527560-4baa-47fa-bfc3-d20fa5cde8cc@sha256:fa94a70c5c56f7407e7de7759d236bf0fa0ba10f0f4a079b5724245747598991",
+            "artifact:artifact_3648ff4b-3762-4637-9fb6-ac4f65c66d43@sha256:04e32398b01df4070ad4c3fb4433bae75a3733a35bfd1cc45fd0b89bc9b99e23",
+            "artifact:artifact_3fe61477-6923-40c5-8d85-90f4f0cecbc2@sha256:9dabb8d1095318df563a6ad80219587a41671effd58c286fb7a4b962e3859e9f"
+          ]
+        },
+        {
+          "id": "parent-log-review",
+          "result": "satisfied",
+          "evidence": [
+            "artifact:artifact_f6527560-4baa-47fa-bfc3-d20fa5cde8cc@sha256:fa94a70c5c56f7407e7de7759d236bf0fa0ba10f0f4a079b5724245747598991",
+            "artifact:artifact_3648ff4b-3762-4637-9fb6-ac4f65c66d43@sha256:04e32398b01df4070ad4c3fb4433bae75a3733a35bfd1cc45fd0b89bc9b99e23",
+            "artifact:artifact_3fe61477-6923-40c5-8d85-90f4f0cecbc2@sha256:9dabb8d1095318df563a6ad80219587a41671effd58c286fb7a4b962e3859e9f"
+          ]
+        }
+      ],
+      "starting_state_sha256": "fdc618c76d8f530b86f03e75278967fbc6d33354ba07a5946558d0fe4ca98031",
+      "final_manifest_sha256": "9dabb8d1095318df563a6ad80219587a41671effd58c286fb7a4b962e3859e9f",
+      "freshness": "Fixture sources and final manifest inspected; immutable exports hash-verified.",
+      "integration_checks": [
+        "Exact durable identities and one dispatch checked",
+        "Reviewed supplied source and recorded gate-specific outcome"
+      ],
+      "coverage_limits": [
+        "Private development execution on macOS; plugin race remains accepted separately",
+        "Context byte count covers recorded review inputs, not uninstrumented earlier inspection."
+      ],
+      "unresolved_issues": [
+        "Missing or incomplete deliverable; no acceptance claimed"
+      ],
+      "next_action": "Bounded correction with predecessor evidence preserved"
+    }
+  },
+  "result": {
+    "taskId": "task_52cd3122-5c29-4821-8832-bf56bb2c6177",
+    "executionId": "exec_2b72c67b-72bd-4808-b4c1-3376e0896ed4",
+    "scopeId": "release-log-regression",
+    "revision": 9,
+    "phase": "completed",
+    "observation": "current",
+    "workspace": "/private/tmp/v2-live-campaign-20261012-01/log-regression/workspace",
+    "workspaceAccess": "exclusive",
+    "requestModel": {
+      "profile": "local"
+    },
+    "model": "llama.cpp/laguna-s-21",
+    "profile": "bounded-inspect",
+    "backendId": "backend_e998b3785ff7f99398d84c80bfe97896",
+    "sessionId": "ses_eceaf802fffeohUKIwYG5UjKSR",
+    "userMessageId": "msg_49f5118b-7e78-4f54-bdf5-871156596934",
+    "predecessorExecutionId": null,
+    "contextMode": null,
+    "baselineHash": "fdc618c76d8f530b86f03e75278967fbc6d33354ba07a5946558d0fe4ca98031",
+    "promptHash": "8ca39bf91f4e8dcfe22ef9481469eeca2fbe5317d26256cd7ca259c3c56ee483",
+    "reportPath": "/private/tmp/v2-live-campaign-20261012-01/log-regression/state/reports/exec_2b72c67b-72bd-4808-b4c1-3376e0896ed4",
+    "queueDeadlineAt": "2026-10-12T18:14:00.398Z",
+    "admittedAt": "2026-10-12T18:12:00.402Z",
+    "executionDeadlineAt": "2026-10-12T18:17:00.402Z",
+    "finalizationDeadlineAt": "2026-10-12T18:14:27.097Z",
+    "intendedOutcome": "completed",
+    "creationIntent": {
+      "backendId": "backend_e998b3785ff7f99398d84c80bfe97896",
+      "marker": "opencode-agents:exec_2b72c67b-72bd-4808-b4c1-3376e0896ed4",
+      "sessionId": "ses_eceaf802fffeohUKIwYG5UjKSR",
+      "createdAt": "2026-10-12T18:12:01.607Z"
+    },
+    "cancellationIntent": null,
+    "pendingRequests": [],
+    "createdAt": "2026-10-12T18:12:00.398Z",
+    "updatedAt": "2026-10-12T18:17:02.211Z",
+    "reportValidity": "valid",
+    "finalManifestHash": "9dabb8d1095318df563a6ad80219587a41671effd58c286fb7a4b962e3859e9f",
+    "reviewStatus": "needs_correction",
+    "terminal": true,
+    "operationally_resolved": true,
+    "usage": {
+      "input_tokens": null,
+      "output_tokens": null,
+      "cache_tokens": null,
+      "reported_cost": null,
+      "currency": null,
+      "source": "not_captured"
+    }
+  }
+}

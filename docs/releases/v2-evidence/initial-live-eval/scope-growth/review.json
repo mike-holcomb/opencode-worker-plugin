@@ -1,0 +1,109 @@
+{
+  "decision": {
+    "review_started_at": "2026-10-12T18:35:56.662758+00:00",
+    "context_bytes": 734,
+    "idempotency_key": "parent-release-reject-scope-growth-0001",
+    "gate_status": "failed",
+    "review": {
+      "disposition": "rejected",
+      "rationale": "Existing model route failed with API connection errors; no report was produced. Preserve this infrastructure failure and rerun after route restoration.",
+      "criteria": [
+        {
+          "id": "summary-exists",
+          "result": "not_checked",
+          "evidence": []
+        },
+        {
+          "id": "dependency-recorded",
+          "result": "not_checked",
+          "evidence": []
+        },
+        {
+          "id": "escalation-recorded",
+          "result": "not_checked",
+          "evidence": []
+        },
+        {
+          "id": "protected-files-unchanged",
+          "result": "not_checked",
+          "evidence": []
+        },
+        {
+          "id": "write-scope",
+          "result": "not_checked",
+          "evidence": []
+        },
+        {
+          "id": "parent-scope-review",
+          "result": "not_checked",
+          "evidence": []
+        }
+      ],
+      "starting_state_sha256": "dfba0650d731c701d3a9e93d0b01d4b6e0a86aabdc3dbffb5eaf86c56704f5be",
+      "final_manifest_sha256": "777505f5839817c707828f6584e0617967f24fe85c501b04b70f0373c1ab5d87",
+      "freshness": "Current terminal snapshot and recorded failure inspected.",
+      "integration_checks": [
+        "One dispatch recorded; missing report prevents acceptance."
+      ],
+      "coverage_limits": [
+        "Rejection based on terminal failure evidence; no successful qualitative source review claimed.",
+        "Context bytes measure the recorded rejection input only."
+      ],
+      "unresolved_issues": [
+        "Existing model route failed with API connection errors; no report was produced. Preserve this infrastructure failure and rerun after route restoration."
+      ],
+      "next_action": "Fresh isolated rerun; preserve this failed attempt."
+    }
+  },
+  "result": {
+    "taskId": "task_2fe2e074-641c-4f61-879d-d5994d0f6191",
+    "executionId": "exec_298c3fdf-1a1b-423d-ad3d-081f33246538",
+    "scopeId": "release-scope-growth",
+    "revision": 9,
+    "phase": "failed",
+    "observation": "current",
+    "workspace": "/private/tmp/v2-live-campaign-20261012-01/scope-growth/workspace",
+    "workspaceAccess": "exclusive",
+    "requestModel": {
+      "profile": "local"
+    },
+    "model": "llama.cpp/laguna-s-21",
+    "profile": "bounded-build",
+    "backendId": "backend_593a142ea4c874f345d6ed69f4875ea9",
+    "sessionId": "ses_ecea00a92ffe7fHFOqF2i7TVEi",
+    "userMessageId": "msg_0b14b898-0884-44a9-934a-47a8b7cc5038",
+    "predecessorExecutionId": null,
+    "contextMode": null,
+    "baselineHash": "dfba0650d731c701d3a9e93d0b01d4b6e0a86aabdc3dbffb5eaf86c56704f5be",
+    "promptHash": "25dac56d39917a5cd30b1762ea28a33b0e60e8ca9691ab39d066ff13cd119e4c",
+    "reportPath": "/private/tmp/v2-live-campaign-20261012-01/scope-growth/state/reports/exec_298c3fdf-1a1b-423d-ad3d-081f33246538",
+    "queueDeadlineAt": "2026-10-12T18:30:53.561Z",
+    "admittedAt": "2026-10-12T18:28:53.565Z",
+    "executionDeadlineAt": "2026-10-12T18:33:53.565Z",
+    "finalizationDeadlineAt": "2026-10-12T18:30:30.351Z",
+    "intendedOutcome": "failed",
+    "creationIntent": {
+      "backendId": "backend_593a142ea4c874f345d6ed69f4875ea9",
+      "marker": "opencode-agents:exec_298c3fdf-1a1b-423d-ad3d-081f33246538",
+      "sessionId": "ses_ecea00a92ffe7fHFOqF2i7TVEi",
+      "createdAt": "2026-10-12T18:28:54.756Z"
+    },
+    "cancellationIntent": null,
+    "pendingRequests": [],
+    "createdAt": "2026-10-12T18:28:53.561Z",
+    "updatedAt": "2026-10-12T18:36:19.400Z",
+    "reportValidity": "missing",
+    "finalManifestHash": "777505f5839817c707828f6584e0617967f24fe85c501b04b70f0373c1ab5d87",
+    "reviewStatus": "rejected",
+    "terminal": true,
+    "operationally_resolved": true,
+    "usage": {
+      "input_tokens": null,
+      "output_tokens": null,
+      "cache_tokens": null,
+      "reported_cost": null,
+      "currency": null,
+      "source": "not_captured"
+    }
+  }
+}

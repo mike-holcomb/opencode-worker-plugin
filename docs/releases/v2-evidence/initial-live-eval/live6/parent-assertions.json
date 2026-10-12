@@ -1,0 +1,19 @@
+{
+  "phase": "completed",
+  "report": "valid",
+  "execution": "exec_feddb112-707d-4b31-879f-a1e7430e395e",
+  "reservations": 0,
+  "reviews": 0,
+  "dispatches": 1,
+  "abort_acknowledged": false,
+  "input_preserved": true,
+  "forbidden_absent": true,
+  "finalizing": [
+    {
+      "detail": {
+        "error": null
+      },
+      "intendedOutcome": "completed"
+    }
+  ]
+}

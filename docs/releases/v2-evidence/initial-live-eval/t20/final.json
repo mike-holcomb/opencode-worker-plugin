@@ -1,0 +1,207 @@
+{
+  "taskId": "task_93342a7f-c427-4eec-b7a1-249fc310bfbe",
+  "executionId": "exec_6be3b347-cdd1-43e1-abdc-bb60594d5bec",
+  "scopeId": "release-t20",
+  "revision": 12,
+  "phase": "timed_out",
+  "observation": "current",
+  "workspace": "/private/tmp/v2-live-campaign-20261012-01/t20/workspace",
+  "workspaceAccess": "exclusive",
+  "requestModel": {
+    "profile": "local"
+  },
+  "model": "llama.cpp/laguna-s-21",
+  "profile": "bounded-build",
+  "backendId": "backend_41a5ef349aea776ac28ca0676770da16",
+  "sessionId": "ses_eceb5a50affesc4Ul0criw5Zc4",
+  "userMessageId": "msg_0860c49e-2d44-475f-a0cd-ff3b24ca0694",
+  "predecessorExecutionId": null,
+  "contextMode": null,
+  "baselineHash": "3d1b1602e04548cdeaf38678d8cbceec28dd7ab638415a4dc4a874708e1623c4",
+  "promptHash": "1827bb01f761e304d860a7659b8f8c4101e19dcbc85a10a4a8b00fa0eafe4045",
+  "reportPath": "/private/tmp/v2-live-campaign-20261012-01/t20/state/reports/exec_6be3b347-cdd1-43e1-abdc-bb60594d5bec",
+  "queueDeadlineAt": "2026-10-12T18:07:17.731Z",
+  "admittedAt": "2026-10-12T18:05:17.735Z",
+  "executionDeadlineAt": "2026-10-12T18:10:17.735Z",
+  "finalizationDeadlineAt": "2026-10-12T18:10:48.289Z",
+  "intendedOutcome": "timed_out",
+  "creationIntent": {
+    "backendId": "backend_41a5ef349aea776ac28ca0676770da16",
+    "marker": "opencode-agents:exec_6be3b347-cdd1-43e1-abdc-bb60594d5bec",
+    "sessionId": "ses_eceb5a50affesc4Ul0criw5Zc4",
+    "createdAt": "2026-10-12T18:05:18.956Z"
+  },
+  "cancellationIntent": {
+    "reason": "execution deadline",
+    "requester": "supervisor",
+    "deadlineOrigin": "2026-10-12T18:10:17.735Z",
+    "createdAt": "2026-10-12T18:10:17.773Z",
+    "abortAcknowledged": true
+  },
+  "pendingRequests": [],
+  "createdAt": "2026-10-12T18:05:17.731Z",
+  "updatedAt": "2026-10-12T18:10:18.304Z",
+  "reportValidity": "missing",
+  "finalManifestHash": "a9081b0aad550bed16bedbb6d4c82b9aceb7ccd828c386642c771c6d25366afe",
+  "reviewStatus": "pending",
+  "terminal": true,
+  "operationally_resolved": true,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "events": [
+    {
+      "cursor": 1,
+      "kind": "queued",
+      "detail": {
+        "taskId": "task_93342a7f-c427-4eec-b7a1-249fc310bfbe"
+      },
+      "createdAt": "2026-10-12T18:05:17.731Z"
+    },
+    {
+      "cursor": 2,
+      "kind": "admitted",
+      "detail": {
+        "executionDeadlineAt": "2026-10-12T18:10:17.735Z",
+        "resourceKeys": [
+          "workspace:/private/tmp/v2-live-campaign-20261012-01/t20/workspace"
+        ]
+      },
+      "createdAt": "2026-10-12T18:05:17.735Z"
+    },
+    {
+      "cursor": 3,
+      "kind": "creation_intent",
+      "detail": {
+        "backendId": "backend_41a5ef349aea776ac28ca0676770da16",
+        "marker": "opencode-agents:exec_6be3b347-cdd1-43e1-abdc-bb60594d5bec"
+      },
+      "createdAt": "2026-10-12T18:05:18.956Z"
+    },
+    {
+      "cursor": 4,
+      "kind": "session_bound",
+      "detail": {
+        "backendId": "backend_41a5ef349aea776ac28ca0676770da16",
+        "sessionId": "ses_eceb5a50affesc4Ul0criw5Zc4"
+      },
+      "createdAt": "2026-10-12T18:05:18.969Z"
+    },
+    {
+      "cursor": 5,
+      "kind": "dispatch_intent",
+      "detail": {
+        "messageId": "msg_0860c49e-2d44-475f-a0cd-ff3b24ca0694"
+      },
+      "createdAt": "2026-10-12T18:05:18.971Z"
+    },
+    {
+      "cursor": 6,
+      "kind": "dispatch_acknowledged",
+      "detail": {},
+      "createdAt": "2026-10-12T18:05:18.977Z"
+    },
+    {
+      "cursor": 7,
+      "kind": "running",
+      "detail": {
+        "messageId": "msg_0860c49e-2d44-475f-a0cd-ff3b24ca0694"
+      },
+      "createdAt": "2026-10-12T18:05:18.977Z"
+    },
+    {
+      "cursor": 8,
+      "kind": "input_request",
+      "detail": {
+        "kind": "permission",
+        "requestId": "per_1314a84920013cnaJT8NjhE2Mr",
+        "revision": 1
+      },
+      "createdAt": "2026-10-12T18:05:29.629Z"
+    },
+    {
+      "cursor": 9,
+      "kind": "input_response_intent",
+      "detail": {
+        "requestId": "per_1314a84920013cnaJT8NjhE2Mr",
+        "requestRevision": 1
+      },
+      "createdAt": "2026-10-12T18:05:29.849Z"
+    },
+    {
+      "cursor": 10,
+      "kind": "input_response_acknowledged",
+      "detail": {
+        "requestId": "per_1314a84920013cnaJT8NjhE2Mr"
+      },
+      "createdAt": "2026-10-12T18:05:29.859Z"
+    },
+    {
+      "cursor": 11,
+      "kind": "running",
+      "detail": {},
+      "createdAt": "2026-10-12T18:05:29.879Z"
+    },
+    {
+      "cursor": 12,
+      "kind": "cancellation_requested",
+      "detail": {
+        "phase": "cancelling",
+        "reason": "execution deadline",
+        "requester": "supervisor"
+      },
+      "createdAt": "2026-10-12T18:10:17.774Z"
+    },
+    {
+      "cursor": 13,
+      "kind": "abort_acknowledged",
+      "detail": {},
+      "createdAt": "2026-10-12T18:10:18.281Z"
+    },
+    {
+      "cursor": 14,
+      "kind": "finalizing",
+      "detail": {
+        "detail": {
+          "cancelEffect": "applied"
+        },
+        "intendedOutcome": "timed_out"
+      },
+      "createdAt": "2026-10-12T18:10:18.290Z"
+    },
+    {
+      "cursor": 15,
+      "kind": "artifact_registered",
+      "detail": {
+        "artifactId": "artifact_1b2b07e2-24f2-42b8-9836-75295c0abc64",
+        "sha256": "a9081b0aad550bed16bedbb6d4c82b9aceb7ccd828c386642c771c6d25366afe"
+      },
+      "createdAt": "2026-10-12T18:10:18.299Z"
+    },
+    {
+      "cursor": 16,
+      "kind": "finalized",
+      "detail": {
+        "finalManifestHash": "a9081b0aad550bed16bedbb6d4c82b9aceb7ccd828c386642c771c6d25366afe",
+        "outcome": "timed_out",
+        "reportValidity": "missing"
+      },
+      "createdAt": "2026-10-12T18:10:18.305Z"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "artifact_1b2b07e2-24f2-42b8-9836-75295c0abc64",
+      "sha256": "a9081b0aad550bed16bedbb6d4c82b9aceb7ccd828c386642c771c6d25366afe",
+      "byte_length": 697,
+      "media_type": "application/json"
+    }
+  ],
+  "cursor": 16,
+  "has_more_events": false
+}

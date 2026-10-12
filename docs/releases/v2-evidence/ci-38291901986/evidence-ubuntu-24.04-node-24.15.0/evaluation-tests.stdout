@@ -1,0 +1,13 @@
+✔ all frozen v2 packets satisfy the bundled TaskPacket schema (42.174323ms)
+✔ rejects missing required packet sections (36.579835ms)
+✔ rejects malformed nested packet fields (36.950469ms)
+✔ rejects unknown nested packet fields (36.556933ms)
+✔ rejects incorrect nested primitive types (36.643554ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 247.56915

@@ -1,0 +1,41 @@
+{
+  "case": "wire-serialization",
+  "execution": "exec_4a691069-e8d0-4246-ab80-cd34b23d593d",
+  "phase": "timed_out",
+  "terminal": true,
+  "report_validity": "missing",
+  "dispatches": 1,
+  "finalization": [
+    {
+      "detail": {
+        "cancelEffect": "applied"
+      },
+      "intendedOutcome": "timed_out"
+    }
+  ],
+  "permission_decisions": [
+    {
+      "request_id": "per_13157354b001r3bkE49MczeSdl",
+      "reply": "deny",
+      "permission": "edit",
+      "patterns": [
+        "private/tmp/v2-live-campaign-20261012-01/wire-serialization/workspace/producer.py"
+      ]
+    },
+    {
+      "request_id": "per_131573744001zka6YSZmGkuShM",
+      "reply": "deny",
+      "permission": "edit",
+      "patterns": [
+        "private/tmp/v2-live-campaign-20261012-01/wire-serialization/workspace/consumer.py"
+      ]
+    }
+  ],
+  "required_criteria": [
+    "wire-tests-pass",
+    "summary-exists",
+    "coupling-recorded",
+    "write-scope",
+    "parent-interface-review"
+  ]
+}

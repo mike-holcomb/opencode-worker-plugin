@@ -126,3 +126,27 @@ backup before opening it with the previous runtime. It also checks that both
 runtimes refuse a future schema. The selected development tag and candidate both
 use schema 3; store tests separately exercise automatic migration snapshots and
 backup failures. The rehearsal never downgrades a live database in place.
+
+### Additional permission requests
+
+The default runner allows exact frozen check commands and declared file edits.
+For interactive evidence collection, add `--permission-decisions /tmp/parent-decisions.json`.
+An additional request is logged as `parent_permission_needed` with its request ID,
+revision, and full detail. Inspect the exact command and scope, then write a JSON
+entry keyed by that request ID:
+
+```json
+{
+  "REQUEST_ID": {
+    "revision": 1,
+    "reply": "allow_once",
+    "authorization_basis": "Parent inspected this exact command and confirmed it stays within the assigned fixture task."
+  }
+}
+```
+
+Use the logged revision, and choose `deny` when the action exceeds the task.
+Write the file atomically. A missing decision waits within the existing execution
+deadline; it never grants permission. Cases 7 and T20 retain their deliberate
+negative decisions regardless of this file. A parent decision authorizes one
+request; it does not change the frozen packet or acceptance checks.

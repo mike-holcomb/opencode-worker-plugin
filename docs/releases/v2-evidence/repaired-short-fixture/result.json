@@ -1,0 +1,36 @@
+{
+  "node": "v24.19.0",
+  "platform": "darwin",
+  "arch": "arm64",
+  "commit": "70c0b43c791a99cbccab5608d0e8d71e4e7bc7ae",
+  "count": 5,
+  "duration_seconds": 0,
+  "fixture": "in-memory MCP transport; programmable backend with real loopback event sockets and owned child processes; real SQLite and evidence capture",
+  "limits": {
+    "start_p95_ms": 2000,
+    "get_p95_ms": 250,
+    "event_p95_ms": 1000,
+    "wait_slack_ms": 1000
+  },
+  "limitations": [
+    "Fake child lifecycle, not the OpenCode executable; live cases cover the managed OpenCode launcher"
+  ],
+  "passes": {
+    "latency": true,
+    "waits": true,
+    "dispatches": true,
+    "memory": true,
+    "backends": true,
+    "duration": true
+  },
+  "p95": {
+    "start_ms": 79.14970800000083,
+    "get_ms": 0.31504099999983737,
+    "event_ms": 6.998125000000073
+  },
+  "dispatches": 25,
+  "baseline_rss": 229048320,
+  "final_median_rss": 229048320,
+  "release_sized": false,
+  "status": "passed_fixture"
+}

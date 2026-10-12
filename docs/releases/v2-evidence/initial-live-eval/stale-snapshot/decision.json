@@ -1,0 +1,56 @@
+{
+  "review_started_at": "2026-10-12T18:35:56.660200+00:00",
+  "context_bytes": 725,
+  "idempotency_key": "parent-release-reject-stale-snapshot-0001",
+  "gate_status": "failed",
+  "review": {
+    "disposition": "rejected",
+    "rationale": "Existing model route failed with API connection errors; no report was produced. Preserve this infrastructure failure and rerun after route restoration.",
+    "criteria": [
+      {
+        "id": "summary-exists",
+        "result": "not_checked",
+        "evidence": []
+      },
+      {
+        "id": "revision-mismatch",
+        "result": "not_checked",
+        "evidence": []
+      },
+      {
+        "id": "recheck-requested",
+        "result": "not_checked",
+        "evidence": []
+      },
+      {
+        "id": "evidence-unchanged",
+        "result": "not_checked",
+        "evidence": []
+      },
+      {
+        "id": "write-scope",
+        "result": "not_checked",
+        "evidence": []
+      },
+      {
+        "id": "parent-stale-review",
+        "result": "not_checked",
+        "evidence": []
+      }
+    ],
+    "starting_state_sha256": "5647aadb519821ede698d82ffca9b949e4c119d17a3fbe1620867b2b9ddebb7d",
+    "final_manifest_sha256": "3e6f2504c721f74c571e218e835ec46bba47b2302ef7f6e5f5deb971b098e232",
+    "freshness": "Current terminal snapshot and recorded failure inspected.",
+    "integration_checks": [
+      "One dispatch recorded; missing report prevents acceptance."
+    ],
+    "coverage_limits": [
+      "Rejection based on terminal failure evidence; no successful qualitative source review claimed.",
+      "Context bytes measure the recorded rejection input only."
+    ],
+    "unresolved_issues": [
+      "Existing model route failed with API connection errors; no report was produced. Preserve this infrastructure failure and rerun after route restoration."
+    ],
+    "next_action": "Fresh isolated rerun; preserve this failed attempt."
+  }
+}

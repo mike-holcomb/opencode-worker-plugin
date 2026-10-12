@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "scenario_id": "log-regression",
+  "result_artifact_sha256": "419f29051461992cbaec54e27ab043439f7524b410fc485a522afd6bc01d22d2",
+  "status": "review_required",
+  "parent_review_required": true,
+  "checks": [
+    {
+      "id": "summary-exists",
+      "kind": "file_exists",
+      "status": "pass",
+      "detail": "verified result artifact: summary.md"
+    },
+    {
+      "id": "affected-requests",
+      "kind": "text_contains",
+      "status": "pass",
+      "detail": "searched summary.md for 2 frozen marker(s)"
+    },
+    {
+      "id": "bounded-window",
+      "kind": "text_contains",
+      "status": "pass",
+      "detail": "searched summary.md for 2 frozen marker(s)"
+    },
+    {
+      "id": "timeout-count-recorded",
+      "kind": "text_contains",
+      "status": "pass",
+      "detail": "searched summary.md for 2 frozen marker(s)"
+    },
+    {
+      "id": "correlation-labeled",
+      "kind": "text_contains_any",
+      "status": "pass",
+      "detail": "searched summary.md for 3 frozen marker(s)"
+    },
+    {
+      "id": "evidence-paths",
+      "kind": "text_contains",
+      "status": "pass",
+      "detail": "searched summary.md for 2 frozen marker(s)"
+    },
+    {
+      "id": "source-unchanged",
+      "kind": "unchanged_paths",
+      "status": "pass",
+      "detail": "changed=[]"
+    },
+    {
+      "id": "write-scope",
+      "kind": "allowed_changed_paths",
+      "status": "pass",
+      "detail": "changed=[]; unauthorized=[]"
+    },
+    {
+      "id": "parent-log-review",
+      "kind": "parent_review",
+      "status": "review_required",
+      "detail": "Verify all supplied log lines were covered, the timeout count is exactly three, and deployment timing is described as correlation rather than proof of causation."
+    }
+  ]
+}

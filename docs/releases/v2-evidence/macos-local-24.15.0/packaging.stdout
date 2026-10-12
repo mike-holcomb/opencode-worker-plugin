@@ -1,0 +1,17 @@
+✔ Node bundle check is read-only, sorted, deterministic, and excludes unlisted files (92.460208ms)
+✔ the shipped v2 source bundle passes the Node allowlist check (16.011834ms)
+✔ release build rejects a stale compiled runtime (53.480584ms)
+✔ allowlist rejects duplicate, traversal, missing, and directory entries (48.003292ms)
+✔ allowlist and skill tree reject symlinks and unlisted runtime files (53.441ms)
+✔ v2 manifest, MCP launch, and Markdown link targets must be bundled (41.989625ms)
+✔ existing output, output inside skill tree, and destination race never clobber (45.150542ms)
+✔ ZIP extraction rejects modified entry names before writing files (35.877709ms)
+✔ installed smoke rejects a changed archive before extraction or execution (36.8605ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 462.957875

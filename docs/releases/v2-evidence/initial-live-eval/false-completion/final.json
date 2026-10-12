@@ -1,0 +1,152 @@
+{
+  "taskId": "task_eebdd82b-a920-4fd0-903d-7aebc0b75e01",
+  "executionId": "exec_1bb5f71e-39db-4b3a-844f-a35a52339f35",
+  "scopeId": "release-false-completion",
+  "revision": 8,
+  "phase": "failed",
+  "observation": "current",
+  "workspace": "/private/tmp/v2-live-campaign-20261012-01/false-completion/workspace",
+  "workspaceAccess": "exclusive",
+  "requestModel": {
+    "profile": "local"
+  },
+  "model": "llama.cpp/laguna-s-21",
+  "profile": "bounded-build",
+  "backendId": "backend_b65cbcaedcf15ac96b29247b77bbb9b0",
+  "sessionId": "ses_ece9dd42fffebYsJcAX1Tgb5Xs",
+  "userMessageId": "msg_be087c73-8de8-43b3-bbb3-25e15a6a2c22",
+  "predecessorExecutionId": null,
+  "contextMode": null,
+  "baselineHash": "aef54c7d7d7233e15e196c9510bb30c47fa5cd79478626008d16a45dc4272bfe",
+  "promptHash": "472fe4037aa086a80594e25a13effd124171ece8faa89bd00203eed02352574a",
+  "reportPath": "/private/tmp/v2-live-campaign-20261012-01/false-completion/state/reports/exec_1bb5f71e-39db-4b3a-844f-a35a52339f35",
+  "queueDeadlineAt": "2026-10-12T18:33:18.554Z",
+  "admittedAt": "2026-10-12T18:31:18.558Z",
+  "executionDeadlineAt": "2026-10-12T18:36:18.558Z",
+  "finalizationDeadlineAt": "2026-10-12T18:32:56.335Z",
+  "intendedOutcome": "failed",
+  "creationIntent": {
+    "backendId": "backend_b65cbcaedcf15ac96b29247b77bbb9b0",
+    "marker": "opencode-agents:exec_1bb5f71e-39db-4b3a-844f-a35a52339f35",
+    "sessionId": "ses_ece9dd42fffebYsJcAX1Tgb5Xs",
+    "createdAt": "2026-10-12T18:31:19.750Z"
+  },
+  "cancellationIntent": null,
+  "pendingRequests": [],
+  "createdAt": "2026-10-12T18:31:18.554Z",
+  "updatedAt": "2026-10-12T18:32:26.356Z",
+  "reportValidity": "missing",
+  "finalManifestHash": "77b335bcfb5821f50444cda6d7afc836587b62608bf24e045a98b7c42d0c3662",
+  "reviewStatus": "pending",
+  "terminal": true,
+  "operationally_resolved": true,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "events": [
+    {
+      "cursor": 1,
+      "kind": "queued",
+      "detail": {
+        "taskId": "task_eebdd82b-a920-4fd0-903d-7aebc0b75e01"
+      },
+      "createdAt": "2026-10-12T18:31:18.554Z"
+    },
+    {
+      "cursor": 2,
+      "kind": "admitted",
+      "detail": {
+        "executionDeadlineAt": "2026-10-12T18:36:18.558Z",
+        "resourceKeys": [
+          "workspace:/private/tmp/v2-live-campaign-20261012-01/false-completion/workspace"
+        ]
+      },
+      "createdAt": "2026-10-12T18:31:18.558Z"
+    },
+    {
+      "cursor": 3,
+      "kind": "creation_intent",
+      "detail": {
+        "backendId": "backend_b65cbcaedcf15ac96b29247b77bbb9b0",
+        "marker": "opencode-agents:exec_1bb5f71e-39db-4b3a-844f-a35a52339f35"
+      },
+      "createdAt": "2026-10-12T18:31:19.750Z"
+    },
+    {
+      "cursor": 4,
+      "kind": "session_bound",
+      "detail": {
+        "backendId": "backend_b65cbcaedcf15ac96b29247b77bbb9b0",
+        "sessionId": "ses_ece9dd42fffebYsJcAX1Tgb5Xs"
+      },
+      "createdAt": "2026-10-12T18:31:19.763Z"
+    },
+    {
+      "cursor": 5,
+      "kind": "dispatch_intent",
+      "detail": {
+        "messageId": "msg_be087c73-8de8-43b3-bbb3-25e15a6a2c22"
+      },
+      "createdAt": "2026-10-12T18:31:19.765Z"
+    },
+    {
+      "cursor": 6,
+      "kind": "dispatch_acknowledged",
+      "detail": {},
+      "createdAt": "2026-10-12T18:31:19.770Z"
+    },
+    {
+      "cursor": 7,
+      "kind": "running",
+      "detail": {
+        "messageId": "msg_be087c73-8de8-43b3-bbb3-25e15a6a2c22"
+      },
+      "createdAt": "2026-10-12T18:31:19.771Z"
+    },
+    {
+      "cursor": 8,
+      "kind": "finalizing",
+      "detail": {
+        "detail": {
+          "error": "{\"name\":\"APIError\",\"data\":{\"message\":\"Cannot connect to API: Unable to connect. Is the computer able to access the url?\",\"isRetryable\":true,\"metadata\":{\"url\":\"http://127.0.0.1:8124/v1/chat/completions\"}}}"
+        },
+        "intendedOutcome": "failed"
+      },
+      "createdAt": "2026-10-12T18:32:26.335Z"
+    },
+    {
+      "cursor": 9,
+      "kind": "artifact_registered",
+      "detail": {
+        "artifactId": "artifact_f2d7b856-c0b1-45e1-8868-4d0d829ff2b9",
+        "sha256": "77b335bcfb5821f50444cda6d7afc836587b62608bf24e045a98b7c42d0c3662"
+      },
+      "createdAt": "2026-10-12T18:32:26.349Z"
+    },
+    {
+      "cursor": 10,
+      "kind": "finalized",
+      "detail": {
+        "finalManifestHash": "77b335bcfb5821f50444cda6d7afc836587b62608bf24e045a98b7c42d0c3662",
+        "outcome": "failed",
+        "reportValidity": "missing"
+      },
+      "createdAt": "2026-10-12T18:32:26.356Z"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "artifact_f2d7b856-c0b1-45e1-8868-4d0d829ff2b9",
+      "sha256": "77b335bcfb5821f50444cda6d7afc836587b62608bf24e045a98b7c42d0c3662",
+      "byte_length": 710,
+      "media_type": "application/json"
+    }
+  ],
+  "cursor": 10,
+  "has_more_events": false
+}

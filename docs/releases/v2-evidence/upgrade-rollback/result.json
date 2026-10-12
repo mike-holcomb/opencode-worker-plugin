@@ -1,0 +1,22 @@
+{
+  "status": "passed",
+  "node": "v24.21.0",
+  "platform": "darwin",
+  "previous_store_sha256": "fa3658d94c8868f34c2c938a77a54fca7166ccd356de32e1c246814446e22639",
+  "candidate_store_sha256": "fa3658d94c8868f34c2c938a77a54fca7166ccd356de32e1c246814446e22639",
+  "rollback_backup_sha256": "0d639bb18d5d0b1965d71c9630366a555e248ecb08ceea5655450e4af33d6e78",
+  "artifact_sha256": "29f005e6ca54b8955cd1611e854c6bcc71377220fbdd7cb995b218d1390037bb",
+  "historical_task": "task_828e507c-6e6e-4cb3-94c8-8927039c2ba1",
+  "checks": [
+    "drained previous runtime",
+    "snapshot includes committed WAL data",
+    "historical task and artifact preserved after upgrade",
+    "candidate can create and drain new work",
+    "matching backup restored with all runtimes stopped",
+    "previous runtime reads restored task and artifact",
+    "both runtimes reject newer schema"
+  ],
+  "limitations": [
+    "Both selected runtimes use schema 3; automatic schema-repair snapshot and backup-failure paths are separately tested in store.test.ts."
+  ]
+}

@@ -1,0 +1,23 @@
+[
+  {
+    "artifact_id": "artifact_ea8bd212-5dcc-4564-8392-7a678a8116fc",
+    "sha256": "ddca0eba5a2e8f2626a638fd7739082d77758ce45ca527ea293558fb79c98118",
+    "byte_length": 7914,
+    "media_type": "application/json",
+    "path": "artifact_ea8bd212-5dcc-4564-8392-7a678a8116fc.json"
+  },
+  {
+    "artifact_id": "artifact_b280565d-d2cd-4987-93eb-41eab76a0084",
+    "sha256": "3170e51b920003f4401ee621114b243975c8496ffb6ab99da5b589c067c992c0",
+    "byte_length": 1630,
+    "media_type": "text/markdown",
+    "path": "summary.md"
+  },
+  {
+    "artifact_id": "artifact_a10b3393-7f05-4c75-aac5-26c8935b8b8c",
+    "sha256": "257e16f7c2325e1c48cbc957f797ddb5c35e712adcbde21be88296e4f2951a84",
+    "byte_length": 1078,
+    "media_type": "application/json",
+    "path": "artifact_a10b3393-7f05-4c75-aac5-26c8935b8b8c.json"
+  }
+]

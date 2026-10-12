@@ -1,0 +1,24 @@
+{
+  "case": "dirty-checkout",
+  "execution": "exec_a69a7caf-46a1-4679-a860-2df45745918c",
+  "phase": "failed",
+  "terminal": true,
+  "report_validity": "missing",
+  "dispatches": 1,
+  "finalization": [
+    {
+      "detail": {
+        "error": "{\"name\":\"APIError\",\"data\":{\"message\":\"Cannot connect to API: Unable to connect. Is the computer able to access the url?\",\"isRetryable\":true,\"metadata\":{\"url\":\"http://127.0.0.1:8124/v1/chat/completions\"}}}"
+      },
+      "intendedOutcome": "failed"
+    }
+  ],
+  "permission_decisions": [],
+  "required_criteria": [
+    "app-tests-pass",
+    "dirty-marker-preserved",
+    "summary-distinguishes-state",
+    "write-scope",
+    "parent-dirty-review"
+  ]
+}

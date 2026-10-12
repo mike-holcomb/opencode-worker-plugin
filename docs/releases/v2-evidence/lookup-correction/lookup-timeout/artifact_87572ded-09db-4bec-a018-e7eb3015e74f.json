@@ -1,0 +1,127 @@
+{
+  "schema_version": 2,
+  "task_id": "task_07589af2-3c49-428b-bec8-cafee1b8feb4",
+  "execution_id": "exec_2a27a2a2-9f17-4737-a11c-455caee9e85f",
+  "outcome": "completed",
+  "summary": "Inspected config.py and client.py. The request timeout definition is DEFAULT_TIMEOUT_SECONDS = 12 in config.py:1. The timeout_for function (config.py:4-5) overrides this to 3 for the 'health' endpoint. The caller Client.request (client.py:5-6) invokes timeout_for(endpoint) to obtain the effective timeout when no explicit timeout argument is provided.",
+  "coverage": [
+    "config.py:1 — DEFAULT_TIMEOUT_SECONDS = 12 (definition)",
+    "config.py:4-5 — timeout_for function returning 3 for 'health', else DEFAULT_TIMEOUT_SECONDS (override logic)",
+    "client.py:1 — from config import timeout_for (import)",
+    "client.py:5-6 — Client.request method calling timeout_for(endpoint) (caller)",
+    "workspace/config.py — full file read (5 lines)",
+    "workspace/client.py — full file read (7 lines)"
+  ],
+  "gaps": [
+    "No shell/exec tool was available to invoke frozen evaluator scripts; parent evaluation of frozen checks is pending.",
+    "Cannot confirm exhaustive absence of additional timeout definitions or callers outside config.py and client.py."
+  ],
+  "findings": [
+    {
+      "id": "definition",
+      "claim": "The request timeout definition is DEFAULT_TIMEOUT_SECONDS = 12, defined in config.py at line 1.",
+      "evidence": [
+        "config.py:1 — 'DEFAULT_TIMEOUT_SECONDS = 12'"
+      ],
+      "caveats": [
+        "DEFAULT_TIMEOUT_SECONDS is module-level; timeout_for (config.py:4-5) is the derived resolver that both uses this constant and provides the override."
+      ]
+    },
+    {
+      "id": "caller",
+      "claim": "The caller that uses the timeout is Client.request, defined in client.py at lines 5-6, which calls timeout_for(endpoint) when no explicit timeout is passed.",
+      "evidence": [
+        "client.py:1 — 'from config import timeout_for'",
+        "client.py:5 — 'def request(self, endpoint, timeout=None):'",
+        "client.py:6 — 'effective_timeout = timeout if timeout is not None else timeout_for(endpoint)'"
+      ],
+      "caveats": [
+        "Client.request directly calls timeout_for, not DEFAULT_TIMEOUT_SECONDS. The constant DEFAULT_TIMEOUT_SECONDS is used by timeout_for within config.py."
+      ]
+    },
+    {
+      "id": "default-vs-override",
+      "claim": "The default timeout is 12 seconds (DEFAULT_TIMEOUT_SECONDS). The override is 3 seconds for the 'health' endpoint, returned by timeout_for when endpoint == 'health'.",
+      "evidence": [
+        "config.py:1 — DEFAULT_TIMEOUT_SECONDS = 12",
+        "config.py:5 — 'return 3 if endpoint == \"health\" else DEFAULT_TIMEOUT_SECONDS'"
+      ],
+      "caveats": [
+        "The override is hardcoded to 3 seconds within timeout_for; no configuration parameter controls it.",
+        "Client.request also accepts an explicit timeout parameter that supersedes both default and override (client.py:6)."
+      ]
+    }
+  ],
+  "changes": [
+    {
+      "path": "/private/tmp/v2-live-campaign-20261012-01/lookup-timeout/state/reports/exec_2a27a2a2-9f17-4737-a11c-455caee9e85f/summary.md",
+      "description": "Created worker report summary.md with defining path/symbol, caller path/symbol, and default-vs-override distinction."
+    },
+    {
+      "path": "/private/tmp/v2-live-campaign-20261012-01/lookup-timeout/state/reports/exec_2a27a2a2-9f17-4737-a11c-455caee9e85f/result.json",
+      "description": "Created corrected WorkerReport schema_version 2 result JSON (strict JSON, no trailing commas)."
+    }
+  ],
+  "checks": [
+    {
+      "id": "summary-exists",
+      "status": "not_run",
+      "exit_code": null,
+      "evidence": [
+        "summary.md written to reports directory for exec_2a27a2a2-9f17-4737-a11c-455caee9e85f."
+      ],
+      "explanation": "The frozen summary-exists evaluator check is run by the parent outside this workspace. Parent evaluation is pending."
+    },
+    {
+      "id": "definition-cited",
+      "status": "not_run",
+      "exit_code": null,
+      "evidence": [
+        "summary.md contains 'config.py' and 'DEFAULT_TIMEOUT_SECONDS' with file/line citation."
+      ],
+      "explanation": "The frozen definition-cited text_contains evaluator check is run by the parent outside this workspace. Parent evaluation is pending."
+    },
+    {
+      "id": "caller-cited",
+      "status": "not_run",
+      "exit_code": null,
+      "evidence": [
+        "summary.md contains 'client.py' and 'Client.request' with file/line citation."
+      ],
+      "explanation": "The frozen caller-cited text_contains evaluator check is run by the parent outside this workspace. Parent evaluation is pending."
+    },
+    {
+      "id": "source-unchanged",
+      "status": "passed",
+      "exit_code": null,
+      "evidence": [
+        "config.py re-read: identical to initial content (5 lines, DEFAULT_TIMEOUT_SECONDS = 12, timeout_for function).",
+        "client.py re-read: identical to initial content (7 lines, import, Client.request method).",
+        "No edit or write operations were performed on config.py or client.py in this execution."
+      ],
+      "explanation": "Verified by re-reading both source files via the read tool. The frozen source-unchanged evaluator check is separately run by the parent; parent evaluation is pending. This 'passed' status reflects my own inspection, not the frozen check."
+    },
+    {
+      "id": "write-scope",
+      "status": "passed",
+      "exit_code": null,
+      "evidence": [
+        "Files written: summary.md and result.json, both under the reports directory for exec_2a27a2a2-9f17-4737-a11c-455caee9e85f.",
+        "No files outside the allowed write path were created or modified."
+      ],
+      "explanation": "Verified by confirming all write operations were confined to the assigned reports directory. The frozen write-scope evaluator check is separately run by the parent; parent evaluation is pending. This 'passed' status reflects my own inspection, not the frozen check."
+    },
+    {
+      "id": "parent-lookup-review",
+      "status": "not_run",
+      "exit_code": null,
+      "evidence": [
+        "Full config.py inspected (5 lines).",
+        "Full client.py inspected (7 lines)."
+      ],
+      "explanation": "The frozen parent-lookup-review evaluator check is performed by the parent. Parent evaluation is pending."
+    }
+  ],
+  "blockers": [],
+  "next_action": "Parent to run frozen evaluator checks (summary-exists, definition-cited, caller-cited, source-unchanged, write-scope, parent-lookup-review) against the produced summary.md and source files. No further worker action required."
+}

@@ -1,0 +1,34 @@
+{
+  "review_started_at": "2026-10-12T18:16:42.758449+00:00",
+  "context_bytes": 7363,
+  "idempotency_key": "parent-release-review-live6-0001",
+  "gate_status": "passed",
+  "review": {
+    "disposition": "accepted",
+    "rationale": "Exact supervisor restart preserved execution/session/message and one dispatch; a schema-valid report accurately cites the unchanged violet input. No reservations remain.",
+    "criteria": [
+      {
+        "id": "answer",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_641c5307-4557-45b7-91fb-431ba7be9d93@sha256:9f1968fd07bfade3f06de7f4d5be458e2a891d7d0caed3a019f1073ba2b0babf",
+          "artifact:artifact_8930ea8c-239e-4976-9976-ab1dc1e67c55@sha256:b2f658321ff5228c203784ba98c7ef1b02f55e04976bdd0d07f10aef16c2728b",
+          "artifact:artifact_fa1eb42f-bf43-4813-9944-03e63a206f78@sha256:7d85a423950c010e72336ed23e398447fdf5cf50294e2a4f7d592d415f0babc5"
+        ]
+      }
+    ],
+    "starting_state_sha256": "4ca91c75e0505660bfdc5c6554801d52babd27265bf719b17a5f8b13593b90a1",
+    "final_manifest_sha256": "7d85a423950c010e72336ed23e398447fdf5cf50294e2a4f7d592d415f0babc5",
+    "freshness": "Fixture sources and final manifest inspected; immutable exports hash-verified.",
+    "integration_checks": [
+      "Exact durable identities and one dispatch checked",
+      "Reviewed supplied source and recorded gate-specific outcome"
+    ],
+    "coverage_limits": [
+      "Private development execution on macOS; plugin race remains accepted separately",
+      "Context byte count covers recorded review inputs, not uninstrumented earlier inspection."
+    ],
+    "unresolved_issues": [],
+    "next_action": "Retain release evidence"
+  }
+}

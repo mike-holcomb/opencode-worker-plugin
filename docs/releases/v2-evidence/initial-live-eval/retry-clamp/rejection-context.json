@@ -1,0 +1,33 @@
+{
+  "case": "retry-clamp",
+  "execution": "exec_1f16ba1e-6616-4c55-9a13-e15fdce16b13",
+  "phase": "timed_out",
+  "terminal": true,
+  "report_validity": "missing",
+  "dispatches": 1,
+  "finalization": [
+    {
+      "detail": {
+        "cancelEffect": "applied"
+      },
+      "intendedOutcome": "timed_out"
+    }
+  ],
+  "permission_decisions": [
+    {
+      "request_id": "per_13152770b001s9S4hDMMuKgEEQ",
+      "reply": "deny",
+      "permission": "edit",
+      "patterns": [
+        "private/tmp/v2-live-campaign-20261012-01/retry-clamp/workspace/retry.py"
+      ]
+    }
+  ],
+  "required_criteria": [
+    "tests-pass",
+    "summary-exists",
+    "check-recorded",
+    "write-scope",
+    "parent-code-review"
+  ]
+}

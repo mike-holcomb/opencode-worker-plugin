@@ -1,0 +1,12 @@
+{
+  "source": "opencode_1.18.35_exact_assistant_messages",
+  "session_id": "ses_eceb5f1a9ffeuhG2kXaykrmRVX",
+  "user_message_id": "msg_e5850bdf-d0c7-4eca-8a6b-463d8efd2e44",
+  "input_tokens": null,
+  "output_tokens": null,
+  "total_tokens": null,
+  "assistant_messages": 0,
+  "reported_cost": null,
+  "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available.",
+  "messages": []
+}
