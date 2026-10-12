@@ -18,6 +18,7 @@ for (const campaign of readdirSync(root, { withFileTypes: true }).filter(d => d.
     attempts.push({ scenario: id, evidence: `${campaign.name}/${id}/`, execution_id: f.executionId,
       created_at: f.createdAt, phase: f.phase, terminal: f.terminal, report_validity: f.reportValidity,
       accepted: review?.result?.reviewStatus === 'accepted', parent_review: m.parent_review,
+      gate_passed: Boolean(review && m.status === 'passed'),
       failed_frozen_checks: checks.filter(c => c.status === 'fail').map(c => c.id),
       dispatches: m.dispatches ?? null, duplicate_dispatch: Number.isInteger(m.dispatches) ? m.dispatches > 1 : null,
       elapsed_ms: m.elapsed_ms ?? null, parent_context_bytes: m.parent_context_bytes ?? null,
@@ -38,6 +39,7 @@ const scenarios = ids.map(id => {
   const runs = attempts.filter(a => a.scenario === id);
   return { id, attempts: runs.length, first_attempt_accepted: runs[0]?.accepted ?? false,
     accepted_deliverables: runs.filter(a => a.accepted).length,
+    gate_passed: runs.some(a => a.gate_passed),
     latest_phase: runs.at(-1)?.phase ?? null,
     accepted_evidence: runs.filter(a => a.accepted).map(a => a.evidence) };
 });
@@ -45,6 +47,7 @@ const result = { schema_version: 1, generated_at: new Date().toISOString(),
   scenarios_recorded: scenarios.filter(s => s.attempts).length, required_scenarios: ids.length,
   attempts: attempts.length, accepted_deliverables: attempts.filter(a => a.accepted).length,
   scenarios_with_accepted_deliverable: scenarios.filter(s => s.accepted_deliverables).length,
+  scenarios_with_passing_gate: scenarios.filter(s => s.gate_passed).length,
   first_attempt_accepted: scenarios.filter(s => s.first_attempt_accepted).length,
   duplicate_dispatch_attempts: attempts.filter(a => a.duplicate_dispatch).length,
   zero_dispatch_attempts: attempts.filter(a => a.dispatches === 0).length,

@@ -1,0 +1,119 @@
+{
+  "decision": {
+    "review_started_at": "2026-10-12T19:50:00.477Z",
+    "context_bytes": 38373,
+    "idempotency_key": "parent-review-exec_58460b11-6dcf-4b37-a6b4-9c5da998da0d",
+    "gate_status": "failed",
+    "review": {
+      "disposition": "needs_correction",
+      "rationale": "Parent read all reports, findings.md and authoritative sources. Despite passing marker checks, summary and main findings assert a definite contradiction by assuming public means no authentication. Sources explicitly leave service identity authentication unknown. Later caveats do not repair the overstatement. findings.md also includes malformed citations such as policy.md:34 and review_scope.txt:12. Requires bounded correction before acceptance.",
+      "criteria": [
+        {
+          "id": "summary-exists",
+          "result": "not_checked",
+          "evidence": [
+            "artifact:artifact_c92beb34-3343-4d6f-8b4f-dfc961c02c3e@sha256:5a5cb02c52aea9e7b364205eeaba3688e60c52ac8c93de941051e11e851cf3b4",
+            "artifact:artifact_28d1b452-7693-4912-9a13-324f2a696269@sha256:ad702aea1086ad85247977d721b55ac33814e85e1dc5c7e43d2e04edf363fe7c",
+            "artifact:artifact_4344663e-7ec8-4051-9a0b-3168b29d4b40@sha256:249e6b27276ee8ab33ac2302a81352a476af227284158bf5742a39afa62edcc3",
+            "artifact:artifact_fc92164d-def9-4d47-8952-c7204d6d51dd@sha256:bef88c48e42fe86c07f5bfdfa289adff6dcfaa6d1d14f63580e426356120457d"
+          ]
+        },
+        {
+          "id": "coverage-recorded",
+          "result": "not_checked",
+          "evidence": [
+            "artifact:artifact_c92beb34-3343-4d6f-8b4f-dfc961c02c3e@sha256:5a5cb02c52aea9e7b364205eeaba3688e60c52ac8c93de941051e11e851cf3b4",
+            "artifact:artifact_28d1b452-7693-4912-9a13-324f2a696269@sha256:ad702aea1086ad85247977d721b55ac33814e85e1dc5c7e43d2e04edf363fe7c",
+            "artifact:artifact_4344663e-7ec8-4051-9a0b-3168b29d4b40@sha256:249e6b27276ee8ab33ac2302a81352a476af227284158bf5742a39afa62edcc3",
+            "artifact:artifact_fc92164d-def9-4d47-8952-c7204d6d51dd@sha256:bef88c48e42fe86c07f5bfdfa289adff6dcfaa6d1d14f63580e426356120457d"
+          ]
+        },
+        {
+          "id": "write-scope",
+          "result": "not_checked",
+          "evidence": [
+            "artifact:artifact_c92beb34-3343-4d6f-8b4f-dfc961c02c3e@sha256:5a5cb02c52aea9e7b364205eeaba3688e60c52ac8c93de941051e11e851cf3b4",
+            "artifact:artifact_28d1b452-7693-4912-9a13-324f2a696269@sha256:ad702aea1086ad85247977d721b55ac33814e85e1dc5c7e43d2e04edf363fe7c",
+            "artifact:artifact_4344663e-7ec8-4051-9a0b-3168b29d4b40@sha256:249e6b27276ee8ab33ac2302a81352a476af227284158bf5742a39afa62edcc3",
+            "artifact:artifact_fc92164d-def9-4d47-8952-c7204d6d51dd@sha256:bef88c48e42fe86c07f5bfdfa289adff6dcfaa6d1d14f63580e426356120457d"
+          ]
+        },
+        {
+          "id": "parent-qualitative-review",
+          "result": "not_checked",
+          "evidence": [
+            "artifact:artifact_c92beb34-3343-4d6f-8b4f-dfc961c02c3e@sha256:5a5cb02c52aea9e7b364205eeaba3688e60c52ac8c93de941051e11e851cf3b4",
+            "artifact:artifact_28d1b452-7693-4912-9a13-324f2a696269@sha256:ad702aea1086ad85247977d721b55ac33814e85e1dc5c7e43d2e04edf363fe7c",
+            "artifact:artifact_4344663e-7ec8-4051-9a0b-3168b29d4b40@sha256:249e6b27276ee8ab33ac2302a81352a476af227284158bf5742a39afa62edcc3",
+            "artifact:artifact_fc92164d-def9-4d47-8952-c7204d6d51dd@sha256:bef88c48e42fe86c07f5bfdfa289adff6dcfaa6d1d14f63580e426356120457d"
+          ]
+        }
+      ],
+      "starting_state_sha256": "a26ef13d36c38161a5e377bf642437d0ffad8203b32a6e527f0dad14c4258a85",
+      "final_manifest_sha256": "bef88c48e42fe86c07f5bfdfa289adff6dcfaa6d1d14f63580e426356120457d",
+      "freshness": "Parent inspected complete recorded fixture inputs, immutable exports, final snapshot, and available checks.",
+      "integration_checks": [
+        "Parent read all reports, findings.md and authoritative sources. Despite passing marker checks, summary and main findings assert a definite contradiction by assuming public means no authentication. Sources explicitly leave service identity authentication unknown. Later caveats do not repair the overstatement. findings.md also includes malformed citations such as policy.md:34 and review_scope.txt:12. Requires bounded correction before acceptance."
+      ],
+      "coverage_limits": [
+        "Trusted-workspace managed mode; plugin race remains separately documented.",
+        "Context measured in bytes; elapsed review time includes concurrent parent work."
+      ],
+      "unresolved_issues": [
+        "Parent read all reports, findings.md and authoritative sources. Despite passing marker checks, summary and main findings assert a definite contradiction by assuming public means no authentication. Sources explicitly leave service identity authentication unknown. Later caveats do not repair the overstatement. findings.md also includes malformed citations such as policy.md:34 and review_scope.txt:12. Requires bounded correction before acceptance."
+      ],
+      "next_action": "Bounded correction or rerun; preserve this attempt."
+    }
+  },
+  "result": {
+    "taskId": "task_e5cd8bdf-8583-4a2b-8a0f-5a2d8359df92",
+    "executionId": "exec_58460b11-6dcf-4b37-a6b4-9c5da998da0d",
+    "scopeId": "release-policy-contradiction",
+    "revision": 26,
+    "phase": "completed",
+    "observation": "current",
+    "workspace": "/private/tmp/v2-eval-parent-20261012/policy-contradiction/workspace",
+    "workspaceAccess": "exclusive",
+    "requestModel": {
+      "profile": "local"
+    },
+    "model": "llama.cpp/laguna-s-21",
+    "profile": "bounded-build",
+    "backendId": "backend_20ce6f8771a684e3766de9ed886be6f8",
+    "sessionId": "ses_ece5aac00ffeW0fVKFWnbycCuZ",
+    "userMessageId": "msg_c1ad5a8a-961e-48bb-9529-1d404065e69f",
+    "predecessorExecutionId": "exec_3e5e1fea-fedb-4ec9-83df-df578a7a5d07",
+    "contextMode": "fresh",
+    "baselineHash": "a26ef13d36c38161a5e377bf642437d0ffad8203b32a6e527f0dad14c4258a85",
+    "promptHash": "5ec2d64aa554250580f412272e7b4cdda1cc183f2bdbfdebb35ad239116de8d5",
+    "reportPath": "/private/tmp/v2-eval-parent-20261012/policy-contradiction/state/reports/exec_58460b11-6dcf-4b37-a6b4-9c5da998da0d",
+    "queueDeadlineAt": "2026-10-12T19:46:39.726Z",
+    "admittedAt": "2026-10-12T19:44:39.730Z",
+    "executionDeadlineAt": "2026-10-12T19:49:39.730Z",
+    "finalizationDeadlineAt": "2026-10-12T19:49:54.726Z",
+    "intendedOutcome": "completed",
+    "creationIntent": {
+      "backendId": "backend_20ce6f8771a684e3766de9ed886be6f8",
+      "marker": "opencode-agents:exec_58460b11-6dcf-4b37-a6b4-9c5da998da0d",
+      "sessionId": "ses_ece5aac00ffeW0fVKFWnbycCuZ",
+      "createdAt": "2026-10-12T19:44:40.952Z"
+    },
+    "cancellationIntent": null,
+    "pendingRequests": [],
+    "createdAt": "2026-10-12T19:44:39.726Z",
+    "updatedAt": "2026-10-12T19:52:26.968Z",
+    "reportValidity": "valid",
+    "finalManifestHash": "bef88c48e42fe86c07f5bfdfa289adff6dcfaa6d1d14f63580e426356120457d",
+    "reviewStatus": "needs_correction",
+    "terminal": true,
+    "operationally_resolved": true,
+    "usage": {
+      "input_tokens": null,
+      "output_tokens": null,
+      "cache_tokens": null,
+      "reported_cost": null,
+      "currency": null,
+      "source": "not_captured"
+    }
+  }
+}

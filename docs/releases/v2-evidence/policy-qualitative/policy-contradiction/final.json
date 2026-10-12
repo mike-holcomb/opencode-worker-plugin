@@ -1,0 +1,304 @@
+{
+  "taskId": "task_e5cd8bdf-8583-4a2b-8a0f-5a2d8359df92",
+  "executionId": "exec_15f04a24-a02c-4839-a93c-9d769cb85c58",
+  "scopeId": "release-policy-contradiction",
+  "revision": 19,
+  "phase": "cancelling",
+  "observation": "unknown",
+  "workspace": "/private/tmp/v2-eval-parent-20261012/policy-contradiction/workspace",
+  "workspaceAccess": "exclusive",
+  "requestModel": {
+    "profile": "local"
+  },
+  "model": "llama.cpp/laguna-s-21",
+  "profile": "bounded-build",
+  "backendId": "backend_d1bbc06d35e8b35e7f2a107af9b35166",
+  "sessionId": "ses_ece5aac00ffeW0fVKFWnbycCuZ",
+  "userMessageId": "msg_59d99990-51ba-4774-b4f4-3288c830020b",
+  "predecessorExecutionId": "exec_58460b11-6dcf-4b37-a6b4-9c5da998da0d",
+  "contextMode": "resume",
+  "baselineHash": "399588f14bae0a0f50949ca6e0966d0aa8a9372e8f718e8fc141f7cbaa749005",
+  "promptHash": "42b3ac0d75d284ab941689be74c7958cac7be687019e51f473a8e41c34cfcf17",
+  "reportPath": "/private/tmp/v2-eval-parent-20261012/policy-contradiction/state/reports/exec_15f04a24-a02c-4839-a93c-9d769cb85c58",
+  "queueDeadlineAt": "2026-10-12T19:54:32.587Z",
+  "admittedAt": "2026-10-12T19:52:32.591Z",
+  "executionDeadlineAt": "2026-10-12T19:57:32.591Z",
+  "finalizationDeadlineAt": null,
+  "intendedOutcome": null,
+  "creationIntent": null,
+  "cancellationIntent": {
+    "reason": "execution deadline",
+    "requester": "supervisor",
+    "deadlineOrigin": "2026-10-12T19:57:32.591Z",
+    "createdAt": "2026-10-12T19:57:32.904Z",
+    "abortAcknowledged": true
+  },
+  "pendingRequests": [
+    {
+      "requestId": "per_131af7c68001zew07E391qZNXD",
+      "executionId": "exec_15f04a24-a02c-4839-a93c-9d769cb85c58",
+      "kind": "permission",
+      "revision": 1,
+      "detail": {
+        "api": "legacy",
+        "detail": {
+          "always": [
+            "ls *"
+          ],
+          "id": "per_131af7c68001zew07E391qZNXD",
+          "metadata": {
+            "command": "ls -la /private/tmp/v2-eval-parent-20261012/policy-contradiction/workspace/"
+          },
+          "patterns": [
+            "ls -la /private/tmp/v2-eval-parent-20261012/policy-contradiction/workspace/"
+          ],
+          "permission": "bash",
+          "sessionID": "ses_ece5aac00ffeW0fVKFWnbycCuZ",
+          "tool": {
+            "callID": "chatcmpl-tool-bfa2eee71b3a0c56",
+            "messageID": "msg_131af76a4001ix88rYU6A3wRsM"
+          }
+        },
+        "id": "per_131af7c68001zew07E391qZNXD",
+        "sessionId": "ses_ece5aac00ffeW0fVKFWnbycCuZ",
+        "type": "permission"
+      },
+      "status": "pending",
+      "createdAt": "2026-10-12T19:55:46.680Z",
+      "response": null,
+      "authorizationBasis": null
+    }
+  ],
+  "createdAt": "2026-10-12T19:52:32.587Z",
+  "updatedAt": "2026-10-12T19:57:33.731Z",
+  "reportValidity": "pending",
+  "finalManifestHash": null,
+  "reviewStatus": "pending",
+  "terminal": false,
+  "operationally_resolved": false,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "events": [
+    {
+      "cursor": 61,
+      "kind": "queued",
+      "detail": {
+        "contextMode": "resume",
+        "predecessorExecutionId": "exec_58460b11-6dcf-4b37-a6b4-9c5da998da0d",
+        "taskId": "task_e5cd8bdf-8583-4a2b-8a0f-5a2d8359df92"
+      },
+      "createdAt": "2026-10-12T19:52:32.587Z"
+    },
+    {
+      "cursor": 62,
+      "kind": "admitted",
+      "detail": {
+        "executionDeadlineAt": "2026-10-12T19:57:32.591Z",
+        "resourceKeys": [
+          "workspace:/private/tmp/v2-eval-parent-20261012/policy-contradiction/workspace"
+        ]
+      },
+      "createdAt": "2026-10-12T19:52:32.591Z"
+    },
+    {
+      "cursor": 63,
+      "kind": "session_bound",
+      "detail": {
+        "backendId": "backend_d1bbc06d35e8b35e7f2a107af9b35166",
+        "sessionId": "ses_ece5aac00ffeW0fVKFWnbycCuZ"
+      },
+      "createdAt": "2026-10-12T19:52:34.220Z"
+    },
+    {
+      "cursor": 64,
+      "kind": "dispatch_intent",
+      "detail": {
+        "messageId": "msg_59d99990-51ba-4774-b4f4-3288c830020b"
+      },
+      "createdAt": "2026-10-12T19:52:34.221Z"
+    },
+    {
+      "cursor": 65,
+      "kind": "dispatch_acknowledged",
+      "detail": {},
+      "createdAt": "2026-10-12T19:52:34.319Z"
+    },
+    {
+      "cursor": 66,
+      "kind": "running",
+      "detail": {
+        "messageId": "msg_59d99990-51ba-4774-b4f4-3288c830020b"
+      },
+      "createdAt": "2026-10-12T19:52:34.320Z"
+    },
+    {
+      "cursor": 67,
+      "kind": "input_request",
+      "detail": {
+        "kind": "permission",
+        "requestId": "per_131ad19ce001mCMdH2IhmLjd8E",
+        "revision": 1
+      },
+      "createdAt": "2026-10-12T19:53:10.356Z"
+    },
+    {
+      "cursor": 68,
+      "kind": "input_response_intent",
+      "detail": {
+        "requestId": "per_131ad19ce001mCMdH2IhmLjd8E",
+        "requestRevision": 1
+      },
+      "createdAt": "2026-10-12T19:54:41.606Z"
+    },
+    {
+      "cursor": 69,
+      "kind": "input_response_acknowledged",
+      "detail": {
+        "requestId": "per_131ad19ce001mCMdH2IhmLjd8E"
+      },
+      "createdAt": "2026-10-12T19:54:41.614Z"
+    },
+    {
+      "cursor": 70,
+      "kind": "running",
+      "detail": {},
+      "createdAt": "2026-10-12T19:54:41.624Z"
+    },
+    {
+      "cursor": 71,
+      "kind": "input_request",
+      "detail": {
+        "kind": "permission",
+        "requestId": "per_131aec13d0012BjTyE13xV0tLx",
+        "revision": 1
+      },
+      "createdAt": "2026-10-12T19:54:58.752Z"
+    },
+    {
+      "cursor": 72,
+      "kind": "input_response_intent",
+      "detail": {
+        "requestId": "per_131aec13d0012BjTyE13xV0tLx",
+        "requestRevision": 1
+      },
+      "createdAt": "2026-10-12T19:54:58.956Z"
+    },
+    {
+      "cursor": 73,
+      "kind": "input_response_acknowledged",
+      "detail": {
+        "requestId": "per_131aec13d0012BjTyE13xV0tLx"
+      },
+      "createdAt": "2026-10-12T19:54:58.960Z"
+    },
+    {
+      "cursor": 74,
+      "kind": "running",
+      "detail": {},
+      "createdAt": "2026-10-12T19:54:58.971Z"
+    },
+    {
+      "cursor": 75,
+      "kind": "input_request",
+      "detail": {
+        "kind": "permission",
+        "requestId": "per_131af38a40018q47x7hNvAH2Lo",
+        "revision": 1
+      },
+      "createdAt": "2026-10-12T19:55:29.327Z"
+    },
+    {
+      "cursor": 76,
+      "kind": "input_request",
+      "detail": {
+        "kind": "permission",
+        "requestId": "per_131af3e8d001bdIxzkhoUpWja4",
+        "revision": 1
+      },
+      "createdAt": "2026-10-12T19:55:30.843Z"
+    },
+    {
+      "cursor": 77,
+      "kind": "input_response_intent",
+      "detail": {
+        "requestId": "per_131af38a40018q47x7hNvAH2Lo",
+        "requestRevision": 1
+      },
+      "createdAt": "2026-10-12T19:55:45.121Z"
+    },
+    {
+      "cursor": 78,
+      "kind": "input_response_acknowledged",
+      "detail": {
+        "requestId": "per_131af38a40018q47x7hNvAH2Lo"
+      },
+      "createdAt": "2026-10-12T19:55:45.127Z"
+    },
+    {
+      "cursor": 79,
+      "kind": "input_response_intent",
+      "detail": {
+        "requestId": "per_131af3e8d001bdIxzkhoUpWja4",
+        "requestRevision": 1
+      },
+      "createdAt": "2026-10-12T19:55:45.133Z"
+    },
+    {
+      "cursor": 80,
+      "kind": "input_response_acknowledged",
+      "detail": {
+        "requestId": "per_131af3e8d001bdIxzkhoUpWja4"
+      },
+      "createdAt": "2026-10-12T19:55:45.138Z"
+    },
+    {
+      "cursor": 81,
+      "kind": "running",
+      "detail": {},
+      "createdAt": "2026-10-12T19:55:45.145Z"
+    },
+    {
+      "cursor": 82,
+      "kind": "input_request",
+      "detail": {
+        "kind": "permission",
+        "requestId": "per_131af7c68001zew07E391qZNXD",
+        "revision": 1
+      },
+      "createdAt": "2026-10-12T19:55:46.681Z"
+    },
+    {
+      "cursor": 83,
+      "kind": "cancellation_requested",
+      "detail": {
+        "phase": "cancelling",
+        "reason": "execution deadline",
+        "requester": "supervisor"
+      },
+      "createdAt": "2026-10-12T19:57:32.905Z"
+    },
+    {
+      "cursor": 84,
+      "kind": "abort_acknowledged",
+      "detail": {},
+      "createdAt": "2026-10-12T19:57:33.706Z"
+    },
+    {
+      "cursor": 85,
+      "kind": "cancelling",
+      "detail": {
+        "reason": "stop has not been confirmed"
+      },
+      "createdAt": "2026-10-12T19:57:33.731Z"
+    }
+  ],
+  "artifacts": [],
+  "cursor": 85,
+  "has_more_events": false
+}

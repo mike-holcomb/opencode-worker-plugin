@@ -1,0 +1,13 @@
+{
+  "schema_version": 2,
+  "scenario_id": "failed-checks",
+  "run_id": "failed-checks-1791834586579",
+  "tier": "standard",
+  "context_mode": "fresh",
+  "context_basis": "ordinary fresh context",
+  "task_file": "task.md",
+  "fixture_files": [
+    "parser.py",
+    "test_parser.py"
+  ]
+}

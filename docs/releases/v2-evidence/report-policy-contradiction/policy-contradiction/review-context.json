@@ -1,0 +1,71 @@
+{
+  "review_started_at": "2026-10-12T19:50:00.477Z",
+  "context_bytes": 38373,
+  "files": [
+    {
+      "path": "packet.json",
+      "sha256": "02f8f9333ec7ffe0d8680191c3f91d80b3aad740f5ee6bbb15839b9a6baa2968",
+      "bytes": 3306
+    },
+    {
+      "path": "final.json",
+      "sha256": "d7fc5eaea2ddd51025b400bb9b310293bf4936cbc3b7b39c465715ee623f95b2",
+      "bytes": 8775
+    },
+    {
+      "path": "exports.json",
+      "sha256": "d22d3d62fc2939598e2436ab7aa702521c4da47d3479d9790ae16f3de39f3036",
+      "bytes": 1375
+    },
+    {
+      "path": "summary.md",
+      "sha256": "ad702aea1086ad85247977d721b55ac33814e85e1dc5c7e43d2e04edf363fe7c",
+      "bytes": 4154
+    },
+    {
+      "path": "artifact_c92beb34-3343-4d6f-8b4f-dfc961c02c3e.json",
+      "sha256": "5a5cb02c52aea9e7b364205eeaba3688e60c52ac8c93de941051e11e851cf3b4",
+      "bytes": 7613
+    },
+    {
+      "path": "artifact_4344663e-7ec8-4051-9a0b-3168b29d4b40.json",
+      "sha256": "249e6b27276ee8ab33ac2302a81352a476af227284158bf5742a39afa62edcc3",
+      "bytes": 5209
+    },
+    {
+      "path": "artifact_fc92164d-def9-4d47-8952-c7204d6d51dd.json",
+      "sha256": "bef88c48e42fe86c07f5bfdfa289adff6dcfaa6d1d14f63580e426356120457d",
+      "bytes": 1558
+    },
+    {
+      "path": "workspace/audit-note.md",
+      "sha256": "2fdcb554e4812aee6be4c8df9f83841d2deff5077cbabf135011988e12cc4882",
+      "bytes": 212
+    },
+    {
+      "path": "workspace/findings.md",
+      "sha256": "249e6b27276ee8ab33ac2302a81352a476af227284158bf5742a39afa62edcc3",
+      "bytes": 5209
+    },
+    {
+      "path": "workspace/policy.md",
+      "sha256": "b021230be1e446eb74b6e22a0c632ad954dce44afddbc2a18bd941e97e658d82",
+      "bytes": 184
+    },
+    {
+      "path": "workspace/review_scope.txt",
+      "sha256": "9d7c7bc16771721c28687d9fd06827a7e376dd7b6458971cf59bc566b7cebca2",
+      "bytes": 150
+    },
+    {
+      "path": "workspace/scenario-input.json",
+      "sha256": "ae76673b786c8cfbbb4dd735e10acdffe077020a8c48ea49d2d4ced0866a26e8",
+      "bytes": 320
+    },
+    {
+      "path": "workspace/task.md",
+      "sha256": "5e156e5814cf54537e9709d5fd0309baab51863873fd7f102f98bc5084628dae",
+      "bytes": 308
+    }
+  ]
+}

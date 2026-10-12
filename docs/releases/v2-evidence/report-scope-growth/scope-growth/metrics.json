@@ -1,0 +1,89 @@
+{
+  "elapsed_ms": 178383,
+  "dispatches": 1,
+  "duplicate_dispatch": false,
+  "dispatch_expectation_met": true,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "report_validity": "valid",
+  "terminal": true,
+  "phase": "completed",
+  "decisions": [
+    {
+      "request_id": "per_131aa928c001eMxPmemLXga6lL",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Idempotent mkdir of the exact assigned execution report directory only.",
+      "permission": "bash",
+      "command": "mkdir -p /private/tmp/v2-eval-parent-20261012/scope-growth/state/reports/exec_68edd588-d6ca-401d-9b09-acbed9f6cc7e",
+      "patterns": [
+        "mkdir -p /private/tmp/v2-eval-parent-20261012/scope-growth/state/reports/exec_68edd588-d6ca-401d-9b09-acbed9f6cc7e"
+      ],
+      "delivery": "acknowledged"
+    },
+    {
+      "request_id": "per_131aa92e60018o6Fyxm6zqiltm",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Read-only listing of assigned fixture workspace.",
+      "permission": "bash",
+      "command": "ls -la /private/tmp/v2-eval-parent-20261012/scope-growth/workspace/",
+      "patterns": [
+        "ls -la /private/tmp/v2-eval-parent-20261012/scope-growth/workspace/"
+      ],
+      "delivery": "acknowledged"
+    },
+    {
+      "request_id": "per_131abb409001Bx5Yjh7rdTNoUX",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Read-only standard-library JSON parse of exact current report, field assertions and prints only.",
+      "permission": "bash",
+      "command": "python3 -c \"import json; d=json.load(open('/private/tmp/v2-eval-parent-20261012/scope-growth/state/reports/exec_68edd588-d6ca-401d-9b09-acbed9f6cc7e/result.json')); print('Valid JSON'); print('Keys:', list(d.keys())); print('Required keys present:', all(k in d for k in ['schema_version','task_id','execution_id','outcome','summary','coverage','gaps','findings','changes','checks','blockers','next_action'])); print('Extra keys:', set(d.keys()) - {'schema_version','task_id','execution_id','outcome','summary','coverage','gaps','findings','changes','checks','blockers','next_action'}); print('schema_version:', d['schema_version']); print('outcome:', d['outcome']); print('changes:', d['changes']); print('checks count:', len(d['checks'])); print('findings count:', len(d['findings'])); print('blockers count:', len(d['blockers']))\"",
+      "patterns": [
+        "python3 -c \"import json; d=json.load(open('/private/tmp/v2-eval-parent-20261012/scope-growth/state/reports/exec_68edd588-d6ca-401d-9b09-acbed9f6cc7e/result.json')); print('Valid JSON'); print('Keys:', list(d.keys())); print('Required keys present:', all(k in d for k in ['schema_version','task_id','execution_id','outcome','summary','coverage','gaps','findings','changes','checks','blockers','next_action'])); print('Extra keys:', set(d.keys()) - {'schema_version','task_id','execution_id','outcome','summary','coverage','gaps','findings','changes','checks','blockers','next_action'}); print('schema_version:', d['schema_version']); print('outcome:', d['outcome']); print('changes:', d['changes']); print('checks count:', len(d['checks'])); print('findings count:', len(d['findings'])); print('blockers count:', len(d['blockers']))\""
+      ],
+      "delivery": "acknowledged"
+    },
+    {
+      "request_id": "per_131abb4f7001punm6os5ngN4fb",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Exact read-only listing of own current execution report directory.",
+      "permission": "bash",
+      "command": "ls -la /private/tmp/v2-eval-parent-20261012/scope-growth/state/reports/exec_68edd588-d6ca-401d-9b09-acbed9f6cc7e/",
+      "patterns": [
+        "ls -la /private/tmp/v2-eval-parent-20261012/scope-growth/state/reports/exec_68edd588-d6ca-401d-9b09-acbed9f6cc7e/"
+      ],
+      "delivery": "acknowledged"
+    }
+  ],
+  "evaluation": {
+    "exit_code": 2
+  },
+  "assertion_error": null,
+  "overlap": null,
+  "status": "passed",
+  "parent_review": "accepted",
+  "parent_review_started_at": "2026-10-12T19:53:18.276Z",
+  "parent_review_elapsed_ms": 17827,
+  "parent_context_bytes": 27822,
+  "observed_inference": {
+    "source": "opencode_1.18.35_exact_assistant_messages",
+    "execution_id": "exec_68edd588-d6ca-401d-9b09-acbed9f6cc7e",
+    "session_id": "ses_ece5634bbffeIifgNRE9Lidy1R",
+    "user_message_id": "msg_0068e171-8b76-493b-92d0-b4894e5e2b9c",
+    "input_tokens": 106267,
+    "output_tokens": 11526,
+    "total_tokens": 117793,
+    "assistant_messages": 7,
+    "reported_cost": null,
+    "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available."
+  }
+}

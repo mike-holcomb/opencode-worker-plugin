@@ -1,0 +1,293 @@
+{
+  "taskId": "task_0b9feb40-b19c-4edd-9447-f2d0dd7c91f5",
+  "executionId": "exec_68edd588-d6ca-401d-9b09-acbed9f6cc7e",
+  "scopeId": "release-scope-growth",
+  "revision": 19,
+  "phase": "completed",
+  "observation": "current",
+  "workspace": "/private/tmp/v2-eval-parent-20261012/scope-growth/workspace",
+  "workspaceAccess": "exclusive",
+  "requestModel": {
+    "profile": "local"
+  },
+  "model": "llama.cpp/laguna-s-21",
+  "profile": "bounded-build",
+  "backendId": "backend_22268a1d1cfe428a36a790c80b74d516",
+  "sessionId": "ses_ece5634bbffeIifgNRE9Lidy1R",
+  "userMessageId": "msg_0068e171-8b76-493b-92d0-b4894e5e2b9c",
+  "predecessorExecutionId": "exec_b56a9327-8b91-4acb-a5ea-e1e5ad125228",
+  "contextMode": "fresh",
+  "baselineHash": "8bdba135ea680d0dd344c003c3525654428735027c8ccc84d68cbb77cb5f6066",
+  "promptHash": "12000b54544430853ac985a0529fc06917e38b55054d0416e73e9b2ed9a05ba8",
+  "reportPath": "/private/tmp/v2-eval-parent-20261012/scope-growth/state/reports/exec_68edd588-d6ca-401d-9b09-acbed9f6cc7e",
+  "queueDeadlineAt": "2026-10-12T19:51:32.091Z",
+  "admittedAt": "2026-10-12T19:49:32.095Z",
+  "executionDeadlineAt": "2026-10-12T19:54:32.095Z",
+  "finalizationDeadlineAt": "2026-10-12T19:52:58.191Z",
+  "intendedOutcome": "completed",
+  "creationIntent": {
+    "backendId": "backend_22268a1d1cfe428a36a790c80b74d516",
+    "marker": "opencode-agents:exec_68edd588-d6ca-401d-9b09-acbed9f6cc7e",
+    "sessionId": "ses_ece5634bbffeIifgNRE9Lidy1R",
+    "createdAt": "2026-10-12T19:49:33.624Z"
+  },
+  "cancellationIntent": null,
+  "pendingRequests": [],
+  "createdAt": "2026-10-12T19:49:32.091Z",
+  "updatedAt": "2026-10-12T19:52:28.235Z",
+  "reportValidity": "valid",
+  "finalManifestHash": "40a93d953589a333530afcc2ac0739e9b5381a8438e28439d9daef96b6dd0dff",
+  "reviewStatus": "pending",
+  "terminal": true,
+  "operationally_resolved": true,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "events": [
+    {
+      "cursor": 21,
+      "kind": "queued",
+      "detail": {
+        "contextMode": "fresh",
+        "predecessorExecutionId": "exec_b56a9327-8b91-4acb-a5ea-e1e5ad125228",
+        "taskId": "task_0b9feb40-b19c-4edd-9447-f2d0dd7c91f5"
+      },
+      "createdAt": "2026-10-12T19:49:32.091Z"
+    },
+    {
+      "cursor": 22,
+      "kind": "admitted",
+      "detail": {
+        "executionDeadlineAt": "2026-10-12T19:54:32.095Z",
+        "resourceKeys": [
+          "workspace:/private/tmp/v2-eval-parent-20261012/scope-growth/workspace"
+        ]
+      },
+      "createdAt": "2026-10-12T19:49:32.095Z"
+    },
+    {
+      "cursor": 23,
+      "kind": "creation_intent",
+      "detail": {
+        "backendId": "backend_22268a1d1cfe428a36a790c80b74d516",
+        "marker": "opencode-agents:exec_68edd588-d6ca-401d-9b09-acbed9f6cc7e"
+      },
+      "createdAt": "2026-10-12T19:49:33.624Z"
+    },
+    {
+      "cursor": 24,
+      "kind": "session_bound",
+      "detail": {
+        "backendId": "backend_22268a1d1cfe428a36a790c80b74d516",
+        "sessionId": "ses_ece5634bbffeIifgNRE9Lidy1R"
+      },
+      "createdAt": "2026-10-12T19:49:33.640Z"
+    },
+    {
+      "cursor": 25,
+      "kind": "dispatch_intent",
+      "detail": {
+        "messageId": "msg_0068e171-8b76-493b-92d0-b4894e5e2b9c"
+      },
+      "createdAt": "2026-10-12T19:49:33.643Z"
+    },
+    {
+      "cursor": 26,
+      "kind": "dispatch_acknowledged",
+      "detail": {},
+      "createdAt": "2026-10-12T19:49:33.654Z"
+    },
+    {
+      "cursor": 27,
+      "kind": "running",
+      "detail": {
+        "messageId": "msg_0068e171-8b76-493b-92d0-b4894e5e2b9c"
+      },
+      "createdAt": "2026-10-12T19:49:33.654Z"
+    },
+    {
+      "cursor": 28,
+      "kind": "input_request",
+      "detail": {
+        "kind": "permission",
+        "requestId": "per_131aa928c001eMxPmemLXga6lL",
+        "revision": 1
+      },
+      "createdAt": "2026-10-12T19:50:24.660Z"
+    },
+    {
+      "cursor": 29,
+      "kind": "input_request",
+      "detail": {
+        "kind": "permission",
+        "requestId": "per_131aa92e60018o6Fyxm6zqiltm",
+        "revision": 1
+      },
+      "createdAt": "2026-10-12T19:50:24.750Z"
+    },
+    {
+      "cursor": 30,
+      "kind": "input_response_intent",
+      "detail": {
+        "requestId": "per_131aa928c001eMxPmemLXga6lL",
+        "requestRevision": 1
+      },
+      "createdAt": "2026-10-12T19:51:01.566Z"
+    },
+    {
+      "cursor": 31,
+      "kind": "input_response_acknowledged",
+      "detail": {
+        "requestId": "per_131aa928c001eMxPmemLXga6lL"
+      },
+      "createdAt": "2026-10-12T19:51:01.573Z"
+    },
+    {
+      "cursor": 32,
+      "kind": "input_response_intent",
+      "detail": {
+        "requestId": "per_131aa92e60018o6Fyxm6zqiltm",
+        "requestRevision": 1
+      },
+      "createdAt": "2026-10-12T19:51:01.577Z"
+    },
+    {
+      "cursor": 33,
+      "kind": "input_response_acknowledged",
+      "detail": {
+        "requestId": "per_131aa92e60018o6Fyxm6zqiltm"
+      },
+      "createdAt": "2026-10-12T19:51:01.581Z"
+    },
+    {
+      "cursor": 34,
+      "kind": "running",
+      "detail": {},
+      "createdAt": "2026-10-12T19:51:01.585Z"
+    },
+    {
+      "cursor": 35,
+      "kind": "input_request",
+      "detail": {
+        "kind": "permission",
+        "requestId": "per_131abb409001Bx5Yjh7rdTNoUX",
+        "revision": 1
+      },
+      "createdAt": "2026-10-12T19:51:38.776Z"
+    },
+    {
+      "cursor": 36,
+      "kind": "input_request",
+      "detail": {
+        "kind": "permission",
+        "requestId": "per_131abb4f7001punm6os5ngN4fb",
+        "revision": 1
+      },
+      "createdAt": "2026-10-12T19:51:39.012Z"
+    },
+    {
+      "cursor": 37,
+      "kind": "input_response_intent",
+      "detail": {
+        "requestId": "per_131abb409001Bx5Yjh7rdTNoUX",
+        "requestRevision": 1
+      },
+      "createdAt": "2026-10-12T19:52:23.922Z"
+    },
+    {
+      "cursor": 38,
+      "kind": "input_response_acknowledged",
+      "detail": {
+        "requestId": "per_131abb409001Bx5Yjh7rdTNoUX"
+      },
+      "createdAt": "2026-10-12T19:52:23.934Z"
+    },
+    {
+      "cursor": 39,
+      "kind": "input_response_intent",
+      "detail": {
+        "requestId": "per_131abb4f7001punm6os5ngN4fb",
+        "requestRevision": 1
+      },
+      "createdAt": "2026-10-12T19:52:23.946Z"
+    },
+    {
+      "cursor": 40,
+      "kind": "waiting_input",
+      "detail": {
+        "reason": "recorded input response may or may not have reached upstream; operator action required"
+      },
+      "createdAt": "2026-10-12T19:52:23.949Z"
+    },
+    {
+      "cursor": 41,
+      "kind": "input_response_acknowledged",
+      "detail": {
+        "requestId": "per_131abb4f7001punm6os5ngN4fb"
+      },
+      "createdAt": "2026-10-12T19:52:23.950Z"
+    },
+    {
+      "cursor": 42,
+      "kind": "running",
+      "detail": {},
+      "createdAt": "2026-10-12T19:52:23.955Z"
+    },
+    {
+      "cursor": 43,
+      "kind": "finalizing",
+      "detail": {
+        "detail": {
+          "error": null
+        },
+        "intendedOutcome": "completed"
+      },
+      "createdAt": "2026-10-12T19:52:28.191Z"
+    },
+    {
+      "cursor": 44,
+      "kind": "artifact_registered",
+      "detail": {
+        "artifactId": "artifact_a8f5a74d-b96b-4de2-aff6-a18bc9cc3c5b",
+        "sha256": "928dc3635834bc50e6c7bf6a3773e4afebc72e7a6ce514e497b5c858f191a98e"
+      },
+      "createdAt": "2026-10-12T19:52:28.204Z"
+    },
+    {
+      "cursor": 45,
+      "kind": "artifact_registered",
+      "detail": {
+        "artifactId": "artifact_c5a68203-3e93-4469-8487-fb19acc03131",
+        "sha256": "eb7cd9d1886f81250f79b21f82ea02cb52574911426a9b9c5cfdb49774193ee9"
+      },
+      "createdAt": "2026-10-12T19:52:28.219Z"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "artifact_a8f5a74d-b96b-4de2-aff6-a18bc9cc3c5b",
+      "sha256": "928dc3635834bc50e6c7bf6a3773e4afebc72e7a6ce514e497b5c858f191a98e",
+      "byte_length": 9282,
+      "media_type": "application/json"
+    },
+    {
+      "artifact_id": "artifact_c5a68203-3e93-4469-8487-fb19acc03131",
+      "sha256": "eb7cd9d1886f81250f79b21f82ea02cb52574911426a9b9c5cfdb49774193ee9",
+      "byte_length": 3096,
+      "media_type": "text/markdown"
+    },
+    {
+      "artifact_id": "artifact_cb65915e-898e-4a2b-b9b7-7cc53797de5e",
+      "sha256": "40a93d953589a333530afcc2ac0739e9b5381a8438e28439d9daef96b6dd0dff",
+      "byte_length": 1015,
+      "media_type": "application/json"
+    }
+  ],
+  "cursor": 45,
+  "has_more_events": true
+}

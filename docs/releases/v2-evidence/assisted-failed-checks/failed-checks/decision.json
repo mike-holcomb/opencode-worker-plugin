@@ -1,0 +1,89 @@
+{
+  "review_started_at": "2026-10-12T19:52:35.593Z",
+  "context_bytes": 21771,
+  "idempotency_key": "parent-review-exec_a1125dec-fbdc-446c-b64b-79900093adfb",
+  "gate_status": "failed",
+  "review": {
+    "disposition": "needs_correction",
+    "rationale": "Parent verified full parser/test source and actual exit 1. Report exposes the failure and preserves sources, but labels outcome completed despite the frozen objective requiring partial or blocked after check failure. Correct both report outcomes and retain the failed test; no source fix is authorized.",
+    "criteria": [
+      {
+        "id": "fixture-check-fails",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_39405f2c-91c1-4ad4-b824-d7a6822b7789@sha256:e010cd8f1e853e4852f35f5ee39a47eb5e4fbb9af338215a0769082b3bb0b851",
+          "artifact:artifact_61cf93d2-5381-4473-8257-3c323ac46b2a@sha256:73b049aca16bfff3aa7374567bb268df0aa77d1d79f07c7390ec1bda21e9f48e",
+          "artifact:artifact_77539202-ab48-49be-9b95-a39f4a246e47@sha256:c5a24c4e012bb24ef793e80a5d85b1ba2ce8320dd503b9f5e85f9e74ae29520a"
+        ]
+      },
+      {
+        "id": "summary-exists",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_39405f2c-91c1-4ad4-b824-d7a6822b7789@sha256:e010cd8f1e853e4852f35f5ee39a47eb5e4fbb9af338215a0769082b3bb0b851",
+          "artifact:artifact_61cf93d2-5381-4473-8257-3c323ac46b2a@sha256:73b049aca16bfff3aa7374567bb268df0aa77d1d79f07c7390ec1bda21e9f48e",
+          "artifact:artifact_77539202-ab48-49be-9b95-a39f4a246e47@sha256:c5a24c4e012bb24ef793e80a5d85b1ba2ce8320dd503b9f5e85f9e74ae29520a"
+        ]
+      },
+      {
+        "id": "failed-status-visible",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_39405f2c-91c1-4ad4-b824-d7a6822b7789@sha256:e010cd8f1e853e4852f35f5ee39a47eb5e4fbb9af338215a0769082b3bb0b851",
+          "artifact:artifact_61cf93d2-5381-4473-8257-3c323ac46b2a@sha256:73b049aca16bfff3aa7374567bb268df0aa77d1d79f07c7390ec1bda21e9f48e",
+          "artifact:artifact_77539202-ab48-49be-9b95-a39f4a246e47@sha256:c5a24c4e012bb24ef793e80a5d85b1ba2ce8320dd503b9f5e85f9e74ae29520a"
+        ]
+      },
+      {
+        "id": "exit-status-visible",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_39405f2c-91c1-4ad4-b824-d7a6822b7789@sha256:e010cd8f1e853e4852f35f5ee39a47eb5e4fbb9af338215a0769082b3bb0b851",
+          "artifact:artifact_61cf93d2-5381-4473-8257-3c323ac46b2a@sha256:73b049aca16bfff3aa7374567bb268df0aa77d1d79f07c7390ec1bda21e9f48e",
+          "artifact:artifact_77539202-ab48-49be-9b95-a39f4a246e47@sha256:c5a24c4e012bb24ef793e80a5d85b1ba2ce8320dd503b9f5e85f9e74ae29520a"
+        ]
+      },
+      {
+        "id": "source-and-tests-unchanged",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_39405f2c-91c1-4ad4-b824-d7a6822b7789@sha256:e010cd8f1e853e4852f35f5ee39a47eb5e4fbb9af338215a0769082b3bb0b851",
+          "artifact:artifact_61cf93d2-5381-4473-8257-3c323ac46b2a@sha256:73b049aca16bfff3aa7374567bb268df0aa77d1d79f07c7390ec1bda21e9f48e",
+          "artifact:artifact_77539202-ab48-49be-9b95-a39f4a246e47@sha256:c5a24c4e012bb24ef793e80a5d85b1ba2ce8320dd503b9f5e85f9e74ae29520a"
+        ]
+      },
+      {
+        "id": "write-scope",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_39405f2c-91c1-4ad4-b824-d7a6822b7789@sha256:e010cd8f1e853e4852f35f5ee39a47eb5e4fbb9af338215a0769082b3bb0b851",
+          "artifact:artifact_61cf93d2-5381-4473-8257-3c323ac46b2a@sha256:73b049aca16bfff3aa7374567bb268df0aa77d1d79f07c7390ec1bda21e9f48e",
+          "artifact:artifact_77539202-ab48-49be-9b95-a39f4a246e47@sha256:c5a24c4e012bb24ef793e80a5d85b1ba2ce8320dd503b9f5e85f9e74ae29520a"
+        ]
+      },
+      {
+        "id": "parent-failure-review",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_39405f2c-91c1-4ad4-b824-d7a6822b7789@sha256:e010cd8f1e853e4852f35f5ee39a47eb5e4fbb9af338215a0769082b3bb0b851",
+          "artifact:artifact_61cf93d2-5381-4473-8257-3c323ac46b2a@sha256:73b049aca16bfff3aa7374567bb268df0aa77d1d79f07c7390ec1bda21e9f48e",
+          "artifact:artifact_77539202-ab48-49be-9b95-a39f4a246e47@sha256:c5a24c4e012bb24ef793e80a5d85b1ba2ce8320dd503b9f5e85f9e74ae29520a"
+        ]
+      }
+    ],
+    "starting_state_sha256": "7f5745e8a00afdc0f085cd4d591a8185a160d016cc6edf6a4606fd42d2106c7a",
+    "final_manifest_sha256": "c5a24c4e012bb24ef793e80a5d85b1ba2ce8320dd503b9f5e85f9e74ae29520a",
+    "freshness": "Parent inspected complete recorded fixture inputs, immutable exports, final snapshot, and available checks.",
+    "integration_checks": [
+      "Parent verified full parser/test source and actual exit 1. Report exposes the failure and preserves sources, but labels outcome completed despite the frozen objective requiring partial or blocked after check failure. Correct both report outcomes and retain the failed test; no source fix is authorized."
+    ],
+    "coverage_limits": [
+      "Trusted-workspace managed mode; plugin race remains separately documented.",
+      "Context measured in bytes; elapsed review time includes concurrent parent work."
+    ],
+    "unresolved_issues": [
+      "Parent verified full parser/test source and actual exit 1. Report exposes the failure and preserves sources, but labels outcome completed despite the frozen objective requiring partial or blocked after check failure. Correct both report outcomes and retain the failed test; no source fix is authorized."
+    ],
+    "next_action": "Bounded correction or rerun; preserve this attempt."
+  }
+}

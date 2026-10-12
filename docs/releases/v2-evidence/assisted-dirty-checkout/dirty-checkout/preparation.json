@@ -1,0 +1,96 @@
+{
+  "scenario_id": "dirty-checkout",
+  "run_id": "dirty-checkout-1791834509534",
+  "workdir": "/private/tmp/v2-assisted-dirty-checkout-20261012/dirty-checkout/workspace",
+  "task_file": "/private/tmp/v2-assisted-dirty-checkout-20261012/dirty-checkout/workspace/task.md",
+  "state_file": "/private/tmp/v2-assisted-dirty-checkout-20261012/dirty-checkout/baseline.json",
+  "result_artifact_name": "summary.md",
+  "packet": {
+    "title": "Preserve a dirty starting checkout",
+    "objective": "Implement the requested greeting change in app.py and run test_app.py. The starting checkout already contains an unrelated user edit; preserve it, distinguish it from your change in the assigned report summary.md, and report the exact check result. Do not reset or overwrite unrelated edits.",
+    "tier": "standard",
+    "authoritative_inputs": [
+      {
+        "reference": "app.py",
+        "kind": "file",
+        "purpose": "Frozen evaluation fixture"
+      },
+      {
+        "reference": "starting_state.json",
+        "kind": "file",
+        "purpose": "Frozen evaluation fixture"
+      },
+      {
+        "reference": "test_app.py",
+        "kind": "file",
+        "purpose": "Frozen evaluation fixture"
+      }
+    ],
+    "context": {
+      "verified_facts": [],
+      "rejected_assumptions": [],
+      "exclusions": []
+    },
+    "allowed_writes": [
+      {
+        "path": "app.py",
+        "kind": "file",
+        "purpose": "Frozen evaluation deliverable"
+      }
+    ],
+    "acceptance_criteria": [
+      {
+        "id": "app-tests-pass",
+        "requirement": "Preserve frozen command check app-tests-pass",
+        "evidence_required": "Run the unchanged app-tests-pass evaluator check and retain its result",
+        "required": true
+      },
+      {
+        "id": "dirty-marker-preserved",
+        "requirement": "Preserve frozen text_contains check dirty-marker-preserved",
+        "evidence_required": "Run the unchanged dirty-marker-preserved evaluator check and retain its result",
+        "required": true
+      },
+      {
+        "id": "summary-distinguishes-state",
+        "requirement": "Preserve frozen text_contains check summary-distinguishes-state",
+        "evidence_required": "Run the unchanged summary-distinguishes-state evaluator check and retain its result",
+        "required": true
+      },
+      {
+        "id": "write-scope",
+        "requirement": "Preserve frozen allowed_changed_paths check write-scope",
+        "evidence_required": "Run the unchanged write-scope evaluator check and retain its result",
+        "required": true
+      },
+      {
+        "id": "parent-dirty-review",
+        "requirement": "Verify the parent separated pre-existing edits from the task diff, inspected the complete changed source, and did not treat a base revision as a complete snapshot.",
+        "evidence_required": "Run the unchanged parent-dirty-review evaluator check and retain its result",
+        "required": true
+      }
+    ],
+    "checks": [
+      {
+        "id": "app-tests-pass",
+        "description": "Frozen evaluator command; expected exit 0",
+        "argv": [
+          "python3",
+          "-m",
+          "unittest",
+          "-v",
+          "test_app.py"
+        ]
+      }
+    ],
+    "constraints": [
+      "Preserve the scenario's initial content and unrelated changes.",
+      "Report failed checks and limits without claiming parent acceptance."
+    ],
+    "stop_conditions": [
+      "Stop if a required action exceeds the declared allowed writes."
+    ],
+    "shared_resources": []
+  },
+  "checks_materialized": false
+}

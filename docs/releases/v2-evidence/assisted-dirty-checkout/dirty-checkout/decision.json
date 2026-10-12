@@ -1,0 +1,74 @@
+{
+  "review_started_at": "2026-10-12T19:50:00.435Z",
+  "context_bytes": 24988,
+  "idempotency_key": "parent-review-exec_349c5130-3042-4b06-935a-366d5feaa640",
+  "gate_status": "passed",
+  "review": {
+    "disposition": "accepted",
+    "rationale": "Parent compared complete starting fixture and final source: only greeting punctuation changed, with original DIRTY_USER_EDIT marker byte-for-byte preserved. Immutable snapshot matches source and all four automatic frozen checks pass, including unchanged unittest. Worker distinguishes pre-existing state from task change; synthetic base revision is not treated as a complete snapshot. Assisted fresh fixture is recorded separately from unresolved earlier attempts.",
+    "criteria": [
+      {
+        "id": "app-tests-pass",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_a4ab3b85-3a1b-4ba8-912f-9535bce1e486@sha256:83e09f765543ff0410a2bd6cdef4a5bb3220e0c43ca32f25b7c74579b10b1908",
+          "artifact:artifact_1ecf38ea-f98e-4e14-ad7b-259f376072e5@sha256:13d3493751cdb062b7135af5387f323be1ac543662b4f0ebb2ab1ec0f33e93cf",
+          "artifact:artifact_b008b31a-9ddc-45b5-93a6-93b6db05416c@sha256:df31c9ebcf093a0752f9dc8c01c076e1435dd2bffd367c627fee3d5d6a757fc9",
+          "artifact:artifact_c63face7-a8ea-4df1-91a1-c8324857247d@sha256:a3ffbd5bdbef17912620e8c5a4051b5ac26ed93f4b549bc5f2f017661c77d7a9"
+        ]
+      },
+      {
+        "id": "dirty-marker-preserved",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_a4ab3b85-3a1b-4ba8-912f-9535bce1e486@sha256:83e09f765543ff0410a2bd6cdef4a5bb3220e0c43ca32f25b7c74579b10b1908",
+          "artifact:artifact_1ecf38ea-f98e-4e14-ad7b-259f376072e5@sha256:13d3493751cdb062b7135af5387f323be1ac543662b4f0ebb2ab1ec0f33e93cf",
+          "artifact:artifact_b008b31a-9ddc-45b5-93a6-93b6db05416c@sha256:df31c9ebcf093a0752f9dc8c01c076e1435dd2bffd367c627fee3d5d6a757fc9",
+          "artifact:artifact_c63face7-a8ea-4df1-91a1-c8324857247d@sha256:a3ffbd5bdbef17912620e8c5a4051b5ac26ed93f4b549bc5f2f017661c77d7a9"
+        ]
+      },
+      {
+        "id": "summary-distinguishes-state",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_a4ab3b85-3a1b-4ba8-912f-9535bce1e486@sha256:83e09f765543ff0410a2bd6cdef4a5bb3220e0c43ca32f25b7c74579b10b1908",
+          "artifact:artifact_1ecf38ea-f98e-4e14-ad7b-259f376072e5@sha256:13d3493751cdb062b7135af5387f323be1ac543662b4f0ebb2ab1ec0f33e93cf",
+          "artifact:artifact_b008b31a-9ddc-45b5-93a6-93b6db05416c@sha256:df31c9ebcf093a0752f9dc8c01c076e1435dd2bffd367c627fee3d5d6a757fc9",
+          "artifact:artifact_c63face7-a8ea-4df1-91a1-c8324857247d@sha256:a3ffbd5bdbef17912620e8c5a4051b5ac26ed93f4b549bc5f2f017661c77d7a9"
+        ]
+      },
+      {
+        "id": "write-scope",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_a4ab3b85-3a1b-4ba8-912f-9535bce1e486@sha256:83e09f765543ff0410a2bd6cdef4a5bb3220e0c43ca32f25b7c74579b10b1908",
+          "artifact:artifact_1ecf38ea-f98e-4e14-ad7b-259f376072e5@sha256:13d3493751cdb062b7135af5387f323be1ac543662b4f0ebb2ab1ec0f33e93cf",
+          "artifact:artifact_b008b31a-9ddc-45b5-93a6-93b6db05416c@sha256:df31c9ebcf093a0752f9dc8c01c076e1435dd2bffd367c627fee3d5d6a757fc9",
+          "artifact:artifact_c63face7-a8ea-4df1-91a1-c8324857247d@sha256:a3ffbd5bdbef17912620e8c5a4051b5ac26ed93f4b549bc5f2f017661c77d7a9"
+        ]
+      },
+      {
+        "id": "parent-dirty-review",
+        "result": "satisfied",
+        "evidence": [
+          "artifact:artifact_a4ab3b85-3a1b-4ba8-912f-9535bce1e486@sha256:83e09f765543ff0410a2bd6cdef4a5bb3220e0c43ca32f25b7c74579b10b1908",
+          "artifact:artifact_1ecf38ea-f98e-4e14-ad7b-259f376072e5@sha256:13d3493751cdb062b7135af5387f323be1ac543662b4f0ebb2ab1ec0f33e93cf",
+          "artifact:artifact_b008b31a-9ddc-45b5-93a6-93b6db05416c@sha256:df31c9ebcf093a0752f9dc8c01c076e1435dd2bffd367c627fee3d5d6a757fc9",
+          "artifact:artifact_c63face7-a8ea-4df1-91a1-c8324857247d@sha256:a3ffbd5bdbef17912620e8c5a4051b5ac26ed93f4b549bc5f2f017661c77d7a9"
+        ]
+      }
+    ],
+    "starting_state_sha256": "1a9117aa40ae7ddbeccfcdb0c9cee4feba3184fec39c6b1ffe930891118b01bb",
+    "final_manifest_sha256": "a3ffbd5bdbef17912620e8c5a4051b5ac26ed93f4b549bc5f2f017661c77d7a9",
+    "freshness": "Parent inspected complete recorded fixture inputs, immutable exports, final snapshot, and available checks.",
+    "integration_checks": [
+      "Parent compared complete starting fixture and final source: only greeting punctuation changed, with original DIRTY_USER_EDIT marker byte-for-byte preserved. Immutable snapshot matches source and all four automatic frozen checks pass, including unchanged unittest. Worker distinguishes pre-existing state from task change; synthetic base revision is not treated as a complete snapshot. Assisted fresh fixture is recorded separately from unresolved earlier attempts."
+    ],
+    "coverage_limits": [
+      "Trusted-workspace managed mode; plugin race remains separately documented.",
+      "Context measured in bytes; elapsed review time includes concurrent parent work."
+    ],
+    "unresolved_issues": [],
+    "next_action": "Retain this reviewed attempt."
+  }
+}

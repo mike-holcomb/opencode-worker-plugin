@@ -1,8 +1,8 @@
 # Linux live evidence handoff
 
 The automated Ubuntu 24.04 x64 matrix already passed on Node 24.15.0 and 24.21.0
-at commit `fdddb447b8bda1378e3d1c8eb2ba23d90b0cf736`. See
-[CI evidence](releases/v2-evidence/ci-38293051099/run.json).
+at commit `494efb6c535e53aac7fb247233ef3db2163bcf90`. See
+[CI evidence](releases/v2-evidence/ci-38300447074/run.json).
 This handoff covers the separate real managed-execution suite on Linux.
 
 Use a trusted disposable Linux filesystem workspace, Node 24.21.0, and the
@@ -18,6 +18,11 @@ npm ci
 npm run build
 cd ../../..
 ```
+
+The fixture suite also requires Python 3 for its sample-project checks. Confirm
+`node --version`, `python3 --version`, and the OpenCode binary version before
+starting, and retain those outputs with the exact checkout commit. Python is a
+test-fixture dependency, not a runtime installation requirement.
 
 The already authorized model route must be reachable from this Linux host at
 `http://127.0.0.1:8124/v1` and expose `laguna-s-21`. Do not create a tunnel or

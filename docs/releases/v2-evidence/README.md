@@ -5,6 +5,10 @@ portable observations and immutable report exports. Private SQLite state,
 transport credentials, provider configuration, and HOME/XDG directories are not
 published. Local recovery state remains in the isolated campaign directories.
 
+- `ci-38300447074`: all four jobs passed at `494efb6`, including the RPC
+  disconnect repair, 93 runtime tests and five release-runner tests.
+- `ci-38299990443`: retained Ubuntu failure that exposed the RPC EPIPE crash.
+- `live-rpc-repair`: fresh reconnect/restart passes after that repair.
 - `ci-38291901986`: clean commit `ceb4c27`, Ubuntu 24.04 x64 and macOS 15 arm64,
   minimum/current supported Node 24; complete runner output and CI job links.
 - `macos-local-*`: the same committed platform runner on the local macOS host.

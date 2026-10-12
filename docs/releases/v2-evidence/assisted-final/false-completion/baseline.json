@@ -1,0 +1,16 @@
+{
+  "schema_version": 2,
+  "scenario_id": "false-completion",
+  "run_id": "false-completion-1791835543092",
+  "prepared_workdir": "/private/tmp/v2-assisted-final-20261012/false-completion/workspace",
+  "manifest_sha256": "d397b764ff5b88baa506ae6d73c3864ffc0683fe4f02b22b897013fc4d32c691",
+  "packet_schema_sha256": "d57a85f17494892fe59d470f3f0ed54071eed7dd33cee884f61d11f83506fd87",
+  "frozen_checks_sha256": "227d908eb9e71a23e16b2b42f34d0e02997ab898bbd96c4f9797d51b9c1bd4eb",
+  "initial_files": {
+    "acceptance.json": "ab62dfb70bcd65d96ddabc5addb9e62cf50e25b797d5e69d3b7609611b6baa3a",
+    "prior-summary.md": "813cbc6e1f3c39e0ad82fe2f2f5221a2d37c2586f7e58d4db3cbc369555f6241",
+    "README.txt": "9fa637ea90bce118d889dc8f7f8c158d7b7e94f8278180c8ee773c89d79d7e92",
+    "scenario-input.json": "ed4a4bd3510033f71e7944b7486a0a6725912760f817afad82e3e26c781674bf",
+    "task.md": "dccaecb23dc1cfd485a13172cb9fae06925a8d15964cee27d4e77b3e2bd7eb80"
+  }
+}

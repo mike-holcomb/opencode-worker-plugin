@@ -25,8 +25,8 @@ An operator can now set `development_execution.enabled: true` with an exact cano
 ## Verification and remaining release work
 
 The [release evidence campaign](release-validation.md) records results in
-[ledger.json](releases/v2-evidence/ledger.json). Commit `fdddb44` passes 92 runtime
-tests, three release-runner permission tests, nine packaging tests, five evaluation
+[ledger.json](releases/v2-evidence/ledger.json). Commit `494efb6` passes 93 runtime
+tests, five release-runner tests, nine packaging tests, five evaluation
 harness tests, frozen-fixture validation, deterministic packaging, and relocated
 read-only installation in all four macOS 15/Ubuntu 24.04 CI jobs on Node 24.15.0
 and 24.21.0. Local macOS arm64 runs also passed at `ceb4c27`. This automated
@@ -41,7 +41,10 @@ not plugin suppression or protection from hostile same-user operating-system
 access. T28 remains excluded from v2-only scope. The campaign also found and fixed
 idle backend retention, failure to replace a proven-dead owned backend, and a
 concurrent supervisor bind loser unlinking the winner's socket. Supervisor socket
-ownership is now elected before SQLite initialization or reconciliation.
+ownership is now elected before SQLite initialization or reconciliation. A later
+Ubuntu CI run exposed an unhandled EPIPE when a timed-out RPC client disconnected;
+the fix preserves durable work and keeps the supervisor serving subsequent clients.
+All four CI jobs and fresh live reconnect/restart cases passed after that fix.
 
 All ten macOS live cases have recorded passing observations and parent reviews.
 Cases 1, 2 and 4–10 were rerun with the repaired runtime. Case 3 retains its earlier
@@ -54,8 +57,11 @@ Failed-check acceptance was refused. Failed fixture attempts remain alongside th
 successful records.
 
 All twelve evaluation scenarios now have actual attempt records and aggregate
-[quality measurements](releases/v2-evidence/quality-summary.json). Six scenarios
-currently have accepted deliverables; bounded corrections remain in progress.
+[quality measurements](releases/v2-evidence/quality-summary.json). 10 scenarios
+have passing reviewed outcomes, including expected rejection of the failed-check
+deliverable; 9 deliverables are accepted. See the
+[quality review](releases/v2-evidence/quality-review.md) for remaining cases and
+retained failures.
 Infrastructure failures, parent permission delays, incorrect runner assumptions,
 invalid reports and unresolved cancellation are retained separately from successes.
 The wire correction includes an explicit parent-feedback mistake, exposed by the

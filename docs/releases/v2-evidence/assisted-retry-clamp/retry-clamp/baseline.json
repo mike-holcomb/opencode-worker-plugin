@@ -1,0 +1,15 @@
+{
+  "schema_version": 2,
+  "scenario_id": "retry-clamp",
+  "run_id": "retry-clamp-1791834486008",
+  "prepared_workdir": "/private/tmp/v2-assisted-retry-clamp-20261012/retry-clamp/workspace",
+  "manifest_sha256": "d397b764ff5b88baa506ae6d73c3864ffc0683fe4f02b22b897013fc4d32c691",
+  "packet_schema_sha256": "d57a85f17494892fe59d470f3f0ed54071eed7dd33cee884f61d11f83506fd87",
+  "frozen_checks_sha256": "85e58b8b007e0b7b885c2f21e785c616173115a4ceafd7c994549da1d44d2e28",
+  "initial_files": {
+    "retry.py": "65919c15620ddcf9318569aefa19d0dce776274b0fd1fa3b909a5cad278961f2",
+    "scenario-input.json": "511ee93be0893cb214427f7dafa7709c09a6ff6df9c4349a19008450bc86b880",
+    "task.md": "e26b7a113c33b40f498db2357ecaae293848cc92889a7f087dd33ffb07943180",
+    "test_retry.py": "97fa3a6dc07fac2a421589bb4b9bb79e9eec7e442d8ee91fbe0215fe7ff8d0f6"
+  }
+}

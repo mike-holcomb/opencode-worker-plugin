@@ -1,0 +1,4 @@
+{
+  "error": "AssertionError [ERR_ASSERTION]: {\"content\":[{\"type\":\"text\",\"text\":\"REQUEST_EXPIRED: REQUEST_EXPIRED\"}],\"isError\":true}",
+  "stack": "AssertionError [ERR_ASSERTION]: {\"content\":[{\"type\":\"text\",\"text\":\"REQUEST_EXPIRED: REQUEST_EXPIRED\"}],\"isError\":true}\n    at call (file:///Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/scripts/release/live.mjs:149:5)\n    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)\n    at async file:///Users/S197758/projects/opencode-worker-plugin/plugins/opencode-agents/runtime/scripts/release/live.mjs:247:9"
+}

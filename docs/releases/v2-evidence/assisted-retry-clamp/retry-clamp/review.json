@@ -1,0 +1,127 @@
+{
+  "decision": {
+    "review_started_at": "2026-10-12T19:48:46.367Z",
+    "context_bytes": 21028,
+    "idempotency_key": "parent-review-exec_1ae192de-ace6-457c-8176-a40de2ef8709",
+    "gate_status": "passed",
+    "review": {
+      "disposition": "accepted",
+      "rationale": "Parent inspected complete source, unchanged frozen tests and immutable report/changed-file artifacts. Four automatic checks pass. Branches return zero below zero, three above three, and the original input throughout zero through three, preserving public name. Only retry.py changed. Explicitly assisted fresh fixture is distinct from unresolved prior executions; no replay or ownership clearing occurred.",
+      "criteria": [
+        {
+          "id": "tests-pass",
+          "result": "satisfied",
+          "evidence": [
+            "artifact:artifact_b9c4e6c9-c1f5-4b85-b544-4005dc4acc9f@sha256:da3dfe611f4cf155b8011451d67b20beec4fd8687bf1e8724b70767f30d551ef",
+            "artifact:artifact_b9fb4ae9-850d-4d63-be21-b2c511b6c1cf@sha256:5f0e328db22a72273b67875702fab8e673a86ba38a2644a51419d9ec1fe9d7d1",
+            "artifact:artifact_3db6b56b-5ffa-407d-9813-a440b57a54ae@sha256:e23dbd831401484d51db3b126fc59671a9db873e66822049def9870b9c7ba4b4",
+            "artifact:artifact_d5b1b4de-72a4-47f2-9872-fcd3658d9295@sha256:fcea4851d10a70a4b990e2766f1e1dcb6994fb779387e40db14da4b4b3e829e3"
+          ]
+        },
+        {
+          "id": "summary-exists",
+          "result": "satisfied",
+          "evidence": [
+            "artifact:artifact_b9c4e6c9-c1f5-4b85-b544-4005dc4acc9f@sha256:da3dfe611f4cf155b8011451d67b20beec4fd8687bf1e8724b70767f30d551ef",
+            "artifact:artifact_b9fb4ae9-850d-4d63-be21-b2c511b6c1cf@sha256:5f0e328db22a72273b67875702fab8e673a86ba38a2644a51419d9ec1fe9d7d1",
+            "artifact:artifact_3db6b56b-5ffa-407d-9813-a440b57a54ae@sha256:e23dbd831401484d51db3b126fc59671a9db873e66822049def9870b9c7ba4b4",
+            "artifact:artifact_d5b1b4de-72a4-47f2-9872-fcd3658d9295@sha256:fcea4851d10a70a4b990e2766f1e1dcb6994fb779387e40db14da4b4b3e829e3"
+          ]
+        },
+        {
+          "id": "check-recorded",
+          "result": "satisfied",
+          "evidence": [
+            "artifact:artifact_b9c4e6c9-c1f5-4b85-b544-4005dc4acc9f@sha256:da3dfe611f4cf155b8011451d67b20beec4fd8687bf1e8724b70767f30d551ef",
+            "artifact:artifact_b9fb4ae9-850d-4d63-be21-b2c511b6c1cf@sha256:5f0e328db22a72273b67875702fab8e673a86ba38a2644a51419d9ec1fe9d7d1",
+            "artifact:artifact_3db6b56b-5ffa-407d-9813-a440b57a54ae@sha256:e23dbd831401484d51db3b126fc59671a9db873e66822049def9870b9c7ba4b4",
+            "artifact:artifact_d5b1b4de-72a4-47f2-9872-fcd3658d9295@sha256:fcea4851d10a70a4b990e2766f1e1dcb6994fb779387e40db14da4b4b3e829e3"
+          ]
+        },
+        {
+          "id": "write-scope",
+          "result": "satisfied",
+          "evidence": [
+            "artifact:artifact_b9c4e6c9-c1f5-4b85-b544-4005dc4acc9f@sha256:da3dfe611f4cf155b8011451d67b20beec4fd8687bf1e8724b70767f30d551ef",
+            "artifact:artifact_b9fb4ae9-850d-4d63-be21-b2c511b6c1cf@sha256:5f0e328db22a72273b67875702fab8e673a86ba38a2644a51419d9ec1fe9d7d1",
+            "artifact:artifact_3db6b56b-5ffa-407d-9813-a440b57a54ae@sha256:e23dbd831401484d51db3b126fc59671a9db873e66822049def9870b9c7ba4b4",
+            "artifact:artifact_d5b1b4de-72a4-47f2-9872-fcd3658d9295@sha256:fcea4851d10a70a4b990e2766f1e1dcb6994fb779387e40db14da4b4b3e829e3"
+          ]
+        },
+        {
+          "id": "parent-code-review",
+          "result": "satisfied",
+          "evidence": [
+            "artifact:artifact_b9c4e6c9-c1f5-4b85-b544-4005dc4acc9f@sha256:da3dfe611f4cf155b8011451d67b20beec4fd8687bf1e8724b70767f30d551ef",
+            "artifact:artifact_b9fb4ae9-850d-4d63-be21-b2c511b6c1cf@sha256:5f0e328db22a72273b67875702fab8e673a86ba38a2644a51419d9ec1fe9d7d1",
+            "artifact:artifact_3db6b56b-5ffa-407d-9813-a440b57a54ae@sha256:e23dbd831401484d51db3b126fc59671a9db873e66822049def9870b9c7ba4b4",
+            "artifact:artifact_d5b1b4de-72a4-47f2-9872-fcd3658d9295@sha256:fcea4851d10a70a4b990e2766f1e1dcb6994fb779387e40db14da4b4b3e829e3"
+          ]
+        }
+      ],
+      "starting_state_sha256": "180117230fc49a0e634277e500ac29f3d5ffcc7dc3adeb23fa807242e8514236",
+      "final_manifest_sha256": "fcea4851d10a70a4b990e2766f1e1dcb6994fb779387e40db14da4b4b3e829e3",
+      "freshness": "Parent inspected complete recorded fixture inputs, immutable exports, final snapshot, and available checks.",
+      "integration_checks": [
+        "Parent inspected complete source, unchanged frozen tests and immutable report/changed-file artifacts. Four automatic checks pass. Branches return zero below zero, three above three, and the original input throughout zero through three, preserving public name. Only retry.py changed. Explicitly assisted fresh fixture is distinct from unresolved prior executions; no replay or ownership clearing occurred."
+      ],
+      "coverage_limits": [
+        "Trusted-workspace managed mode; plugin race remains separately documented.",
+        "Context measured in bytes; elapsed review time includes concurrent parent work."
+      ],
+      "unresolved_issues": [],
+      "next_action": "Retain this reviewed attempt."
+    }
+  },
+  "result": {
+    "taskId": "task_060b1043-ce5a-4978-bfda-01a83ba15c97",
+    "executionId": "exec_1ae192de-ace6-457c-8176-a40de2ef8709",
+    "scopeId": "release-retry-clamp",
+    "revision": 15,
+    "phase": "completed",
+    "observation": "current",
+    "workspace": "/private/tmp/v2-assisted-retry-clamp-20261012/retry-clamp/workspace",
+    "workspaceAccess": "exclusive",
+    "requestModel": {
+      "profile": "local"
+    },
+    "model": "llama.cpp/laguna-s-21",
+    "profile": "bounded-build",
+    "backendId": "backend_e31f43d29d8c5555e53574d507d89a35",
+    "sessionId": "ses_ece577e1fffeH7LI4qoYmupczp",
+    "userMessageId": "msg_271b87bf-fd64-420b-bd9d-46b3923bfdcd",
+    "predecessorExecutionId": null,
+    "contextMode": null,
+    "baselineHash": "180117230fc49a0e634277e500ac29f3d5ffcc7dc3adeb23fa807242e8514236",
+    "promptHash": "71b37f708627053972978ffe796319b64d182c44e5e1e6d590723273d50a4d5b",
+    "reportPath": "/private/tmp/v2-assisted-retry-clamp-20261012/retry-clamp/state/reports/exec_1ae192de-ace6-457c-8176-a40de2ef8709",
+    "queueDeadlineAt": "2026-10-12T19:50:08.105Z",
+    "admittedAt": "2026-10-12T19:48:08.108Z",
+    "executionDeadlineAt": "2026-10-12T19:53:08.108Z",
+    "finalizationDeadlineAt": "2026-10-12T19:48:54.004Z",
+    "intendedOutcome": "completed",
+    "creationIntent": {
+      "backendId": "backend_e31f43d29d8c5555e53574d507d89a35",
+      "marker": "opencode-agents:exec_1ae192de-ace6-457c-8176-a40de2ef8709",
+      "sessionId": "ses_ece577e1fffeH7LI4qoYmupczp",
+      "createdAt": "2026-10-12T19:48:09.306Z"
+    },
+    "cancellationIntent": null,
+    "pendingRequests": [],
+    "createdAt": "2026-10-12T19:48:08.105Z",
+    "updatedAt": "2026-10-12T19:49:00.415Z",
+    "reportValidity": "valid",
+    "finalManifestHash": "fcea4851d10a70a4b990e2766f1e1dcb6994fb779387e40db14da4b4b3e829e3",
+    "reviewStatus": "accepted",
+    "terminal": true,
+    "operationally_resolved": true,
+    "usage": {
+      "input_tokens": null,
+      "output_tokens": null,
+      "cache_tokens": null,
+      "reported_cost": null,
+      "currency": null,
+      "source": "not_captured"
+    }
+  }
+}

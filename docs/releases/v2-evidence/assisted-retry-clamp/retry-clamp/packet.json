@@ -1,0 +1,84 @@
+{
+  "title": "Clamp retry count at the public boundary",
+  "objective": "Implement the requested retry boundary in retry.py: negative values behave as zero and values above three behave as three, while values from zero through three are preserved. Keep the public function name and write a concise assigned report summary.md with the check command and result. Do not change tests.",
+  "tier": "standard",
+  "authoritative_inputs": [
+    {
+      "reference": "retry.py",
+      "kind": "file",
+      "purpose": "Frozen evaluation fixture"
+    },
+    {
+      "reference": "test_retry.py",
+      "kind": "file",
+      "purpose": "Frozen evaluation fixture"
+    }
+  ],
+  "context": {
+    "verified_facts": [
+      "This is an explicitly assisted fresh evaluation after earlier attempts timed out during parent permission waits. Complete only the frozen objective, keeping source changes within the declared files and preserving unrelated dirty content. The assigned unittest command is directly authorized. Use read/glob/grep for inspection; avoid extra shell validators or directory discovery. The two assigned report directories already exist: write strict JSON and summary directly to those exact report paths, then finish the turn promptly. The parent runs all frozen evaluator checks except the assigned unittest. Mark those parent-only checks not_run with exit_code null, and never search for evaluator files or parent/supervisor state. Report the actual test result honestly, including any expected failure. Do not claim parent acceptance. Original acceptance criteria and source fixtures remain authoritative."
+    ],
+    "rejected_assumptions": [],
+    "exclusions": []
+  },
+  "allowed_writes": [
+    {
+      "path": "retry.py",
+      "kind": "file",
+      "purpose": "Frozen evaluation deliverable"
+    }
+  ],
+  "acceptance_criteria": [
+    {
+      "id": "tests-pass",
+      "requirement": "Preserve frozen command check tests-pass",
+      "evidence_required": "Run the unchanged tests-pass evaluator check and retain its result",
+      "required": true
+    },
+    {
+      "id": "summary-exists",
+      "requirement": "Preserve frozen file_exists check summary-exists",
+      "evidence_required": "Run the unchanged summary-exists evaluator check and retain its result",
+      "required": true
+    },
+    {
+      "id": "check-recorded",
+      "requirement": "Preserve frozen text_contains check check-recorded",
+      "evidence_required": "Run the unchanged check-recorded evaluator check and retain its result",
+      "required": true
+    },
+    {
+      "id": "write-scope",
+      "requirement": "Preserve frozen allowed_changed_paths check write-scope",
+      "evidence_required": "Run the unchanged write-scope evaluator check and retain its result",
+      "required": true
+    },
+    {
+      "id": "parent-code-review",
+      "requirement": "Verify behavior at negative, boundary, and above-bound inputs, inspect the complete diff, and confirm the test result supports acceptance.",
+      "evidence_required": "Run the unchanged parent-code-review evaluator check and retain its result",
+      "required": true
+    }
+  ],
+  "checks": [
+    {
+      "id": "tests-pass",
+      "description": "Frozen evaluator command; expected exit 0",
+      "argv": [
+        "python3",
+        "-m",
+        "unittest",
+        "-v",
+        "test_retry.py"
+      ]
+    }
+  ],
+  "constraints": [
+    "Preserve the scenario's initial content and unrelated changes.",
+    "Report failed checks and limits without claiming parent acceptance."
+  ],
+  "stop_conditions": [
+    "Stop if a required action exceeds the declared allowed writes."
+  ],
+  "shared_resources": []
+}

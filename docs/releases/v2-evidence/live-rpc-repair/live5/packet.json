@@ -1,0 +1,34 @@
+{
+  "title": "Release live5",
+  "objective": "Read input.txt and report the exact answer with a citation. Write both assigned report files.",
+  "tier": "standard",
+  "authoritative_inputs": [
+    {
+      "reference": "input.txt",
+      "kind": "file",
+      "purpose": "Source answer"
+    }
+  ],
+  "context": {
+    "verified_facts": [],
+    "rejected_assumptions": [],
+    "exclusions": []
+  },
+  "allowed_writes": [],
+  "acceptance_criteria": [
+    {
+      "id": "answer",
+      "requirement": "Report violet citing input.txt",
+      "evidence_required": "Source and immutable report",
+      "required": true
+    }
+  ],
+  "checks": [],
+  "constraints": [
+    "Do not alter project files."
+  ],
+  "stop_conditions": [
+    "Stop on denied actions and report the denial."
+  ],
+  "shared_resources": []
+}

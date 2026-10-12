@@ -1,0 +1,39 @@
+{
+  "schema_version": 2,
+  "scenario_id": "dirty-checkout",
+  "result_artifact_sha256": "13d3493751cdb062b7135af5387f323be1ac543662b4f0ebb2ab1ec0f33e93cf",
+  "status": "review_required",
+  "parent_review_required": true,
+  "checks": [
+    {
+      "id": "app-tests-pass",
+      "kind": "command",
+      "status": "pass",
+      "detail": "exit=0; stdout=\"\"; stderr=\"test_greeting_has_requested_punctuation (test_app.AppTests.test_greeting_has_requested_punctuation) ... ok\\n\\n----------------------------------------------------------------------\\nRan 1 test in 0.000s\\n\\nOK\\n\""
+    },
+    {
+      "id": "dirty-marker-preserved",
+      "kind": "text_contains",
+      "status": "pass",
+      "detail": "searched app.py for 1 frozen marker(s)"
+    },
+    {
+      "id": "summary-distinguishes-state",
+      "kind": "text_contains",
+      "status": "pass",
+      "detail": "searched summary.md for 2 frozen marker(s)"
+    },
+    {
+      "id": "write-scope",
+      "kind": "allowed_changed_paths",
+      "status": "pass",
+      "detail": "changed=[\"app.py\"]; unauthorized=[]"
+    },
+    {
+      "id": "parent-dirty-review",
+      "kind": "parent_review",
+      "status": "review_required",
+      "detail": "Verify the parent separated pre-existing edits from the task diff, inspected the complete changed source, and did not treat a base revision as a complete snapshot."
+    }
+  ]
+}

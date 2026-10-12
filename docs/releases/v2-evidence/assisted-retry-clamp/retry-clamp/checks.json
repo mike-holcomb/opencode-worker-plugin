@@ -1,0 +1,39 @@
+{
+  "schema_version": 2,
+  "scenario_id": "retry-clamp",
+  "result_artifact_sha256": "5f0e328db22a72273b67875702fab8e673a86ba38a2644a51419d9ec1fe9d7d1",
+  "status": "review_required",
+  "parent_review_required": true,
+  "checks": [
+    {
+      "id": "tests-pass",
+      "kind": "command",
+      "status": "pass",
+      "detail": "exit=0; stdout=\"\"; stderr=\"test_above_three_is_three (test_retry.RetryBoundaryTests.test_above_three_is_three) ... ok\\ntest_negative_is_zero (test_retry.RetryBoundaryTests.test_negative_is_zero) ... ok\\ntest_zero_and_three_are_preserved (test_retry.RetryBoundaryTests.test_zero_and_three_are_preserved) ... ok\\n\\n----------------------------------------------------------------------\\nRan 3 tests in 0.000s\\n\\nOK\\n\""
+    },
+    {
+      "id": "summary-exists",
+      "kind": "file_exists",
+      "status": "pass",
+      "detail": "verified result artifact: summary.md"
+    },
+    {
+      "id": "check-recorded",
+      "kind": "text_contains",
+      "status": "pass",
+      "detail": "searched summary.md for 2 frozen marker(s)"
+    },
+    {
+      "id": "write-scope",
+      "kind": "allowed_changed_paths",
+      "status": "pass",
+      "detail": "changed=[\"retry.py\"]; unauthorized=[]"
+    },
+    {
+      "id": "parent-code-review",
+      "kind": "parent_review",
+      "status": "review_required",
+      "detail": "Verify behavior at negative, boundary, and above-bound inputs, inspect the complete diff, and confirm the test result supports acceptance."
+    }
+  ]
+}

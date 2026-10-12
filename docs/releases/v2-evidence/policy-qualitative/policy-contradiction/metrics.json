@@ -1,0 +1,87 @@
+{
+  "elapsed_ms": 341951,
+  "dispatches": 1,
+  "duplicate_dispatch": false,
+  "dispatch_expectation_met": true,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "report_validity": "pending",
+  "terminal": false,
+  "phase": "cancelling",
+  "decisions": [
+    {
+      "request_id": "per_131ad19ce001mCMdH2IhmLjd8E",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Exact read-only listing of the current assigned report directory, with literal echo fallback.",
+      "permission": "bash",
+      "command": "ls -la /private/tmp/v2-eval-parent-20261012/policy-contradiction/state/reports/exec_15f04a24-a02c-4839-a93c-9d769cb85c58/ 2>/dev/null || echo \"Directory does not exist\"",
+      "patterns": [
+        "ls -la /private/tmp/v2-eval-parent-20261012/policy-contradiction/state/reports/exec_15f04a24-a02c-4839-a93c-9d769cb85c58/ 2>/dev/null",
+        "echo \"Directory does not exist\""
+      ],
+      "delivery": "acknowledged"
+    },
+    {
+      "request_id": "per_131aec13d0012BjTyE13xV0tLx",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Exact frozen fixture command or exact declared file edit within the authorized isolated evaluation.",
+      "permission": "edit",
+      "patterns": [
+        "private/tmp/v2-eval-parent-20261012/policy-contradiction/workspace/findings.md"
+      ],
+      "delivery": "acknowledged"
+    },
+    {
+      "request_id": "per_131af38a40018q47x7hNvAH2Lo",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Read-only standard-library JSON parse and field/array inspection of exact current report; no writes.",
+      "permission": "bash",
+      "command": "python3 -c \"\nimport json\n\n# Validate result.json\nwith open('/private/tmp/v2-eval-parent-20261012/policy-contradiction/state/reports/exec_15f04a24-a02c-4839-a93c-9d769cb85c58/result.json') as f:\n    data = json.load(f)\n\n# Check required top-level fields\nrequired = ['schema_version','task_id','execution_id','outcome','summary','coverage','gaps','findings','changes','checks','blockers','next_action']\nmissing = [r for r in required if r not in data]\nextra = [k for k in data if k not in required]\nprint(f'schema_version: {data[\\\"schema_version\\\"]} (expected 2)')\nprint(f'task_id: {data[\\\"task_id\\\"]}')\nprint(f'execution_id: {data[\\\"execution_id\\\"]}')\nprint(f'outcome: {data[\\\"outcome\\\"]}')\nprint(f'Missing fields: {missing}')\nprint(f'Extra fields: {extra}')\n\n# Validate finding items\nfor f in data['findings']:\n    f_required = ['id','claim','evidence','caveats']\n    f_missing = [r for r in f_required if r not in f]\n    f_extra = [k for k in f if k not in f_required]\n    if f_missing or f_extra:\n        print(f'Finding {f[\\\"id\\\"]} - missing: {f_missing}, extra: {f_extra}')\n\n# Validate check items\nfor c in data['checks']:\n    c_required = ['id','status','exit_code','evidence','explanation']\n    c_missing = [r for r in c_required if r not in c]\n    c_extra = [k for k in c if k not in c_required]\n    if c_missing or c_extra:\n        print(f'Check {c[\\\"id\\\"]} - missing: {c_missing}, extra: {c_extra}')\n\n# Validate change items\nfor ch in data['changes']:\n    ch_required = ['path','description']\n    ch_missing = [r for r in ch_required if r not in ch]\n    ch_extra = [k for k in ch if k not in ch_required]\n    if ch_missing or ch_extra:\n        print(f'Change - missing: {ch_missing}, extra: {ch_extra}')\n\nprint(f'Findings: {len(data[\\\"findings\\\"])}')\nprint(f'Coverage: {len(data[\\\"coverage\\\"])}')\nprint(f'Gaps: {len(data[\\\"gaps\\\"])}')\nprint(f'Changes: {len(data[\\\"changes\\\"])}')\nprint(f'Checks: {len(data[\\\"checks\\\"])}')\nprint(f'Blockers: {data[\\\"blockers\\\"]}')\nprint('JSON validation: OK')\n\"\n",
+      "patterns": [
+        "python3 -c \"\nimport json\n\n# Validate result.json\nwith open('/private/tmp/v2-eval-parent-20261012/policy-contradiction/state/reports/exec_15f04a24-a02c-4839-a93c-9d769cb85c58/result.json') as f:\n    data = json.load(f)\n\n# Check required top-level fields\nrequired = ['schema_version','task_id','execution_id','outcome','summary','coverage','gaps','findings','changes','checks','blockers','next_action']\nmissing = [r for r in required if r not in data]\nextra = [k for k in data if k not in required]\nprint(f'schema_version: {data[\\\"schema_version\\\"]} (expected 2)')\nprint(f'task_id: {data[\\\"task_id\\\"]}')\nprint(f'execution_id: {data[\\\"execution_id\\\"]}')\nprint(f'outcome: {data[\\\"outcome\\\"]}')\nprint(f'Missing fields: {missing}')\nprint(f'Extra fields: {extra}')\n\n# Validate finding items\nfor f in data['findings']:\n    f_required = ['id','claim','evidence','caveats']\n    f_missing = [r for r in f_required if r not in f]\n    f_extra = [k for k in f if k not in f_required]\n    if f_missing or f_extra:\n        print(f'Finding {f[\\\"id\\\"]} - missing: {f_missing}, extra: {f_extra}')\n\n# Validate check items\nfor c in data['checks']:\n    c_required = ['id','status','exit_code','evidence','explanation']\n    c_missing = [r for r in c_required if r not in c]\n    c_extra = [k for k in c if k not in c_required]\n    if c_missing or c_extra:\n        print(f'Check {c[\\\"id\\\"]} - missing: {c_missing}, extra: {c_extra}')\n\n# Validate change items\nfor ch in data['changes']:\n    ch_required = ['path','description']\n    ch_missing = [r for r in ch_required if r not in ch]\n    ch_extra = [k for k in ch if k not in ch_required]\n    if ch_missing or ch_extra:\n        print(f'Change - missing: {ch_missing}, extra: {ch_extra}')\n\nprint(f'Findings: {len(data[\\\"findings\\\"])}')\nprint(f'Coverage: {len(data[\\\"coverage\\\"])}')\nprint(f'Gaps: {len(data[\\\"gaps\\\"])}')\nprint(f'Changes: {len(data[\\\"changes\\\"])}')\nprint(f'Checks: {len(data[\\\"checks\\\"])}')\nprint(f'Blockers: {data[\\\"blockers\\\"]}')\nprint('JSON validation: OK')\n\""
+      ],
+      "delivery": "acknowledged"
+    },
+    {
+      "request_id": "per_131af3e8d001bdIxzkhoUpWja4",
+      "request_revision": 1,
+      "reply": "allow_once",
+      "authorization_basis": "Read-only listing of declared findings.md and exact current execution reports.",
+      "permission": "bash",
+      "command": "ls -la /private/tmp/v2-eval-parent-20261012/policy-contradiction/workspace/findings.md /private/tmp/v2-eval-parent-20261012/policy-contradiction/state/reports/exec_15f04a24-a02c-4839-a93c-9d769cb85c58/summary.md /private/tmp/v2-eval-parent-20261012/policy-contradiction/state/reports/exec_15f04a24-a02c-4839-a93c-9d769cb85c58/result.json",
+      "patterns": [
+        "ls -la /private/tmp/v2-eval-parent-20261012/policy-contradiction/workspace/findings.md /private/tmp/v2-eval-parent-20261012/policy-contradiction/state/reports/exec_15f04a24-a02c-4839-a93c-9d769cb85c58/summary.md /private/tmp/v2-eval-parent-20261012/policy-contradiction/state/reports/exec_15f04a24-a02c-4839-a93c-9d769cb85c58/result.json"
+      ],
+      "delivery": "acknowledged"
+    }
+  ],
+  "evaluation": null,
+  "assertion_error": null,
+  "overlap": null,
+  "status": "incomplete",
+  "parent_review": "pending",
+  "parent_review_started_at": null,
+  "parent_review_elapsed_ms": null,
+  "parent_context_bytes": null,
+  "observed_inference": {
+    "source": "opencode_1.18.35_exact_assistant_messages",
+    "execution_id": "exec_15f04a24-a02c-4839-a93c-9d769cb85c58",
+    "session_id": "ses_ece5aac00ffeW0fVKFWnbycCuZ",
+    "user_message_id": "msg_59d99990-51ba-4774-b4f4-3288c830020b",
+    "input_tokens": 133871,
+    "output_tokens": 10705,
+    "total_tokens": null,
+    "assistant_messages": 5,
+    "reported_cost": null,
+    "cost_note": "Raw OpenCode cost may use configured defaults; no verified billing measurement is available."
+  }
+}

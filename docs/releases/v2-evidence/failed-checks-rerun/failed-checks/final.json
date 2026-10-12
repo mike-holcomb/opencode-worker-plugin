@@ -1,0 +1,19 @@
+{
+  "executionId": "exec_c7fdd291-c3d9-4401-877f-29976663a190",
+  "taskId": "task_625b9f49-3d77-4e71-9d8f-4e207045b588",
+  "scopeId": "release-failed-checks",
+  "workspace": "/private/tmp/v2-failed-checks-rerun-20261012/failed-checks/workspace",
+  "phase": "cancelling",
+  "observation": "unknown",
+  "sessionId": "ses_ece5d1652ffeSI1iwaGvgi41ts",
+  "userMessageId": "msg_c096df0a-c8f7-4821-87df-a6e3e17297a2",
+  "baselineHash": "ab667287b6a3559c5019f8638d9c9673d887bcb4b7e9b9ee0298b9b252a06e0d",
+  "finalManifestHash": null,
+  "reportValidity": "pending",
+  "createdAt": "2026-10-12T19:42:01.030Z",
+  "reportPath": "/private/tmp/v2-failed-checks-rerun-20261012/failed-checks/state/reports/exec_c7fdd291-c3d9-4401-877f-29976663a190",
+  "revision": 25,
+  "terminal": false,
+  "operationally_resolved": false,
+  "snapshot_source": "Read-only SQLite snapshot after runner REQUEST_EXPIRED error; not a finalized artifact export"
+}

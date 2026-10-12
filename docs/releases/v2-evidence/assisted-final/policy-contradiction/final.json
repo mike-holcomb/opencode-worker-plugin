@@ -1,0 +1,235 @@
+{
+  "taskId": "task_ea1be99d-bb07-4aab-81f5-2e8c1f3a22be",
+  "executionId": "exec_c37e3517-3ce5-4bbd-9752-37cce2a10c30",
+  "scopeId": "release-policy-contradiction",
+  "revision": 14,
+  "phase": "timed_out",
+  "observation": "current",
+  "workspace": "/private/tmp/v2-assisted-final-20261012/policy-contradiction/workspace",
+  "workspaceAccess": "exclusive",
+  "requestModel": {
+    "profile": "local"
+  },
+  "model": "llama.cpp/laguna-s-21",
+  "profile": "bounded-build",
+  "backendId": "backend_a8bd0d409856acffacd33c931d97e3de",
+  "sessionId": "ses_ece4c1021ffemgdCtPqPgLa111",
+  "userMessageId": "msg_517c2c4b-8d65-4654-98e3-08680672ff9f",
+  "predecessorExecutionId": null,
+  "contextMode": null,
+  "baselineHash": "0cc7b797f7b6cfab5ec59250af9b8f2a93d680726eefa2b1e99577e9b3256fb2",
+  "promptHash": "10c19d90928504a070a4866ba3545919c0714b6943218111cfeb06a1bd6dec65",
+  "reportPath": "/private/tmp/v2-assisted-final-20261012/policy-contradiction/state/reports/exec_c37e3517-3ce5-4bbd-9752-37cce2a10c30",
+  "queueDeadlineAt": "2026-10-12T20:02:37.127Z",
+  "admittedAt": "2026-10-12T20:00:37.131Z",
+  "executionDeadlineAt": "2026-10-12T20:05:37.131Z",
+  "finalizationDeadlineAt": "2026-10-12T20:06:07.901Z",
+  "intendedOutcome": "timed_out",
+  "creationIntent": {
+    "backendId": "backend_a8bd0d409856acffacd33c931d97e3de",
+    "marker": "opencode-agents:exec_c37e3517-3ce5-4bbd-9752-37cce2a10c30",
+    "sessionId": "ses_ece4c1021ffemgdCtPqPgLa111",
+    "createdAt": "2026-10-12T20:00:38.359Z"
+  },
+  "cancellationIntent": {
+    "reason": "execution deadline",
+    "requester": "supervisor",
+    "deadlineOrigin": "2026-10-12T20:05:37.131Z",
+    "createdAt": "2026-10-12T20:05:37.363Z",
+    "abortAcknowledged": true
+  },
+  "pendingRequests": [],
+  "createdAt": "2026-10-12T20:00:37.127Z",
+  "updatedAt": "2026-10-12T20:05:37.919Z",
+  "reportValidity": "missing",
+  "finalManifestHash": "292db7a805c52f87f55d773966b332c1e98065f3c5c7fba6a6c2a96715e85734",
+  "reviewStatus": "pending",
+  "terminal": true,
+  "operationally_resolved": true,
+  "usage": {
+    "input_tokens": null,
+    "output_tokens": null,
+    "cache_tokens": null,
+    "reported_cost": null,
+    "currency": null,
+    "source": "not_captured"
+  },
+  "events": [
+    {
+      "cursor": 1,
+      "kind": "queued",
+      "detail": {
+        "taskId": "task_ea1be99d-bb07-4aab-81f5-2e8c1f3a22be"
+      },
+      "createdAt": "2026-10-12T20:00:37.127Z"
+    },
+    {
+      "cursor": 2,
+      "kind": "admitted",
+      "detail": {
+        "executionDeadlineAt": "2026-10-12T20:05:37.131Z",
+        "resourceKeys": [
+          "workspace:/private/tmp/v2-assisted-final-20261012/policy-contradiction/workspace"
+        ]
+      },
+      "createdAt": "2026-10-12T20:00:37.131Z"
+    },
+    {
+      "cursor": 3,
+      "kind": "creation_intent",
+      "detail": {
+        "backendId": "backend_a8bd0d409856acffacd33c931d97e3de",
+        "marker": "opencode-agents:exec_c37e3517-3ce5-4bbd-9752-37cce2a10c30"
+      },
+      "createdAt": "2026-10-12T20:00:38.359Z"
+    },
+    {
+      "cursor": 4,
+      "kind": "session_bound",
+      "detail": {
+        "backendId": "backend_a8bd0d409856acffacd33c931d97e3de",
+        "sessionId": "ses_ece4c1021ffemgdCtPqPgLa111"
+      },
+      "createdAt": "2026-10-12T20:00:38.370Z"
+    },
+    {
+      "cursor": 5,
+      "kind": "dispatch_intent",
+      "detail": {
+        "messageId": "msg_517c2c4b-8d65-4654-98e3-08680672ff9f"
+      },
+      "createdAt": "2026-10-12T20:00:38.371Z"
+    },
+    {
+      "cursor": 6,
+      "kind": "dispatch_acknowledged",
+      "detail": {},
+      "createdAt": "2026-10-12T20:00:38.378Z"
+    },
+    {
+      "cursor": 7,
+      "kind": "running",
+      "detail": {
+        "messageId": "msg_517c2c4b-8d65-4654-98e3-08680672ff9f"
+      },
+      "createdAt": "2026-10-12T20:00:38.378Z"
+    },
+    {
+      "cursor": 8,
+      "kind": "input_request",
+      "detail": {
+        "kind": "permission",
+        "requestId": "per_131b40e87001cxfeI4vh39R21i",
+        "revision": 1
+      },
+      "createdAt": "2026-10-12T20:00:46.226Z"
+    },
+    {
+      "cursor": 9,
+      "kind": "input_request",
+      "detail": {
+        "kind": "permission",
+        "requestId": "per_131b41018001rPdaHaS0osi1uO",
+        "revision": 1
+      },
+      "createdAt": "2026-10-12T20:00:46.626Z"
+    },
+    {
+      "cursor": 10,
+      "kind": "input_response_intent",
+      "detail": {
+        "requestId": "per_131b40e87001cxfeI4vh39R21i",
+        "requestRevision": 1
+      },
+      "createdAt": "2026-10-12T20:01:04.581Z"
+    },
+    {
+      "cursor": 11,
+      "kind": "input_response_acknowledged",
+      "detail": {
+        "requestId": "per_131b40e87001cxfeI4vh39R21i"
+      },
+      "createdAt": "2026-10-12T20:01:04.590Z"
+    },
+    {
+      "cursor": 12,
+      "kind": "input_response_intent",
+      "detail": {
+        "requestId": "per_131b41018001rPdaHaS0osi1uO",
+        "requestRevision": 1
+      },
+      "createdAt": "2026-10-12T20:01:04.599Z"
+    },
+    {
+      "cursor": 13,
+      "kind": "input_response_unconfirmed",
+      "detail": {
+        "reason": "request_absent_in_exact_session_snapshot",
+        "requestId": "per_131b41018001rPdaHaS0osi1uO"
+      },
+      "createdAt": "2026-10-12T20:01:04.614Z"
+    },
+    {
+      "cursor": 14,
+      "kind": "running",
+      "detail": {},
+      "createdAt": "2026-10-12T20:01:04.615Z"
+    },
+    {
+      "cursor": 15,
+      "kind": "cancellation_requested",
+      "detail": {
+        "phase": "cancelling",
+        "reason": "execution deadline",
+        "requester": "supervisor"
+      },
+      "createdAt": "2026-10-12T20:05:37.364Z"
+    },
+    {
+      "cursor": 16,
+      "kind": "abort_acknowledged",
+      "detail": {},
+      "createdAt": "2026-10-12T20:05:37.878Z"
+    },
+    {
+      "cursor": 17,
+      "kind": "finalizing",
+      "detail": {
+        "detail": {
+          "cancelEffect": "applied"
+        },
+        "intendedOutcome": "timed_out"
+      },
+      "createdAt": "2026-10-12T20:05:37.901Z"
+    },
+    {
+      "cursor": 18,
+      "kind": "artifact_registered",
+      "detail": {
+        "artifactId": "artifact_d5492365-95bf-4f4c-9d2c-227a03c5c7da",
+        "sha256": "292db7a805c52f87f55d773966b332c1e98065f3c5c7fba6a6c2a96715e85734"
+      },
+      "createdAt": "2026-10-12T20:05:37.913Z"
+    },
+    {
+      "cursor": 19,
+      "kind": "finalized",
+      "detail": {
+        "finalManifestHash": "292db7a805c52f87f55d773966b332c1e98065f3c5c7fba6a6c2a96715e85734",
+        "outcome": "timed_out",
+        "reportValidity": "missing"
+      },
+      "createdAt": "2026-10-12T20:05:37.919Z"
+    }
+  ],
+  "artifacts": [
+    {
+      "artifact_id": "artifact_d5492365-95bf-4f4c-9d2c-227a03c5c7da",
+      "sha256": "292db7a805c52f87f55d773966b332c1e98065f3c5c7fba6a6c2a96715e85734",
+      "byte_length": 712,
+      "media_type": "application/json"
+    }
+  ],
+  "cursor": 19,
+  "has_more_events": false
+}

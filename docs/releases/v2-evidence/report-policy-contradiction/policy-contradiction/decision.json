@@ -1,0 +1,66 @@
+{
+  "review_started_at": "2026-10-12T19:50:00.477Z",
+  "context_bytes": 38373,
+  "idempotency_key": "parent-review-exec_58460b11-6dcf-4b37-a6b4-9c5da998da0d",
+  "gate_status": "failed",
+  "review": {
+    "disposition": "needs_correction",
+    "rationale": "Parent read all reports, findings.md and authoritative sources. Despite passing marker checks, summary and main findings assert a definite contradiction by assuming public means no authentication. Sources explicitly leave service identity authentication unknown. Later caveats do not repair the overstatement. findings.md also includes malformed citations such as policy.md:34 and review_scope.txt:12. Requires bounded correction before acceptance.",
+    "criteria": [
+      {
+        "id": "summary-exists",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_c92beb34-3343-4d6f-8b4f-dfc961c02c3e@sha256:5a5cb02c52aea9e7b364205eeaba3688e60c52ac8c93de941051e11e851cf3b4",
+          "artifact:artifact_28d1b452-7693-4912-9a13-324f2a696269@sha256:ad702aea1086ad85247977d721b55ac33814e85e1dc5c7e43d2e04edf363fe7c",
+          "artifact:artifact_4344663e-7ec8-4051-9a0b-3168b29d4b40@sha256:249e6b27276ee8ab33ac2302a81352a476af227284158bf5742a39afa62edcc3",
+          "artifact:artifact_fc92164d-def9-4d47-8952-c7204d6d51dd@sha256:bef88c48e42fe86c07f5bfdfa289adff6dcfaa6d1d14f63580e426356120457d"
+        ]
+      },
+      {
+        "id": "coverage-recorded",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_c92beb34-3343-4d6f-8b4f-dfc961c02c3e@sha256:5a5cb02c52aea9e7b364205eeaba3688e60c52ac8c93de941051e11e851cf3b4",
+          "artifact:artifact_28d1b452-7693-4912-9a13-324f2a696269@sha256:ad702aea1086ad85247977d721b55ac33814e85e1dc5c7e43d2e04edf363fe7c",
+          "artifact:artifact_4344663e-7ec8-4051-9a0b-3168b29d4b40@sha256:249e6b27276ee8ab33ac2302a81352a476af227284158bf5742a39afa62edcc3",
+          "artifact:artifact_fc92164d-def9-4d47-8952-c7204d6d51dd@sha256:bef88c48e42fe86c07f5bfdfa289adff6dcfaa6d1d14f63580e426356120457d"
+        ]
+      },
+      {
+        "id": "write-scope",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_c92beb34-3343-4d6f-8b4f-dfc961c02c3e@sha256:5a5cb02c52aea9e7b364205eeaba3688e60c52ac8c93de941051e11e851cf3b4",
+          "artifact:artifact_28d1b452-7693-4912-9a13-324f2a696269@sha256:ad702aea1086ad85247977d721b55ac33814e85e1dc5c7e43d2e04edf363fe7c",
+          "artifact:artifact_4344663e-7ec8-4051-9a0b-3168b29d4b40@sha256:249e6b27276ee8ab33ac2302a81352a476af227284158bf5742a39afa62edcc3",
+          "artifact:artifact_fc92164d-def9-4d47-8952-c7204d6d51dd@sha256:bef88c48e42fe86c07f5bfdfa289adff6dcfaa6d1d14f63580e426356120457d"
+        ]
+      },
+      {
+        "id": "parent-qualitative-review",
+        "result": "not_checked",
+        "evidence": [
+          "artifact:artifact_c92beb34-3343-4d6f-8b4f-dfc961c02c3e@sha256:5a5cb02c52aea9e7b364205eeaba3688e60c52ac8c93de941051e11e851cf3b4",
+          "artifact:artifact_28d1b452-7693-4912-9a13-324f2a696269@sha256:ad702aea1086ad85247977d721b55ac33814e85e1dc5c7e43d2e04edf363fe7c",
+          "artifact:artifact_4344663e-7ec8-4051-9a0b-3168b29d4b40@sha256:249e6b27276ee8ab33ac2302a81352a476af227284158bf5742a39afa62edcc3",
+          "artifact:artifact_fc92164d-def9-4d47-8952-c7204d6d51dd@sha256:bef88c48e42fe86c07f5bfdfa289adff6dcfaa6d1d14f63580e426356120457d"
+        ]
+      }
+    ],
+    "starting_state_sha256": "a26ef13d36c38161a5e377bf642437d0ffad8203b32a6e527f0dad14c4258a85",
+    "final_manifest_sha256": "bef88c48e42fe86c07f5bfdfa289adff6dcfaa6d1d14f63580e426356120457d",
+    "freshness": "Parent inspected complete recorded fixture inputs, immutable exports, final snapshot, and available checks.",
+    "integration_checks": [
+      "Parent read all reports, findings.md and authoritative sources. Despite passing marker checks, summary and main findings assert a definite contradiction by assuming public means no authentication. Sources explicitly leave service identity authentication unknown. Later caveats do not repair the overstatement. findings.md also includes malformed citations such as policy.md:34 and review_scope.txt:12. Requires bounded correction before acceptance."
+    ],
+    "coverage_limits": [
+      "Trusted-workspace managed mode; plugin race remains separately documented.",
+      "Context measured in bytes; elapsed review time includes concurrent parent work."
+    ],
+    "unresolved_issues": [
+      "Parent read all reports, findings.md and authoritative sources. Despite passing marker checks, summary and main findings assert a definite contradiction by assuming public means no authentication. Sources explicitly leave service identity authentication unknown. Later caveats do not repair the overstatement. findings.md also includes malformed citations such as policy.md:34 and review_scope.txt:12. Requires bounded correction before acceptance."
+    ],
+    "next_action": "Bounded correction or rerun; preserve this attempt."
+  }
+}

@@ -1,0 +1,34 @@
+[
+  {
+    "artifact_id": "artifact_c92beb34-3343-4d6f-8b4f-dfc961c02c3e",
+    "sha256": "5a5cb02c52aea9e7b364205eeaba3688e60c52ac8c93de941051e11e851cf3b4",
+    "byte_length": 7613,
+    "media_type": "application/json",
+    "execution_id": "exec_58460b11-6dcf-4b37-a6b4-9c5da998da0d",
+    "path": "artifact_c92beb34-3343-4d6f-8b4f-dfc961c02c3e.json"
+  },
+  {
+    "artifact_id": "artifact_28d1b452-7693-4912-9a13-324f2a696269",
+    "sha256": "ad702aea1086ad85247977d721b55ac33814e85e1dc5c7e43d2e04edf363fe7c",
+    "byte_length": 4154,
+    "media_type": "text/markdown",
+    "execution_id": "exec_58460b11-6dcf-4b37-a6b4-9c5da998da0d",
+    "path": "summary.md"
+  },
+  {
+    "artifact_id": "artifact_4344663e-7ec8-4051-9a0b-3168b29d4b40",
+    "sha256": "249e6b27276ee8ab33ac2302a81352a476af227284158bf5742a39afa62edcc3",
+    "byte_length": 5209,
+    "media_type": "application/octet-stream",
+    "execution_id": "exec_58460b11-6dcf-4b37-a6b4-9c5da998da0d",
+    "path": "artifact_4344663e-7ec8-4051-9a0b-3168b29d4b40.json"
+  },
+  {
+    "artifact_id": "artifact_fc92164d-def9-4d47-8952-c7204d6d51dd",
+    "sha256": "bef88c48e42fe86c07f5bfdfa289adff6dcfaa6d1d14f63580e426356120457d",
+    "byte_length": 1558,
+    "media_type": "application/json",
+    "execution_id": "exec_58460b11-6dcf-4b37-a6b4-9c5da998da0d",
+    "path": "artifact_fc92164d-def9-4d47-8952-c7204d6d51dd.json"
+  }
+]
