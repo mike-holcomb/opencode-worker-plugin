@@ -5,10 +5,10 @@ checkout and all evidence outside `/mnt/c`; this campaign certifies the native
 Linux filesystem in WSL2. Native Windows and Windows-mounted workspace paths are
 not covered. The runner verifies the WSL2 kernel and records it in `result.json`.
 
-Use branch `release-evidence/v2-20261012` from the repository, or the supplied
+Use branch `feat/opencode-agents-v2` from the repository, or the supplied
 Git bundle, and record `git rev-parse HEAD`. The prepared handoff bundle identifies
 commit `ceb4c272a91120baee02a995178e79ae7b558945` for the automated matrix.
-For live tests, use the latest evidence-branch commit containing parent permission decisions. See the [Linux live handoff](linux-release-check.md) for
+For live tests, use the latest PR #1 branch commit containing parent permission decisions. See the [Linux live handoff](linux-release-check.md) for
 the private-state handling and parent-review requirements that also apply here.
 
 From the repository root, install the locked development dependencies once:
