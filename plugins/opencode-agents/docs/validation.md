@@ -1,11 +1,68 @@
-# V2 development validation
+# V2 validation
 
-Version `2.0.0-dev.0` is not release certified. The source compatibility manifest has `execution_supported: false`. An exact trusted workspace can use the private development opt-in described in [installation](installation.md).
+[OpenCode Agents v2.0.0](https://github.com/mike-holcomb/opencode-worker-plugin/releases/tag/v2.0.0)
+is a published full release. Its internal package version remains `2.0.0-dev.0`,
+and the compatibility manifest retains `execution_supported: false`. Live managed
+execution requires the exact trusted-workspace opt-in in [installation](installation.md).
+Release publication and execution certification are separate statuses.
 
-On macOS arm64 with Node 24.19.0, the TypeScript runtime builds and all 87 runtime tests pass. Nine Node packaging tests and five evaluation harness tests pass. The deterministic, allowlisted archive contains 72 files with a per-file manifest and SHA-256 sidecar. A relocated read-only smoke test verified those hashes, discovered ten MCP tools, left bundle bytes unchanged, and wrote state outside the bundle. These tests perform no model inference. The [evaluation harness](../evaluation/README.md) validates twelve v2 scenarios, 69 frozen checks, and 31 fixture files; the scenario runs have not been completed.
+## Automated checks
 
-An isolated Codex CLI 0.162.0 local marketplace installation resolved the bundled MCP command to the plugin cache directory. The installed diagnostic ran there under Node 24.19.0 with missing configuration and no inference. Git-backed marketplace installation from a release tag remains untested.
+The tagged main merge has the same tree as PR head `5a91c29`, which passed all four
+[CI jobs](https://github.com/mike-holcomb/opencode-worker-plugin/actions/runs/38306022269):
+macOS 15 and Ubuntu 24.04, each on Node 24.15.0 and 24.21.0. Each job ran 93 runtime
+tests, five release-runner tests, nine packaging tests, five evaluation-harness
+tests, frozen-fixture validation, deterministic packaging, and relocated read-only
+installation. These automated checks perform no provider inference.
 
-Authorized live checks against OpenCode 1.18.35 and the configured provider/model used the existing local port forward. They exercised task starts, reports, concurrent workspaces, reconnect, exact-session follow-up, permission handling, cancellation, and restart reconciliation. Some restart and permission cases remain unresolved, and no suite-wide release claim is made. The OpenCode plugin lazy-load race is an accepted development FIXME for trusted workspaces.
+All 30 applicable fault cases have direct coverage under the configured boundary,
+including a real T20 worker attempt to access the parent review channel. This is
+not plugin suppression or protection from hostile same-user operating-system access.
 
-Remaining release work includes the partial fake-backend case T20, incomplete live cases, Git-backed installed-host validation, Linux and WSL2 checks, the twelve v2 scenario runs, performance targets, and the one-hour soak. See the source repository's `docs/v2-implementation.md` for detailed evidence and current limits.
+## Installation evidence
+
+The deterministic allowlisted archive contains 72 files, a per-file manifest, and
+SHA-256 checksums. The ZIP attached to v2.0.0 passed a relocated read-only smoke
+test on Node 24.21.0: ten MCP tools, unchanged bundle bytes, and external runtime state.
+
+Codex CLI 0.162.0 resolved plugin-relative MCP startup in a local marketplace
+installation. Codex CLI 0.162.1 passed Git-backed installation from the historical
+`v2.0.0-dev.0` tag. Installation from the `v2.0.0` marketplace ref remains to be
+verified; the published ZIP smoke test does not establish that result.
+
+## Live, evaluation, and performance evidence
+
+All ten macOS live cases have recorded passing observations and parent reviews.
+Case 3 retains its documented historical concurrency evidence; reconnect and
+supervisor restart were rerun after the RPC fix with exact identity continuity
+and one dispatch. Missing or failed deliverables in operational denial/cancellation
+cases remain rejected. Historical failed and unresolved attempts are retained.
+
+All twelve evaluation scenarios were run, producing 40 retained attempts: nine
+accepted deliverables and ten passing reviewed scenario outcomes, including
+expected rejection in the failed-check scenario. Policy-contradiction and
+false-completion assessments still need satisfactory reviewed results. Model-route
+outages, harness defects, parent delays, and report errors are recorded; automated
+marker checks alone do not establish acceptance.
+
+The one-hour, 1,000-execution fake-backend soak passed, with 20 additional warmups.
+Measured p95 admission was 83.6 ms, cached read 1.08 ms, and event visibility 8.34 ms.
+All 1,020 backends closed and final median RSS stayed within the fixture limit.
+These measurements use in-memory MCP transport and fake owned child backends;
+they exclude provider latency, cold startup, and local RPC transport.
+Upgrade/rollback rehearsal also passed with matching backups and preserved data.
+
+## Remaining certification checks and limitations
+
+- Policy-contradiction and false-completion evaluation outcomes.
+- Linux live and WSL2 operator evidence. Automated Ubuntu CI does not certify live Linux execution.
+- Marketplace installation from the final `v2.0.0` tag.
+- OpenCode 1.18.35 can load a project plugin introduced after launch inspection.
+  This accepted limitation requires trusted workspaces and is not a passed plugin-suppression test.
+- Attached execution and native questions remain intentionally disabled.
+
+See the repository's
+[implementation status](https://github.com/mike-holcomb/opencode-worker-plugin/blob/main/docs/v2-implementation.md),
+[evidence ledger](https://github.com/mike-holcomb/opencode-worker-plugin/blob/main/docs/releases/v2-evidence/ledger.json),
+and [quality review](https://github.com/mike-holcomb/opencode-worker-plugin/blob/main/docs/releases/v2-evidence/quality-review.md)
+for exact provenance and measurement limits.

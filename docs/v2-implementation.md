@@ -1,6 +1,6 @@
 # V2 implementation status
 
-This branch implements much of [spec-v2.md](spec-v2.md), but it is a development build, not a v2 release. The compatibility manifest still has `execution_supported: false`; real tasks require a private development opt-in naming the exact trusted workspace. Without it, `start_task` returns `UNSUPPORTED_BACKEND`.
+[v2.0.0](https://github.com/mike-holcomb/opencode-worker-plugin/releases/tag/v2.0.0) is published as a full GitHub release from the main merge of PR #1. The tagged plugin/runtime manifests retain internal version `2.0.0-dev.0`. Execution certification against [spec-v2.md](spec-v2.md) remains incomplete: the compatibility manifest still has `execution_supported: false`, and real tasks require a private development opt-in naming the exact trusted workspace. Without it, `start_task` returns `UNSUPPORTED_BACKEND`. The evidence ledger records the validation campaign and its outstanding gates; publication did not turn those gates into passing results.
 
 ## Implemented in this branch
 
@@ -80,8 +80,9 @@ of newer schemas. Both selected runtimes use schema 3; migration snapshots and
 backup-failure paths have separate deterministic tests. Historical pushed-tag
 installation passed, but a changed candidate still needs its own immutable tag
 verification. WSL2 is assigned to the operator using the
-[prepared evidence runner](wsl2-release-check.md). Keep the development label and
-`execution_supported: false` until every remaining gate passes.
+[prepared evidence runner](wsl2-release-check.md). The release is published;
+`execution_supported: false` remains until the outstanding execution-certification
+checks pass.
 
 The isolated 2026-10-12 test-only manifest enabled real v2 dispatch without changing the source compatibility gate. A read-only task and a declared-write task both completed with valid file reports and accepted parent reviews. The write used a scoped `allow_once` reply, changed only the declared target, and preserved pre-existing dirty content. A separate fixture ran two independent workspaces concurrently and recovered an active task with the same execution/session/message after an MCP client reconnect; both reports and parent reviews were valid. An exact-session correction produced a valid accepted follow-up while preserving the predecessor artifact. A controlled supervisor restart recovered the same active execution/session/message with one dispatch intent, but that worker finished without a report; an accepted review was correctly rejected. A fresh cancellation case used a same-server abort acknowledgement plus a separate exact-turn snapshot to prove stop, finalize `cancelled`, and release ownership. Another cancellation interrupted an active approved script, preserved its partial write, and captured that file as an immutable artifact. A backend restart recovered the exact recorded session/message with no observed replay, but remained unresolved and retained its reservation. An older denied-permission case also remains `cancelling/unknown` after a restart, with its reservation held. All fixture supervisors were stopped without clearing unresolved records or resubmitting prompts. The live run also found and fixed a non-Git report-permission root mismatch, a missing JSON Schema in the frozen prompt, and deadline-abort outcome classification. Exact IDs and artifacts are in the [first isolated run](../.work/v2/live-2026-10-12/summary.md), [concurrent and reconnect checks](../.work/v2/live-2026-10-12/extra.md), [correction and restart checks](../.work/v2/live-2026-10-12/extra2.md), and [cancellation and backend-restart checks](../.work/v2/live-2026-10-12/extra4.md).
 
