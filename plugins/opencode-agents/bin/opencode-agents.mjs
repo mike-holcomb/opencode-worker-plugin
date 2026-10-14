@@ -540,7 +540,7 @@ var require_cross_spawn = __commonJS({
 // src/cli.ts
 import { createHash as createHash10 } from "node:crypto";
 import { createWriteStream, rmSync as rmSync4 } from "node:fs";
-import { once as once2 } from "node:events";
+import { once } from "node:events";
 
 // src/doctor.ts
 import { spawnSync } from "node:child_process";
@@ -20288,7 +20288,6 @@ import { readFileSync as readFileSync4 } from "node:fs";
 // src/managed-server.ts
 import { randomBytes, randomUUID } from "node:crypto";
 import { execFile, spawn } from "node:child_process";
-import { once } from "node:events";
 import { existsSync as existsSync2, readFileSync as readFileSync3, readdirSync } from "node:fs";
 import { homedir as homedir2 } from "node:os";
 import { isDeepStrictEqual } from "node:util";
@@ -26227,6 +26226,9 @@ async function startManagedServer(options) {
   const { env, profiles } = await launchEnvironment(options);
   const child = spawn(options.binary, ["serve", "--pure", "--hostname", "127.0.0.1", "--port", "0"], {
     cwd: options.workspace,
+    // Supported managed platforms are POSIX. Own a separate process group so
+    // ordinary tool subprocesses cannot outlive forced cancellation unnoticed.
+    detached: process.platform !== "win32",
     env: { ...env, OPENCODE_SERVER_PASSWORD: password },
     stdio: ["ignore", "pipe", "pipe"]
   });
@@ -26264,14 +26266,16 @@ async function startManagedServer(options) {
   }
   return {
     backendId,
+    instanceId: randomUUID(),
     baseUrl,
     backend,
     isAlive: () => child.exitCode === null && child.signalCode === null,
     confirmAbortStopped: async (sessionId, messageId) => {
-      if (child.killed || child.exitCode !== null || child.signalCode !== null) return false;
+      if (child.killed || child.exitCode !== null || child.signalCode !== null) return { stopped: false, observation: null };
       const observed = await backend.inspectTurn(sessionId, messageId, { timeoutMs: 5e3 });
-      return !child.killed && child.exitCode === null && child.signalCode === null && observed.submitted && !observed.finished && observed.statusOmitted === true && observed.activeTools === 0 && observed.pendingRequests.length === 0;
+      return { observation: observed, stopped: !child.killed && child.exitCode === null && child.signalCode === null && observed.submitted && !observed.finished && observed.statusOmitted === true && observed.activeTools === 0 && observed.pendingRequests.length === 0 };
     },
+    terminateOwned: () => process.platform === "win32" ? Promise.resolve(false) : terminateOwnedChild(child, 5e3, true),
     close: () => stopOwnedChild(child)
   };
 }
@@ -26334,14 +26338,47 @@ function waitForServerUrl(child, timeoutMs) {
   });
 }
 async function stopOwnedChild(child) {
-  if (child.exitCode !== null || child.signalCode !== null) return;
-  const exited = once(child, "exit").then(() => void 0);
-  child.kill("SIGTERM");
-  await Promise.race([exited, new Promise((resolve5) => setTimeout(resolve5, 5e3))]);
-  if (child.exitCode === null && child.signalCode === null) {
-    child.kill("SIGKILL");
-    await exited;
+  if (!await terminateOwnedChild(child, 5e3, process.platform !== "win32")) throw new Error("owned worker exit was not confirmed");
+}
+async function terminateOwnedChild(child, waitMs = 5e3, ownsProcessGroup = false) {
+  const groupGone = () => {
+    if (!ownsProcessGroup) return true;
+    if (!child.pid) return false;
+    try {
+      process.kill(-child.pid, 0);
+      return false;
+    } catch (error62) {
+      return error62.code === "ESRCH";
+    }
+  };
+  const exited = () => (child.exitCode !== null || child.signalCode !== null) && groupGone();
+  for (const signal of ["SIGTERM", "SIGKILL"]) {
+    if (exited()) return true;
+    await new Promise((resolve5) => {
+      const finish = () => {
+        clearTimeout(timer);
+        clearInterval(poll);
+        child.off("exit", onExit);
+        resolve5();
+      };
+      const onExit = () => {
+        if (exited()) finish();
+      };
+      const timer = setTimeout(finish, waitMs);
+      const poll = setInterval(onExit, Math.min(waitMs, 25));
+      child.once("exit", onExit);
+      try {
+        if (ownsProcessGroup) {
+          if (child.pid) process.kill(-child.pid, signal);
+          else finish();
+        } else child.kill(signal);
+      } catch {
+        finish();
+      }
+      if (exited()) finish();
+    });
   }
+  return exited();
 }
 
 // src/attached.ts
@@ -41520,10 +41557,10 @@ var ExecutionCoordinator = class {
         const observed = await backend.inspectTurn(task.sessionId, task.userMessageId, { timeoutMs: 5e3 });
         this.updateRequests(task, observed);
         if (observed.pendingRequests.some((item) => item.id === request.id))
-          this.markUnknown(task, `reply delivery is uncertain: ${String(error62)}`);
+          this.markUnknown(task, "reply delivery is uncertain; the exact request remains upstream and will not be resent");
         else this.store.resolveUnconfirmedInputResponse(task.executionId, request.id);
       } catch (inspectionError) {
-        this.markUnknown(task, `reply and exact-request observation are uncertain: ${String(inspectionError)}`);
+        this.markUnknown(task, "reply and exact-request observation are uncertain; the recorded response will not be resent");
       }
     }
     this.kick();
@@ -41538,7 +41575,7 @@ var ExecutionCoordinator = class {
           try {
             await this.reconcile(task);
           } catch (error62) {
-            this.handleFailure(task, error62);
+            await this.handleFailure(task, error62);
           }
         }
         await this.releaseIdleBackends();
@@ -41566,6 +41603,8 @@ var ExecutionCoordinator = class {
     }
   }
   async backendFor(task) {
+    if (this.store.cancellationEvent(task.executionId, "cancellation_recovery_intent"))
+      throw new Error("worker termination has begun; backend reopening is forbidden");
     const config2 = task.backendConfig;
     if (!config2) throw new Error("recorded backend launch configuration is missing");
     if (!task.reportPath || task.launchContract?.reportPath !== task.reportPath)
@@ -41799,16 +41838,24 @@ var ExecutionCoordinator = class {
     this.store.expireMissingInputRequests(task.executionId, observed.pendingRequests.map((request) => request.id));
   }
   async reconcileCancellation(task) {
+    if (this.store.cancellationEvent(task.executionId, "cancellation_stop_confirmed")) {
+      this.finishCancellation(task);
+      return;
+    }
+    if (this.store.cancellationEvent(task.executionId, "cancellation_recovery_intent")) {
+      await this.recoverCancellation(task);
+      return;
+    }
     if (!task.userMessageId) {
       if (this.store.dispatchIntent(task.executionId)) {
-        this.markUnknown(task, "cancellation lacks recorded message identity");
+        if (!await this.recoverCancellation(task)) this.cancellationDiagnostic(task, "recorded_message_identity_missing");
         return;
       }
       if (!task.sessionId && task.creationIntent) {
         const { backend: backend2 } = await this.backendFor(task);
         const found = await backend2.findCreatedSession(task.creationIntent.marker, { timeoutMs: 5e3 });
         if (!found) {
-          this.markUnknown(task, "session creation remains ambiguous during cancellation");
+          if (!await this.recoverCancellation(task)) this.cancellationDiagnostic(task, "session_creation_ambiguous");
           return;
         }
         if (found.backendId !== task.creationIntent.backendId || found.workspace !== task.workspace)
@@ -41825,12 +41872,16 @@ var ExecutionCoordinator = class {
       return;
     }
     if (!task.sessionId) {
-      this.markUnknown(task, "cancellation lacks exact session identity");
+      if (!await this.recoverCancellation(task)) this.cancellationDiagnostic(task, "exact_session_identity_missing");
       return;
     }
+    const sessionId = task.sessionId;
+    const messageId = task.userMessageId;
     const lease = await this.backendFor(task);
     const { backend } = lease;
-    const before = await backend.inspectTurn(task.sessionId, task.userMessageId, { timeoutMs: 5e3 });
+    const before = await backend.inspectTurn(sessionId, messageId, { timeoutMs: 5e3 });
+    this.updateRequests(task, before);
+    task = this.store.get(task.scopeId, task.taskId);
     if (before.finished) {
       this.freshAbortAcks.delete(task.executionId);
       const abortApplied = Boolean(task.cancellationIntent?.abortAcknowledged && isCorrelatedAbort(before.error));
@@ -41844,14 +41895,26 @@ var ExecutionCoordinator = class {
       return;
     }
     let acknowledged = Boolean(task.cancellationIntent?.abortAcknowledged);
-    if (!acknowledged) {
-      acknowledged = await backend.abortSession(task.sessionId, { timeoutMs: 5e3 });
-      if (acknowledged) {
+    if (!this.hasFreshAbort(task, lease)) {
+      const freshAcknowledgement = await backend.abortSession(sessionId, { timeoutMs: 5e3 });
+      acknowledged ||= freshAcknowledgement;
+      if (freshAcknowledgement) {
         this.store.acknowledgeAbort(task.executionId);
-        this.freshAbortAcks.set(task.executionId, { lease, sessionId: task.sessionId, messageId: task.userMessageId });
+        this.freshAbortAcks.set(task.executionId, { lease, sessionId, messageId });
       }
     }
-    const after = await backend.inspectTurn(task.sessionId, task.userMessageId, { timeoutMs: 5e3 });
+    let after = await backend.inspectTurn(sessionId, messageId, { timeoutMs: 5e3 });
+    this.updateRequests(task, after);
+    let stopped = false;
+    if (!after.finished && acknowledged && lease.confirmAbortStopped && this.hasFreshAbort(task, lease)) {
+      const proof = await lease.confirmAbortStopped(sessionId, messageId);
+      if (proof.observation) {
+        after = proof.observation;
+        this.updateRequests(task, after);
+      }
+      stopped = proof.stopped;
+    }
+    task = this.store.get(task.scopeId, task.taskId);
     if (after.finished) {
       this.freshAbortAcks.delete(task.executionId);
       const abortApplied = Boolean(acknowledged && isCorrelatedAbort(after.error));
@@ -41862,7 +41925,7 @@ var ExecutionCoordinator = class {
         abortApplied ? task.cancellationIntent?.deadlineOrigin ? "timed_out" : "cancelled" : after.error ? "failed" : "completed",
         { cancelEffect: abortApplied ? "applied" : "not_applied" }
       );
-    } else if (acknowledged && lease.confirmAbortStopped && this.freshAbortAcks.get(task.executionId)?.lease === lease && this.freshAbortAcks.get(task.executionId)?.sessionId === task.sessionId && this.freshAbortAcks.get(task.executionId)?.messageId === task.userMessageId && await lease.confirmAbortStopped(task.sessionId, task.userMessageId)) {
+    } else if (stopped) {
       this.freshAbortAcks.delete(task.executionId);
       this.store.beginFinalization(
         task.scopeId,
@@ -41871,7 +41934,68 @@ var ExecutionCoordinator = class {
         task.cancellationIntent?.deadlineOrigin ? "timed_out" : "cancelled",
         { cancelEffect: "applied" }
       );
-    } else this.markUnknown(task, "stop has not been confirmed");
+    } else {
+      if (!await this.recoverCancellation(task, after))
+        this.cancellationDiagnostic(task, "stop_not_confirmed", lease, after);
+    }
+  }
+  hasFreshAbort(task, lease) {
+    const ack = this.freshAbortAcks.get(task.executionId);
+    return ack?.lease === lease && ack.sessionId === task.sessionId && ack.messageId === task.userMessageId;
+  }
+  cancellationDiagnostic(task, reason, lease, observed) {
+    this.markUnknown(task, reason);
+    this.store.recordCancellationEvent(task.executionId, "cancellation_diagnostic", {
+      reason,
+      backendAvailable: Boolean(lease && lease.isAlive?.() !== false && reason !== "backend_observation_unavailable"),
+      freshAbortProof: Boolean(lease && this.hasFreshAbort(task, lease)),
+      status: observed?.status ?? null,
+      statusOmitted: observed?.statusOmitted ?? null,
+      activeTools: observed?.activeTools ?? null,
+      pendingRequests: observed?.pendingRequests.length ?? null
+    });
+  }
+  finishCancellation(task) {
+    this.store.expireMissingInputRequests(task.executionId, []);
+    task = this.store.get(task.scopeId, task.taskId);
+    this.store.beginFinalization(
+      task.scopeId,
+      task.taskId,
+      task.revision,
+      task.cancellationIntent?.deadlineOrigin ? "timed_out" : "cancelled",
+      { cancelEffect: "applied", stopProof: "owned_worker_exit" }
+    );
+  }
+  async recoverCancellation(task, observed) {
+    if (!task.cancellationIntent || Date.now() - Date.parse(task.cancellationIntent.createdAt) < 3e4) return false;
+    const lease = task.backendId ? this.backends.get(task.backendId) : void 0;
+    const intent = this.store.cancellationEvent(task.executionId, "cancellation_recovery_intent");
+    if (!lease?.terminateOwned || !lease.instanceId || intent && intent.detail.instanceId !== lease.instanceId) {
+      this.cancellationDiagnostic(task, "owned_process_handle_unavailable", lease, observed);
+      return true;
+    }
+    if (task.workspaceAccess !== "exclusive" || !this.store.ownsResource(task.executionId, `workspace:${task.workspace}`) || this.store.unresolved().some((other) => other.executionId !== task.executionId && other.admittedAt && (other.backendId === lease.backendId || other.workspace === task.workspace))) {
+      this.cancellationDiagnostic(task, "exclusive_worker_ownership_unproven", lease, observed);
+      return true;
+    }
+    const identity = { backendId: lease.backendId, instanceId: lease.instanceId };
+    this.store.recordCancellationEvent(task.executionId, "cancellation_recovery_intent", identity);
+    this.streams.get(lease.backendId)?.abort();
+    this.streams.delete(lease.backendId);
+    let stopped = false;
+    try {
+      stopped = await lease.terminateOwned();
+    } catch {
+    }
+    if (!stopped || lease.isAlive?.() !== false) {
+      this.cancellationDiagnostic(task, "owned_worker_exit_unconfirmed", lease);
+      return true;
+    }
+    this.store.recordCancellationEvent(task.executionId, "cancellation_stop_confirmed", identity);
+    this.freshAbortAcks.delete(task.executionId);
+    this.backends.delete(lease.backendId);
+    this.finishCancellation(task);
+    return true;
   }
   async finalize(task) {
     const outcome = task.intendedOutcome ?? "failed";
@@ -41879,7 +42003,7 @@ var ExecutionCoordinator = class {
       if (!task.reportPath || !task.frozenBaseline) throw new Error("frozen report path or baseline missing");
       mkdirSync3(task.reportPath, { recursive: true, mode: 448 });
       let structuredReport;
-      if (task.sessionId && task.userMessageId) {
+      if (task.sessionId && task.userMessageId && !this.store.cancellationEvent(task.executionId, "cancellation_stop_confirmed")) {
         try {
           structuredReport = (await (await this.backendFor(task)).backend.readResult(task.sessionId, task.userMessageId, { timeoutMs: 5e3 })).structured;
         } catch {
@@ -41910,15 +42034,22 @@ var ExecutionCoordinator = class {
   }
   markUnknown(task, reason) {
     const current = this.store.get(task.scopeId, task.taskId);
-    if (current && current.executionId === task.executionId && current.observation !== "unknown")
+    if (current && current.executionId === task.executionId && current.observation !== "unknown" && !["completed", "failed", "cancelled", "timed_out"].includes(current.phase))
       this.store.transition(task.scopeId, task.taskId, current.revision, current.phase, "unknown", { reason });
   }
-  handleFailure(task, error62) {
+  async handleFailure(task, error62) {
     const current = this.store.get(task.scopeId, task.taskId);
     if (!current || current.executionId !== task.executionId) return;
     if (current.phase === "queued" || current.phase === "dispatching" && !current.creationIntent && !this.store.dispatchIntent(current.executionId)) {
       this.store.transition(current.scopeId, current.taskId, current.revision, "failed", "current", { error: String(error62) });
       this.store.release(current.executionId);
+    } else if (current.cancellationIntent && current.phase === "cancelling") {
+      if (!await this.recoverCancellation(current))
+        this.cancellationDiagnostic(
+          current,
+          "backend_observation_unavailable",
+          current.backendId ? this.backends.get(current.backendId) : void 0
+        );
     } else this.markUnknown(current, String(error62));
   }
 };
@@ -41933,8 +42064,8 @@ import { chmodSync as chmodSync2, closeSync as closeSync4, existsSync as existsS
 import { dirname as dirname3, join as join6 } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 var StoreConflict = class extends Error {
-  constructor(code) {
-    super(code);
+  constructor(code, message = code) {
+    super(message);
     this.code = code;
   }
   code;
@@ -42832,6 +42963,22 @@ var SqliteTaskStore = class {
       this.event(executionId, "abort_acknowledged", {});
     });
   }
+  cancellationEvent(executionId, kind) {
+    const row = this.db.prepare("SELECT detail_json,created_at FROM events WHERE execution_id=? AND kind=? ORDER BY sequence DESC LIMIT 1").get(executionId, kind);
+    return row ? { detail: JSON.parse(row.detail_json), createdAt: row.created_at } : null;
+  }
+  recordCancellationEvent(executionId, kind, detail) {
+    this.transaction(() => {
+      const previous = this.cancellationEvent(executionId, kind);
+      if (previous && canonical2(previous.detail) === canonical2(detail) && (kind !== "cancellation_diagnostic" || Date.now() - Date.parse(previous.createdAt) < 3e4)) return;
+      this.event(executionId, kind, detail);
+      this.db.prepare("UPDATE executions SET revision=revision+1,updated_at=? WHERE execution_id=?").run(now(), executionId);
+    });
+  }
+  ownsResource(executionId, resourceKey) {
+    const row = this.db.prepare("SELECT execution_id FROM resource_reservations WHERE resource_key=?").get(resourceKey);
+    return row?.execution_id === executionId;
+  }
   cancelTask(input2) {
     const payloadHash = cancelSemanticHash(input2);
     return this.transaction(() => {
@@ -42892,7 +43039,7 @@ var SqliteTaskStore = class {
   upsertInputRequest(scopeId, taskId, executionId, requestId, kind, detail) {
     return this.transaction(() => {
       const task = this.get(scopeId, taskId);
-      if (!task || task.executionId !== executionId || !["running", "waiting_input", "dispatching"].includes(task.phase)) {
+      if (!task || task.executionId !== executionId || !["running", "waiting_input", "dispatching", "cancelling"].includes(task.phase)) {
         throw new StoreConflict("INVALID_STATE");
       }
       const previous = this.inputRequests(executionId).find((request) => request.requestId === requestId);
@@ -42904,7 +43051,7 @@ var SqliteTaskStore = class {
       } else {
         this.db.prepare("INSERT INTO input_requests(request_id,execution_id,kind,revision,detail_json,status,created_at) VALUES(?,?,?,1,?,'pending',?)").run(requestId, executionId, kind, canonical2(detail), instant);
       }
-      this.db.prepare("UPDATE executions SET phase='waiting_input',revision=revision+1,updated_at=? WHERE execution_id=?").run(instant, executionId);
+      this.db.prepare("UPDATE executions SET phase=?,revision=revision+1,updated_at=? WHERE execution_id=?").run(task.cancellationIntent ? "cancelling" : "waiting_input", instant, executionId);
       this.event(executionId, "input_request", { requestId, kind, revision: previous ? previous.revision + 1 : 1 });
       return this.inputRequests(executionId).find((request) => request.requestId === requestId);
     });
@@ -42925,9 +43072,16 @@ var SqliteTaskStore = class {
       const task = this.get(input2.scopeId, input2.taskId);
       if (!task || task.executionId !== input2.executionId) throw new StoreConflict("INVALID_STATE");
       if (task.revision !== input2.expectedRevision) throw new StoreConflict("STALE_REVISION");
-      if (task.phase !== "waiting_input") throw new StoreConflict("REQUEST_EXPIRED");
       const request = this.inputRequests(input2.executionId).find((item) => item.requestId === input2.requestId);
-      if (!request || request.status !== "pending" || request.revision !== input2.requestRevision) throw new StoreConflict("REQUEST_EXPIRED");
+      if (!request || request.status !== "pending") throw new StoreConflict("REQUEST_EXPIRED", "request is no longer pending; observe the execution");
+      if (request.revision !== input2.requestRevision) throw new StoreConflict("REQUEST_EXPIRED", "request revision is stale; observe the execution");
+      if (task.cancellationIntent) {
+        if (task.phase !== "cancelling" || request.kind !== "permission" || input2.reply !== "deny" || this.cancellationEvent(task.executionId, "cancellation_recovery_intent"))
+          throw new StoreConflict("INVALID_STATE", "cancellation permits only permission denial before worker termination begins");
+      } else if (task.phase !== "waiting_input") throw new StoreConflict("INVALID_STATE", "execution is not waiting for input");
+      const binding = request.detail;
+      if (binding.sessionId !== task.sessionId || binding.type !== request.kind)
+        throw new StoreConflict("REQUEST_EXPIRED", "request binding does not match the execution; observe the execution");
       const instant = now();
       this.db.prepare("UPDATE input_requests SET status='responding',response_json=?,authorization_basis_json=? WHERE request_id=?").run(canonical2(input2.reply), canonical2(input2.authorizationBasis), input2.requestId);
       this.db.prepare("UPDATE executions SET revision=revision+1,updated_at=? WHERE execution_id=?").run(instant, input2.executionId);
@@ -42989,6 +43143,7 @@ var SqliteTaskStore = class {
           { requestId: request.requestId, reason: "request_absent_in_exact_session_snapshot" }
         );
       }
+      if (expired2.length) this.db.prepare("UPDATE executions SET revision=revision+1,updated_at=? WHERE execution_id=?").run(now(), executionId);
       return expired2.map((request) => request.requestId);
     });
   }
@@ -43908,12 +44063,12 @@ async function main(args) {
         digest = result2.sha256;
         const bytes = Buffer.from(result2.content_base64, "base64");
         hash3.update(bytes);
-        if (!output2.write(bytes)) await once2(output2, "drain");
+        if (!output2.write(bytes)) await once(output2, "drain");
         if (result2.next_offset === null) break;
         offset = result2.next_offset;
       }
       output2.end();
-      await once2(output2, "finish");
+      await once(output2, "finish");
       if (hash3.digest("hex") !== digest) throw new Error("exported bytes do not match artifact hash");
       process.stdout.write(`${JSON.stringify({ path: args[6], sha256: digest })}
 `);

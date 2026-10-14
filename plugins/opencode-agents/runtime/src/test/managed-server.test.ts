@@ -3,7 +3,69 @@ import { mkdtempSync, mkdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
 import { test } from "node:test";
-import { assertNoLocalPlugins, assertWorkerPolicy, workerPolicy } from "../managed-server.js";
+import { EventEmitter } from "node:events";
+import { spawn } from "node:child_process";
+import { assertNoLocalPlugins, assertWorkerPolicy, terminateOwnedChild, workerPolicy } from "../managed-server.js";
+
+test("owned-worker termination escalates and requires exit evidence", async () => {
+  class Child extends EventEmitter {
+    exitCode: number | null = null;
+    signalCode: NodeJS.Signals | null = null;
+    signals: NodeJS.Signals[] = [];
+    exitOnKill = false;
+    kill(signal: NodeJS.Signals) {
+      this.signals.push(signal);
+      if (this.exitOnKill && signal === "SIGKILL") { this.signalCode = signal; this.emit("exit"); }
+      return true;
+    }
+  }
+  const child = new Child();
+  assert.equal(await terminateOwnedChild(child, 5), false, "successful kill() is not exit proof");
+  assert.deepEqual(child.signals, ["SIGTERM", "SIGKILL"]);
+  assert.equal(child.listenerCount("exit"), 0);
+  child.exitOnKill = true;
+  assert.equal(await terminateOwnedChild(child, 5), true);
+  assert.equal(child.listenerCount("exit"), 0);
+  const signals = child.signals.length;
+  assert.equal(await terminateOwnedChild(child, 5), true);
+  assert.equal(child.signals.length, signals, "an exited child is never signaled again");
+});
+
+test("termination confirms a real owned child exit without affecting an unrelated child", async () => {
+  const child = spawn(process.execPath, ["-e", "setInterval(() => {}, 1000)"], { stdio: "ignore" });
+  const unrelated = spawn(process.execPath, ["-e", "setInterval(() => {}, 1000)"], { stdio: "ignore" });
+  try {
+    assert.equal(await terminateOwnedChild(child, 100), true);
+    assert.ok(child.exitCode !== null || child.signalCode !== null);
+    assert.equal(unrelated.exitCode, null);
+    assert.equal(unrelated.signalCode, null);
+  } finally {
+    await terminateOwnedChild(child, 100);
+    await terminateOwnedChild(unrelated, 100);
+  }
+});
+
+test("managed termination stops a tool subprocess and escalates when its parent ignores SIGTERM", { skip: process.platform === "win32" }, async () => {
+  const script = `
+    process.on('SIGTERM', () => {});
+    const tool = require('node:child_process').spawn(process.execPath,
+      ['-e', "console.log('tool ready'); setInterval(() => {}, 1000)"], { stdio: ['ignore', 'pipe', 'ignore'] });
+    tool.stdout.once('data', () => console.log('ready'));
+    setInterval(() => {}, 1000);
+  `;
+  const child = spawn(process.execPath, ["-e", script],
+    { detached: true, stdio: ["ignore", "pipe", "ignore"] });
+  try {
+    await new Promise<void>((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error("child did not start")), 3_000);
+      child.stdout.once("data", () => { clearTimeout(timeout); resolve(); });
+      child.once("error", (error) => { clearTimeout(timeout); reject(error); });
+    });
+    assert.equal(await terminateOwnedChild(child, 100, true), true);
+    assert.equal(child.signalCode, "SIGKILL");
+    assert.throws(() => process.kill(-child.pid!, 0), (error: unknown) => (error as NodeJS.ErrnoException).code === "ESRCH");
+  } finally { await terminateOwnedChild(child, 100, true); }
+});
 
 test("worker profiles restrict inspection edits to the assigned execution report", () => {
   const worktree = "/tmp/sample-project";

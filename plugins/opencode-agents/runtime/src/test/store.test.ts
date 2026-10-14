@@ -258,7 +258,9 @@ test("cancellation and request response intents survive restart without releasin
       baselineHash: "a".repeat(64), promptHash: "b".repeat(64) });
     task = store.admit(task.scopeId, task.taskId, task.revision, ["workspace:project"])!;
     task = store.transition(task.scopeId, task.taskId, task.revision, "running", "current");
-    const request = store.upsertInputRequest(task.scopeId, task.taskId, task.executionId, "permission-1", "permission", { action: "read" });
+    task = store.bindSession(task.scopeId, task.taskId, task.revision, "backend_exact", "ses_exact");
+    const request = store.upsertInputRequest(task.scopeId, task.taskId, task.executionId, "permission-1", "permission",
+      { sessionId: "ses_exact", type: "permission", action: "read" });
     task = store.get(task.scopeId, task.taskId)!;
     task = store.respondToRequest({ scopeId: task.scopeId, taskId: task.taskId, executionId: task.executionId,
       expectedRevision: task.revision, idempotencyKey: "response-test-0000001", requestId: request.requestId,

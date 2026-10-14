@@ -59,6 +59,8 @@ export type BackendEvent = {
   data: unknown;
 };
 
+export type AbortStopProof = { stopped: boolean; observation: TurnObservation | null };
+
 export interface OpenCodeBackend {
   inspectBackend(control?: RequestControl): Promise<BackendInspection>;
   createSession(marker: string, control?: RequestControl): Promise<SessionIdentity>;
