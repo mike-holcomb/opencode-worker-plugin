@@ -41652,6 +41652,12 @@ var ExecutionCoordinator = class {
       task = this.store.admit(task.scopeId, task.taskId, task.revision, resourceKeys(task));
       if (!task) return;
     }
+    if (task.cancellationIntent && ["dispatching", "running", "waiting_input", "cancelling"].includes(task.phase)) {
+      if (task.phase !== "cancelling")
+        task = this.store.transition(task.scopeId, task.taskId, task.revision, "cancelling", task.observation);
+      await this.reconcileCancellation(task);
+      return;
+    }
     if (["dispatching", "running", "waiting_input"].includes(task.phase) && expired(task.executionDeadlineAt) && !task.cancellationIntent) {
       this.store.cancelTask({
         scopeId: task.scopeId,
@@ -41751,6 +41757,8 @@ var ExecutionCoordinator = class {
     }
     const { backend } = await this.backendFor(task);
     const observed = await backend.inspectTurn(task.sessionId, task.userMessageId, { timeoutMs: 5e3 });
+    task = this.store.get(task.scopeId, task.taskId);
+    if (task.cancellationIntent) return;
     this.updateRequests(task, observed);
     task = this.store.get(task.scopeId, task.taskId);
     if (observed.finished) {
