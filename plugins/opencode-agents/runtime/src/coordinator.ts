@@ -222,6 +222,14 @@ export class ExecutionCoordinator {
       task = this.store.admit(task.scopeId, task.taskId, task.revision, resourceKeys(task));
       if (!task) return;
     }
+    // Durable cancellation intent remains authoritative even if an older
+    // observation restored an active phase before this coordinator restarted.
+    if (task.cancellationIntent && ["dispatching", "running", "waiting_input", "cancelling"].includes(task.phase)) {
+      if (task.phase !== "cancelling")
+        task = this.store.transition(task.scopeId, task.taskId, task.revision, "cancelling", task.observation);
+      await this.reconcileCancellation(task);
+      return;
+    }
     if (["dispatching", "running", "waiting_input"].includes(task.phase) &&
       expired(task.executionDeadlineAt) && !task.cancellationIntent) {
       this.store.cancelTask({ scopeId: task.scopeId, taskId: task.taskId, executionId: task.executionId,
@@ -294,6 +302,10 @@ export class ExecutionCoordinator {
     if (!task.sessionId || !task.userMessageId) { this.markUnknown(task, "missing exact turn identity"); return; }
     const { backend } = await this.backendFor(task);
     const observed = await backend.inspectTurn(task.sessionId, task.userMessageId, { timeoutMs: 5_000 });
+    task = this.store.get(task.scopeId, task.taskId)!;
+    // Cancellation may have committed while inspection was in flight. Leave
+    // both request updates and outcome selection to cancellation reconciliation.
+    if (task.cancellationIntent) return;
     this.updateRequests(task, observed);
     task = this.store.get(task.scopeId, task.taskId)!;
     if (observed.finished) {

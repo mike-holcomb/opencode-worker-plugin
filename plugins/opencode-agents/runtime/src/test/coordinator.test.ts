@@ -205,6 +205,102 @@ test("generic backend abort acknowledgement and idle snapshot retain ownership",
   } finally { await fx.coordinator.close(); fx.restore(); }
 });
 
+for (const scenario of ["no pending requests", "a pending request", "normal completion"]) {
+  test(`an in-flight observation preserves cancellation with ${scenario}`, async (t) => {
+    const fx = setup();
+    let resumed: ExecutionCoordinator | null = null;
+    const entered = Promise.withResolvers<void>();
+    const inspection = Promise.withResolvers<TurnObservation>();
+    try {
+      await fx.coordinator.start();
+      const active = fx.store.get("scope", fx.task.taskId)!;
+      assert.equal(active.phase, "running");
+      const inspectTurn = fx.backend.inspectTurn.bind(fx.backend);
+      fx.backend.inspectTurn = async () => {
+        entered.resolve();
+        return inspection.promise;
+      };
+      fx.coordinator.kick();
+      await entered.promise;
+      const current = fx.store.get("scope", active.taskId)!;
+      const cancelled = fx.store.cancelTask({ scopeId: "scope", taskId: current.taskId, executionId: current.executionId,
+        expectedRevision: current.revision, idempotencyKey: "observe-cancel-123456", reason: "stop", requester: "parent" });
+      assert.equal(cancelled.phase, "cancelling");
+      assert.ok(cancelled.cancellationIntent);
+      const requests: PendingRequest[] = scenario === "a pending request" ? [{ id: "per_race", sessionId: fx.backend.sessionId,
+        type: "permission", api: "legacy", detail: { permission: "bash", patterns: ["pwd"] } }] : [];
+      // Stop scheduling before releasing inspection so the assertion sees the
+      // raced observation's write, without a later tick masking the regression.
+      const closing = fx.coordinator.close();
+      fx.backend.finished = scenario === "normal completion";
+      inspection.resolve({ ...await inspectTurn(fx.backend.sessionId, fx.backend.messageId), pendingRequests: requests });
+      await closing;
+      fx.backend.inspectTurn = inspectTurn;
+      const after = fx.store.get("scope", active.taskId)!;
+      assert.equal(after.phase, "cancelling");
+      assert.equal(after.observation, cancelled.observation);
+      assert.deepEqual(after.cancellationIntent, cancelled.cancellationIntent);
+      assert.equal(fx.store.reserve("other-observation", [`workspace:${active.workspace}`]), false);
+
+      // An existing parent cancellation must still be actionable after the
+      // execution deadline, rather than being skipped or replaced by a timeout.
+      t.mock.method(Date, "now", () => Date.parse(active.executionDeadlineAt!) + 1);
+      resumed = fx.restart();
+      await resumed.start();
+      await resumed.close();
+      assert.equal(fx.backend.aborted, scenario !== "normal completion");
+      if (scenario !== "normal completion") {
+        assert.equal(fx.store.get("scope", active.taskId)?.phase, "cancelling");
+        assert.equal(fx.store.reserve("other-observation", [`workspace:${active.workspace}`]), false);
+        fx.backend.finished = true;
+        fx.backend.error = JSON.stringify({ name: "MessageAbortedError", data: { message: "Aborted" } });
+        resumed = fx.restart();
+        await resumed.start();
+        await resumed.close();
+      } else {
+        assert.ok(fx.store.events(active.executionId).some((event) => event.kind === "finalizing" &&
+          (event.detail as { detail?: { cancelEffect?: string } }).detail?.cancelEffect === "not_applied"));
+      }
+      assert.equal(fx.store.get("scope", active.taskId)?.phase, "finalizing");
+      resumed = fx.restart();
+      await resumed.start();
+      assert.equal(fx.store.get("scope", active.taskId)?.phase, scenario === "normal completion" ? "completed" : "cancelled");
+      const followup = fx.store.start({ scopeId: "scope", idempotencyKey: "after-cancel-12345678", workspace: active.workspace,
+        packet: active.packet, model: active.model, profile: active.profile,
+        baselineHash: active.baselineHash, promptHash: active.promptHash });
+      assert.ok(fx.store.admit("scope", followup.taskId, followup.revision, [`workspace:${active.workspace}`]));
+      assert.equal(fx.backend.submitCount, 1);
+    } finally {
+      inspection.resolve({ submitted: true, assistantMessageIds: [], activeTools: 1, status: "busy",
+        pendingRequests: [], finished: false, error: null });
+      await resumed?.close(); await fx.coordinator.close(); fx.restore();
+    }
+  });
+}
+
+for (const phase of ["dispatching", "running", "waiting_input"] as const) {
+  test(`reconciliation recovers durable cancellation intent stranded in ${phase}`, async (t) => {
+    const fx = setup();
+    let resumed: ExecutionCoordinator | null = null;
+    try {
+      await fx.coordinator.start();
+      await fx.coordinator.close();
+      const active = fx.store.get("scope", fx.task.taskId)!;
+      const cancelled = fx.store.cancelTask({ scopeId: "scope", taskId: active.taskId, executionId: active.executionId,
+        expectedRevision: active.revision, idempotencyKey: "stranded-cancel-12345", reason: "stop", requester: "parent" });
+      fx.store.transition("scope", active.taskId, cancelled.revision, phase, "current");
+      t.mock.method(Date, "now", () => Date.parse(active.executionDeadlineAt!) + 1);
+      resumed = fx.restart();
+      await resumed.start();
+      assert.equal(fx.backend.aborted, true);
+      assert.equal(fx.store.get("scope", active.taskId)?.phase, "cancelling");
+      assert.ok(fx.store.get("scope", active.taskId)?.cancellationIntent?.abortAcknowledged);
+      assert.equal(fx.store.reserve("other-stranded", [`workspace:${active.workspace}`]), false);
+      assert.equal(fx.backend.submitCount, 1);
+    } finally { await resumed?.close(); await fx.coordinator.close(); fx.restore(); }
+  });
+}
+
 test("a fresh managed abort acknowledgement and independent exact-turn stop snapshot release ownership", async () => {
   const fx = setup(undefined, undefined, true);
   try {
