@@ -12,6 +12,7 @@ bundle-files.txt
 compatibility.json
 docs/evaluation.md
 docs/installation.md
+docs/progress.md
 docs/validation.md
 evaluation/README.md
 evaluation/v2-cases.json
@@ -50,6 +51,8 @@ evaluation/fixtures/wire-serialization/producer.py
 evaluation/fixtures/wire-serialization/test_wire.py
 runtime/package-lock.json
 runtime/package.json
+schemas/progress-checkpoint.schema.json
+schemas/progress-read.schema.json
 schemas/review.schema.json
 schemas/task-packet.schema.json
 schemas/worker-report.schema.json

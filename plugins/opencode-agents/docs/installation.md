@@ -9,7 +9,7 @@ if the installed package displays that internal version.
 
 1. Install Node.js 24.15 or later within the 24.x line. The `node` on the Codex
    host's PATH must resolve to that supported line; Node 25/26 are not supported.
-2. Install OpenCode 1.18.35 and configure the authorized provider/model separately
+2. Install OpenCode 1.19.0 and configure the authorized provider/model separately
    if you intend to execute tasks. Installation does not install OpenCode,
    download models, or run inference.
 3. Install from the repository marketplace:
@@ -49,7 +49,7 @@ The configuration requires `schema_version: 1`, `project_roots`, `read_roots`,
 `provider_id`, `model_id`, and `destination` matching the operator's authorized
 OpenCode route. Optional `limits` control concurrency, timeouts, and artifact size.
 
-Known plugin boundary FIXME: managed OpenCode 1.18.35 can load a project plugin introduced after the toolkit's launch-time inspection. Use only trusted workspaces under the documented exception; plugin suppression and the outstanding certification checks remain unverified. Do not treat worker tool permissions as containment for plugin code.
+This development branch targets OpenCode/SDK 1.19.0. Managed workers disable project configuration discovery and load the native progress tool from a private, frozen directory. Full host/plugin discovery containment and release certification remain unverified; use the exact trusted-workspace opt-in. Worker tool permissions do not establish containment for plugin code. The published v2.0.0 tag retains its historical 1.18.35 target.
 
 For a trusted local test workspace, add this field to the operator's private `config.json` alongside `project_roots`, `opencode_binary`, and `models`:
 
@@ -60,9 +60,9 @@ For a trusted local test workspace, add this field to the operator's private `co
 }
 ```
 
-Only the exact resolved workspace is trusted; listing its parent does not trust children. This opt-in applies to managed OpenCode 1.18.35 with the pinned SDK and matching OpenAPI digest. It does not bypass required capabilities, frozen provider routing, worker permissions, MCP disablement, plugin preflight, or report policy. Attached execution stays disabled. `doctor.backend.certifiedPairs` and `doctor.backend.executionTested` remain false, and `compatibility.json` remains execution-disabled. Removing the field blocks new starts and follow-ups; already admitted executions retain their frozen authorization and must be cancelled explicitly if they should stop.
+Only the exact resolved workspace is trusted; listing its parent does not trust children. This opt-in applies to managed OpenCode 1.19.0 with the pinned SDK and matching OpenAPI digest. It does not bypass required capabilities, frozen provider routing, worker permissions, MCP disablement, plugin preflight, or report policy. Attached execution stays disabled. `doctor.backend.certifiedPairs` and `doctor.backend.executionTested` remain false, and `compatibility.json` remains execution-disabled. Removing the field blocks new starts and follow-ups; already admitted executions retain their frozen authorization and must be cancelled explicitly if they should stop.
 
-The Codex plugin declares one bundled stdio MCP server in `.mcp.json`, with a relative argument pointing to `bin/opencode-agents.mjs`. A read-only bundle smoke test exercises that command from the plugin directory. In an isolated local marketplace install, Codex CLI 0.162.0 resolved the MCP working directory to its plugin cache and ran the bundled diagnostic under Node 24.19.0. Codex CLI 0.162.1 also passed Git-backed installation from the historical `v2.0.0-dev.0` tag. Marketplace installation from `v2.0.0` remains unverified; the published ZIP passed a separate read-only installed-bundle smoke test. Ensure that the host's `node` resolves to a supported Node 24.x version before launching the plugin. The `opencode-agents:opencode-agents` skill describes the ten v2 MCP tools. State defaults to platform application data and may be moved with `OPENCODE_AGENTS_STATE_DIR`; keep state, credentials, reports, and task workspaces outside the installed plugin.
+The Codex plugin declares one bundled stdio MCP server in `.mcp.json`, with a relative argument pointing to `bin/opencode-agents.mjs`. A read-only bundle smoke test exercises that command from the plugin directory. In an isolated local marketplace install, Codex CLI 0.162.0 resolved the MCP working directory to its plugin cache and ran the bundled diagnostic under Node 24.19.0. Codex CLI 0.162.1 also passed Git-backed installation from the historical `v2.0.0-dev.0` tag. Marketplace installation from `v2.0.0` remains unverified; the published ZIP passed a separate read-only installed-bundle smoke test. Ensure that the host's `node` resolves to a supported Node 24.x version before launching the plugin. The `opencode-agents:opencode-agents` skill describes the eleven development MCP tools. State defaults to platform application data and may be moved with `OPENCODE_AGENTS_STATE_DIR`; keep state, credentials, reports, and task workspaces outside the installed plugin.
 
 Use `opencode_health` from Codex for read-only prerequisites. From an extracted plugin directory, run `node ./bin/opencode-agents.mjs doctor`; installing the plugin does not add a global shell executable. The executable does not compile TypeScript or run `npm install` at startup. The installed bundle includes compiled JavaScript, compatibility data, schemas, worker profiles, and dependency license notices.
 

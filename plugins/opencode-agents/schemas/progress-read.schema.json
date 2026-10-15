@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "scope_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "execution_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 128
+    },
+    "after_cursor": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512
+    },
+    "max_updates": {
+      "default": 5,
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 20
+    },
+    "max_bytes": {
+      "default": 8192,
+      "type": "integer",
+      "minimum": 8192,
+      "maximum": 32768
+    },
+    "include_snapshot": {
+      "default": false,
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "scope_id",
+    "task_id",
+    "execution_id",
+    "max_updates",
+    "max_bytes",
+    "include_snapshot"
+  ],
+  "additionalProperties": false
+}

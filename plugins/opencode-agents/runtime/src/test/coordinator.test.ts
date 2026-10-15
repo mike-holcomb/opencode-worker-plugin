@@ -13,6 +13,7 @@ import { renderPrompt } from "../prompt.js";
 import { SupervisorService } from "../service.js";
 import { SqliteTaskStore, type CancellationDiagnostic } from "../store.js";
 import { captureBaseline } from "../workspace.js";
+import { SdkOpenCodeBackend } from "../opencode-backend.js";
 
 class FakeBackend implements OpenCodeBackend {
   readonly backendId = "backend_fake";
@@ -131,6 +132,166 @@ async function until(predicate: () => boolean): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 10));
   }
   assert.ok(predicate(), "expected reconciliation did not finish");
+}
+
+for (const ending of ["socket error", "EOF"] as const) {
+  test(`SDK ${ending} lets the coordinator disclose a gap before reconnecting`, { timeout: 5_000 }, async (t) => {
+    const fx = setup();
+    const sdk = new SdkOpenCodeBackend("http://sdk.invalid", fx.backend.workspace, fx.backend.backendId);
+    const streams: ReadableStreamDefaultController<Uint8Array>[] = [];
+    const checkpoint = { stage: "verifying" as const, summary: "Before disconnect", completed: [], remaining: [], blocker: null, evidence_refs: [] };
+    const parts = new Map<string, unknown>();
+    t.mock.method(globalThis, "fetch", async (input: Request | URL | string) => {
+      const url = new URL(input instanceof Request ? input.url : String(input));
+      if (url.pathname === "/event") {
+        return new Response(new ReadableStream<Uint8Array>({ start(controller) { streams.push(controller); } }),
+          { headers: { "Content-Type": "text/event-stream" } });
+      }
+      assert.match(url.pathname, /\/session\/ses_fake\/message\/assistant$/);
+      return Response.json({ info: { id: "assistant", sessionID: fx.backend.sessionId, role: "assistant", parentID: fx.backend.messageId },
+        parts: [...parts.values()] });
+    });
+    const inspect = fx.backend.inspectBackend.bind(fx.backend);
+    Object.assign(fx.backend, {
+      subscribeEvents: sdk.subscribeEvents.bind(sdk), readCheckpoint: sdk.readCheckpoint.bind(sdk),
+      inspectBackend: async () => {
+        const inspection = await inspect();
+        return { ...inspection, capabilities: { ...inspection.capabilities, progressCheckpoints: true } };
+      },
+    });
+    const emit = (connection: number, id: string, summary: string) => {
+      const part = { id, sessionID: fx.backend.sessionId, messageID: "assistant", type: "tool", tool: "report_progress",
+        state: { status: "completed", metadata: { opencode_agents_progress: { ...checkpoint, summary } } } };
+      parts.set(id, part);
+      streams[connection]!.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ type: "message.part.updated", properties: { part, sessionID: fx.backend.sessionId } })}\n\n`));
+    };
+    try {
+      await fx.coordinator.start(); await until(() => streams.length === 1);
+      emit(0, "before", checkpoint.summary);
+      await until(() => fx.coordinator.progress.read(fx.task.executionId, { include_snapshot: true }).snapshot?.summary === checkpoint.summary);
+      const expired = fx.coordinator.progress.hint(fx.task.executionId).progress_cursor;
+      const inspections = fx.backend.inspectionCount;
+      if (ending === "socket error") streams[0]!.error(new Error("socket disconnected"));
+      else streams[0]!.close();
+      await until(() => fx.coordinator.progress.read(fx.task.executionId, { after_cursor: expired }).gap?.reason === "disconnect");
+      assert.equal(streams.length, 1, "SDK did not reconnect internally");
+      const gap = fx.coordinator.progress.read(fx.task.executionId, { after_cursor: expired });
+      assert.equal(gap.snapshot?.summary, checkpoint.summary);
+      assert.equal(fx.coordinator.progress.read(fx.task.executionId, { after_cursor: gap.next_cursor }).gap, null);
+      await until(() => streams.length === 2);
+      assert.ok(fx.backend.inspectionCount > inspections, "authoritative reconciliation follows the disconnect");
+      emit(1, "before", checkpoint.summary); emit(1, "after", "After reconnect");
+      await until(() => fx.coordinator.progress.read(fx.task.executionId, { after_cursor: gap.next_cursor }).updates.length > 0);
+      const resumed = fx.coordinator.progress.read(fx.task.executionId, { after_cursor: gap.next_cursor });
+      assert.equal(resumed.gap, null); assert.deepEqual(resumed.updates.map((update) => update.summary), ["After reconnect"]);
+      assert.equal(fx.backend.submitCount, 1, "reconnect does not resubmit the originating turn");
+      await fx.coordinator.close();
+      // Closing the second stream deliberately must not reset progress again.
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      assert.equal(fx.coordinator.progress.read(fx.task.executionId, { after_cursor: resumed.next_cursor }).gap, null);
+      assert.equal(streams.length, 2);
+    } finally { await fx.coordinator.close(); fx.restore(); }
+  });
+}
+
+for (const failure of ["declared size", "streamed size", "timeout", "publication", "shutdown"] as const) {
+  test(`checkpoint ${failure} preserves advisory loss semantics on a connected stream`, { timeout: 6_000 }, async (t) => {
+    const fx = setup();
+    const sdk = new SdkOpenCodeBackend("http://sdk.invalid", fx.backend.workspace, fx.backend.backendId);
+    const streams: ReadableStreamDefaultController<Uint8Array>[] = [];
+    const checkpoint = { stage: "verifying" as const, summary: "Before failure", completed: [], remaining: [], blocker: null, evidence_refs: [] };
+    const parts = new Map<string, unknown>();
+    let failAttribution = false; let pendingAttribution = false; let attributionAborted = false;
+    t.mock.method(globalThis, "fetch", async (input: Request | URL | string, init?: RequestInit) => {
+      const url = new URL(input instanceof Request ? input.url : String(input));
+      if (url.pathname === "/event") {
+        return new Response(new ReadableStream<Uint8Array>({ start(controller) { streams.push(controller); } }),
+          { headers: { "Content-Type": "text/event-stream" } });
+      }
+      assert.match(url.pathname, /\/session\/ses_fake\/message\/assistant$/);
+      if (failAttribution && (failure === "timeout" || failure === "shutdown")) {
+        const signal = input instanceof Request ? input.signal : init?.signal;
+        assert.ok(signal);
+        pendingAttribution = true;
+        return await new Promise<Response>((_resolve, reject) => {
+          const abort = () => { attributionAborted = true; reject(signal.reason); };
+          if (signal.aborted) abort();
+          else signal.addEventListener("abort", abort, { once: true });
+        });
+      }
+      const message = { info: { id: "assistant", sessionID: fx.backend.sessionId, role: "assistant", parentID: fx.backend.messageId },
+        parts: [...parts.values(), ...(failAttribution && failure !== "publication"
+          ? [{ id: "large-text", sessionID: fx.backend.sessionId, messageID: "assistant", type: "text", text: "x".repeat(256 * 1024) }] : [])] };
+      const body = JSON.stringify(message);
+      return new Response(body, { headers: { "Content-Type": "application/json",
+        ...(failAttribution && failure === "declared size" ? { "Content-Length": String(Buffer.byteLength(body)) } : {}) } });
+    });
+    const inspect = fx.backend.inspectBackend.bind(fx.backend);
+    Object.assign(fx.backend, {
+      subscribeEvents: sdk.subscribeEvents.bind(sdk), readCheckpoint: sdk.readCheckpoint.bind(sdk),
+      inspectBackend: async () => {
+        const inspection = await inspect();
+        return { ...inspection, capabilities: { ...inspection.capabilities, progressCheckpoints: true } };
+      },
+    });
+    const emit = (id: string, summary: string) => {
+      const part = { id, sessionID: fx.backend.sessionId, messageID: "assistant", type: "tool", tool: "report_progress",
+        state: { status: "completed", metadata: { opencode_agents_progress: { ...checkpoint, summary } } } };
+      parts.set(id, part);
+      streams[0]!.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ type: "message.part.updated", properties: { part, sessionID: fx.backend.sessionId } })}\n\n`));
+    };
+    try {
+      await fx.coordinator.start(); await until(() => streams.length === 1);
+      const initial = fx.coordinator.progress.hint(fx.task.executionId).progress_cursor;
+      for (const part of [
+        { id: "text", sessionID: fx.backend.sessionId, messageID: "assistant", type: "text", text: "Unrelated text" },
+        { id: "invalid", sessionID: fx.backend.sessionId, messageID: "assistant", type: "tool", tool: "report_progress",
+          state: { status: "completed", metadata: { opencode_agents_progress: { ...checkpoint, stage: "invalid" } } } },
+      ]) streams[0]!.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ type: "message.part.updated", properties: { part, sessionID: fx.backend.sessionId } })}\n\n`));
+      emit("before", checkpoint.summary);
+      await until(() => fx.coordinator.progress.read(fx.task.executionId, { include_snapshot: true }).snapshot?.summary === checkpoint.summary);
+      const admitted = fx.coordinator.progress.read(fx.task.executionId, { after_cursor: initial });
+      assert.equal(admitted.gap, null); assert.equal(admitted.dropped_count, 0); assert.equal(admitted.updates.length, 1);
+      const expired = fx.coordinator.progress.hint(fx.task.executionId).progress_cursor;
+      const taskBefore = fx.store.get("scope", fx.task.taskId)!;
+      const eventsBefore = fx.store.events(fx.task.executionId);
+      failAttribution = true;
+      emit(failure === "publication" ? "before" : "lost", "Lost checkpoint");
+      if (failure === "shutdown") {
+        await until(() => pendingAttribution);
+        await fx.coordinator.close();
+        await until(() => attributionAborted);
+        const page = fx.coordinator.progress.read(fx.task.executionId, { after_cursor: expired });
+        assert.equal(page.gap, null); assert.equal(page.dropped_count, 0); assert.equal(page.next_cursor, expired);
+      } else {
+        // The SDK's actual 2-second attribution deadline exercises timeout propagation.
+        if (failure === "timeout") {
+          await until(() => pendingAttribution);
+          await new Promise((resolve) => setTimeout(resolve, 2_050));
+          assert.equal(attributionAborted, true);
+        }
+        await until(() => fx.coordinator.progress.read(fx.task.executionId, { after_cursor: expired }).gap?.reason === "attribution_failure");
+        const gap = fx.coordinator.progress.read(fx.task.executionId, { after_cursor: expired });
+        assert.equal(gap.dropped_count, 1); assert.deepEqual(gap.updates, []);
+        assert.equal(gap.snapshot?.summary, checkpoint.summary);
+        assert.deepEqual(fx.coordinator.progress.read(fx.task.executionId, { after_cursor: expired }), gap);
+        const recovered = fx.coordinator.progress.read(fx.task.executionId, { after_cursor: gap.next_cursor });
+        assert.equal(recovered.gap, null); assert.equal(recovered.next_cursor, gap.next_cursor);
+        assert.deepEqual(recovered.updates, []);
+        failAttribution = false; parts.delete("lost");
+        emit("before", checkpoint.summary); emit("after", "After failure");
+        await until(() => fx.coordinator.progress.read(fx.task.executionId, { after_cursor: gap.next_cursor }).updates.length === 1);
+        const resumed = fx.coordinator.progress.read(fx.task.executionId, { after_cursor: gap.next_cursor });
+        assert.equal(resumed.gap, null); assert.equal(resumed.dropped_count, 1);
+        assert.deepEqual(resumed.updates.map((update) => update.summary), ["After failure"]);
+      }
+      const taskAfter = fx.store.get("scope", fx.task.taskId)!;
+      assert.equal(taskAfter.phase, taskBefore.phase); assert.equal(taskAfter.observation, taskBefore.observation);
+      assert.equal(taskAfter.revision, taskBefore.revision);
+      assert.deepEqual(fx.store.events(fx.task.executionId), eventsBefore);
+      assert.equal(fx.backend.submitCount, 1); assert.equal(streams.length, 1);
+    } finally { await fx.coordinator.close(); fx.restore(); }
+  });
 }
 
 function cancelFixture(fx: ReturnType<typeof setup>, deadline = false) {

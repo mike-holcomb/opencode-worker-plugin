@@ -6,6 +6,15 @@ and the compatibility manifest retains `execution_supported: false`. Live manage
 execution requires the exact trusted-workspace opt-in in [installation](installation.md).
 Release publication and execution certification are separate statuses.
 
+## Development branch: OpenCode 1.19.0
+
+The development branch pins OpenCode and SDK 1.19.0. Native checkpoint transport,
+read-only audits, continuation, supervisor recovery, permission delivery and
+cancellation have local Glimmer evidence. These checks do not certify the release;
+`execution_supported` remains false. See [progress validation](progress.md) for
+reproduction commands, measured response sizes and the denial fixture limit.
+The evidence below describes the historical published tag.
+
 ## Automated checks
 
 The tagged main merge has the same tree as PR head `5a91c29`, which passed all four

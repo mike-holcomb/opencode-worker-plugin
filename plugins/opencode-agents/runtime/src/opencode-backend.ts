@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
+import { CheckpointInputSchema } from "./progress.js";
 import { compatibilityPath } from "./resources.js";
 import { createOpencodeClient } from "@opencode-ai/sdk/v2";
 import type { BackendEvent, BackendInspection, OpenCodeBackend, PendingRequest, RequestControl, SessionIdentity, TurnObservation } from "./backend.js";
@@ -17,6 +18,26 @@ function requireData<T>(result: { data?: T; error?: unknown }, operation: string
   return result.data as NonNullable<T>;
 }
 
+/** Bound the supported single-message attribution API; never recover whole history. */
+export const boundedCheckpointFetch: typeof fetch = async (input, init) => {
+  const url = new URL(input instanceof Request ? input.url : String(input));
+  const response = await fetch(input, init);
+  if (!/\/session\/[^/]+\/message\/[^/]+$/.test(url.pathname) || !response.body) return response;
+  const limit = 256 * 1024;
+  if (Number(response.headers.get("content-length")) > limit) { await response.body.cancel(); throw new Error("checkpoint attribution response exceeds 256 KiB"); }
+  const reader = response.body.getReader();
+  const chunks: Uint8Array[] = []; let bytes = 0;
+  try {
+    while (true) {
+      const item = await reader.read(); if (item.done) break;
+      bytes += item.value.byteLength;
+      if (bytes > limit) { await reader.cancel(); throw new Error("checkpoint attribution response exceeds 256 KiB"); }
+      chunks.push(item.value);
+    }
+  } finally { reader.releaseLock(); }
+  return new Response(Buffer.concat(chunks), { status: response.status, statusText: response.statusText, headers: response.headers });
+};
+
 export class SdkOpenCodeBackend implements OpenCodeBackend {
   private readonly client;
   private readonly headers: Record<string, string>;
@@ -26,9 +47,10 @@ export class SdkOpenCodeBackend implements OpenCodeBackend {
     readonly workspace: string,
     readonly backendId: string,
     headers?: Record<string, string>,
+    private readonly progressTransportEnabled = false,
   ) {
     this.headers = headers ?? {};
-    this.client = createOpencodeClient({ baseUrl, directory: workspace, headers });
+    this.client = createOpencodeClient({ baseUrl, directory: workspace, headers, fetch: boundedCheckpointFetch });
   }
 
   private identity(id: string): SessionIdentity {
@@ -55,7 +77,7 @@ export class SdkOpenCodeBackend implements OpenCodeBackend {
       pairs: Array<{ binary_version: string; sdk_version: string; openapi_sha256: string; execution_supported: boolean;
         capabilities: BackendInspection["capabilities"] }>;
     };
-    const pair = manifest.pairs.find((item) => item.binary_version === health.version && item.sdk_version === "1.18.35" && item.openapi_sha256 === openapiDigest);
+    const pair = manifest.pairs.find((item) => item.binary_version === health.version && item.sdk_version === "1.19.0" && item.openapi_sha256 === openapiDigest);
     return {
       version: health.version,
       openapiDigest,
@@ -64,12 +86,14 @@ export class SdkOpenCodeBackend implements OpenCodeBackend {
       configurationDigest,
       supportedForExecution: pair?.execution_supported ?? false,
       exactPairRecognized: pair !== undefined,
-      capabilities: pair?.capabilities ?? {
+      capabilities: pair ? { ...pair.capabilities, progressCheckpoints: Boolean(this.progressTransportEnabled && pair.capabilities.progressCheckpoints &&
+        (config.agent as Record<string, { permission?: Record<string, unknown> }> | undefined)?.["bounded-inspect"]?.permission?.report_progress === "allow") } : {
         callerAssignedMessageId: false,
         permissionRequests: false,
         questionRequests: false,
         structuredOutput: false,
         sessionRecovery: false,
+        progressCheckpoints: false,
       },
     };
   }
@@ -173,7 +197,10 @@ export class SdkOpenCodeBackend implements OpenCodeBackend {
   }
 
   async *subscribeEvents(control?: RequestControl): AsyncIterable<BackendEvent> {
-    const { stream } = await this.client.event.subscribe({ directory: this.workspace }, { signal: signalFor(control) });
+    // Let the coordinator disclose a gap before reconnecting. SDK retries would
+    // otherwise hide lost checkpoints inside this same iterator.
+    const { stream } = await this.client.event.subscribe({ directory: this.workspace },
+      { signal: signalFor(control), sseMaxRetryAttempts: 1 });
     for await (const event of stream) {
       const data: unknown = event;
       const record = data && typeof data === "object" ? data as Record<string, unknown> : {};
@@ -181,6 +208,26 @@ export class SdkOpenCodeBackend implements OpenCodeBackend {
       const sessionId = typeof properties.sessionID === "string" ? properties.sessionID : undefined;
       yield { type: typeof record.type === "string" ? record.type : "unknown", data, ...(sessionId ? { sessionId } : {}) };
     }
+  }
+
+  /** Called only by background event ingestion, never by a parent read. */
+  async readCheckpoint(event: BackendEvent, sessionId: string, userMessageId: string, control?: RequestControl): Promise<{ sourceId: string; checkpoint: unknown } | null> {
+    if (event.type !== "message.part.updated" || event.sessionId !== sessionId) return null;
+    const record = event.data as { properties?: { part?: { id?: unknown; sessionID?: unknown; messageID?: unknown; type?: unknown; tool?: unknown; state?: { status?: unknown; metadata?: Record<string, unknown> } } } };
+    const candidate = record.properties?.part;
+    if (!candidate || candidate.sessionID !== sessionId || candidate.type !== "tool" || candidate.tool !== "report_progress" ||
+      candidate.state?.status !== "completed" || typeof candidate.id !== "string" || candidate.id.length > 128 ||
+      typeof candidate.messageID !== "string" || candidate.messageID.length > 128 ||
+      !CheckpointInputSchema.safeParse(candidate.state.metadata?.opencode_agents_progress).success) return null;
+    const message = requireData(await this.client.session.message({ sessionID: sessionId,
+      messageID: candidate.messageID, directory: this.workspace }, { signal: signalFor(control) }), "checkpoint attribution");
+    if (message.info.role !== "assistant" || message.info.parentID !== userMessageId ||
+      message.info.sessionID !== sessionId || message.info.id !== candidate.messageID) return null;
+    const part = message.parts.find((part) => part.id === candidate.id);
+    if (!part || part.type !== "tool" || part.tool !== "report_progress" || part.state.status !== "completed" ||
+      part.sessionID !== sessionId || part.messageID !== candidate.messageID) return null;
+    const parsed = CheckpointInputSchema.safeParse(part.state.metadata?.opencode_agents_progress);
+    return parsed.success ? { sourceId: part.id, checkpoint: parsed.data } : null;
   }
 
   async replyToRequest(request: PendingRequest, reply: "allow_once" | "deny" | string[][], control?: RequestControl): Promise<void> {

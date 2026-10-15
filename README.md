@@ -29,7 +29,7 @@ Live tasks require the private `development_execution` opt-in for an exact trust
 workspace. Installation alone does not enable execution.
 
 Follow the [installation and configuration guide](plugins/opencode-agents/docs/installation.md).
-Managed execution uses OpenCode 1.18.35. A known plugin-loading race limits its
+Managed execution targets OpenCode 1.19.0. A known plugin-loading race limits its
 use to trusted workspaces; attached execution and native questions remain disabled.
 See [validation](plugins/opencode-agents/docs/validation.md) and the
 [implementation status](docs/v2-implementation.md) for measured results and open

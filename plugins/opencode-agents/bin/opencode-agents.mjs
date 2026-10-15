@@ -383,12 +383,12 @@ var require_readShebang = __commonJS({
     var fs = __require("fs");
     var shebangCommand = require_shebang_command();
     function readShebang(command) {
-      const size = 150;
-      const buffer = Buffer.alloc(size);
+      const size2 = 150;
+      const buffer = Buffer.alloc(size2);
       let fd;
       try {
         fd = fs.openSync(command, "r");
-        fs.readSync(fd, buffer, 0, size, 0);
+        fs.readSync(fd, buffer, 0, size2, 0);
         fs.closeSync(fd);
       } catch (e) {
       }
@@ -437,21 +437,21 @@ var require_parse = __commonJS({
       }
       return parsed;
     }
-    function parse4(command, args, options) {
-      if (args && !Array.isArray(args)) {
-        options = args;
-        args = null;
+    function parse4(command, args2, options) {
+      if (args2 && !Array.isArray(args2)) {
+        options = args2;
+        args2 = null;
       }
-      args = args ? args.slice(0) : [];
+      args2 = args2 ? args2.slice(0) : [];
       options = Object.assign({}, options);
       const parsed = {
         command,
-        args,
+        args: args2,
         options,
         file: void 0,
         original: {
           command,
-          args
+          args: args2
         }
       };
       return options.shell ? parsed : parseNonShell(parsed);
@@ -517,14 +517,14 @@ var require_cross_spawn = __commonJS({
     var cp = __require("child_process");
     var parse4 = require_parse();
     var enoent = require_enoent();
-    function spawn3(command, args, options) {
-      const parsed = parse4(command, args, options);
+    function spawn3(command, args2, options) {
+      const parsed = parse4(command, args2, options);
       const spawned = cp.spawn(parsed.command, parsed.args, parsed.options);
       enoent.hookChildProcess(spawned, parsed);
       return spawned;
     }
-    function spawnSync3(command, args, options) {
-      const parsed = parse4(command, args, options);
+    function spawnSync3(command, args2, options) {
+      const parsed = parse4(command, args2, options);
       const result2 = cp.spawnSync(parsed.command, parsed.args, parsed.options);
       result2.error = result2.error || enoent.verifyENOENTSync(result2.status, parsed);
       return result2;
@@ -538,13 +538,13 @@ var require_cross_spawn = __commonJS({
 });
 
 // src/cli.ts
-import { createHash as createHash10 } from "node:crypto";
+import { createHash as createHash12 } from "node:crypto";
 import { createWriteStream, rmSync as rmSync4 } from "node:fs";
 import { once } from "node:events";
 
 // src/doctor.ts
 import { spawnSync } from "node:child_process";
-import { existsSync as existsSync3, readFileSync as readFileSync5 } from "node:fs";
+import { existsSync as existsSync4, readFileSync as readFileSync6 } from "node:fs";
 
 // src/config.ts
 import { readFileSync, realpathSync } from "node:fs";
@@ -1802,8 +1802,8 @@ function parsedType(data) {
   }
   return t;
 }
-function issue(...args) {
-  const [iss, input2, inst] = args;
+function issue(...args2) {
+  const [iss, input2, inst] = args2;
   if (typeof iss === "string") {
     return {
       message: iss,
@@ -2568,20 +2568,20 @@ function anchor(source) {
   return new RegExp(`^${source}$`);
 }
 var date = /* @__PURE__ */ anchor(dateSource);
-function timeSource(args) {
+function timeSource(args2) {
   const hhmm = `(?:[01]\\d|2[0-3]):[0-5]\\d`;
-  const regex = typeof args.precision === "number" ? args.precision === -1 ? `${hhmm}` : args.precision === 0 ? `${hhmm}:[0-5]\\d` : `${hhmm}:[0-5]\\d\\.\\d{${args.precision}}` : args.seconds ? `${hhmm}:[0-5]\\d(?:\\.\\d+)?` : `${hhmm}(?::[0-5]\\d(?:\\.\\d+)?)?`;
+  const regex = typeof args2.precision === "number" ? args2.precision === -1 ? `${hhmm}` : args2.precision === 0 ? `${hhmm}:[0-5]\\d` : `${hhmm}:[0-5]\\d\\.\\d{${args2.precision}}` : args2.seconds ? `${hhmm}:[0-5]\\d(?:\\.\\d+)?` : `${hhmm}(?::[0-5]\\d(?:\\.\\d+)?)?`;
   return regex;
 }
-function time(args) {
-  return new RegExp(`^${timeSource(args)}$`);
+function time(args2) {
+  return new RegExp(`^${timeSource(args2)}$`);
 }
-function datetime(args) {
+function datetime(args2) {
   const opts = ["Z"];
-  if (args.offset)
+  if (args2.offset)
     opts.push(`([+-](?:[01]\\d|2[0-3]):[0-5]\\d)`);
-  const qualified = `${timeSource({ precision: args.precision, seconds: true })}(?:${opts.join("|")})`;
-  const timeRegex = args.local ? `${qualified}|${timeSource({ precision: args.precision })}` : qualified;
+  const qualified = `${timeSource({ precision: args2.precision, seconds: true })}(?:${opts.join("|")})`;
+  const timeRegex = args2.local ? `${qualified}|${timeSource({ precision: args2.precision })}` : qualified;
   return new RegExp(`^${dateSource}T(?:${timeRegex})$`);
 }
 var anyString = /^[\s\S]{0,}$/;
@@ -2803,8 +2803,8 @@ var $ZodCheckMaxSize = /* @__PURE__ */ $constructor("$ZodCheckMaxSize", (inst, d
   (_a3 = inst._zod.def).when ?? (_a3.when = _whenHasSize);
   inst._zod.check = (payload) => {
     const input2 = payload.value;
-    const size = input2.size;
-    if (size <= def.maximum)
+    const size2 = input2.size;
+    if (size2 <= def.maximum)
       return;
     payload.issues.push({
       origin: getSizableOrigin(input2),
@@ -2823,8 +2823,8 @@ var $ZodCheckMinSize = /* @__PURE__ */ $constructor("$ZodCheckMinSize", (inst, d
   (_a3 = inst._zod.def).when ?? (_a3.when = _whenHasSize);
   inst._zod.check = (payload) => {
     const input2 = payload.value;
-    const size = input2.size;
-    if (size >= def.minimum)
+    const size2 = input2.size;
+    if (size2 >= def.minimum)
       return;
     payload.issues.push({
       origin: getSizableOrigin(input2),
@@ -2843,10 +2843,10 @@ var $ZodCheckSizeEquals = /* @__PURE__ */ $constructor("$ZodCheckSizeEquals", (i
   (_a3 = inst._zod.def).when ?? (_a3.when = _whenHasSize);
   inst._zod.check = (payload) => {
     const input2 = payload.value;
-    const size = input2.size;
-    if (size === def.size)
+    const size2 = input2.size;
+    if (size2 === def.size)
       return;
-    const tooBig = size > def.size;
+    const tooBig = size2 > def.size;
     payload.issues.push({
       origin: getSizableOrigin(input2),
       ...tooBig ? { code: "too_big", maximum: def.size } : { code: "too_small", minimum: def.size },
@@ -3098,10 +3098,10 @@ var $ZodCheckOverwrite = /* @__PURE__ */ $constructor("$ZodCheckOverwrite", (ins
 
 // node_modules/zod/v4/core/doc.js
 var Doc = class {
-  constructor(args = [], closed = {}) {
+  constructor(args2 = [], closed = {}) {
     this.content = [];
     this.indent = 0;
-    this.args = args;
+    this.args = args2;
     this.closed = closed;
   }
   // the compiler catches a child's throw and keeps writing into this doc, so the indent has to unwind with it
@@ -5432,8 +5432,8 @@ var $ZodFunction = /* @__PURE__ */ $constructor("$ZodFunction", (inst, def) => {
     if (typeof func !== "function") {
       throw new Error("implement() must be called with a function");
     }
-    return Object.defineProperty(function(...args) {
-      const parsedArgs = inst._def.input ? parse(inst._def.input, args) : args;
+    return Object.defineProperty(function(...args2) {
+      const parsedArgs = inst._def.input ? parse(inst._def.input, args2) : args2;
       const result2 = Reflect.apply(func, this, parsedArgs);
       if (inst._def.output) {
         return parse(inst._def.output, result2);
@@ -5445,8 +5445,8 @@ var $ZodFunction = /* @__PURE__ */ $constructor("$ZodFunction", (inst, def) => {
     if (typeof func !== "function") {
       throw new Error("implementAsync() must be called with a function");
     }
-    return Object.defineProperty(async function(...args) {
-      const parsedArgs = inst._def.input ? await parseAsync(inst._def.input, args) : args;
+    return Object.defineProperty(async function(...args2) {
+      const parsedArgs = inst._def.input ? await parseAsync(inst._def.input, args2) : args2;
       const result2 = await Reflect.apply(func, this, parsedArgs);
       if (inst._def.output) {
         return await parseAsync(inst._def.output, result2);
@@ -5472,22 +5472,22 @@ var $ZodFunction = /* @__PURE__ */ $constructor("$ZodFunction", (inst, def) => {
     }
     return payload;
   };
-  inst.input = (...args) => {
+  inst.input = (...args2) => {
     const F = inst.constructor;
-    if (Array.isArray(args[0])) {
+    if (Array.isArray(args2[0])) {
       return new F({
         type: "function",
         input: new $ZodTuple({
           type: "tuple",
-          items: args[0],
-          rest: args[1]
+          items: args2[0],
+          rest: args2[1]
         }),
         output: inst._def.output
       });
     }
     return new F({
       type: "function",
-      input: args[0],
+      input: args2[0],
       output: inst._def.output
     });
   };
@@ -9860,8 +9860,8 @@ function ko_default() {
 }
 
 // node_modules/zod/v4/locales/lt.js
-var capitalizeFirstCharacter = (text) => {
-  return text.charAt(0).toUpperCase() + text.slice(1);
+var capitalizeFirstCharacter = (text2) => {
+  return text2.charAt(0).toUpperCase() + text2.slice(1);
 };
 function getUnitTypeFromNumber(number4) {
   const abs = Math.abs(number4);
@@ -15622,11 +15622,11 @@ function _minSize(minimum, params) {
   });
 }
 // @__NO_SIDE_EFFECTS__
-function _size(size, params) {
+function _size(size2, params) {
   return new $ZodCheckSizeEquals({
     check: "size_equals",
     ...normalizeParams(params),
-    size
+    size: size2
   });
 }
 // @__NO_SIDE_EFFECTS__
@@ -16707,8 +16707,8 @@ var contributors = {
 function aggregateChecks(schema) {
   const agg = {};
   const def = schema._zod.def;
-  const list = schema._zod.traits.has("$ZodCheck") ? [schema, ...def.checks ?? []] : def.checks ?? [];
-  for (const ch of list)
+  const list2 = schema._zod.traits.has("$ZodCheck") ? [schema, ...def.checks ?? []] : def.checks ?? [];
+  for (const ch of list2)
     contributors[ch._zod.def.check]?.(agg, ch._zod.def);
   const bag = schema._zod.bag;
   if (bag.minimum !== void 0)
@@ -17842,11 +17842,11 @@ var ZodType = /* @__PURE__ */ $constructor("ZodType", (inst, def) => {
     globalRegistry.add(cl, { description });
     return cl;
   },
-  meta(...args) {
-    if (args.length === 0)
+  meta(...args2) {
+    if (args2.length === 0)
       return globalRegistry.get(this);
     const cl = this.clone();
-    globalRegistry.add(cl, args[0]);
+    globalRegistry.add(cl, args2[0]);
     return cl;
   },
   isOptional() {
@@ -17855,8 +17855,8 @@ var ZodType = /* @__PURE__ */ $constructor("ZodType", (inst, def) => {
   isNullable() {
     return this.safeParse(null).success;
   },
-  apply(fn, ...args) {
-    return args.length === 0 ? fn(this) : fn(this, ...args);
+  apply(fn, ...args2) {
+    return args2.length === 0 ? fn(this) : fn(this, ...args2);
   },
   // Overrides core's `~standard` to add `jsonSchema`. Must stay a prototype entry: redefining it per instance demotes instances to dictionary mode.
   get "~standard"() {
@@ -17944,29 +17944,29 @@ var _ZodString = /* @__PURE__ */ $constructor(
     minLength: (inst) => aggregateChecks(inst).minimum ?? null,
     maxLength: (inst) => aggregateChecks(inst).maximum ?? null
   }, {
-    regex(...args) {
-      return this.check(_regex(...args));
+    regex(...args2) {
+      return this.check(_regex(...args2));
     },
-    includes(...args) {
-      return this.check(_includes(...args));
+    includes(...args2) {
+      return this.check(_includes(...args2));
     },
-    startsWith(...args) {
-      return this.check(_startsWith(...args));
+    startsWith(...args2) {
+      return this.check(_startsWith(...args2));
     },
-    endsWith(...args) {
-      return this.check(_endsWith(...args));
+    endsWith(...args2) {
+      return this.check(_endsWith(...args2));
     },
-    min(...args) {
-      return this.check(_minLength(...args));
+    min(...args2) {
+      return this.check(_minLength(...args2));
     },
-    max(...args) {
-      return this.check(_maxLength(...args));
+    max(...args2) {
+      return this.check(_maxLength(...args2));
     },
-    length(...args) {
-      return this.check(_length(...args));
+    length(...args2) {
+      return this.check(_length(...args2));
     },
-    nonempty(...args) {
-      return this.check(_minLength(1, ...args));
+    nonempty(...args2) {
+      return this.check(_minLength(1, ...args2));
     },
     lowercase(params) {
       return this.check(_lowercase(params));
@@ -17977,8 +17977,8 @@ var _ZodString = /* @__PURE__ */ $constructor(
     trim() {
       return this.check(_trim());
     },
-    normalize(...args) {
-      return this.check(_normalize(...args));
+    normalize(...args2) {
+      return this.check(_normalize(...args2));
     },
     toLowerCase() {
       return this.check(_toLowerCase());
@@ -18600,14 +18600,14 @@ var ZodObject = /* @__PURE__ */ $constructor("ZodObject", (inst, def) => {
   omit(mask) {
     return util_exports.omit(this, mask);
   },
-  partial(...args) {
-    return util_exports.partial(ZodOptional, this, args[0]);
+  partial(...args2) {
+    return util_exports.partial(ZodOptional, this, args2[0]);
   },
-  exactPartial(...args) {
-    return util_exports.partial(ZodExactOptional, this, args[0], "exactPartial");
+  exactPartial(...args2) {
+    return util_exports.partial(ZodExactOptional, this, args2[0], "exactPartial");
   },
-  required(...args) {
-    return util_exports.required(ZodNonOptional, this, args[0]);
+  required(...args2) {
+    return util_exports.required(ZodNonOptional, this, args2[0]);
   }
 });
 function object(shape, params) {
@@ -18767,10 +18767,10 @@ var ZodMap = /* @__PURE__ */ $constructor("ZodMap", (inst, def) => {
   inst._zod.processJSONSchema = (ctx, json2, params) => mapProcessor(inst, ctx, json2, params);
   inst.keyType = def.keyType;
   inst.valueType = def.valueType;
-  inst.min = (...args) => inst.check(_minSize(...args));
+  inst.min = (...args2) => inst.check(_minSize(...args2));
   inst.nonempty = (params) => inst.check(_minSize(1, params));
-  inst.max = (...args) => inst.check(_maxSize(...args));
-  inst.size = (...args) => inst.check(_size(...args));
+  inst.max = (...args2) => inst.check(_maxSize(...args2));
+  inst.size = (...args2) => inst.check(_size(...args2));
 });
 function map(keyType, valueType, params) {
   return new ZodMap({
@@ -18785,10 +18785,10 @@ var ZodSet = /* @__PURE__ */ $constructor("ZodSet", (inst, def) => {
   $ZodSet.init(inst, def);
   ZodType.init(inst, def);
   inst._zod.processJSONSchema = (ctx, json2, params) => setProcessor(inst, ctx, json2, params);
-  inst.min = (...args) => inst.check(_minSize(...args));
+  inst.min = (...args2) => inst.check(_minSize(...args2));
   inst.nonempty = (params) => inst.check(_minSize(1, params));
-  inst.max = (...args) => inst.check(_maxSize(...args));
-  inst.size = (...args) => inst.check(_size(...args));
+  inst.max = (...args2) => inst.check(_maxSize(...args2));
+  inst.size = (...args2) => inst.check(_size(...args2));
 });
 function set(valueType, params) {
   return new ZodSet({
@@ -18875,8 +18875,8 @@ var ZodFile = /* @__PURE__ */ $constructor("ZodFile", (inst, def) => {
   $ZodFile.init(inst, def);
   ZodType.init(inst, def);
   inst._zod.processJSONSchema = (ctx, json2, params) => fileProcessor(inst, ctx, json2, params);
-  inst.min = (size, params) => inst.check(_minSize(size, params));
-  inst.max = (size, params) => inst.check(_maxSize(size, params));
+  inst.min = (size2, params) => inst.check(_minSize(size2, params));
+  inst.max = (size2, params) => inst.check(_maxSize(size2, params));
   inst.mime = (types, params) => inst.check(_mime(Array.isArray(types) ? types : [types], params));
 });
 function file(params) {
@@ -19194,11 +19194,11 @@ function _instanceof(cls, params = {}) {
   };
   return inst;
 }
-var stringbool = (...args) => _stringbool({
+var stringbool = (...args2) => _stringbool({
   Codec: ZodCodec,
   Boolean: ZodBoolean,
   String: ZodString
-}, ...args);
+}, ...args2);
 function json(params) {
   const jsonSchema = lazy(() => {
     return union([string2(params), number2(), boolean2(), _null3(), array(jsonSchema), record(string2(), jsonSchema)]);
@@ -20282,25 +20282,123 @@ function loadConfiguration(path = configurationPath()) {
 }
 
 // src/attached.ts
-import { createHash as createHash3 } from "node:crypto";
-import { readFileSync as readFileSync4 } from "node:fs";
+import { createHash as createHash5 } from "node:crypto";
+import { readFileSync as readFileSync5 } from "node:fs";
+
+// src/worker-progress.ts
+import { createHash } from "node:crypto";
+import { chmodSync, existsSync, lstatSync, mkdirSync, readFileSync as readFileSync2, readdirSync, writeFileSync } from "node:fs";
+import { basename, dirname, isAbsolute as isAbsolute2, join as join2 } from "node:path";
+var stages = ["starting", "investigating", "implementing", "verifying", "preparing_report", "blocked"];
+var text = (limit) => ({ type: "string", minLength: 1, maxLength: limit });
+var list = (limit) => ({ type: "array", maxItems: 5, items: text(limit) });
+var args = {
+  stage: { type: "string", enum: stages },
+  summary: text(600),
+  completed: list(200),
+  remaining: list(200),
+  blocker: { anyOf: [{ type: "null" }, { type: "object", properties: { summary: text(400), request_id: text(128) }, required: ["summary"], additionalProperties: false }] },
+  evidence_refs: list(128)
+};
+function createProgressToolAsset() {
+  return `const stages = ${JSON.stringify(stages)};
+const keys = ['stage','summary','completed','remaining','blocker','evidence_refs'];
+function object(value, allowed, required, name) {
+ if (!value || typeof value !== 'object' || Array.isArray(value) || Object.keys(value).some(k=>!allowed.includes(k)) || required.some(k=>!Object.hasOwn(value,k))) throw new Error(name+': expected exactly the documented checkpoint fields');
+}
+function text(value, limit, name) { if(typeof value!=='string'||value.length<1||value.length>limit) throw new Error(name+': expected 1..'+limit+' characters'); }
+function list(value, limit, name) { if(!Array.isArray(value)||value.length>5)throw new Error(name+': expected at most five entries'); for(const item of value)text(item,limit,name); }
+export default {
+ description: 'Publish a short milestone or blocker transition. Claims are advisory; this tool cannot control execution or replace a permission request. Avoid credentials, raw commands/results, source excerpts, and hidden reasoning.',
+ args: ${JSON.stringify(args)},
+ async execute(input) {
+  object(input,keys,keys,'checkpoint');
+  if(!stages.includes(input.stage))throw new Error('stage: expected a documented generic stage');
+  text(input.summary,600,'summary'); list(input.completed,200,'completed');list(input.remaining,200,'remaining');list(input.evidence_refs,128,'evidence_refs');
+  if(input.blocker!==null){object(input.blocker,['summary','request_id'],['summary'],'blocker');text(input.blocker.summary,400,'blocker.summary');if(Object.hasOwn(input.blocker,'request_id'))text(input.blocker.request_id,128,'blocker.request_id');}
+  if(Buffer.byteLength(JSON.stringify(input),'utf8')>4096)throw new Error('checkpoint: exceeds 4096 UTF-8 bytes; submit fewer/shorter entries');
+  return {output:'Checkpoint emitted; supervisor ingestion is asynchronous.',title:'Worker progress',metadata:{opencode_agents_progress:JSON.parse(JSON.stringify(input))}};
+ }
+};
+`;
+}
+var hash2 = (value) => createHash("sha256").update(value).digest("hex");
+var privateDirectories = ["tool", "home", "home/.opencode", "config", "config/opencode"];
+var ignored = "node_modules\npackage.json\npackage-lock.json\nbun.lock\n.gitignore\n";
+function assertProgressTool(directory, expectedSha256) {
+  const walk = (path, relative3 = "") => {
+    const info = lstatSync(path);
+    if (info.isSymbolicLink()) throw new Error(`progress tool symlink: ${relative3}`);
+    if (!info.isDirectory()) throw new Error(`progress configuration is not a directory: ${relative3}`);
+    for (const entry of readdirSync(path)) {
+      const name = relative3 ? `${relative3}/${entry}` : entry;
+      const child = join2(path, entry);
+      if (lstatSync(child).isSymbolicLink()) throw new Error(`progress tool symlink: ${name}`);
+      if (privateDirectories.includes(name)) {
+        walk(child, name);
+        continue;
+      }
+      const expected = name === "package.json" ? '{"type":"module"}\n' : [".gitignore", "home/.opencode/.gitignore", "config/opencode/.gitignore"].includes(name) ? ignored : name === "tool/report_progress.js" ? createProgressToolAsset() : null;
+      if (expected === null || !lstatSync(child).isFile() || readFileSync2(child, "utf8") !== expected)
+        throw new Error(`unexpected or substituted progress tool source: ${name}`);
+    }
+  };
+  walk(directory);
+  for (const relative3 of privateDirectories) if (!lstatSync(join2(directory, relative3)).isDirectory()) throw new Error("missing isolated discovery directory");
+  for (const relative3 of [".gitignore", "home/.opencode/.gitignore", "config/opencode/.gitignore"])
+    if (readFileSync2(join2(directory, relative3), "utf8") !== ignored) throw new Error("isolated discovery ignore file changed");
+  if (hash2(readFileSync2(join2(directory, "tool/report_progress.js"), "utf8")) !== expectedSha256)
+    throw new Error("progress tool hash mismatch");
+  if (readFileSync2(join2(directory, "package.json"), "utf8") !== '{"type":"module"}\n') throw new Error("progress package mismatch");
+}
+function stageProgressTool(reportPath) {
+  if (!isAbsolute2(reportPath)) throw new Error("progress tool requires an absolute execution report path");
+  const directory = join2(dirname(reportPath), `${basename(reportPath)}.progress-config`);
+  const asset = createProgressToolAsset();
+  const sha256 = hash2(asset);
+  if (existsSync(directory)) {
+    assertProgressTool(directory, sha256);
+    return { directory, sha256, asset };
+  }
+  mkdirSync(directory, { recursive: true, mode: 448 });
+  for (const relative3 of privateDirectories) mkdirSync(join2(directory, relative3), { mode: 448 });
+  writeFileSync(join2(directory, "package.json"), '{"type":"module"}\n', { mode: 384, flag: "wx" });
+  writeFileSync(join2(directory, "tool/report_progress.js"), asset, { mode: 384, flag: "wx" });
+  for (const relative3 of [".gitignore", "home/.opencode/.gitignore", "config/opencode/.gitignore"])
+    writeFileSync(join2(directory, relative3), ignored, { mode: 384, flag: "wx" });
+  for (const relative3 of [...privateDirectories].reverse()) chmodSync(join2(directory, relative3), 320);
+  chmodSync(directory, 320);
+  assertProgressTool(directory, sha256);
+  return { directory, sha256, asset };
+}
+function isolatedProgressEnvironment(baseEnv, directory) {
+  const env = {
+    ...baseEnv,
+    OPENCODE_CONFIG_DIR: directory,
+    OPENCODE_DISABLE_PROJECT_CONFIG: "true",
+    OPENCODE_TEST_HOME: join2(directory, "home"),
+    XDG_CONFIG_HOME: join2(directory, "config")
+  };
+  delete env.OPENCODE_CONFIG;
+  return env;
+}
 
 // src/managed-server.ts
-import { randomBytes, randomUUID } from "node:crypto";
+import { randomBytes, randomUUID as randomUUID2 } from "node:crypto";
 import { execFile, spawn } from "node:child_process";
-import { existsSync as existsSync2, readFileSync as readFileSync3, readdirSync } from "node:fs";
+import { existsSync as existsSync3, readFileSync as readFileSync4, readdirSync as readdirSync2 } from "node:fs";
 import { homedir as homedir2 } from "node:os";
 import { isDeepStrictEqual } from "node:util";
 import { promisify } from "node:util";
-import { dirname, isAbsolute as isAbsolute2, join as join2, parse as parse3, relative, resolve } from "node:path";
+import { dirname as dirname2, isAbsolute as isAbsolute3, join as join3, parse as parse3, relative, resolve } from "node:path";
 
 // src/backend.ts
 function executionPairAllowed(inspection, trustedDevelopmentOptIn) {
-  return inspection.supportedForExecution || trustedDevelopmentOptIn && inspection.exactPairRecognized === true && inspection.version === "1.18.35";
+  return inspection.supportedForExecution || trustedDevelopmentOptIn && inspection.exactPairRecognized === true && inspection.version === "1.19.0";
 }
 
 // src/launch-config.ts
-import { createHash } from "node:crypto";
+import { createHash as createHash2 } from "node:crypto";
 function canonical(value) {
   if (value === null || typeof value !== "object") return JSON.stringify(value);
   if (Array.isArray(value)) return `[${value.map(canonical).join(",")}]`;
@@ -20308,7 +20406,7 @@ function canonical(value) {
   return `{${Object.keys(record2).sort().map((key) => `${JSON.stringify(key)}:${canonical(record2[key])}`).join(",")}}`;
 }
 function effectiveConfigHash(value) {
-  return createHash("sha256").update(canonical(value)).digest("hex");
+  return createHash2("sha256").update(canonical(value)).digest("hex");
 }
 function policyNeutralConfigHash(contract) {
   const config2 = JSON.parse(contract.configContent);
@@ -20353,23 +20451,258 @@ function assertSelectedModelDestination(model, contract) {
 }
 
 // src/opencode-backend.ts
-import { createHash as createHash2 } from "node:crypto";
-import { readFileSync as readFileSync2 } from "node:fs";
+import { createHash as createHash4 } from "node:crypto";
+import { readFileSync as readFileSync3 } from "node:fs";
+
+// src/progress.ts
+import { createHash as createHash3, randomUUID } from "node:crypto";
+var CheckpointInputSchema = external_exports.object({
+  stage: external_exports.enum(["starting", "investigating", "implementing", "verifying", "preparing_report", "blocked"]),
+  summary: external_exports.string().min(1).max(600),
+  completed: external_exports.array(external_exports.string().min(1).max(200)).max(5),
+  remaining: external_exports.array(external_exports.string().min(1).max(200)).max(5),
+  blocker: external_exports.object({ summary: external_exports.string().min(1).max(400), request_id: external_exports.string().min(1).max(128).optional() }).strict().nullable(),
+  evidence_refs: external_exports.array(external_exports.string().min(1).max(128)).max(5)
+}).strict().refine((value) => Buffer.byteLength(JSON.stringify(value), "utf8") <= 4096, "checkpoint exceeds 4096 UTF-8 bytes; submit fewer or shorter entries");
+var Id = external_exports.string().min(1).max(128);
+var ProgressReadSchema = external_exports.object({
+  scope_id: Id,
+  task_id: Id,
+  execution_id: Id,
+  after_cursor: external_exports.string().min(1).max(512).optional(),
+  max_updates: external_exports.number().int().min(1).max(20).default(5),
+  max_bytes: external_exports.number().int().min(8192).max(32768).default(8192),
+  include_snapshot: external_exports.boolean().default(false)
+}).strict();
+var ReadOptions = ProgressReadSchema.omit({ scope_id: true, task_id: true, execution_id: true });
+var CursorSchema = external_exports.object({ v: external_exports.literal(1), e: Id, p: external_exports.string().uuid(), g: external_exports.string().uuid(), s: external_exports.number().int().min(0).max(Number.MAX_SAFE_INTEGER) }).strict();
+var size = (value) => Buffer.byteLength(JSON.stringify(value), "utf8");
+var sha = (value) => createHash3("sha256").update(value).digest("hex");
+var ProgressManager = class {
+  processGeneration = randomUUID();
+  states = /* @__PURE__ */ new Map();
+  evicted = /* @__PURE__ */ new Map();
+  now;
+  maxCount;
+  maxExecutionBytes;
+  maxAggregateBytes;
+  terminalTtlMs;
+  constructor(options = {}) {
+    this.now = options.now ?? Date.now;
+    this.maxCount = options.maxCount ?? 100;
+    this.maxExecutionBytes = options.maxExecutionBytes ?? 256 * 1024;
+    this.maxAggregateBytes = options.maxAggregateBytes ?? 16 * 1024 * 1024;
+    this.terminalTtlMs = options.terminalTtlMs ?? 30 * 6e4;
+    for (const limit of [this.maxCount, this.maxExecutionBytes, this.maxAggregateBytes, this.terminalTtlMs])
+      if (!Number.isSafeInteger(limit) || limit < 1) throw new Error("progress limits must be positive safe integers");
+  }
+  cursor(executionId, state, sequence = state?.sequence ?? 0) {
+    return Buffer.from(JSON.stringify({
+      v: 1,
+      e: executionId,
+      p: this.processGeneration,
+      g: state?.generation ?? this.evicted.get(executionId)?.generation ?? this.processGeneration,
+      s: sequence
+    })).toString("base64url");
+  }
+  decode(encoded, executionId) {
+    if (!/^[A-Za-z0-9_-]+$/.test(encoded) || Buffer.from(encoded, "base64url").toString("base64url") !== encoded) throw new Error("malformed progress cursor");
+    let cursor;
+    try {
+      cursor = CursorSchema.parse(JSON.parse(Buffer.from(encoded, "base64url").toString("utf8")));
+    } catch {
+      throw new Error("malformed progress cursor");
+    }
+    if (cursor.e !== executionId) throw new Error("progress cursor belongs to another execution");
+    return cursor;
+  }
+  register(executionId, availability) {
+    Id.parse(executionId);
+    this.sweep();
+    const current = this.states.get(executionId);
+    if (current) {
+      current.availability = availability;
+      return;
+    }
+    const eviction = this.evicted.get(executionId);
+    this.evicted.delete(executionId);
+    this.states.set(executionId, {
+      generation: eviction?.generation ?? randomUUID(),
+      sequence: 0,
+      availability,
+      entries: [],
+      latest: null,
+      dedup: /* @__PURE__ */ new Map(),
+      rate: [],
+      dropped: 0,
+      lastActivity: this.now(),
+      terminalAt: null,
+      resetReason: eviction?.reason ?? null,
+      blocker: null
+    });
+    this.enforceAggregate();
+  }
+  append(executionId, sourceId, input2) {
+    Id.parse(sourceId);
+    const checkpoint = CheckpointInputSchema.parse(JSON.parse(JSON.stringify(input2)));
+    const canonical3 = JSON.stringify({
+      stage: checkpoint.stage,
+      summary: checkpoint.summary,
+      completed: checkpoint.completed,
+      remaining: checkpoint.remaining,
+      blocker: checkpoint.blocker ? {
+        summary: checkpoint.blocker.summary,
+        ...checkpoint.blocker.request_id ? { request_id: checkpoint.blocker.request_id } : {}
+      } : null,
+      evidence_refs: checkpoint.evidence_refs
+    });
+    const hash4 = sha(canonical3);
+    this.sweep();
+    const state = this.states.get(executionId);
+    if (!state || state.availability !== "supported") return { accepted: false, duplicate: false };
+    const prior = state.dedup.get(sourceId);
+    if (prior) {
+      if (prior !== hash4) throw new Error("checkpoint source ID has conflicting content");
+      return { accepted: true, duplicate: true };
+    }
+    const now2 = this.now();
+    state.rate = state.rate.filter((entry2) => now2 - entry2.at < 6e4);
+    const blocker = checkpoint.blocker ? JSON.stringify(checkpoint.blocker) : null;
+    const routine = blocker === state.blocker;
+    if (state.dedup.size >= 1024 || state.rate.length >= 60 || routine && state.rate.filter((entry2) => entry2.routine).length >= 48) {
+      state.dropped++;
+      return { accepted: false, duplicate: false };
+    }
+    const sequence = state.sequence + 1;
+    const entry = { sequence, checkpoint: {
+      ...checkpoint,
+      checkpoint_id: `checkpoint_${sha(sourceId).slice(0, 32)}`,
+      cursor: this.cursor(executionId, state, sequence),
+      recorded_at: new Date(now2).toISOString(),
+      source: "worker"
+    }, bytes: 0 };
+    entry.bytes = size(entry.checkpoint);
+    const admissionBytes = 512 + entry.bytes + [...state.dedup].reduce((sum, [id]) => sum + Buffer.byteLength(id) + 160, 0) + Buffer.byteLength(sourceId) + 160 + 60 * 24;
+    if (admissionBytes > this.maxExecutionBytes) {
+      state.dropped++;
+      return { accepted: false, duplicate: false };
+    }
+    state.sequence = sequence;
+    state.entries.push(entry);
+    state.latest = entry;
+    state.dedup.set(sourceId, hash4);
+    state.rate.push({ at: now2, routine });
+    state.blocker = blocker;
+    state.lastActivity = now2;
+    while (state.entries.length > this.maxCount || this.stateBytes(state) > this.maxExecutionBytes && state.entries.length > 1) state.entries.shift();
+    this.enforceAggregate();
+    return { accepted: true, duplicate: false };
+  }
+  recordLoss(executionId) {
+    const state = this.states.get(executionId);
+    if (!state || state.availability !== "supported") return;
+    state.dropped = Math.min(Number.MAX_SAFE_INTEGER, state.dropped + 1);
+    this.reset(executionId, "attribution_failure");
+  }
+  reset(executionId, reason) {
+    const state = this.states.get(executionId);
+    if (!state) return;
+    state.generation = randomUUID();
+    state.sequence = 0;
+    state.entries = [];
+    state.resetReason = reason;
+    state.lastActivity = this.now();
+    this.sweep();
+  }
+  /** Supervisor maintenance runs independently of consumer reads. */
+  maintain() {
+    this.sweep();
+  }
+  markTerminal(executionId) {
+    const state = this.states.get(executionId);
+    if (state) state.terminalAt = this.now();
+    this.sweep();
+  }
+  hint(executionId) {
+    const state = this.states.get(executionId);
+    return { progress_cursor: this.cursor(executionId, state), progress_available: state?.availability ?? "not_enabled" };
+  }
+  read(executionId, input2 = {}, runtime = {}, identity = {}) {
+    Id.parse(executionId);
+    const options = ReadOptions.parse(input2);
+    const state = this.states.get(executionId);
+    const cursor = options.after_cursor ? this.decode(options.after_cursor, executionId) : null;
+    const freshBaseline = cursor?.g === this.processGeneration && cursor.s === 0 && state?.resetReason === null;
+    let reason = null;
+    if (cursor?.p !== void 0 && cursor.p !== this.processGeneration) reason = "restart";
+    else if (cursor && !state && (cursor.s > 0 || cursor.g !== (this.evicted.get(executionId)?.generation ?? this.processGeneration)))
+      reason = this.evicted.get(executionId)?.reason ?? "buffer_unavailable";
+    else if (cursor && state && cursor.g !== state.generation && !freshBaseline) reason = state.resetReason ?? "buffer_evicted";
+    else if (cursor && state && cursor.s > state.sequence) throw new Error("progress cursor is ahead of the execution stream");
+    else if (cursor && state?.entries.length && cursor.s < state.entries[0].sequence - 1) reason = "retention";
+    const page = {
+      ...identity,
+      availability: state?.availability ?? "not_enabled",
+      updates: [],
+      next_cursor: reason ? this.cursor(executionId, state) : options.after_cursor ?? this.cursor(executionId, state, state?.entries[0] ? state.entries[0].sequence - 1 : 0),
+      has_more: false,
+      gap: reason ? { reason, history_missed: true, snapshot_available: !!state?.latest } : null,
+      snapshot: (options.include_snapshot || reason) && state?.latest ? state.latest.checkpoint : null,
+      runtime: { ...runtime, last_worker_checkpoint_at: state?.latest?.checkpoint.recorded_at ?? null },
+      dropped_count: state?.dropped ?? 0
+    };
+    if (size(page) > options.max_bytes) throw new Error("progress response exceeds max_bytes; increase the page budget");
+    if (reason || !state) return structuredClone(page);
+    const eligible = state.entries.filter((entry) => entry.sequence > (cursor?.s ?? 0));
+    for (const entry of eligible) {
+      if (page.updates.length >= options.max_updates) break;
+      const trial = { ...page, updates: [...page.updates, entry.checkpoint], next_cursor: entry.checkpoint.cursor, has_more: false };
+      if (size(trial) > options.max_bytes) break;
+      page.updates.push(entry.checkpoint);
+      page.next_cursor = entry.checkpoint.cursor;
+    }
+    page.has_more = page.updates.length < eligible.length;
+    if (page.has_more && page.updates.length === 0) throw new Error("max_bytes cannot fit snapshot and next checkpoint; increase max_bytes or disable include_snapshot");
+    return structuredClone(page);
+  }
+  stateBytes(state) {
+    const latestExtra = state.latest && !state.entries.includes(state.latest) ? state.latest.bytes : 0;
+    return 512 + latestExtra + state.entries.reduce((sum, entry) => sum + entry.bytes, 0) + [...state.dedup].reduce((sum, [id]) => sum + Buffer.byteLength(id) + 160, 0) + state.rate.length * 24;
+  }
+  evict(id, reason) {
+    this.states.delete(id);
+    this.evicted.delete(id);
+    this.evicted.set(id, { reason, generation: randomUUID() });
+    while (this.evicted.size > 256 || this.evicted.size * 256 > this.maxAggregateBytes / 4) this.evicted.delete(this.evicted.keys().next().value);
+  }
+  enforceAggregate() {
+    let bytes = this.evicted.size * 256 + [...this.states].reduce((sum, [id, state]) => sum + Buffer.byteLength(id) + this.stateBytes(state), 0);
+    for (const [id, state] of [...this.states].sort((a, b) => a[1].lastActivity - b[1].lastActivity)) {
+      if (bytes <= this.maxAggregateBytes) break;
+      this.evict(id, "aggregate");
+      bytes = this.evicted.size * 256 + [...this.states].reduce((sum, [id2, value]) => sum + Buffer.byteLength(id2) + this.stateBytes(value), 0);
+    }
+  }
+  sweep() {
+    for (const [id, state] of this.states) if (state.terminalAt !== null && this.now() - state.terminalAt >= this.terminalTtlMs) this.evict(id, "terminal");
+    this.enforceAggregate();
+  }
+};
 
 // src/resources.ts
-import { existsSync } from "node:fs";
+import { existsSync as existsSync2 } from "node:fs";
 import { fileURLToPath } from "node:url";
 function compatibilityPath() {
   for (const relative3 of ["../../compatibility.json", "../compatibility.json"]) {
     const path = fileURLToPath(new URL(relative3, import.meta.url));
-    if (existsSync(path)) return path;
+    if (existsSync2(path)) return path;
   }
   throw new Error("bundled compatibility.json is missing");
 }
 function workerProfilePath(profile) {
   for (const relative3 of [`../../worker/${profile}.md`, `../worker/${profile}.md`]) {
     const path = fileURLToPath(new URL(relative3, import.meta.url));
-    if (existsSync(path)) return path;
+    if (existsSync2(path)) return path;
   }
   throw new Error(`bundled worker profile is missing: ${profile}`);
 }
@@ -20700,7 +21033,7 @@ var jsonBodySerializer = {
 };
 
 // node_modules/@opencode-ai/sdk/dist/v2/gen/client/utils.gen.js
-var createQuerySerializer = ({ parameters = {}, ...args } = {}) => {
+var createQuerySerializer = ({ parameters = {}, ...args2 } = {}) => {
   const querySerializer = (queryParams) => {
     const search = [];
     if (queryParams && typeof queryParams === "object") {
@@ -20709,7 +21042,7 @@ var createQuerySerializer = ({ parameters = {}, ...args } = {}) => {
         if (value === void 0 || value === null) {
           continue;
         }
-        const options = parameters[name] || args;
+        const options = parameters[name] || args2;
         if (Array.isArray(value)) {
           const serializedArray = serializeArrayParam({
             allowReserved: options.allowReserved,
@@ -21022,8 +21355,8 @@ var createClient = (config2 = {}) => {
           data = await response[parseAs]();
           break;
         case "json": {
-          const text = await response.text();
-          data = text ? JSON.parse(text) : {};
+          const text2 = await response.text();
+          data = text2 ? JSON.parse(text2) : {};
           break;
         }
         case "stream":
@@ -21154,7 +21487,7 @@ var stripEmptySlots = (params) => {
     }
   }
 };
-var buildClientParams = (args, fields) => {
+var buildClientParams = (args2, fields) => {
   const params = {
     body: {},
     headers: {},
@@ -21163,7 +21496,7 @@ var buildClientParams = (args, fields) => {
   };
   const map2 = buildKeyMap(fields);
   let config2;
-  for (const [index, arg] of args.entries()) {
+  for (const [index, arg] of args2.entries()) {
     if (fields[index]) {
       config2 = fields[index];
     }
@@ -21219,8 +21552,8 @@ var client = createClient(createConfig({ baseUrl: "http://localhost:4096" }));
 // node_modules/@opencode-ai/sdk/dist/v2/gen/sdk.gen.js
 var HeyApiClient = class {
   client;
-  constructor(args) {
-    this.client = args?.client ?? client;
+  constructor(args2) {
+    this.client = args2?.client ?? client;
   }
 };
 var HeyApiRegistry = class {
@@ -25557,9 +25890,9 @@ var V2 = class extends HeyApiClient {
 };
 var OpencodeClient = class _OpencodeClient extends HeyApiClient {
   static __registry = new HeyApiRegistry();
-  constructor(args) {
-    super(args);
-    _OpencodeClient.__registry.set(this, args?.key);
+  constructor(args2) {
+    super(args2);
+    _OpencodeClient.__registry.set(this, args2?.key);
   }
   _auth;
   get auth() {
@@ -25789,17 +26122,47 @@ function requireData(result2, operation) {
   }
   return result2.data;
 }
+var boundedCheckpointFetch = async (input2, init) => {
+  const url2 = new URL(input2 instanceof Request ? input2.url : String(input2));
+  const response = await fetch(input2, init);
+  if (!/\/session\/[^/]+\/message\/[^/]+$/.test(url2.pathname) || !response.body) return response;
+  const limit = 256 * 1024;
+  if (Number(response.headers.get("content-length")) > limit) {
+    await response.body.cancel();
+    throw new Error("checkpoint attribution response exceeds 256 KiB");
+  }
+  const reader = response.body.getReader();
+  const chunks = [];
+  let bytes = 0;
+  try {
+    while (true) {
+      const item = await reader.read();
+      if (item.done) break;
+      bytes += item.value.byteLength;
+      if (bytes > limit) {
+        await reader.cancel();
+        throw new Error("checkpoint attribution response exceeds 256 KiB");
+      }
+      chunks.push(item.value);
+    }
+  } finally {
+    reader.releaseLock();
+  }
+  return new Response(Buffer.concat(chunks), { status: response.status, statusText: response.statusText, headers: response.headers });
+};
 var SdkOpenCodeBackend = class {
-  constructor(baseUrl, workspace, backendId, headers) {
+  constructor(baseUrl, workspace, backendId, headers, progressTransportEnabled = false) {
     this.baseUrl = baseUrl;
     this.workspace = workspace;
     this.backendId = backendId;
+    this.progressTransportEnabled = progressTransportEnabled;
     this.headers = headers ?? {};
-    this.client = createOpencodeClient({ baseUrl, directory: workspace, headers });
+    this.client = createOpencodeClient({ baseUrl, directory: workspace, headers, fetch: boundedCheckpointFetch });
   }
   baseUrl;
   workspace;
   backendId;
+  progressTransportEnabled;
   client;
   headers;
   identity(id) {
@@ -25817,12 +26180,12 @@ var SdkOpenCodeBackend = class {
     const path = requireData(await this.client.path.get({ directory: this.workspace }, { signal }), "backend path");
     if (path.directory !== this.workspace) throw new Error(`backend workspace mismatch: ${path.directory}`);
     const config2 = requireData(await this.client.config.get({ directory: this.workspace }, { signal }), "backend config");
-    const configurationDigest = createHash2("sha256").update(JSON.stringify(config2)).digest("hex");
+    const configurationDigest = createHash4("sha256").update(JSON.stringify(config2)).digest("hex");
     const doc = await fetch(new URL("/doc", this.baseUrl), { headers: this.headers, signal });
     if (!doc.ok) throw new Error(`backend OpenAPI document unavailable: ${doc.status}`);
-    const openapiDigest = createHash2("sha256").update(Buffer.from(await doc.arrayBuffer())).digest("hex");
-    const manifest = JSON.parse(readFileSync2(compatibilityPath(), "utf8"));
-    const pair = manifest.pairs.find((item) => item.binary_version === health.version && item.sdk_version === "1.18.35" && item.openapi_sha256 === openapiDigest);
+    const openapiDigest = createHash4("sha256").update(Buffer.from(await doc.arrayBuffer())).digest("hex");
+    const manifest = JSON.parse(readFileSync3(compatibilityPath(), "utf8"));
+    const pair = manifest.pairs.find((item) => item.binary_version === health.version && item.sdk_version === "1.19.0" && item.openapi_sha256 === openapiDigest);
     return {
       version: health.version,
       openapiDigest,
@@ -25831,12 +26194,13 @@ var SdkOpenCodeBackend = class {
       configurationDigest,
       supportedForExecution: pair?.execution_supported ?? false,
       exactPairRecognized: pair !== void 0,
-      capabilities: pair?.capabilities ?? {
+      capabilities: pair ? { ...pair.capabilities, progressCheckpoints: Boolean(this.progressTransportEnabled && pair.capabilities.progressCheckpoints && config2.agent?.["bounded-inspect"]?.permission?.report_progress === "allow") } : {
         callerAssignedMessageId: false,
         permissionRequests: false,
         questionRequests: false,
         structuredOutput: false,
-        sessionRecovery: false
+        sessionRecovery: false,
+        progressCheckpoints: false
       }
     };
   }
@@ -25935,7 +26299,10 @@ var SdkOpenCodeBackend = class {
     };
   }
   async *subscribeEvents(control) {
-    const { stream } = await this.client.event.subscribe({ directory: this.workspace }, { signal: signalFor(control) });
+    const { stream } = await this.client.event.subscribe(
+      { directory: this.workspace },
+      { signal: signalFor(control), sseMaxRetryAttempts: 1 }
+    );
     for await (const event of stream) {
       const data = event;
       const record2 = data && typeof data === "object" ? data : {};
@@ -25943,6 +26310,23 @@ var SdkOpenCodeBackend = class {
       const sessionId = typeof properties.sessionID === "string" ? properties.sessionID : void 0;
       yield { type: typeof record2.type === "string" ? record2.type : "unknown", data, ...sessionId ? { sessionId } : {} };
     }
+  }
+  /** Called only by background event ingestion, never by a parent read. */
+  async readCheckpoint(event, sessionId, userMessageId, control) {
+    if (event.type !== "message.part.updated" || event.sessionId !== sessionId) return null;
+    const record2 = event.data;
+    const candidate = record2.properties?.part;
+    if (!candidate || candidate.sessionID !== sessionId || candidate.type !== "tool" || candidate.tool !== "report_progress" || candidate.state?.status !== "completed" || typeof candidate.id !== "string" || candidate.id.length > 128 || typeof candidate.messageID !== "string" || candidate.messageID.length > 128 || !CheckpointInputSchema.safeParse(candidate.state.metadata?.opencode_agents_progress).success) return null;
+    const message = requireData(await this.client.session.message({
+      sessionID: sessionId,
+      messageID: candidate.messageID,
+      directory: this.workspace
+    }, { signal: signalFor(control) }), "checkpoint attribution");
+    if (message.info.role !== "assistant" || message.info.parentID !== userMessageId || message.info.sessionID !== sessionId || message.info.id !== candidate.messageID) return null;
+    const part = message.parts.find((part2) => part2.id === candidate.id);
+    if (!part || part.type !== "tool" || part.tool !== "report_progress" || part.state.status !== "completed" || part.sessionID !== sessionId || part.messageID !== candidate.messageID) return null;
+    const parsed = CheckpointInputSchema.safeParse(part.state.metadata?.opencode_agents_progress);
+    return parsed.success ? { sourceId: part.id, checkpoint: parsed.data } : null;
   }
   async replyToRequest(request, reply, control) {
     const signal = signalFor(control);
@@ -26013,36 +26397,36 @@ function assertNoLocalPlugins(workspace, env) {
   const documents = /* @__PURE__ */ new Set();
   let current = resolve(workspace);
   while (true) {
-    roots.add(join2(current, ".opencode"));
-    documents.add(join2(current, "opencode.json"));
-    documents.add(join2(current, "opencode.jsonc"));
-    const parent = dirname(current);
+    roots.add(join3(current, ".opencode"));
+    documents.add(join3(current, "opencode.json"));
+    documents.add(join3(current, "opencode.jsonc"));
+    const parent = dirname2(current);
     if (parent === current) break;
     current = parent;
   }
   const workerHome = env.HOME ?? homedir2();
-  const globalConfig2 = fromWorker(join2(env.XDG_CONFIG_HOME ?? join2(workerHome, ".config"), "opencode"));
+  const globalConfig2 = fromWorker(join3(env.XDG_CONFIG_HOME ?? join3(workerHome, ".config"), "opencode"));
   roots.add(globalConfig2);
   roots.add(fromWorker(env.OPENCODE_CONFIG_DIR ?? globalConfig2));
-  roots.add(fromWorker(join2(env.OPENCODE_TEST_HOME ?? workerHome, ".opencode")));
-  roots.add(fromWorker(join2(env.XDG_DATA_HOME ?? join2(workerHome, ".local", "share"), "opencode")));
+  roots.add(fromWorker(join3(env.OPENCODE_TEST_HOME ?? workerHome, ".opencode")));
+  roots.add(fromWorker(join3(env.XDG_DATA_HOME ?? join3(workerHome, ".local", "share"), "opencode")));
   for (const root of roots) {
-    documents.add(join2(root, "opencode.json"));
-    documents.add(join2(root, "opencode.jsonc"));
-    documents.add(join2(root, "config.json"));
+    documents.add(join3(root, "opencode.json"));
+    documents.add(join3(root, "opencode.jsonc"));
+    documents.add(join3(root, "config.json"));
     for (const name of ["plugin", "plugins"]) {
-      const location = join2(root, name);
-      if (existsSync2(location) && readdirSync(location).length > 0)
+      const location = join3(root, name);
+      if (existsSync3(location) && readdirSync2(location).length > 0)
         throw new Error(`OpenCode local plugins present at ${location}; server-mode --pure does not suppress them reliably`);
     }
   }
   if (env.OPENCODE_CONFIG) documents.add(fromWorker(env.OPENCODE_CONFIG));
   if (env.OPENCODE_CONFIG_CONTENT) assertNoPluginKeys(JSON.parse(env.OPENCODE_CONFIG_CONTENT), "OPENCODE_CONFIG_CONTENT");
   for (const file2 of documents) {
-    if (!existsSync2(file2)) continue;
+    if (!existsSync3(file2)) continue;
     let config2;
     try {
-      config2 = parseJsoncConfig(readFileSync3(file2, "utf8"));
+      config2 = parseJsoncConfig(readFileSync4(file2, "utf8"));
     } catch {
       throw new Error(`OpenCode config document at ${file2} cannot be checked for V2 plugins`);
     }
@@ -26144,8 +26528,8 @@ async function worktreeRoot(workspace, env) {
     throw new Error(`cannot establish OpenCode worktree root: ${String(error62)}`);
   }
 }
-function workerPolicy(reportPath, worktree) {
-  if (!isAbsolute2(reportPath)) throw new Error("assigned report path must be absolute");
+function workerPolicy(reportPath, worktree, options = {}) {
+  if (!isAbsolute3(reportPath)) throw new Error("assigned report path must be absolute");
   const absoluteReport = resolve(reportPath);
   const reportEditPattern = `${relative(worktree, absoluteReport).replaceAll("\\", "/")}/*`;
   const reportExternalPattern = `${absoluteReport}/*`;
@@ -26157,7 +26541,8 @@ function workerPolicy(reportPath, worktree) {
     external_directory: { "*": "deny", [reportExternalPattern]: "allow" },
     task: "deny",
     question: "deny",
-    skill: "deny"
+    skill: "deny",
+    ...options.progressEnabled !== false ? { report_progress: "allow" } : {}
   };
   return {
     reportEditPattern,
@@ -26195,7 +26580,14 @@ function assertWorkerPolicy(config2, profiles) {
   }
 }
 async function launchEnvironment(options) {
-  const baseEnv = { ...process.env, ...options.env };
+  let baseEnv = { ...process.env, ...options.env };
+  if (options.launchContract?.progressTool) {
+    const expected = stageProgressTool(options.launchContract.reportPath);
+    if (expected.directory !== options.launchContract.progressTool.directory || expected.sha256 !== options.launchContract.progressTool.sha256)
+      throw new Error("frozen progress tool attribution changed");
+    assertProgressTool(expected.directory, expected.sha256);
+    baseEnv = isolatedProgressEnvironment(baseEnv, expected.directory);
+  }
   assertNoLocalPlugins(options.workspace, baseEnv);
   const supplied = options.launchContract ? object2(JSON.parse(options.launchContract.configContent)) : baseEnv.OPENCODE_CONFIG_CONTENT ? object2(JSON.parse(baseEnv.OPENCODE_CONFIG_CONTENT)) : {};
   const { stdout } = await execFileAsync(options.binary, ["debug", "config", "--pure"], {
@@ -26212,7 +26604,11 @@ async function launchEnvironment(options) {
     throw new Error("frozen execution report path is missing");
   const reportPath = options.launchContract?.reportPath;
   if (!reportPath) throw new Error("managed worker requires an assigned execution report path");
-  const { profiles } = workerPolicy(reportPath, await worktreeRoot(options.workspace, baseEnv));
+  const { profiles } = workerPolicy(
+    reportPath,
+    await worktreeRoot(options.workspace, baseEnv),
+    { progressEnabled: !options.launchContract || Boolean(options.launchContract.progressTool) }
+  );
   if (options.launchContract) assertWorkerPolicy(resolved, profiles);
   const overlay = options.launchContract ? supplied : {
     ...supplied,
@@ -26245,13 +26641,14 @@ async function startManagedServer(options) {
     await stopOwnedChild(child);
     throw error62;
   }
-  const backendId = options.backendId ?? `backend_${randomUUID()}`;
+  const backendId = options.backendId ?? `backend_${randomUUID2()}`;
   const token = Buffer.from(`opencode:${password}`).toString("base64");
-  const backend = new SdkOpenCodeBackend(baseUrl, options.workspace, backendId, { Authorization: `Basic ${token}` });
+  const backend = new SdkOpenCodeBackend(baseUrl, options.workspace, backendId, { Authorization: `Basic ${token}` }, Boolean(options.launchContract?.progressTool));
   try {
     const effective = await backend.effectiveConfiguration({ timeoutMs: 5e3 });
     assertWorkerPolicy(effective, profiles);
     if (options.launchContract) assertFrozenEffectiveConfig(effective, options.launchContract);
+    if (options.launchContract?.progressTool) assertProgressTool(options.launchContract.progressTool.directory, options.launchContract.progressTool.sha256);
     const inspected = await backend.inspectBackend({ timeoutMs: 5e3 });
     const developmentTrusted = trustedDevelopmentWorkspace(
       { development_execution: options.developmentExecution },
@@ -26259,14 +26656,14 @@ async function startManagedServer(options) {
     );
     if (!executionPairAllowed(inspected, developmentTrusted))
       throw new Error(`OpenCode ${inspected.version} is neither certified nor development-enabled for this exact workspace and pair`);
-    if (inspected.version !== "1.18.35") throw new Error(`OpenCode ${inspected.version} has no certified abort-stop proof`);
+    if (inspected.version !== "1.19.0") throw new Error(`OpenCode ${inspected.version} has no certified abort-stop proof`);
   } catch (error62) {
     await stopOwnedChild(child);
     throw error62;
   }
   return {
     backendId,
-    instanceId: randomUUID(),
+    instanceId: randomUUID2(),
     baseUrl,
     backend,
     isAlive: () => child.exitCode === null && child.signalCode === null,
@@ -26280,8 +26677,8 @@ async function startManagedServer(options) {
   };
 }
 async function freezeManagedLaunch(binary, workspace, reportPath, env = process.env) {
-  if (!isAbsolute2(reportPath)) throw new Error("assigned report path must be absolute");
-  const baseEnv = { ...env };
+  if (!isAbsolute3(reportPath)) throw new Error("assigned report path must be absolute");
+  const baseEnv = { ...env, OPENCODE_DISABLE_PROJECT_CONFIG: "true" };
   assertNoLocalPlugins(workspace, baseEnv);
   const { stdout } = await execFileAsync(binary, ["debug", "config", "--pure"], {
     cwd: workspace,
@@ -26299,7 +26696,8 @@ async function freezeManagedLaunch(binary, workspace, reportPath, env = process.
     mcp: { ...inheritedMcp, ...disabledMcp },
     agent: { ...object2(resolved.agent ?? {}), ...profiles }
   });
-  const frozenEnv = { ...baseEnv, OPENCODE_CONFIG_CONTENT: content };
+  const progressTool = stageProgressTool(reportPath);
+  const frozenEnv = { ...isolatedProgressEnvironment(baseEnv, progressTool.directory), OPENCODE_CONFIG_CONTENT: content };
   const expected = await execFileAsync(binary, ["debug", "config", "--pure"], {
     cwd: workspace,
     env: frozenEnv,
@@ -26308,7 +26706,13 @@ async function freezeManagedLaunch(binary, workspace, reportPath, env = process.
   });
   const effective = object2(JSON.parse(expected.stdout));
   assertWorkerPolicy(effective, profiles);
-  return { configContent: content, effectiveConfigSha256: effectiveConfigHash(effective), reportPath };
+  assertProgressTool(progressTool.directory, progressTool.sha256);
+  return {
+    configContent: content,
+    effectiveConfigSha256: effectiveConfigHash(effective),
+    reportPath,
+    progressTool: { directory: progressTool.directory, sha256: progressTool.sha256 }
+  };
 }
 function waitForServerUrl(child, timeoutMs) {
   return new Promise((resolve5, reject) => {
@@ -26387,12 +26791,12 @@ async function boundedBytes(response, maxBytes) {
   if (!response.body) throw new Error("empty HTTP response");
   const reader = response.body.getReader();
   const parts = [];
-  let size = 0;
+  let size2 = 0;
   while (true) {
     const next = await reader.read();
     if (next.done) break;
-    size += next.value.byteLength;
-    if (size > maxBytes) {
+    size2 += next.value.byteLength;
+    if (size2 > maxBytes) {
       await reader.cancel();
       throw new Error("diagnostic response exceeds size limit");
     }
@@ -26437,7 +26841,7 @@ async function inspectAttached(config2) {
       message: `attached state namespace returned ${String(path.state)}`
     };
     const configuration = JSON.parse((await get(`/config?directory=${query}`)).toString("utf8"));
-    base.configurationSha256 = createHash3("sha256").update(JSON.stringify(configuration)).digest("hex");
+    base.configurationSha256 = createHash5("sha256").update(JSON.stringify(configuration)).digest("hex");
     let policyMessage = null;
     try {
       if (typeof path.worktree !== "string" || !path.worktree.startsWith("/")) throw new Error("attached worktree identity is missing");
@@ -26446,10 +26850,10 @@ async function inspectAttached(config2) {
       policyMessage = String(error62);
     }
     const openapi = await get("/doc", 5 * 1024 * 1024);
-    base.openapiSha256 = createHash3("sha256").update(openapi).digest("hex");
+    base.openapiSha256 = createHash5("sha256").update(openapi).digest("hex");
     if (policyMessage) return { ...base, status: "policy_mismatch", message: policyMessage };
-    const manifest = JSON.parse(readFileSync4(compatibilityPath(), "utf8"));
-    const knownPair = manifest.pairs.some((pair) => pair.binary_version === base.version && pair.sdk_version === "1.18.35" && pair.openapi_sha256 === base.openapiSha256);
+    const manifest = JSON.parse(readFileSync5(compatibilityPath(), "utf8"));
+    const knownPair = manifest.pairs.some((pair) => pair.binary_version === base.version && pair.sdk_version === "1.19.0" && pair.openapi_sha256 === base.openapiSha256);
     return { ...base, status: "unsupported", message: knownPair ? "attached process identity and effective config match, but plugin suppression and session ownership are not certified for dispatch" : "attached OpenCode version/OpenAPI pair is not in the certified manifest" };
   } catch (error62) {
     return { ...base, status: "unreachable", message: `attached read-only probe failed: ${String(error62)}`.slice(0, 500) };
@@ -26464,11 +26868,11 @@ function doctor() {
     runtime: { node: process.versions.node, supportedNode: major === 24 && minor >= 15, toolkit: "2.0.0-dev.0" },
     configuration: { path: configurationPath(), status: "missing" },
     backend: { mode: "managed", binary: null, version: null, configuredModels: [], certifiedPairs: [], executionTested: false },
-    storage: { path: stateDirectory(), exists: existsSync3(stateDirectory()) }
+    storage: { path: stateDirectory(), exists: existsSync4(stateDirectory()) }
   };
-  const manifest = JSON.parse(readFileSync5(compatibilityPath(), "utf8"));
+  const manifest = JSON.parse(readFileSync6(compatibilityPath(), "utf8"));
   result2.backend.certifiedPairs = manifest.pairs.filter((pair) => pair.execution_supported).map((pair) => `${pair.binary_version}/${pair.sdk_version}`);
-  if (!existsSync3(result2.configuration.path)) return result2;
+  if (!existsSync4(result2.configuration.path)) return result2;
   try {
     const config2 = loadConfiguration(result2.configuration.path);
     result2.configuration.status = "valid";
@@ -26587,7 +26991,7 @@ var JSONValueSchema = lazy(() => union([
 var JSONObjectSchema = record(string2(), JSONValueSchema);
 var JSONArraySchema = array(JSONValueSchema);
 var ProgressTokenSchema = union([string2(), number2().int()]);
-var CursorSchema = string2();
+var CursorSchema2 = string2();
 var TaskMetadataSchema = object({ ttl: number2().optional() });
 var RelatedTaskMetadataSchema = object({ taskId: string2() });
 var RequestMetaSchema = looseObject({
@@ -26758,9 +27162,9 @@ var ProgressNotificationSchema = NotificationSchema.extend({
   method: literal("notifications/progress"),
   params: ProgressNotificationParamsSchema
 });
-var PaginatedRequestParamsSchema = BaseRequestParamsSchema.extend({ cursor: CursorSchema.optional() });
+var PaginatedRequestParamsSchema = BaseRequestParamsSchema.extend({ cursor: CursorSchema2.optional() });
 var PaginatedRequestSchema = RequestSchema.extend({ params: PaginatedRequestParamsSchema.optional() });
-var PaginatedResultSchema = ResultSchema.extend({ nextCursor: CursorSchema.optional() });
+var PaginatedResultSchema = ResultSchema.extend({ nextCursor: CursorSchema2.optional() });
 var ResourceContentsSchema = object({
   uri: string2(),
   mimeType: optional(string2()),
@@ -30284,7 +30688,7 @@ var schemas_exports3 = /* @__PURE__ */ __exportAll({
   CreateMessageResultSchema: () => CreateMessageResultSchema,
   CreateMessageResultWithToolsSchema: () => CreateMessageResultWithToolsSchema,
   CreateTaskResultSchema: () => CreateTaskResultSchema,
-  CursorSchema: () => CursorSchema,
+  CursorSchema: () => CursorSchema2,
   DiscoverRequestSchema: () => DiscoverRequestSchema,
   DiscoverResultSchema: () => DiscoverResultSchema,
   ElicitRequestFormParamsSchema: () => ElicitRequestFormParamsSchema,
@@ -32149,23 +32553,23 @@ var require_code$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
   };
   exports._Code = _Code;
   exports.nil = new _Code("");
-  function _(strs, ...args) {
+  function _(strs, ...args2) {
     const code = [strs[0]];
     let i = 0;
-    while (i < args.length) {
-      addCodeArg(code, args[i]);
+    while (i < args2.length) {
+      addCodeArg(code, args2[i]);
       code.push(strs[++i]);
     }
     return new _Code(code);
   }
   exports._ = _;
   const plus = new _Code("+");
-  function str(strs, ...args) {
+  function str(strs, ...args2) {
     const expr = [safeStringify(strs[0])];
     let i = 0;
-    while (i < args.length) {
+    while (i < args2.length) {
       expr.push(plus);
-      addCodeArg(expr, args[i]);
+      addCodeArg(expr, args2[i]);
       expr.push(plus, safeStringify(strs[++i]));
     }
     optimize(expr);
@@ -32710,10 +33114,10 @@ var require_codegen = /* @__PURE__ */ __commonJSMin(((exports) => {
     }
   };
   var Func = class extends BlockNode {
-    constructor(name, args, async) {
+    constructor(name, args2, async) {
       super();
       this.name = name;
-      this.args = args;
+      this.args = args2;
       this.async = async;
     }
     render(opts) {
@@ -32938,8 +33342,8 @@ var require_codegen = /* @__PURE__ */ __commonJSMin(((exports) => {
       this._nodes.length = len;
       return this;
     }
-    func(name, args = code_1.nil, async, funcBody) {
-      this._blockNode(new Func(name, args, async));
+    func(name, args2 = code_1.nil, async, funcBody) {
+      this._blockNode(new Func(name, args2, async));
       if (funcBody) this.code(funcBody).endFunc();
       return this;
     }
@@ -33021,13 +33425,13 @@ var require_codegen = /* @__PURE__ */ __commonJSMin(((exports) => {
   }
   exports.not = not;
   const andCode = mappend(exports.operators.AND);
-  function and(...args) {
-    return args.reduce(andCode);
+  function and(...args2) {
+    return args2.reduce(andCode);
   }
   exports.and = and;
   const orCode = mappend(exports.operators.OR);
-  function or(...args) {
-    return args.reduce(orCode);
+  function or(...args2) {
+    return args2.reduce(orCode);
   }
   exports.or = or;
   function mappend(op) {
@@ -33043,9 +33447,9 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports) => {
   const codegen_1 = require_codegen();
   const code_1 = require_code$1();
   function toHash(arr) {
-    const hash3 = {};
-    for (const item of arr) hash3[item] = true;
-    return hash3;
+    const hash4 = {};
+    for (const item of arr) hash4[item] = true;
+    return hash4;
   }
   exports.toHash = toHash;
   function alwaysValidSchema(it, schema) {
@@ -33657,8 +34061,8 @@ var require_code = /* @__PURE__ */ __commonJSMin(((exports) => {
       [names_1.default.rootData, names_1.default.rootData]
     ];
     if (it.opts.dynamicRef) valCxt.push([names_1.default.dynamicAnchors, names_1.default.dynamicAnchors]);
-    const args = (0, codegen_1._)`${dataAndSchema}, ${gen.object(...valCxt)}`;
-    return context !== codegen_1.nil ? (0, codegen_1._)`${func}.call(${context}, ${args})` : (0, codegen_1._)`${func}(${args})`;
+    const args2 = (0, codegen_1._)`${dataAndSchema}, ${gen.object(...valCxt)}`;
+    return context !== codegen_1.nil ? (0, codegen_1._)`${func}.call(${context}, ${args2})` : (0, codegen_1._)`${func}(${args2})`;
   }
   exports.callValidateCode = callValidateCode;
   const newRegExp = (0, codegen_1._)`new RegExp`;
@@ -35718,7 +36122,7 @@ var require_core$3 = /* @__PURE__ */ __commonJSMin(((exports) => {
     }
     errorsText(errors = this.errors, { separator = ", ", dataVar = "data" } = {}) {
       if (!errors || errors.length === 0) return "No errors";
-      return errors.map((e) => `${dataVar}${e.instancePath} ${e.message}`).reduce((text, msg) => text + separator + msg);
+      return errors.map((e) => `${dataVar}${e.instancePath} ${e.message}`).reduce((text2, msg) => text2 + separator + msg);
     }
     $dataMetaSchema(metaSchema, keywordsJsonPointers) {
       const rules = this.RULES.all;
@@ -39024,11 +39428,11 @@ var require_dist = /* @__PURE__ */ __commonJSMin(((exports, module) => {
     if (!f) throw new Error(`Unknown format "${name}"`);
     return f;
   };
-  function addFormats2(ajv, list, fs, exportName) {
+  function addFormats2(ajv, list2, fs, exportName) {
     var _a3;
     var _b;
     (_a3 = (_b = ajv.opts.code).formats) !== null && _a3 !== void 0 || (_b.formats = (0, codegen_1._)`require("ajv-formats/dist/formats").${exportName}`);
-    for (const f of list) ajv.addFormat(f, fs[f]);
+    for (const f of list2) ajv.addFormat(f, fs[f]);
   }
   module.exports = exports = formatsPlugin;
   Object.defineProperty(exports, "__esModule", { value: true });
@@ -40021,8 +40425,8 @@ var McpServer = class {
       if (!tool) throw new ProtocolError(ProtocolErrorCode.InvalidParams, `Tool ${request.params.name} not found`);
       if (!tool.enabled) throw new ProtocolError(ProtocolErrorCode.InvalidParams, `Tool ${request.params.name} disabled`);
       try {
-        const args = await this.validateToolInput(tool, request.params.arguments, request.params.name);
-        const result2 = await this.executeToolHandler(tool, args, ctx);
+        const args2 = await this.validateToolInput(tool, request.params.arguments, request.params.name);
+        const result2 = await this.executeToolHandler(tool, args2, ctx);
         await this.validateToolOutput(tool, result2, request.params.name);
         if (isInputRequiredResult(result2)) return result2;
         return this.server.projectCallToolResult(result2, tool.outputSchemaJson);
@@ -40051,10 +40455,10 @@ var McpServer = class {
   /**
   * Validates tool input arguments against the tool's input schema.
   */
-  async validateToolInput(tool, args, toolName) {
-    if (this._maxToolInputElements !== void 0 && toolInputElementCount(args, this._maxToolInputElements) > this._maxToolInputElements) throw new ProtocolError(ProtocolErrorCode.InvalidParams, `Invalid arguments for tool ${toolName}: arguments contain more than the maximum of ${this._maxToolInputElements} elements`);
+  async validateToolInput(tool, args2, toolName) {
+    if (this._maxToolInputElements !== void 0 && toolInputElementCount(args2, this._maxToolInputElements) > this._maxToolInputElements) throw new ProtocolError(ProtocolErrorCode.InvalidParams, `Invalid arguments for tool ${toolName}: arguments contain more than the maximum of ${this._maxToolInputElements} elements`);
     if (!tool.inputSchema) return;
-    const parseResult = await validateStandardSchema(tool.inputSchema, args ?? {});
+    const parseResult = await validateStandardSchema(tool.inputSchema, args2 ?? {});
     if (!parseResult.success) throw new ProtocolError(ProtocolErrorCode.InvalidParams, `Input validation error: Invalid arguments for tool ${toolName}: ${parseResult.error}`);
     return parseResult.data;
   }
@@ -40072,8 +40476,8 @@ var McpServer = class {
   /**
   * Executes a tool handler.
   */
-  async executeToolHandler(tool, args, ctx) {
-    return tool.executor(args, ctx);
+  async executeToolHandler(tool, args2, ctx) {
+    return tool.executor(args2, ctx);
   }
   _completionHandlerInitialized = false;
   setCompletionRequestHandler() {
@@ -40457,7 +40861,7 @@ var McpServer = class {
 function createToolExecutor(inputSchema, handler) {
   if (inputSchema) {
     const callback$1 = handler;
-    return async (args, ctx) => callback$1(args, ctx);
+    return async (args2, ctx) => callback$1(args2, ctx);
   }
   const callback = handler;
   return async (_args, ctx) => callback(ctx);
@@ -40483,8 +40887,8 @@ function convertOutputSchemaJson(outputSchema) {
 function createPromptHandler(name, argsSchema, callback) {
   if (argsSchema) {
     const typedCallback = callback;
-    return async (args, ctx) => {
-      const parseResult = await validateStandardSchema(argsSchema, args ?? {});
+    return async (args2, ctx) => {
+      const parseResult = await validateStandardSchema(argsSchema, args2 ?? {});
       if (!parseResult.success) throw new ProtocolError(ProtocolErrorCode.InvalidParams, `Invalid arguments for prompt ${name}: ${parseResult.error}`);
       return typedCallback(parseResult.data, ctx);
     };
@@ -40624,7 +41028,7 @@ var StdioServerTransport = class {
 };
 
 // src/contracts.ts
-var Id = external_exports.string().min(1);
+var Id2 = external_exports.string().min(1);
 var Text = external_exports.string().min(1);
 var TextLine = external_exports.string();
 var AuthoritativeInputSchema = external_exports.object({
@@ -40637,7 +41041,7 @@ var TaskContextSchema = external_exports.object({
   verified_facts: external_exports.array(Text),
   rejected_assumptions: external_exports.array(Text),
   exclusions: external_exports.array(Text),
-  predecessor_task_id: Id.optional()
+  predecessor_task_id: Id2.optional()
 }).strict();
 var AllowedWriteSchema = external_exports.object({
   path: Text,
@@ -40645,13 +41049,13 @@ var AllowedWriteSchema = external_exports.object({
   purpose: Text
 }).strict();
 var AcceptanceCriterionSchema = external_exports.object({
-  id: Id,
+  id: Id2,
   requirement: Text,
   evidence_required: Text,
   required: external_exports.boolean()
 }).strict();
 var WorkerCheckSchema = external_exports.object({
-  id: Id,
+  id: Id2,
   description: Text,
   argv: external_exports.array(TextLine).optional(),
   cwd: external_exports.string().optional()
@@ -40674,7 +41078,7 @@ var TaskPacketSchema = external_exports.object({
   shared_resources: external_exports.array(SharedResourceSchema)
 }).strict();
 var FindingSchema = external_exports.object({
-  id: Id,
+  id: Id2,
   claim: Text,
   evidence: external_exports.array(TextLine),
   caveats: external_exports.array(Text)
@@ -40684,7 +41088,7 @@ var ChangeSchema = external_exports.object({
   description: Text
 }).strict();
 var ReportCheckSchema = external_exports.object({
-  id: Id,
+  id: Id2,
   status: external_exports.enum(["passed", "failed", "not_run"]),
   exit_code: external_exports.number().nullable(),
   evidence: external_exports.array(TextLine),
@@ -40692,8 +41096,8 @@ var ReportCheckSchema = external_exports.object({
 }).strict();
 var WorkerReportSchema = external_exports.object({
   schema_version: external_exports.literal(2),
-  task_id: Id,
-  execution_id: Id,
+  task_id: Id2,
+  execution_id: Id2,
   outcome: external_exports.enum([
     "completed",
     "partial",
@@ -40717,7 +41121,7 @@ var ReviewDispositionSchema = external_exports.enum([
   "awaiting_evidence"
 ]);
 var ReviewCriterionSchema = external_exports.object({
-  id: Id,
+  id: Id2,
   result: external_exports.enum(["satisfied", "unsatisfied", "not_checked"]),
   evidence: external_exports.array(TextLine)
 }).strict();
@@ -40735,14 +41139,14 @@ var ReviewSchema = external_exports.object({
 }).strict();
 
 // src/rpc.ts
-import { randomBytes as randomBytes2, randomUUID as randomUUID2, timingSafeEqual } from "node:crypto";
+import { randomBytes as randomBytes2, randomUUID as randomUUID3, timingSafeEqual } from "node:crypto";
 import { createServer, createConnection } from "node:net";
-import { chmodSync, existsSync as existsSync4, mkdirSync, readFileSync as readFileSync6, renameSync, rmSync, writeFileSync } from "node:fs";
-import { join as join3 } from "node:path";
+import { chmodSync as chmodSync2, existsSync as existsSync5, mkdirSync as mkdirSync2, readFileSync as readFileSync7, renameSync, rmSync, writeFileSync as writeFileSync2 } from "node:fs";
+import { join as join4 } from "node:path";
 var MAX_REQUEST_BYTES = 128 * 1024;
 var MAX_RESPONSE_BYTES = 8 * 1024 * 1024;
 function paths(stateDir) {
-  return { socket: join3(stateDir, "supervisor.sock"), connection: join3(stateDir, "connection.json") };
+  return { socket: join4(stateDir, "supervisor.sock"), connection: join4(stateDir, "connection.json") };
 }
 function equalToken(left, right) {
   const a = Buffer.from(left);
@@ -40750,11 +41154,11 @@ function equalToken(left, right) {
   return a.length === b.length && timingSafeEqual(a, b);
 }
 async function startRpcServer(stateDir, handler) {
-  mkdirSync(stateDir, { recursive: true, mode: 448 });
-  chmodSync(stateDir, 448);
+  mkdirSync2(stateDir, { recursive: true, mode: 448 });
+  chmodSync2(stateDir, 448);
   const { socket, connection } = paths(stateDir);
-  if (existsSync4(socket)) throw new Error("socket already exists; reconcile the recorded supervisor before removal");
-  const generation = randomUUID2();
+  if (existsSync5(socket)) throw new Error("socket already exists; reconcile the recorded supervisor before removal");
+  const generation = randomUUID3();
   const token = randomBytes2(32).toString("hex");
   const server = createServer((client2) => serveClient(client2, token, handler));
   let bound = false;
@@ -40767,15 +41171,15 @@ async function startRpcServer(stateDir, handler) {
       });
     });
     bound = true;
-    chmodSync(socket, 384);
+    chmodSync2(socket, 384);
     const staged = `${connection}.${generation}.tmp`;
-    writeFileSync(staged, JSON.stringify({ generation, socket, token }), { mode: 384, flag: "wx" });
+    writeFileSync2(staged, JSON.stringify({ generation, socket, token }), { mode: 384, flag: "wx" });
     renameSync(staged, connection);
-    chmodSync(connection, 384);
+    chmodSync2(connection, 384);
   } catch (error62) {
     if (bound) {
       await new Promise((resolve5) => server.close(() => resolve5()));
-      if (existsSync4(socket)) rmSync(socket);
+      if (existsSync5(socket)) rmSync(socket);
     }
     throw error62;
   }
@@ -40842,8 +41246,8 @@ function serveClient(client2, token, handler) {
 }
 function readConnection(stateDir) {
   const { connection } = paths(stateDir);
-  if (!existsSync4(connection)) return null;
-  const value = JSON.parse(readFileSync6(connection, "utf8"));
+  if (!existsSync5(connection)) return null;
+  const value = JSON.parse(readFileSync7(connection, "utf8"));
   if (!value || typeof value.generation !== "string" || typeof value.token !== "string" || value.socket !== paths(stateDir).socket) {
     throw new Error("invalid supervisor connection record");
   }
@@ -40852,7 +41256,7 @@ function readConnection(stateDir) {
 async function rpcRequest(stateDir, method, params, timeoutMs = 3e4) {
   const connection = readConnection(stateDir);
   if (!connection) throw new Error("supervisor is not running");
-  const id = randomUUID2();
+  const id = randomUUID3();
   return await new Promise((resolve5, reject) => {
     const client2 = createConnection(connection.socket);
     let response = "";
@@ -40890,21 +41294,21 @@ async function rpcRequest(stateDir, method, params, timeoutMs = 3e4) {
 
 // src/daemon.ts
 import { spawn as spawn2 } from "node:child_process";
-import { join as join8 } from "node:path";
+import { join as join9 } from "node:path";
 import { fileURLToPath as fileURLToPath2 } from "node:url";
 
 // src/artifacts.ts
-import { createHash as createHash4, randomUUID as randomUUID3 } from "node:crypto";
-import { closeSync, existsSync as existsSync5, fsyncSync, lstatSync, mkdirSync as mkdirSync2, openSync, readFileSync as readFileSync7, readdirSync as readdirSync2, renameSync as renameSync2, rmSync as rmSync2, writeSync, constants } from "node:fs";
-import { basename, join as join4, resolve as resolve2 } from "node:path";
+import { createHash as createHash6, randomUUID as randomUUID4 } from "node:crypto";
+import { closeSync, existsSync as existsSync6, fsyncSync, lstatSync as lstatSync2, mkdirSync as mkdirSync3, openSync, readFileSync as readFileSync8, readdirSync as readdirSync3, renameSync as renameSync2, rmSync as rmSync2, writeSync, constants } from "node:fs";
+import { basename as basename2, join as join5, resolve as resolve2 } from "node:path";
 var ArtifactStore = class {
   constructor(root, maxBytes = 50 * 1024 * 1024) {
     this.root = root;
     this.maxBytes = maxBytes;
-    this.staging = join4(root, "staging");
-    this.objects = join4(root, "objects");
-    mkdirSync2(this.staging, { recursive: true, mode: 448 });
-    mkdirSync2(this.objects, { recursive: true, mode: 448 });
+    this.staging = join5(root, "staging");
+    this.objects = join5(root, "objects");
+    mkdirSync3(this.staging, { recursive: true, mode: 448 });
+    mkdirSync3(this.objects, { recursive: true, mode: 448 });
   }
   root;
   maxBytes;
@@ -40912,10 +41316,10 @@ var ArtifactStore = class {
   objects;
   captureBytes(executionId, bytes, mediaType, register2) {
     if (bytes.byteLength > this.maxBytes) throw new Error(`artifact exceeds ${this.maxBytes} bytes`);
-    const sha256 = createHash4("sha256").update(bytes).digest("hex");
-    const artifactId = `artifact_${randomUUID3()}`;
-    const stagedPath = join4(this.staging, `${artifactId}.tmp`);
-    const finalPath = join4(this.objects, sha256);
+    const sha256 = createHash6("sha256").update(bytes).digest("hex");
+    const artifactId = `artifact_${randomUUID4()}`;
+    const stagedPath = join5(this.staging, `${artifactId}.tmp`);
+    const finalPath = join5(this.objects, sha256);
     const fd = openSync(stagedPath, constants.O_CREAT | constants.O_EXCL | constants.O_WRONLY, 384);
     try {
       let offset = 0;
@@ -40927,8 +41331,8 @@ var ArtifactStore = class {
     const entry = { artifactId, executionId, sha256, byteLength: bytes.byteLength, mediaType, path: finalPath };
     try {
       register2(entry);
-      if (existsSync5(finalPath)) {
-        if (createHash4("sha256").update(readFileSync7(finalPath)).digest("hex") !== sha256) throw new Error("artifact hash collision or corrupt object");
+      if (existsSync6(finalPath)) {
+        if (createHash6("sha256").update(readFileSync8(finalPath)).digest("hex") !== sha256) throw new Error("artifact hash collision or corrupt object");
         rmSync2(stagedPath);
       } else {
         renameSync2(stagedPath, finalPath);
@@ -40936,7 +41340,7 @@ var ArtifactStore = class {
       }
       return entry;
     } catch (error62) {
-      if (existsSync5(stagedPath)) rmSync2(stagedPath);
+      if (existsSync6(stagedPath)) rmSync2(stagedPath);
       throw error62;
     }
   }
@@ -40944,17 +41348,17 @@ var ArtifactStore = class {
     if (!Number.isSafeInteger(offset) || offset < 0 || !Number.isSafeInteger(maxBytes) || maxBytes < 1 || maxBytes > 65536) {
       throw new RangeError("invalid artifact read range");
     }
-    if (resolve2(entry.path) !== join4(this.objects, entry.sha256) || basename(entry.path) !== entry.sha256) throw new Error("artifact path is outside store");
-    const stat = lstatSync(entry.path);
+    if (resolve2(entry.path) !== join5(this.objects, entry.sha256) || basename2(entry.path) !== entry.sha256) throw new Error("artifact path is outside store");
+    const stat = lstatSync2(entry.path);
     if (!stat.isFile() || stat.isSymbolicLink() || stat.size !== entry.byteLength) throw new Error("artifact changed");
-    const all = readFileSync7(entry.path);
-    if (createHash4("sha256").update(all).digest("hex") !== entry.sha256) throw new Error("artifact changed");
+    const all = readFileSync8(entry.path);
+    if (createHash6("sha256").update(all).digest("hex") !== entry.sha256) throw new Error("artifact changed");
     const bytes = all.subarray(offset, offset + maxBytes);
     const nextOffset = offset + bytes.byteLength < all.byteLength ? offset + bytes.byteLength : null;
     return { bytes, nextOffset };
   }
   stagedFiles() {
-    return readdirSync2(this.staging).filter((name) => name.endsWith(".tmp"));
+    return readdirSync3(this.staging).filter((name) => name.endsWith(".tmp"));
   }
   /** Reconcile the file/SQLite publication window before admitting new work. */
   reconcile(lookup, registered = []) {
@@ -40962,20 +41366,20 @@ var ArtifactStore = class {
     const removed = [];
     for (const name of this.stagedFiles()) {
       const artifactId = name.slice(0, -4);
-      const path = join4(this.staging, name);
+      const path = join5(this.staging, name);
       const entry = lookup(artifactId);
       if (!entry) {
         rmSync2(path);
         removed.push(artifactId);
         continue;
       }
-      if (resolve2(entry.path) !== join4(this.objects, entry.sha256)) throw new Error(`artifact path mismatch: ${artifactId}`);
-      const staged = readFileSync7(path);
-      if (staged.byteLength !== entry.byteLength || createHash4("sha256").update(staged).digest("hex") !== entry.sha256)
+      if (resolve2(entry.path) !== join5(this.objects, entry.sha256)) throw new Error(`artifact path mismatch: ${artifactId}`);
+      const staged = readFileSync8(path);
+      if (staged.byteLength !== entry.byteLength || createHash6("sha256").update(staged).digest("hex") !== entry.sha256)
         throw new Error(`staged artifact differs from committed registration: ${artifactId}`);
-      if (existsSync5(entry.path)) {
-        const final = readFileSync7(entry.path);
-        if (final.byteLength !== entry.byteLength || createHash4("sha256").update(final).digest("hex") !== entry.sha256)
+      if (existsSync6(entry.path)) {
+        const final = readFileSync8(entry.path);
+        if (final.byteLength !== entry.byteLength || createHash6("sha256").update(final).digest("hex") !== entry.sha256)
           throw new Error(`published artifact differs from committed registration: ${artifactId}`);
         rmSync2(path);
       } else {
@@ -40985,9 +41389,9 @@ var ArtifactStore = class {
       published.push(artifactId);
     }
     for (const entry of registered) {
-      if (resolve2(entry.path) !== join4(this.objects, entry.sha256)) throw new Error(`registered artifact path mismatch: ${entry.artifactId}`);
+      if (resolve2(entry.path) !== join5(this.objects, entry.sha256)) throw new Error(`registered artifact path mismatch: ${entry.artifactId}`);
       try {
-        const stat = lstatSync(entry.path);
+        const stat = lstatSync2(entry.path);
         if (!stat.isFile() || stat.isSymbolicLink() || stat.size !== entry.byteLength)
           throw new Error("not a regular file with recorded size");
       } catch {
@@ -41007,20 +41411,20 @@ var ArtifactStore = class {
 };
 
 // src/coordinator.ts
-import { createHash as createHash7, randomUUID as randomUUID4 } from "node:crypto";
-import { mkdirSync as mkdirSync3 } from "node:fs";
+import { createHash as createHash9, randomUUID as randomUUID5 } from "node:crypto";
+import { mkdirSync as mkdirSync4 } from "node:fs";
 
 // src/evidence.ts
-import { createHash as createHash6 } from "node:crypto";
+import { createHash as createHash8 } from "node:crypto";
 import { execFileSync as execFileSync2 } from "node:child_process";
-import { closeSync as closeSync3, constants as constants2, existsSync as existsSync7, fstatSync as fstatSync2, lstatSync as lstatSync3, openSync as openSync3, readFileSync as readFileSync9 } from "node:fs";
-import { join as join5, resolve as resolve4, sep as sep2 } from "node:path";
+import { closeSync as closeSync3, constants as constants2, existsSync as existsSync8, fstatSync as fstatSync2, lstatSync as lstatSync4, openSync as openSync3, readFileSync as readFileSync10 } from "node:fs";
+import { join as join6, resolve as resolve4, sep as sep2 } from "node:path";
 
 // src/workspace.ts
-import { createHash as createHash5 } from "node:crypto";
+import { createHash as createHash7 } from "node:crypto";
 import { execFileSync, spawnSync as spawnSync2 } from "node:child_process";
-import { closeSync as closeSync2, existsSync as existsSync6, fstatSync, lstatSync as lstatSync2, openSync as openSync2, readFileSync as readFileSync8, readdirSync as readdirSync3, readlinkSync, readSync, realpathSync as realpathSync2, statSync } from "node:fs";
-import { dirname as dirname2, isAbsolute as isAbsolute3, relative as relative2, resolve as resolve3, sep } from "node:path";
+import { closeSync as closeSync2, existsSync as existsSync7, fstatSync, lstatSync as lstatSync3, openSync as openSync2, readFileSync as readFileSync9, readdirSync as readdirSync4, readlinkSync, readSync, realpathSync as realpathSync2, statSync } from "node:fs";
+import { dirname as dirname3, isAbsolute as isAbsolute4, relative as relative2, resolve as resolve3, sep } from "node:path";
 var WorkspaceError = class extends Error {
   constructor(code, message) {
     super(message);
@@ -41028,23 +41432,23 @@ var WorkspaceError = class extends Error {
   }
   code;
 };
-function hash2(data) {
-  return createHash5("sha256").update(data).digest("hex");
+function hash3(data) {
+  return createHash7("sha256").update(data).digest("hex");
 }
 function inside(path, root) {
   return path === root || path.startsWith(root + sep);
 }
 function nearestExisting(path) {
   let candidate = path;
-  while (!existsSync6(candidate)) {
-    const parent = dirname2(candidate);
+  while (!existsSync7(candidate)) {
+    const parent = dirname3(candidate);
     if (parent === candidate) throw new WorkspaceError("INVALID_INPUT", `no existing ancestor for ${path}`);
     candidate = parent;
   }
   return realpathSync2(candidate);
 }
 function canonicalPath(path) {
-  if (!isAbsolute3(path)) throw new WorkspaceError("INVALID_INPUT", "workspace and configured roots must be absolute");
+  if (!isAbsolute4(path)) throw new WorkspaceError("INVALID_INPUT", "workspace and configured roots must be absolute");
   return realpathSync2(path);
 }
 function canonicalWorkspace(path, projectRoots) {
@@ -41056,19 +41460,19 @@ function canonicalWorkspace(path, projectRoots) {
   return workspace;
 }
 function resolveDeclaredPath(workspace, path, roots) {
-  const absolute = isAbsolute3(path) ? resolve3(path) : resolve3(workspace, path);
+  const absolute = isAbsolute4(path) ? resolve3(path) : resolve3(workspace, path);
   const existing = nearestExisting(absolute);
   if (!roots.some((root) => inside(existing, root) && inside(absolute, root))) {
     throw new WorkspaceError("OUTSIDE_CONFIGURED_ROOT", `declared path escapes configured roots: ${path}`);
   }
-  if (existsSync6(absolute)) return realpathSync2(absolute);
+  if (existsSync7(absolute)) return realpathSync2(absolute);
   return absolute;
 }
-function git(workspace, args) {
+function git(workspace, args2) {
   try {
-    return execFileSync("git", ["-C", workspace, ...args], { encoding: "buffer", maxBuffer: 50 * 1024 * 1024, stdio: ["ignore", "pipe", "ignore"] });
+    return execFileSync("git", ["-C", workspace, ...args2], { encoding: "buffer", maxBuffer: 50 * 1024 * 1024, stdio: ["ignore", "pipe", "ignore"] });
   } catch {
-    throw new WorkspaceError("INVALID_INPUT", `cannot inspect Git state with ${args[0]}`);
+    throw new WorkspaceError("INVALID_INPUT", `cannot inspect Git state with ${args2[0]}`);
   }
 }
 function isGitWorkspace(workspace) {
@@ -41092,19 +41496,19 @@ function hashRegularFile(path) {
   try {
     const before = fstatSync(fd);
     if (!before.isFile()) throw new Error("not a regular file");
-    const digest = createHash5("sha256");
+    const digest = createHash7("sha256");
     const chunk = Buffer.allocUnsafe(1024 * 1024);
-    let size = 0;
+    let size2 = 0;
     while (true) {
       const count = readSync(fd, chunk, 0, chunk.byteLength, null);
       if (!count) break;
       digest.update(chunk.subarray(0, count));
-      size += count;
+      size2 += count;
     }
     const after = fstatSync(fd);
-    if (size !== before.size || after.size !== before.size || after.mtimeMs !== before.mtimeMs || after.ino !== before.ino)
+    if (size2 !== before.size || after.size !== before.size || after.mtimeMs !== before.mtimeMs || after.ino !== before.ino)
       throw new Error("file changed during evidence scan");
-    return { sha256: digest.digest("hex"), byteLength: size };
+    return { sha256: digest.digest("hex"), byteLength: size2 };
   } finally {
     closeSync2(fd);
   }
@@ -41130,7 +41534,7 @@ function captureEvidenceIndex(workspace, writeTargets, gitWorkspace) {
     try {
       let stat;
       try {
-        stat = lstatSync2(path);
+        stat = lstatSync3(path);
       } catch (error62) {
         if (error62.code === "ENOENT") {
           entries.set(name, { path: name, kind: "absent", sha256: null, byteLength: null });
@@ -41144,7 +41548,7 @@ function captureEvidenceIndex(workspace, writeTargets, gitWorkspace) {
       } else if (stat.isDirectory()) entries.set(name, { path: name, kind: "directory", sha256: null, byteLength: null });
       else if (stat.isSymbolicLink()) {
         const target = readlinkSync(path);
-        entries.set(name, { path: name, kind: "symlink", sha256: hash2(target), byteLength: Buffer.byteLength(target) });
+        entries.set(name, { path: name, kind: "symlink", sha256: hash3(target), byteLength: Buffer.byteLength(target) });
       } else entries.set(name, { path: name, kind: "other", sha256: null, byteLength: null });
     } catch (error62) {
       gaps.push(`cannot index ${name}: ${String(error62)}`);
@@ -41156,7 +41560,7 @@ function captureEvidenceIndex(workspace, writeTargets, gitWorkspace) {
     const name = relative2(workspace, path);
     if (entries.get(name)?.kind !== "directory") return;
     try {
-      for (const child of readdirSync3(path).sort()) {
+      for (const child of readdirSync4(path).sort()) {
         if (limitHit) break;
         if (path === workspace && child === ".git") continue;
         walk(resolve3(path, child));
@@ -41192,20 +41596,20 @@ function captureBaseline(input2) {
   const writeTargets = input2.packet.allowed_writes.map((item) => resolveDeclaredPath(workspace, item.path, [workspace]));
   const writeTargetState = writeTargets.map((path, index) => {
     const kind = input2.packet.allowed_writes[index].kind;
-    const existed = existsSync6(path);
-    const sha256 = existed && kind === "file" && lstatSync2(path).isFile() ? hash2(readFileSync8(path)) : null;
+    const existed = existsSync7(path);
+    const sha256 = existed && kind === "file" && lstatSync3(path).isFile() ? hash3(readFileSync9(path)) : null;
     return { path, kind, existed, sha256 };
   });
   const gitWorkspace = isGitWorkspace(workspace);
   const files = inputFiles.map((path) => {
-    const stat = lstatSync2(path);
+    const stat = lstatSync3(path);
     if (!stat.isFile() || stat.isSymbolicLink()) throw new WorkspaceError("INVALID_INPUT", `declared input is not a regular file: ${path}`);
-    const bytes = readFileSync8(path);
+    const bytes = readFileSync9(path);
     let untracked = false;
     if (gitWorkspace && inside(path, workspace)) {
       untracked = !isTracked(workspace, path);
     }
-    return { path, sha256: hash2(bytes), byteLength: bytes.byteLength, untracked };
+    return { path, sha256: hash3(bytes), byteLength: bytes.byteLength, untracked };
   });
   let gitState = null;
   if (gitWorkspace) {
@@ -41213,8 +41617,8 @@ function captureBaseline(input2) {
     gitState = {
       repositoryIdentity: canonicalPath(common),
       head: git(workspace, ["rev-parse", "HEAD"]).toString("utf8").trim(),
-      trackedDiffSha256: hash2(git(workspace, ["diff", "--binary", "HEAD", "--"])),
-      stagedDiffSha256: hash2(git(workspace, ["diff", "--cached", "--binary", "--"]))
+      trackedDiffSha256: hash3(git(workspace, ["diff", "--binary", "HEAD", "--"])),
+      stagedDiffSha256: hash3(git(workspace, ["diff", "--cached", "--binary", "--"]))
     };
   }
   const evidenceIndex = captureEvidenceIndex(workspace, writeTargetState, gitWorkspace);
@@ -41231,29 +41635,29 @@ function captureBaseline(input2) {
     evidenceIndex,
     coverageLimits
   };
-  return { ...manifest, sha256: hash2(JSON.stringify(manifest)) };
+  return { ...manifest, sha256: hash3(JSON.stringify(manifest)) };
 }
 function compareBaseline(baseline) {
   const changed = [];
   if (!baseline.evidenceIndex?.complete) changed.push("evidence:baseline-index-incomplete");
   for (const file2 of baseline.files) {
     try {
-      const stat = lstatSync2(file2.path);
-      if (!stat.isFile() || stat.isSymbolicLink() || hash2(readFileSync8(file2.path)) !== file2.sha256) changed.push(file2.path);
+      const stat = lstatSync3(file2.path);
+      if (!stat.isFile() || stat.isSymbolicLink() || hash3(readFileSync9(file2.path)) !== file2.sha256) changed.push(file2.path);
     } catch {
       changed.push(file2.path);
     }
   }
   for (const target of baseline.writeTargetState) {
-    const exists = existsSync6(target.path);
+    const exists = existsSync7(target.path);
     if (exists !== target.existed) {
       changed.push(target.path);
       continue;
     }
     if (exists && target.sha256 !== null) {
       try {
-        const stat = lstatSync2(target.path);
-        if (!stat.isFile() || stat.isSymbolicLink() || hash2(readFileSync8(target.path)) !== target.sha256) changed.push(target.path);
+        const stat = lstatSync3(target.path);
+        if (!stat.isFile() || stat.isSymbolicLink() || hash3(readFileSync9(target.path)) !== target.sha256) changed.push(target.path);
       } catch {
         changed.push(target.path);
       }
@@ -41275,8 +41679,8 @@ function compareBaseline(baseline) {
   if (baseline.git) {
     try {
       if (git(baseline.workspace, ["rev-parse", "HEAD"]).toString("utf8").trim() !== baseline.git.head) changed.push("git:HEAD");
-      if (hash2(git(baseline.workspace, ["diff", "--binary", "HEAD", "--"])) !== baseline.git.trackedDiffSha256) changed.push("git:tracked-diff");
-      if (hash2(git(baseline.workspace, ["diff", "--cached", "--binary", "--"])) !== baseline.git.stagedDiffSha256) changed.push("git:staged-diff");
+      if (hash3(git(baseline.workspace, ["diff", "--binary", "HEAD", "--"])) !== baseline.git.trackedDiffSha256) changed.push("git:tracked-diff");
+      if (hash3(git(baseline.workspace, ["diff", "--cached", "--binary", "--"])) !== baseline.git.stagedDiffSha256) changed.push("git:staged-diff");
     } catch {
       changed.push("git:unavailable");
     }
@@ -41286,15 +41690,15 @@ function compareBaseline(baseline) {
 }
 
 // src/evidence.ts
-function sha(bytes) {
-  return createHash6("sha256").update(bytes).digest("hex");
+function sha2(bytes) {
+  return createHash8("sha256").update(bytes).digest("hex");
 }
 function inside2(path, root) {
   return path === root || path.startsWith(root + sep2);
 }
-function git2(workspace, args) {
+function git2(workspace, args2) {
   try {
-    return execFileSync2("git", ["-C", workspace, ...args], { maxBuffer: 50 * 1024 * 1024, stdio: ["ignore", "pipe", "ignore"] });
+    return execFileSync2("git", ["-C", workspace, ...args2], { maxBuffer: 50 * 1024 * 1024, stdio: ["ignore", "pipe", "ignore"] });
   } catch {
     return null;
   }
@@ -41305,11 +41709,11 @@ function sameEntry(before, after) {
 function regularBytes(path, expected) {
   const fd = openSync3(path, constants2.O_RDONLY | constants2.O_NOFOLLOW);
   try {
-    const stat = lstatSync3(path);
+    const stat = lstatSync4(path);
     if (!stat.isFile() || stat.isSymbolicLink() || stat.size !== expected.byteLength)
       throw new Error("file changed type or size before capture");
-    const bytes = readFileSync9(fd);
-    if (sha(bytes) !== expected.sha256) throw new Error("file changed after final index");
+    const bytes = readFileSync10(fd);
+    if (sha2(bytes) !== expected.sha256) throw new Error("file changed after final index");
     return bytes;
   } finally {
     closeSync3(fd);
@@ -41319,12 +41723,12 @@ function safeRegularBytes(path, maxBytes) {
   const fd = openSync3(path, constants2.O_RDONLY | constants2.O_NOFOLLOW);
   try {
     const before = fstatSync2(fd);
-    const namedBefore = lstatSync3(path);
+    const namedBefore = lstatSync4(path);
     if (!before.isFile() || !namedBefore.isFile() || namedBefore.isSymbolicLink() || namedBefore.ino !== before.ino || before.size > maxBytes)
       throw new Error("not a regular file within the snapshot limit");
-    const bytes = readFileSync9(fd);
+    const bytes = readFileSync10(fd);
     const after = fstatSync2(fd);
-    const namedAfter = lstatSync3(path);
+    const namedAfter = lstatSync4(path);
     if (after.size !== before.size || after.mtimeMs !== before.mtimeMs || after.ino !== before.ino || namedAfter.ino !== before.ino || bytes.byteLength !== before.size)
       throw new Error("file changed during capture");
     return bytes;
@@ -41349,7 +41753,7 @@ function captureEvidence(input2) {
     if (!captured.some((item) => item.artifactId === entry.artifactId)) captured.push(entry);
   };
   const capture = (bytes, mediaType, label) => {
-    const key = identity(sha(bytes), bytes.byteLength, mediaType);
+    const key = identity(sha2(bytes), bytes.byteLength, mediaType);
     const existing = existingByIdentity.get(key);
     if (existing) {
       artifacts.read(existing, 0, 1);
@@ -41366,11 +41770,11 @@ function captureEvidence(input2) {
     include(entry);
     return entry;
   };
-  const reportPath = join5(outputDirectory, "result.json");
+  const reportPath = join6(outputDirectory, "result.json");
   let reportBytes = null;
   if (input2.structuredReport !== void 0 && input2.structuredReport !== null) {
     reportBytes = Buffer.from(JSON.stringify(input2.structuredReport));
-  } else if (existsSync7(reportPath)) {
+  } else if (existsSync8(reportPath)) {
     try {
       reportBytes = safeRegularBytes(reportPath, maxSnapshotBytes);
     } catch (error62) {
@@ -41390,8 +41794,8 @@ function captureEvidence(input2) {
       }
     } else reportValidity = "invalid";
   } else gaps.push("result.json is missing or not capturable");
-  const summaryPath = join5(outputDirectory, "summary.md");
-  if (existsSync7(summaryPath)) {
+  const summaryPath = join6(outputDirectory, "summary.md");
+  if (existsSync8(summaryPath)) {
     try {
       if (!capture(safeRegularBytes(summaryPath, maxSnapshotBytes), "text/markdown", "summary.md") && reportValidity === "valid")
         reportValidity = "invalid";
@@ -41447,8 +41851,8 @@ function captureEvidence(input2) {
     starting_state_sha256: baseline.sha256,
     baseline_index_complete: initial?.complete ?? false,
     final_index_complete: final.complete,
-    tracked_diff_to_head_sha256: tracked ? sha(tracked) : null,
-    staged_diff_sha256: staged ? sha(staged) : null,
+    tracked_diff_to_head_sha256: tracked ? sha2(tracked) : null,
+    staged_diff_sha256: staged ? sha2(staged) : null,
     changes,
     coverage_limits: [.../* @__PURE__ */ new Set([...baseline.coverageLimits ?? [], ...final.coverageLimits])],
     report_validity: reportValidity,
@@ -41460,7 +41864,7 @@ function captureEvidence(input2) {
   const manifestBytes = Buffer.from(JSON.stringify(manifest));
   const manifestEntry = capture(manifestBytes, "application/json", "final change manifest");
   if (!manifestEntry) reportValidity = "invalid";
-  return { reportValidity, finalManifestHash: manifestEntry ? sha(manifestBytes) : null, artifacts: captured, gaps };
+  return { reportValidity, finalManifestHash: manifestEntry ? sha2(manifestBytes) : null, artifacts: captured, gaps };
 }
 
 // src/coordinator.ts
@@ -41477,7 +41881,7 @@ var defaultOpener = async ({ backendId, workspace, config: config2, launchContra
   });
 };
 function backendIdentity(task, config2) {
-  return `backend_${createHash7("sha256").update(JSON.stringify({
+  return `backend_${createHash9("sha256").update(JSON.stringify({
     workspace: task.workspace,
     binary: config2.opencode_binary,
     models: config2.models,
@@ -41512,6 +41916,16 @@ var ExecutionCoordinator = class {
   store;
   artifacts;
   opener;
+  progress = new ProgressManager({ maxAggregateBytes: 15 * 1024 * 1024 });
+  progressObservations = /* @__PURE__ */ new Map();
+  progressRuntime(executionId) {
+    return this.progressObservations.get(executionId) ?? { observed_at: null, backend_reachable: null };
+  }
+  recordProgressObservation(executionId, reachable) {
+    this.progressObservations.delete(executionId);
+    this.progressObservations.set(executionId, { observed_at: (/* @__PURE__ */ new Date()).toISOString(), backend_reachable: reachable });
+    if (this.progressObservations.size > 256) this.progressObservations.delete(this.progressObservations.keys().next().value);
+  }
   backends = /* @__PURE__ */ new Map();
   streams = /* @__PURE__ */ new Map();
   freshAbortAcks = /* @__PURE__ */ new Map();
@@ -41570,6 +41984,7 @@ var ExecutionCoordinator = class {
     try {
       do {
         this.again = false;
+        this.progress.maintain();
         for (const task of this.store.unresolved()) {
           if (this.stopping) break;
           try {
@@ -41613,7 +42028,10 @@ var ExecutionCoordinator = class {
     if (task.backendId && task.backendId !== id) throw new Error("recorded backend identity differs from frozen launch configuration");
     const cached2 = this.backends.get(id);
     if (cached2) {
-      if (cached2.isAlive?.() !== false) return cached2;
+      if (cached2.isAlive?.() !== false) {
+        this.progress.register(task.executionId, cached2.progressSupported ? "supported" : "unsupported");
+        return cached2;
+      }
       await this.releaseBackend(id, cached2);
     }
     const lease = await this.opener({
@@ -41633,6 +42051,9 @@ var ExecutionCoordinator = class {
       openapiDigest: inspection.openapiDigest,
       workspace: inspection.workspace
     });
+    lease.progressSupported = Boolean(inspection.capabilities.progressCheckpoints && lease.backend.readCheckpoint);
+    this.progress.register(task.executionId, lease.progressSupported ? "supported" : "unsupported");
+    this.recordProgressObservation(task.executionId, true);
     this.backends.set(id, lease);
     this.watchEvents(lease);
     return lease;
@@ -41645,15 +42066,32 @@ var ExecutionCoordinator = class {
       let delay = 1e3;
       while (!controller.signal.aborted && !this.stopping) {
         try {
-          for await (const _event of lease.backend.subscribeEvents({ signal: controller.signal })) {
+          for await (const event of lease.backend.subscribeEvents({ signal: controller.signal })) {
             if (controller.signal.aborted) break;
+            if (event.type === "message.part.updated" && lease.backend.readCheckpoint) {
+              for (const current of this.store.unresolved()) {
+                if (current.backendId !== lease.backendId || current.sessionId !== event.sessionId || !current.userMessageId) continue;
+                try {
+                  const update = await lease.backend.readCheckpoint(event, current.sessionId, current.userMessageId, { signal: controller.signal, timeoutMs: 2e3 });
+                  if (!update) continue;
+                  const checkpoint = CheckpointInputSchema.parse(update.checkpoint);
+                  if (checkpoint.evidence_refs.some((id) => !this.store.artifact(current.executionId, id))) continue;
+                  if (checkpoint.blocker?.request_id && !current.pendingRequests.some((request) => request.requestId === checkpoint.blocker.request_id)) continue;
+                  this.progress.append(current.executionId, update.sourceId, checkpoint);
+                } catch {
+                  if (!controller.signal.aborted && !this.stopping) this.progress.recordLoss(current.executionId);
+                }
+              }
+            }
             this.kick();
           }
         } catch {
         }
         if (controller.signal.aborted || this.stopping) break;
         for (const task of this.store.unresolved()) {
-          if (task.backendId !== lease.backendId || task.observation !== "current") continue;
+          if (task.backendId !== lease.backendId) continue;
+          this.progress.reset(task.executionId, "disconnect");
+          if (task.observation !== "current") continue;
           try {
             this.store.transition(
               task.scopeId,
@@ -41770,10 +42208,10 @@ var ExecutionCoordinator = class {
     }
     if (!task.sessionId) throw new Error("session not bound");
     if (!task.reportPath) throw new Error("frozen report path is missing");
-    mkdirSync3(task.reportPath, { recursive: true, mode: 448 });
+    mkdirSync4(task.reportPath, { recursive: true, mode: 448 });
     const sessionId = task.sessionId;
-    const messageId = `msg_${randomUUID4()}`;
-    task = this.store.recordDispatchIntent(task.scopeId, task.taskId, task.revision, lease.backendId, sessionId, messageId);
+    const messageId = `msg_${randomUUID5()}`;
+    task = this.store.recordDispatchIntent(task.scopeId, task.taskId, task.revision, lease.backendId, sessionId, messageId, lease.instanceId ?? null);
     const slash = task.model.indexOf("/");
     const providerId = slash < 0 ? "" : task.model.slice(0, slash);
     const modelId = slash < 0 ? "" : task.model.slice(slash + 1);
@@ -41796,6 +42234,7 @@ var ExecutionCoordinator = class {
     }
     const { backend } = await this.backendFor(task);
     const observed = await backend.inspectTurn(task.sessionId, task.userMessageId, { timeoutMs: 5e3 });
+    this.recordProgressObservation(task.executionId, true);
     task = this.store.get(task.scopeId, task.taskId);
     if (task.cancellationIntent) return;
     this.updateRequests(task, observed);
@@ -41970,7 +42409,7 @@ var ExecutionCoordinator = class {
     if (!task.cancellationIntent || Date.now() - Date.parse(task.cancellationIntent.createdAt) < 3e4) return false;
     const lease = task.backendId ? this.backends.get(task.backendId) : void 0;
     const intent = this.store.cancellationEvent(task.executionId, "cancellation_recovery_intent");
-    if (!lease?.terminateOwned || !lease.instanceId || intent && intent.detail.instanceId !== lease.instanceId) {
+    if (!lease?.terminateOwned || !lease.instanceId || !task.workerInstanceId || lease.instanceId !== task.workerInstanceId || intent && intent.detail.instanceId !== lease.instanceId) {
       this.cancellationDiagnostic(task, "owned_process_handle_unavailable", lease, observed);
       return true;
     }
@@ -42001,7 +42440,7 @@ var ExecutionCoordinator = class {
     const outcome = task.intendedOutcome ?? "failed";
     try {
       if (!task.reportPath || !task.frozenBaseline) throw new Error("frozen report path or baseline missing");
-      mkdirSync3(task.reportPath, { recursive: true, mode: 448 });
+      mkdirSync4(task.reportPath, { recursive: true, mode: 448 });
       let structuredReport;
       if (task.sessionId && task.userMessageId && !this.store.cancellationEvent(task.executionId, "cancellation_stop_confirmed")) {
         try {
@@ -42023,6 +42462,7 @@ var ExecutionCoordinator = class {
       });
       this.store.finalize(task.scopeId, task.taskId, task.revision, outcome, evidence.reportValidity, evidence.finalManifestHash);
       this.store.release(task.executionId);
+      this.progress.markTerminal(task.executionId);
     } catch (error62) {
       if (!expired(task.finalizationDeadlineAt)) {
         this.markUnknown(task, `evidence capture: ${String(error62)}`);
@@ -42030,6 +42470,7 @@ var ExecutionCoordinator = class {
       }
       this.store.finalize(task.scopeId, task.taskId, task.revision, outcome, "invalid", null);
       this.store.release(task.executionId);
+      this.progress.markTerminal(task.executionId);
     }
   }
   markUnknown(task, reason) {
@@ -42055,13 +42496,13 @@ var ExecutionCoordinator = class {
 };
 
 // src/service.ts
-import { randomUUID as randomUUID6 } from "node:crypto";
-import { join as join7 } from "node:path";
+import { randomUUID as randomUUID7 } from "node:crypto";
+import { join as join8 } from "node:path";
 
 // src/store.ts
-import { createHash as createHash8, randomUUID as randomUUID5 } from "node:crypto";
-import { chmodSync as chmodSync2, closeSync as closeSync4, existsSync as existsSync8, fsyncSync as fsyncSync2, mkdirSync as mkdirSync4, openSync as openSync4, rmSync as rmSync3 } from "node:fs";
-import { dirname as dirname3, join as join6 } from "node:path";
+import { createHash as createHash10, randomUUID as randomUUID6 } from "node:crypto";
+import { chmodSync as chmodSync3, closeSync as closeSync4, existsSync as existsSync9, fsyncSync as fsyncSync2, mkdirSync as mkdirSync5, openSync as openSync4, rmSync as rmSync3 } from "node:fs";
+import { dirname as dirname4, join as join7 } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 var StoreConflict = class extends Error {
   constructor(code, message = code) {
@@ -42077,7 +42518,7 @@ function canonical2(value) {
   return `{${Object.keys(object3).filter((key) => object3[key] !== void 0).sort().map((key) => `${JSON.stringify(key)}:${canonical2(object3[key])}`).join(",")}}`;
 }
 function hashPayload(value) {
-  return createHash8("sha256").update(canonical2(value)).digest("hex");
+  return createHash10("sha256").update(canonical2(value)).digest("hex");
 }
 function now() {
   return (/* @__PURE__ */ new Date()).toISOString();
@@ -42135,8 +42576,8 @@ var SqliteTaskStore = class {
   diagnosticFlushTimer = null;
   diagnosticMaintenanceTimer;
   constructor(filename, options = {}) {
-    const existingDatabase = existsSync8(filename);
-    mkdirSync4(dirname3(filename), { recursive: true, mode: 448 });
+    const existingDatabase = existsSync9(filename);
+    mkdirSync5(dirname4(filename), { recursive: true, mode: 448 });
     this.db = new DatabaseSync(filename);
     const versionTable = this.db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='schema_version'").get();
     let schemaVersion = null;
@@ -42149,8 +42590,8 @@ var SqliteTaskStore = class {
       }
     }
     this.db.exec("PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA synchronous=FULL;");
-    chmodSync2(filename, 384);
-    for (const suffix of ["-wal", "-shm"]) if (existsSync8(filename + suffix)) chmodSync2(filename + suffix, 384);
+    chmodSync3(filename, 384);
+    for (const suffix of ["-wal", "-shm"]) if (existsSync9(filename + suffix)) chmodSync3(filename + suffix, 384);
     const objects = new Set(this.db.prepare("SELECT name FROM sqlite_master WHERE type IN ('table','index')").all().map((row) => row.name));
     const requiredObjects = [
       "schema_version",
@@ -42187,16 +42628,17 @@ var SqliteTaskStore = class {
       "execution_timeout_seconds",
       "context_mode",
       "backend_config_json",
-      "launch_contract_json"
+      "launch_contract_json",
+      "worker_instance_id"
     ]) || missingColumn("tasks", ["workspace_access", "request_model_json"]) || missingColumn("input_requests", ["created_at", "response_json", "authorization_basis_json"]) || missingColumn("cancellation_intents", ["abort_acknowledged"]);
     if (existingDatabase && schemaNeedsUpgrade) {
-      const backupDirectory = join6(dirname3(filename), "backups");
+      const backupDirectory = join7(dirname4(filename), "backups");
       let backupPath = null;
       try {
-        mkdirSync4(backupDirectory, { recursive: true, mode: 448 });
-        backupPath = join6(
+        mkdirSync5(backupDirectory, { recursive: true, mode: 448 });
+        backupPath = join7(
           backupDirectory,
-          `${(/* @__PURE__ */ new Date()).toISOString().replaceAll(":", "-")}-schema-${schemaVersion ?? "unknown"}-to-3-${randomUUID5()}.sqlite`
+          `${(/* @__PURE__ */ new Date()).toISOString().replaceAll(":", "-")}-schema-${schemaVersion ?? "unknown"}-to-3-${randomUUID6()}.sqlite`
         );
         closeSync4(openSync4(backupPath, "wx", 384));
         this.db.prepare("VACUUM INTO ?").run(backupPath);
@@ -42311,7 +42753,8 @@ var SqliteTaskStore = class {
       execution_timeout_seconds: "INTEGER",
       context_mode: "TEXT",
       backend_config_json: "TEXT",
-      launch_contract_json: "TEXT"
+      launch_contract_json: "TEXT",
+      worker_instance_id: "TEXT"
     })) {
       if (!columns.has(name)) this.db.exec(`ALTER TABLE executions ADD COLUMN ${name} ${definition}`);
     }
@@ -42413,7 +42856,7 @@ var SqliteTaskStore = class {
     const row = this.db.prepare("SELECT content_blob,original_bytes FROM diagnostic_logs WHERE execution_id=?").get(executionId);
     if (!row) return null;
     const bytes = Buffer.from(row.content_blob);
-    const digest = createHash8("sha256").update(bytes).digest("hex");
+    const digest = createHash10("sha256").update(bytes).digest("hex");
     let offset = 0;
     if (opaqueCursor !== "start") {
       let token;
@@ -42466,8 +42909,8 @@ var SqliteTaskStore = class {
         if (!task2) throw new Error("stored idempotency result is missing");
         return task2;
       }
-      const taskId = input2.taskId ?? `task_${randomUUID5()}`;
-      const executionId = input2.executionId ?? `exec_${randomUUID5()}`;
+      const taskId = input2.taskId ?? `task_${randomUUID6()}`;
+      const executionId = input2.executionId ?? `exec_${randomUUID6()}`;
       const created = now();
       this.db.prepare("INSERT INTO tasks(task_id,scope_id,workspace,packet_json,model,profile,current_execution_id,created_at,workspace_access,request_model_json) VALUES(?,?,?,?,?,?,?,?,?,?)").run(
         taskId,
@@ -42499,7 +42942,7 @@ var SqliteTaskStore = class {
         created,
         created
       );
-      this.db.prepare("INSERT INTO operations VALUES(?,?,?,?,?,?,?)").run(`op_${randomUUID5()}`, input2.scopeId, "start", input2.idempotencyKey, payloadHash, canonical2({ taskId, executionId }), created);
+      this.db.prepare("INSERT INTO operations VALUES(?,?,?,?,?,?,?)").run(`op_${randomUUID6()}`, input2.scopeId, "start", input2.idempotencyKey, payloadHash, canonical2({ taskId, executionId }), created);
       this.event(executionId, "queued", { taskId });
       const task = this.get(input2.scopeId, taskId);
       if (!task) throw new Error("new task missing");
@@ -42534,7 +42977,7 @@ var SqliteTaskStore = class {
       e.session_id,e.user_message_id,e.report_validity,e.review_status,e.final_manifest_hash,e.backend_config_json,e.launch_contract_json,
       e.baseline_hash,e.prompt_hash,e.frozen_prompt,e.frozen_baseline_json,e.report_path,
       e.queue_deadline_at,e.admitted_at,e.execution_deadline_at,e.finalization_deadline_at,e.intended_outcome,
-      e.packet_json,e.created_at,e.updated_at
+      e.worker_instance_id,e.packet_json,e.created_at,e.updated_at
       FROM tasks t JOIN executions e ON e.task_id=t.task_id
       WHERE t.scope_id=? AND t.task_id=? AND e.execution_id=?`).get(scopeId, taskId, executionId);
     if (!row) return null;
@@ -42575,7 +43018,8 @@ var SqliteTaskStore = class {
       updatedAt: row.updated_at,
       reportValidity: row.report_validity,
       finalManifestHash: row.final_manifest_hash,
-      reviewStatus: row.review_status
+      reviewStatus: row.review_status,
+      workerInstanceId: row.worker_instance_id
     };
   }
   list(scopeId, limit = 20) {
@@ -42730,7 +43174,7 @@ var SqliteTaskStore = class {
           const value = typeof source[key] === "string" ? source[key] : JSON.stringify(source[key]);
           blockers[key] = Buffer.from(value).subarray(0, 256).toString("utf8");
         }
-        const digest = createHash8("sha256").update(row.detail_json).digest("hex");
+        const digest = createHash10("sha256").update(row.detail_json).digest("hex");
         const detailCursor = Buffer.from(JSON.stringify({
           executionId,
           sequence: row.sequence,
@@ -42776,7 +43220,7 @@ var SqliteTaskStore = class {
     const row = this.db.prepare("SELECT detail_json FROM events WHERE execution_id=? AND sequence=?").get(executionId, token.sequence);
     if (!row) throw new StoreConflict("INVALID_STATE");
     const bytes = Buffer.from(row.detail_json);
-    const digest = createHash8("sha256").update(bytes).digest("hex");
+    const digest = createHash10("sha256").update(bytes).digest("hex");
     if (digest !== token.sha256 || token.offset > bytes.byteLength) throw new StoreConflict("INVALID_STATE");
     const offset = token.offset;
     const chunk = bytes.subarray(offset, offset + 2048);
@@ -42838,17 +43282,24 @@ var SqliteTaskStore = class {
       return this.get(scopeId, taskId);
     });
   }
-  recordDispatchIntent(scopeId, taskId, expectedRevision, backendId, sessionId, messageId) {
+  recordDispatchIntent(scopeId, taskId, expectedRevision, backendId, sessionId, messageId, workerInstanceId) {
     return this.transaction(() => {
       const task = this.get(scopeId, taskId);
       if (!task) throw new Error("task not found");
       if (task.revision !== expectedRevision) throw new StoreConflict("STALE_REVISION");
       if (task.backendId !== backendId || task.sessionId !== sessionId || !["queued", "dispatching"].includes(task.phase)) throw new StoreConflict("INVALID_STATE");
       if (task.userMessageId || this.dispatchIntent(task.executionId)) throw new StoreConflict("INVALID_STATE");
-      const execution = this.db.prepare("SELECT prompt_hash FROM executions WHERE execution_id=?").get(task.executionId);
+      const execution = this.db.prepare("SELECT prompt_hash,worker_instance_id FROM executions WHERE execution_id=?").get(task.executionId);
       this.db.prepare("INSERT INTO dispatch_intents VALUES(?,?,?,?,?,0,?)").run(task.executionId, backendId, sessionId, messageId, execution.prompt_hash, now());
-      this.db.prepare("UPDATE executions SET user_message_id=?,phase='dispatching',revision=revision+1,updated_at=? WHERE execution_id=?").run(messageId, now(), task.executionId);
-      this.event(task.executionId, "dispatch_intent", { messageId });
+      const updates = ["user_message_id=?", "phase='dispatching'", "revision=revision+1", "updated_at=?"];
+      const params = [messageId, now()];
+      if (workerInstanceId && !execution.worker_instance_id) {
+        updates.push("worker_instance_id=?");
+        params.push(workerInstanceId);
+      }
+      params.push(task.executionId);
+      this.db.prepare(`UPDATE executions SET ${updates.join(",")} WHERE execution_id=?`).run(...params);
+      this.event(task.executionId, "dispatch_intent", { messageId, workerInstanceId: workerInstanceId ?? null });
       return this.get(scopeId, taskId);
     });
   }
@@ -42900,7 +43351,7 @@ var SqliteTaskStore = class {
       const objective = JSON.parse(original.packet_json).objective;
       if (packet.objective !== objective) throw new StoreConflict("INVALID_STATE");
       if (input2.contextMode === "resume" && (!predecessor.backendId || !predecessor.sessionId)) throw new StoreConflict("INVALID_STATE");
-      const executionId = input2.executionId ?? `exec_${randomUUID5()}`;
+      const executionId = input2.executionId ?? `exec_${randomUUID6()}`;
       const instant = now();
       const backendId = null;
       const sessionId = input2.contextMode === "resume" ? predecessor.sessionId : null;
@@ -42932,7 +43383,7 @@ var SqliteTaskStore = class {
       );
       this.db.prepare("UPDATE tasks SET current_execution_id=? WHERE task_id=?").run(executionId, input2.taskId);
       this.db.prepare("INSERT INTO operations VALUES(?,?,?,?,?,?,?)").run(
-        `op_${randomUUID5()}`,
+        `op_${randomUUID6()}`,
         input2.scopeId,
         "continue",
         input2.idempotencyKey,
@@ -43001,7 +43452,7 @@ var SqliteTaskStore = class {
       const phase = task.phase === "queued" ? input2.deadlineOrigin ? "timed_out" : "cancelled" : "cancelling";
       this.db.prepare("UPDATE executions SET phase=?,revision=revision+1,updated_at=? WHERE execution_id=?").run(phase, instant, task.executionId);
       this.db.prepare("INSERT INTO operations VALUES(?,?,?,?,?,?,?)").run(
-        `op_${randomUUID5()}`,
+        `op_${randomUUID6()}`,
         input2.scopeId,
         "cancel",
         input2.idempotencyKey,
@@ -43086,7 +43537,7 @@ var SqliteTaskStore = class {
       this.db.prepare("UPDATE input_requests SET status='responding',response_json=?,authorization_basis_json=? WHERE request_id=?").run(canonical2(input2.reply), canonical2(input2.authorizationBasis), input2.requestId);
       this.db.prepare("UPDATE executions SET revision=revision+1,updated_at=? WHERE execution_id=?").run(instant, input2.executionId);
       this.db.prepare("INSERT INTO operations VALUES(?,?,?,?,?,?,?)").run(
-        `op_${randomUUID5()}`,
+        `op_${randomUUID6()}`,
         input2.scopeId,
         "respond",
         input2.idempotencyKey,
@@ -43234,9 +43685,9 @@ var SqliteTaskStore = class {
         }
       }
       const created = now();
-      this.db.prepare("INSERT INTO reviews VALUES(?,?,?,?,?)").run(`review_${randomUUID5()}`, task.executionId, review.disposition, canonical2(review), created);
+      this.db.prepare("INSERT INTO reviews VALUES(?,?,?,?,?)").run(`review_${randomUUID6()}`, task.executionId, review.disposition, canonical2(review), created);
       this.db.prepare("UPDATE executions SET review_status=?,revision=revision+1,updated_at=? WHERE execution_id=?").run(review.disposition, created, task.executionId);
-      this.db.prepare("INSERT INTO operations VALUES(?,?,?,?,?,?,?)").run(`op_${randomUUID5()}`, scopeId, "review", idempotencyKey, payloadHash, canonical2({ taskId, executionId: task.executionId }), created);
+      this.db.prepare("INSERT INTO operations VALUES(?,?,?,?,?,?,?)").run(`op_${randomUUID6()}`, scopeId, "review", idempotencyKey, payloadHash, canonical2({ taskId, executionId: task.executionId }), created);
       this.event(task.executionId, "review_recorded", { disposition: review.disposition });
       return this.getExecution(scopeId, taskId, task.executionId);
     });
@@ -43244,13 +43695,13 @@ var SqliteTaskStore = class {
 };
 
 // src/prompt.ts
-import { createHash as createHash9 } from "node:crypto";
-import { readFileSync as readFileSync10 } from "node:fs";
+import { createHash as createHash11 } from "node:crypto";
+import { readFileSync as readFileSync11 } from "node:fs";
 function renderPrompt(input2) {
   const { taskId, executionId, profile, packet, baseline, outputDirectory } = input2;
-  const profileText = readFileSync10(workerProfilePath(profile), "utf8");
-  const profileHash = createHash9("sha256").update(profileText).digest("hex");
-  const text = [
+  const profileText = readFileSync11(workerProfilePath(profile), "utf8");
+  const profileHash = createHash11("sha256").update(profileText).digest("hex");
+  const text2 = [
     `# ${packet.title}`,
     `Task ID: ${taskId}`,
     `Execution ID: ${executionId}`,
@@ -43288,12 +43739,12 @@ function renderPrompt(input2) {
     "The report is evidence for parent review; do not claim parent acceptance or invoke the parent-facing toolkit.",
     ""
   ].join("\n");
-  return { text, sha256: createHash9("sha256").update(text).digest("hex") };
+  return { text: text2, sha256: createHash11("sha256").update(text2).digest("hex") };
 }
 
 // src/service.ts
-var Id2 = external_exports.string().min(1);
-var ScopeTask = external_exports.object({ scope_id: Id2, task_id: Id2 }).strict();
+var Id3 = external_exports.string().min(1);
+var ScopeTask = external_exports.object({ scope_id: Id3, task_id: Id3 }).strict();
 function compactTask(task) {
   const {
     packet: _packet,
@@ -43332,11 +43783,13 @@ var SupervisorService = class {
     this.artifacts = artifacts;
     this.coordinator = coordinator;
     this.freezeLaunch = freezeLaunch;
+    this.progress = coordinator?.progress ?? new ProgressManager();
   }
   store;
   artifacts;
   coordinator;
   freezeLaunch;
+  progress;
   assertExecutionAdmission(config2, workspace) {
     const diagnostics = doctor();
     if (!this.coordinator || !diagnostics.runtime.supportedNode || !(diagnostics.backend.executionTested || trustedDevelopmentWorkspace(config2, workspace)))
@@ -43360,6 +43813,8 @@ var SupervisorService = class {
         return this.health();
       case "get_task":
         return this.getTask(params);
+      case "get_progress":
+        return this.getProgress(params);
       case "list_tasks":
         return this.listTasks(params);
       case "wait_tasks":
@@ -43393,7 +43848,7 @@ var SupervisorService = class {
   }
   getTask(params) {
     const input2 = ScopeTask.extend({
-      execution_id: Id2.optional(),
+      execution_id: Id3.optional(),
       after_cursor: external_exports.number().int().min(0).default(0),
       event_detail_cursor: external_exports.string().min(1).max(512).optional(),
       diagnostic_cursor: external_exports.string().min(1).max(512).optional()
@@ -43405,6 +43860,7 @@ var SupervisorService = class {
     const page = this.store.eventPage(task.executionId, input2.after_cursor);
     const snapshot = {
       ...compactTask(task),
+      ...this.progress.hint(task.executionId),
       events: page.events,
       artifacts: this.store.artifactsForExecution(task.executionId).map(({ artifactId, sha256, byteLength, mediaType }) => ({ artifact_id: artifactId, sha256, byte_length: byteLength, media_type: mediaType })),
       cursor: page.cursor,
@@ -43420,8 +43876,23 @@ var SupervisorService = class {
     };
     return snapshot;
   }
+  getProgress(params) {
+    const input2 = ProgressReadSchema.parse(params);
+    const task = this.store.getExecution(input2.scope_id, input2.task_id, input2.execution_id);
+    if (!task) throw new ToolkitError("INVALID_INPUT", "execution not found", "change_input");
+    try {
+      const { scope_id: _scope, task_id: _task, execution_id: _execution, ...options } = input2;
+      return this.progress.read(task.executionId, options, {
+        phase: task.phase,
+        observation: task.observation,
+        ...this.coordinator?.progressRuntime(task.executionId) ?? { observed_at: null, backend_reachable: null }
+      }, { scope_id: input2.scope_id, task_id: input2.task_id, execution_id: task.executionId });
+    } catch (error62) {
+      throw new ToolkitError("INVALID_INPUT", String(error62), "change_input");
+    }
+  }
   listTasks(params) {
-    const input2 = external_exports.object({ scope_id: Id2, limit: external_exports.number().int().min(1).max(100).default(20), states: external_exports.array(Id2).optional(), page_cursor: Id2.optional() }).strict().parse(params);
+    const input2 = external_exports.object({ scope_id: Id3, limit: external_exports.number().int().min(1).max(100).default(20), states: external_exports.array(Id3).optional(), page_cursor: Id3.optional() }).strict().parse(params);
     const page = this.store.listPage(input2.scope_id, {
       limit: input2.limit,
       ...input2.states ? { states: input2.states } : {},
@@ -43431,8 +43902,8 @@ var SupervisorService = class {
   }
   async waitTasks(params) {
     const input2 = external_exports.object({
-      scope_id: Id2,
-      targets: external_exports.array(external_exports.object({ task_id: Id2, after_cursor: external_exports.number().int().min(0).default(0) }).strict()).min(1).max(16),
+      scope_id: Id3,
+      targets: external_exports.array(external_exports.object({ task_id: Id3, after_cursor: external_exports.number().int().min(0).default(0), execution_id: Id3.optional(), after_progress_cursor: Id3.max(512).optional() }).strict()).min(1).max(16),
       timeout_ms: external_exports.number().int().min(0).max(3e4).default(2e4)
     }).strict().parse(params);
     const deadline2 = Date.now() + input2.timeout_ms;
@@ -43440,9 +43911,21 @@ var SupervisorService = class {
       const changed = input2.targets.flatMap((target) => {
         const task = this.store.get(input2.scope_id, target.task_id);
         if (!task) throw new ToolkitError("INVALID_INPUT", `task not found: ${target.task_id}`, "change_input");
+        if (target.execution_id && target.execution_id !== task.executionId) throw new ToolkitError("INVALID_INPUT", "wait execution is no longer current", "change_input");
         const page = this.store.eventPage(task.executionId, target.after_cursor);
-        return page.events.length ? [{
+        let progressChanged = false;
+        if (target.after_progress_cursor) {
+          if (!target.execution_id) throw new ToolkitError("INVALID_INPUT", "execution_id required with progress cursor", "change_input");
+          try {
+            const delta = this.progress.read(task.executionId, { after_cursor: target.after_progress_cursor });
+            progressChanged = delta.updates.length > 0 || delta.gap !== null;
+          } catch (error62) {
+            throw new ToolkitError("INVALID_INPUT", String(error62), "change_input");
+          }
+        }
+        return page.events.length || progressChanged ? [{
           task: compactTask(task),
+          ...progressChanged ? this.progress.hint(task.executionId) : {},
           events: page.events,
           cursor: page.cursor,
           has_more_events: page.hasMore
@@ -43459,8 +43942,8 @@ var SupervisorService = class {
   }
   readArtifact(params) {
     const input2 = ScopeTask.extend({
-      execution_id: Id2,
-      artifact_id: Id2,
+      execution_id: Id3,
+      artifact_id: Id3,
       byte_offset: external_exports.number().int().min(0).default(0),
       max_bytes: external_exports.number().int().min(1).max(65536).default(16384)
     }).parse(params);
@@ -43481,7 +43964,7 @@ var SupervisorService = class {
     };
   }
   recordReview(params) {
-    const input2 = ScopeTask.extend({ execution_id: Id2, expected_revision: external_exports.number().int().positive(), idempotency_key: external_exports.string().min(16).max(128), review: ReviewSchema }).parse(params);
+    const input2 = ScopeTask.extend({ execution_id: Id3, expected_revision: external_exports.number().int().positive(), idempotency_key: external_exports.string().min(16).max(128), review: ReviewSchema }).parse(params);
     const task = this.store.getExecution(input2.scope_id, input2.task_id, input2.execution_id);
     if (!task) throw new ToolkitError("INVALID_INPUT", "execution not found", "change_input");
     if (!["bounded-build", "bounded-inspect"].includes(task.profile)) throw new StoreConflict("INVALID_STATE");
@@ -43505,10 +43988,10 @@ var SupervisorService = class {
   }
   async startTask(params) {
     const input2 = external_exports.object({
-      scope_id: Id2,
+      scope_id: Id3,
       idempotency_key: external_exports.string().min(16).max(128).optional(),
-      workspace: external_exports.object({ path: Id2, access: external_exports.enum(["exclusive", "shared_read"]).default("exclusive") }).strict(),
-      model: external_exports.union([external_exports.object({ provider_id: Id2, model_id: Id2 }).strict(), external_exports.object({ profile: Id2 }).strict()]),
+      workspace: external_exports.object({ path: Id3, access: external_exports.enum(["exclusive", "shared_read"]).default("exclusive") }).strict(),
+      model: external_exports.union([external_exports.object({ provider_id: Id3, model_id: Id3 }).strict(), external_exports.object({ profile: Id3 }).strict()]),
       profile: external_exports.enum(["bounded-build", "bounded-inspect"]),
       limits: external_exports.object({ queue_timeout_seconds: external_exports.number().int().positive(), execution_timeout_seconds: external_exports.number().int().positive() }).strict(),
       packet: TaskPacketSchema,
@@ -43564,9 +44047,9 @@ var SupervisorService = class {
     if (!input2.idempotency_key) throw new ToolkitError("INVALID_INPUT", "idempotency_key is required", "change_input");
     if (config2.attached_backend) throw new ToolkitError("UNSUPPORTED_BACKEND", "attached backend dispatch is not certified");
     this.assertExecutionAdmission(config2, baseline.workspace);
-    const taskId = `task_${randomUUID6()}`;
-    const executionId = `exec_${randomUUID6()}`;
-    const reportPath = join7(stateDirectory(), "reports", executionId);
+    const taskId = `task_${randomUUID7()}`;
+    const executionId = `exec_${randomUUID7()}`;
+    const reportPath = join8(stateDirectory(), "reports", executionId);
     const launchContract = await this.frozenLaunch(config2.opencode_binary, baseline.workspace, reportPath, configuredModel);
     const frozen = renderPrompt({
       taskId,
@@ -43603,7 +44086,7 @@ var SupervisorService = class {
   }
   async continueTask(params) {
     const input2 = ScopeTask.extend({
-      predecessor_execution_id: Id2,
+      predecessor_execution_id: Id3,
       expected_revision: external_exports.number().int().positive(),
       idempotency_key: external_exports.string().min(16).max(128),
       context_mode: external_exports.enum(["resume", "fresh"]),
@@ -43644,8 +44127,8 @@ var SupervisorService = class {
       readRoots: config2.read_roots,
       packet: input2.packet
     });
-    const executionId = `exec_${randomUUID6()}`;
-    const reportPath = join7(stateDirectory(), "reports", executionId);
+    const executionId = `exec_${randomUUID7()}`;
+    const reportPath = join8(stateDirectory(), "reports", executionId);
     if (!predecessor.launchContract) throw new ToolkitError("UNSUPPORTED_BACKEND", "predecessor launch configuration is missing");
     if (predecessor.backendConfig?.opencode_binary !== config2.opencode_binary)
       throw new ToolkitError("POLICY_MISMATCH", "follow-up changes the recorded OpenCode binary", "change_input");
@@ -43684,8 +44167,8 @@ var SupervisorService = class {
   }
   cancelTask(params) {
     const input2 = ScopeTask.extend({
-      execution_id: Id2,
-      reason: Id2,
+      execution_id: Id3,
+      reason: Id3,
       expected_revision: external_exports.number().int().positive(),
       idempotency_key: external_exports.string().min(16).max(128)
     }).parse(params);
@@ -43712,11 +44195,11 @@ var SupervisorService = class {
   }
   async respondToRequest(params) {
     const input2 = ScopeTask.extend({
-      execution_id: Id2,
-      request_id: Id2,
+      execution_id: Id3,
+      request_id: Id3,
       request_revision: external_exports.number().int().positive(),
-      reply: external_exports.union([external_exports.enum(["allow_once", "deny"]), external_exports.array(external_exports.array(Id2))]),
-      authorization_basis: Id2,
+      reply: external_exports.union([external_exports.enum(["allow_once", "deny"]), external_exports.array(external_exports.array(Id3))]),
+      authorization_basis: Id3,
       idempotency_key: external_exports.string().min(16).max(128)
     }).parse(params);
     if (!this.coordinator) throw new ToolkitError("UNSUPPORTED_BACKEND", "execution coordinator is unavailable");
@@ -43789,8 +44272,8 @@ async function runDaemon() {
   let store;
   let coordinator;
   try {
-    store = new SqliteTaskStore(join8(stateDir, "state.sqlite"));
-    const artifacts = new ArtifactStore(join8(stateDir, "artifacts"));
+    store = new SqliteTaskStore(join9(stateDir, "state.sqlite"));
+    const artifacts = new ArtifactStore(join9(stateDir, "artifacts"));
     coordinator = new ExecutionCoordinator(store, artifacts);
     const service = new SupervisorService(store, artifacts, coordinator);
     artifacts.reconcile((artifactId) => store.artifactById(artifactId), store.allArtifacts());
@@ -43851,21 +44334,21 @@ async function stopDaemon() {
 }
 
 // src/mcp.ts
-var Id3 = external_exports.string().min(1);
+var Id4 = external_exports.string().min(1);
 var Key = external_exports.string().min(16).max(128);
 var Revision = external_exports.number().int().positive();
-var Scope = { scope_id: Id3 };
+var Scope = { scope_id: Id4 };
 function result(value) {
   const structuredContent = value && typeof value === "object" && !Array.isArray(value) ? value : { value };
   const raw = JSON.stringify(structuredContent);
-  const text = raw.length > 8e3 ? `${raw.slice(0, 7950)}... [read structured content for full response]` : raw;
-  return { structuredContent, content: [{ type: "text", text }] };
+  const text2 = raw.length > 8e3 ? `${raw.slice(0, 7950)}... [read structured content for full response]` : raw;
+  return { structuredContent, content: [{ type: "text", text: text2 }] };
 }
 function createMcpServer(call) {
   const server = new McpServer({ name: "opencode-agents", version: "2.0.0-dev.0" });
   server.registerTool("opencode_health", {
     description: "Read toolkit and configured backend health without inference.",
-    inputSchema: external_exports.object({ backend_id: Id3.optional() }).strict(),
+    inputSchema: external_exports.object({ backend_id: Id4.optional() }).strict(),
     annotations: { readOnlyHint: true }
   }, async (input2) => result(await call("health", input2)));
   server.registerTool("opencode_start_task", {
@@ -43873,10 +44356,10 @@ function createMcpServer(call) {
     inputSchema: external_exports.object({
       ...Scope,
       idempotency_key: Key.optional(),
-      workspace: external_exports.object({ path: Id3, access: external_exports.enum(["exclusive", "shared_read"]).default("exclusive") }).strict(),
+      workspace: external_exports.object({ path: Id4, access: external_exports.enum(["exclusive", "shared_read"]).default("exclusive") }).strict(),
       model: external_exports.union([
-        external_exports.object({ provider_id: Id3, model_id: Id3 }).strict(),
-        external_exports.object({ profile: Id3 }).strict()
+        external_exports.object({ provider_id: Id4, model_id: Id4 }).strict(),
+        external_exports.object({ profile: Id4 }).strict()
       ]),
       profile: external_exports.enum(["bounded-build", "bounded-inspect"]),
       limits: external_exports.object({ queue_timeout_seconds: external_exports.number().int().positive(), execution_timeout_seconds: external_exports.number().int().positive() }).strict(),
@@ -43888,30 +44371,41 @@ function createMcpServer(call) {
     description: "Read a compact task snapshot and material events.",
     inputSchema: external_exports.object({
       ...Scope,
-      task_id: Id3,
-      execution_id: Id3.optional(),
+      task_id: Id4,
+      execution_id: Id4.optional(),
       after_cursor: external_exports.number().int().min(0).optional(),
-      event_detail_cursor: Id3.optional(),
-      diagnostic_cursor: Id3.optional()
+      event_detail_cursor: Id4.optional(),
+      diagnostic_cursor: Id4.optional()
     }).strict(),
     annotations: { readOnlyHint: true }
   }, async (input2) => result(await call("get_task", input2)));
+  server.registerTool("opencode_get_progress", {
+    description: "Read bounded unseen worker checkpoints for one exact execution without inference.",
+    inputSchema: ProgressReadSchema,
+    annotations: { readOnlyHint: true }
+  }, async (input2) => {
+    const value = await call("get_progress", input2);
+    return { structuredContent: value, content: [{
+      type: "text",
+      text: "Read structuredContent for the bounded, advisory worker progress delta."
+    }] };
+  });
   server.registerTool("opencode_list_tasks", {
     description: "Recover task identities in a coordination scope.",
-    inputSchema: external_exports.object({ ...Scope, states: external_exports.array(Id3).optional(), limit: external_exports.number().int().min(1).max(100).default(20), page_cursor: Id3.optional() }).strict(),
+    inputSchema: external_exports.object({ ...Scope, states: external_exports.array(Id4).optional(), limit: external_exports.number().int().min(1).max(100).default(20), page_cursor: Id4.optional() }).strict(),
     annotations: { readOnlyHint: true }
   }, async (input2) => result(await call("list_tasks", input2)));
   server.registerTool("opencode_wait_tasks", {
     description: "Wait briefly for material changes; timeout never cancels work.",
-    inputSchema: external_exports.object({ ...Scope, targets: external_exports.array(external_exports.object({ task_id: Id3, after_cursor: external_exports.number().int().min(0).default(0) }).strict()).min(1).max(16), timeout_ms: external_exports.number().int().min(0).max(3e4).default(2e4) }).strict(),
+    inputSchema: external_exports.object({ ...Scope, targets: external_exports.array(external_exports.object({ task_id: Id4, after_cursor: external_exports.number().int().min(0).default(0), execution_id: Id4.optional(), after_progress_cursor: Id4.max(512).optional() }).strict()).min(1).max(16), timeout_ms: external_exports.number().int().min(0).max(3e4).default(2e4) }).strict(),
     annotations: { readOnlyHint: true }
   }, async (input2) => result(await call("wait_tasks", input2)));
   server.registerTool("opencode_continue_task", {
     description: "Continue a resolved task in its exact recorded session or fresh context.",
     inputSchema: external_exports.object({
       ...Scope,
-      task_id: Id3,
-      predecessor_execution_id: Id3,
+      task_id: Id4,
+      predecessor_execution_id: Id4,
       expected_revision: Revision,
       idempotency_key: Key,
       context_mode: external_exports.enum(["resume", "fresh"]),
@@ -43920,18 +44414,18 @@ function createMcpServer(call) {
   }, async (input2) => result(await call("continue_task", input2)));
   server.registerTool("opencode_cancel_task", {
     description: "Record a cancellation request; confirmation is reported separately.",
-    inputSchema: external_exports.object({ ...Scope, task_id: Id3, execution_id: Id3, reason: Id3, expected_revision: Revision, idempotency_key: Key }).strict()
+    inputSchema: external_exports.object({ ...Scope, task_id: Id4, execution_id: Id4, reason: Id4, expected_revision: Revision, idempotency_key: Key }).strict()
   }, async (input2) => result(await call("cancel_task", input2)));
   server.registerTool("opencode_respond_to_request", {
     description: "Reply once to a current permission or question request.",
     inputSchema: external_exports.object({
       ...Scope,
-      task_id: Id3,
-      execution_id: Id3,
-      request_id: Id3,
+      task_id: Id4,
+      execution_id: Id4,
+      request_id: Id4,
       request_revision: Revision,
-      reply: external_exports.union([external_exports.enum(["allow_once", "deny"]), external_exports.array(external_exports.array(Id3))]),
-      authorization_basis: Id3,
+      reply: external_exports.union([external_exports.enum(["allow_once", "deny"]), external_exports.array(external_exports.array(Id4))]),
+      authorization_basis: Id4,
       idempotency_key: Key
     }).strict()
   }, async (input2) => result(await call("respond_to_request", input2)));
@@ -43939,9 +44433,9 @@ function createMcpServer(call) {
     description: "Read a bounded range of an immutable artifact.",
     inputSchema: external_exports.object({
       ...Scope,
-      task_id: Id3,
-      execution_id: Id3,
-      artifact_id: Id3,
+      task_id: Id4,
+      execution_id: Id4,
+      artifact_id: Id4,
       byte_offset: external_exports.number().int().min(0).default(0),
       max_bytes: external_exports.number().int().min(1).max(65536).default(16384)
     }).strict(),
@@ -43949,7 +44443,7 @@ function createMcpServer(call) {
   }, async (input2) => result(await call("read_artifact", input2)));
   server.registerTool("opencode_record_review", {
     description: "Append the parent's evidence-based review decision.",
-    inputSchema: external_exports.object({ ...Scope, task_id: Id3, execution_id: Id3, expected_revision: Revision, idempotency_key: Key, review: ReviewSchema }).strict()
+    inputSchema: external_exports.object({ ...Scope, task_id: Id4, execution_id: Id4, expected_revision: Revision, idempotency_key: Key, review: ReviewSchema }).strict()
   }, async (input2) => result(await call("record_review", input2)));
   return server;
 }
@@ -43965,116 +44459,116 @@ async function runMcp() {
 }
 
 // src/cli.ts
-async function main(args) {
-  if (args.length === 1 && args[0] === "doctor") {
+async function main(args2) {
+  if (args2.length === 1 && args2[0] === "doctor") {
     process.stdout.write(`${JSON.stringify(await doctorWithAttached(), null, 2)}
 `);
     return 0;
   }
-  if (args.length === 1 && args[0] === "mcp") {
+  if (args2.length === 1 && args2[0] === "mcp") {
     await runMcp();
     return 0;
   }
-  if (args[0] === "daemon" && args.length === 2) {
-    if (args[1] === "run") {
+  if (args2[0] === "daemon" && args2.length === 2) {
+    if (args2[1] === "run") {
       await runDaemon();
       return 0;
     }
-    const value = args[1] === "start" ? await startDaemon(process.argv[1]) : args[1] === "status" ? await daemonStatus() : args[1] === "stop" ? await stopDaemon() : null;
+    const value = args2[1] === "start" ? await startDaemon(process.argv[1]) : args2[1] === "status" ? await daemonStatus() : args2[1] === "stop" ? await stopDaemon() : null;
     if (value !== null) {
       process.stdout.write(`${JSON.stringify(value)}
 `);
       return 0;
     }
   }
-  if (args[0] === "tasks" && args[1] === "list" && args.length === 3) {
-    process.stdout.write(`${JSON.stringify(await rpcRequest(stateDirectory(), "list_tasks", { scope_id: args[2] }), null, 2)}
+  if (args2[0] === "tasks" && args2[1] === "list" && args2.length === 3) {
+    process.stdout.write(`${JSON.stringify(await rpcRequest(stateDirectory(), "list_tasks", { scope_id: args2[2] }), null, 2)}
 `);
     return 0;
   }
-  if (args[0] === "tasks" && args[1] === "get" && args.length === 4) {
-    process.stdout.write(`${JSON.stringify(await rpcRequest(stateDirectory(), "get_task", { scope_id: args[2], task_id: args[3] }), null, 2)}
+  if (args2[0] === "tasks" && args2[1] === "get" && args2.length === 4) {
+    process.stdout.write(`${JSON.stringify(await rpcRequest(stateDirectory(), "get_task", { scope_id: args2[2], task_id: args2[3] }), null, 2)}
 `);
     return 0;
   }
-  if (args[0] === "tasks" && args[1] === "diagnostics" && (args.length === 4 || args.length === 5)) {
+  if (args2[0] === "tasks" && args2[1] === "diagnostics" && (args2.length === 4 || args2.length === 5)) {
     process.stdout.write(`${JSON.stringify(await rpcRequest(stateDirectory(), "get_task", {
-      scope_id: args[2],
-      task_id: args[3],
-      diagnostic_cursor: args[4] ?? "start"
+      scope_id: args2[2],
+      task_id: args2[3],
+      diagnostic_cursor: args2[4] ?? "start"
     }), null, 2)}
 `);
     return 0;
   }
-  if (args[0] === "tasks" && args[1] === "wait" && args.length === 5) {
-    const timeout = Number(args[4]);
+  if (args2[0] === "tasks" && args2[1] === "wait" && args2.length === 5) {
+    const timeout = Number(args2[4]);
     process.stdout.write(`${JSON.stringify(await rpcRequest(stateDirectory(), "wait_tasks", {
-      scope_id: args[2],
-      targets: [{ task_id: args[3] }],
+      scope_id: args2[2],
+      targets: [{ task_id: args2[3] }],
       timeout_ms: timeout
     }, timeout + 1500), null, 2)}
 `);
     return 0;
   }
-  if (args[0] === "tasks" && args[1] === "cancel" && args.length === 8) {
-    const revision = Number(args[5]);
+  if (args2[0] === "tasks" && args2[1] === "cancel" && args2.length === 8) {
+    const revision = Number(args2[5]);
     if (!Number.isSafeInteger(revision) || revision < 1) throw new Error("expected_revision must be a positive integer");
     const result2 = await rpcRequest(stateDirectory(), "cancel_task", {
-      scope_id: args[2],
-      task_id: args[3],
-      execution_id: args[4],
+      scope_id: args2[2],
+      task_id: args2[3],
+      execution_id: args2[4],
       expected_revision: revision,
-      reason: args[6],
-      idempotency_key: args[7]
+      reason: args2[6],
+      idempotency_key: args2[7]
     });
     process.stdout.write(`${JSON.stringify(result2, null, 2)}
 `);
     return 0;
   }
-  if (args[0] === "artifacts" && args[1] === "read" && (args.length === 6 || args.length === 8)) {
+  if (args2[0] === "artifacts" && args2[1] === "read" && (args2.length === 6 || args2.length === 8)) {
     const result2 = await rpcRequest(stateDirectory(), "read_artifact", {
-      scope_id: args[2],
-      task_id: args[3],
-      execution_id: args[4],
-      artifact_id: args[5],
-      ...args[6] ? { byte_offset: Number(args[6]) } : {},
-      ...args[7] ? { max_bytes: Number(args[7]) } : {}
+      scope_id: args2[2],
+      task_id: args2[3],
+      execution_id: args2[4],
+      artifact_id: args2[5],
+      ...args2[6] ? { byte_offset: Number(args2[6]) } : {},
+      ...args2[7] ? { max_bytes: Number(args2[7]) } : {}
     });
     process.stdout.write(`${JSON.stringify(result2, null, 2)}
 `);
     return 0;
   }
-  if (args[0] === "artifacts" && args[1] === "export" && args.length === 7) {
-    const output2 = createWriteStream(args[6], { flags: "wx", mode: 384 });
-    const hash3 = createHash10("sha256");
+  if (args2[0] === "artifacts" && args2[1] === "export" && args2.length === 7) {
+    const output2 = createWriteStream(args2[6], { flags: "wx", mode: 384 });
+    const hash4 = createHash12("sha256");
     try {
       let offset = 0;
       let digest = null;
       while (true) {
         const result2 = await rpcRequest(stateDirectory(), "read_artifact", {
-          scope_id: args[2],
-          task_id: args[3],
-          execution_id: args[4],
-          artifact_id: args[5],
+          scope_id: args2[2],
+          task_id: args2[3],
+          execution_id: args2[4],
+          artifact_id: args2[5],
           byte_offset: offset,
           max_bytes: 65536
         });
         if (digest && result2.sha256 !== digest) throw new Error("artifact changed during export");
         digest = result2.sha256;
         const bytes = Buffer.from(result2.content_base64, "base64");
-        hash3.update(bytes);
+        hash4.update(bytes);
         if (!output2.write(bytes)) await once(output2, "drain");
         if (result2.next_offset === null) break;
         offset = result2.next_offset;
       }
       output2.end();
       await once(output2, "finish");
-      if (hash3.digest("hex") !== digest) throw new Error("exported bytes do not match artifact hash");
-      process.stdout.write(`${JSON.stringify({ path: args[6], sha256: digest })}
+      if (hash4.digest("hex") !== digest) throw new Error("exported bytes do not match artifact hash");
+      process.stdout.write(`${JSON.stringify({ path: args2[6], sha256: digest })}
 `);
     } catch (error62) {
       output2.destroy();
-      rmSync4(args[6], { force: true });
+      rmSync4(args2[6], { force: true });
       throw error62;
     }
     return 0;

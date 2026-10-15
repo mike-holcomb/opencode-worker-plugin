@@ -38,7 +38,7 @@ test("development opt-in requires an exact trusted workspace and keeps certifica
   let backendId = "";
   let finished = false;
   const backend = {
-    async inspectBackend() { return { version: "1.18.35", openapiDigest: "pinned-digest", backendId,
+    async inspectBackend() { return { version: "1.19.0", openapiDigest: "pinned-digest", backendId,
       workspace: canonicalWorkspace, configurationDigest: "frozen", supportedForExecution: false, exactPairRecognized: true,
       capabilities: { callerAssignedMessageId: true, permissionRequests: true,
         questionRequests: false, structuredOutput: false, sessionRecovery: true } }; },
@@ -105,7 +105,7 @@ test("development opt-in requires an exact trusted workspace and keeps certifica
 });
 
 test("development pair gate rejects unknown pair even with workspace opt-in", () => {
-  const inspection = { version: "1.18.35", openapiDigest: "wrong", backendId: "backend",
+  const inspection = { version: "1.19.0", openapiDigest: "wrong", backendId: "backend",
     workspace: "/tmp/project", configurationDigest: "config", supportedForExecution: false,
     exactPairRecognized: false, capabilities: { callerAssignedMessageId: true, permissionRequests: true,
       questionRequests: false, structuredOutput: false, sessionRecovery: true } };

@@ -1,7 +1,7 @@
 import { resolve } from 'node:path';
 import assert from 'node:assert/strict';
 
-// OpenCode 1.18.35 may strip the leading slash from an edit pattern.
+// OpenCode 1.19.0 may strip the leading slash from an edit pattern.
 // That spelling needs a separately supplied, declared absolute metadata path.
 export function allowsDeclaredEdit(detail, workspace, allowedPaths) {
   const patterns=detail.patterns;

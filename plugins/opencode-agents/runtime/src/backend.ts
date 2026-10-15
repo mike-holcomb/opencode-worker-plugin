@@ -18,13 +18,14 @@ export type BackendInspection = {
     questionRequests: boolean;
     structuredOutput: boolean;
     sessionRecovery: boolean;
+    progressCheckpoints?: boolean;
   };
 };
 
 /** A private development opt-in never changes the pair's certified status. */
 export function executionPairAllowed(inspection: BackendInspection, trustedDevelopmentOptIn: boolean): boolean {
   return inspection.supportedForExecution || (trustedDevelopmentOptIn &&
-    inspection.exactPairRecognized === true && inspection.version === "1.18.35");
+    inspection.exactPairRecognized === true && inspection.version === "1.19.0");
 }
 
 export type SessionIdentity = {
@@ -75,6 +76,7 @@ export interface OpenCodeBackend {
     structuredOutputSchema?: Record<string, unknown>;
   }, control?: RequestControl): Promise<void>;
   inspectTurn(sessionId: string, messageId: string, control?: RequestControl): Promise<TurnObservation>;
+  readCheckpoint?(event: BackendEvent, sessionId: string, userMessageId: string, control?: RequestControl): Promise<{ sourceId: string; checkpoint: unknown } | null>;
   subscribeEvents(control?: RequestControl): AsyncIterable<BackendEvent>;
   replyToRequest(request: PendingRequest, reply: "allow_once" | "deny" | string[][], control?: RequestControl): Promise<void>;
   abortSession(sessionId: string, control?: RequestControl): Promise<boolean>;

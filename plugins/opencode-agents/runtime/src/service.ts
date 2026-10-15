@@ -1,3 +1,4 @@
+import { ProgressManager, ProgressReadSchema } from "./progress.js";
 import { z } from "zod";
 import { randomUUID } from "node:crypto";
 import { join } from "node:path";
@@ -30,9 +31,12 @@ export class ToolkitError extends Error {
 }
 
 export class SupervisorService {
+  readonly progress: ProgressManager;
   constructor(readonly store: SqliteTaskStore, readonly artifacts: ArtifactStore,
     readonly coordinator?: ExecutionCoordinator,
-    readonly freezeLaunch: typeof freezeManagedLaunch = freezeManagedLaunch) {}
+    readonly freezeLaunch: typeof freezeManagedLaunch = freezeManagedLaunch) {
+    this.progress = coordinator?.progress ?? new ProgressManager();
+  }
 
   private assertExecutionAdmission(config: UserConfig, workspace: string): void {
     const diagnostics = doctor();
@@ -56,6 +60,7 @@ export class SupervisorService {
     switch (method) {
       case "health": return this.health();
       case "get_task": return this.getTask(params);
+      case "get_progress": return this.getProgress(params);
       case "list_tasks": return this.listTasks(params);
       case "wait_tasks": return this.waitTasks(params);
       case "read_artifact": return this.readArtifact(params);
@@ -88,7 +93,7 @@ export class SupervisorService {
       : this.store.get(input.scope_id, input.task_id);
     if (!task) throw new ToolkitError("INVALID_INPUT", "task not found", "change_input");
     const page = this.store.eventPage(task.executionId, input.after_cursor);
-    const snapshot = { ...compactTask(task),
+    const snapshot = { ...compactTask(task), ...this.progress.hint(task.executionId),
       events: page.events, artifacts: this.store.artifactsForExecution(task.executionId).map(({ artifactId, sha256, byteLength, mediaType }) =>
         ({ artifact_id: artifactId, sha256, byte_length: byteLength, media_type: mediaType })),
       cursor: page.cursor, has_more_events: page.hasMore };
@@ -97,6 +102,19 @@ export class SupervisorService {
     if (input.diagnostic_cursor) return { ...snapshot,
       diagnostic: this.store.diagnosticChunk(task.executionId, input.diagnostic_cursor) };
     return snapshot;
+  }
+
+  private getProgress(params: unknown) {
+    const input = ProgressReadSchema.parse(params);
+    const task = this.store.getExecution(input.scope_id, input.task_id, input.execution_id);
+    if (!task) throw new ToolkitError("INVALID_INPUT", "execution not found", "change_input");
+    try {
+      const { scope_id: _scope, task_id: _task, execution_id: _execution, ...options } = input;
+      return this.progress.read(task.executionId, options, {
+        phase: task.phase, observation: task.observation,
+        ...(this.coordinator?.progressRuntime(task.executionId) ?? { observed_at: null, backend_reachable: null }),
+      }, { scope_id: input.scope_id, task_id: input.task_id, execution_id: task.executionId });
+    } catch (error) { throw new ToolkitError("INVALID_INPUT", String(error), "change_input"); }
   }
 
   private listTasks(params: unknown) {
@@ -108,15 +126,24 @@ export class SupervisorService {
   }
 
   private async waitTasks(params: unknown) {
-    const input = z.object({ scope_id: Id, targets: z.array(z.object({ task_id: Id, after_cursor: z.number().int().min(0).default(0) }).strict()).min(1).max(16),
+    const input = z.object({ scope_id: Id, targets: z.array(z.object({ task_id: Id, after_cursor: z.number().int().min(0).default(0), execution_id: Id.optional(), after_progress_cursor: Id.max(512).optional() }).strict()).min(1).max(16),
       timeout_ms: z.number().int().min(0).max(30_000).default(20_000) }).strict().parse(params);
     const deadline = Date.now() + input.timeout_ms;
     while (true) {
       const changed = input.targets.flatMap((target) => {
         const task = this.store.get(input.scope_id, target.task_id);
         if (!task) throw new ToolkitError("INVALID_INPUT", `task not found: ${target.task_id}`, "change_input");
+        if (target.execution_id && target.execution_id !== task.executionId) throw new ToolkitError("INVALID_INPUT", "wait execution is no longer current", "change_input");
         const page = this.store.eventPage(task.executionId, target.after_cursor);
-        return page.events.length ? [{ task: compactTask(task), events: page.events,
+        let progressChanged = false;
+        if (target.after_progress_cursor) {
+          if (!target.execution_id) throw new ToolkitError("INVALID_INPUT", "execution_id required with progress cursor", "change_input");
+          try {
+            const delta = this.progress.read(task.executionId, { after_cursor: target.after_progress_cursor }) as { updates: unknown[]; gap: unknown };
+            progressChanged = delta.updates.length > 0 || delta.gap !== null;
+          } catch (error) { throw new ToolkitError("INVALID_INPUT", String(error), "change_input"); }
+        }
+        return page.events.length || progressChanged ? [{ task: compactTask(task), ...(progressChanged ? this.progress.hint(task.executionId) : {}), events: page.events,
           cursor: page.cursor, has_more_events: page.hasMore }] : [];
       });
       if (changed.length) return { timed_out: false, changed: changed.slice(0, 1),
