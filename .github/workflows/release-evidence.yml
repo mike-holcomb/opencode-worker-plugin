@@ -1,7 +1,9 @@
 name: Release evidence
 on:
+  pull_request:
+    branches: [main]
   push:
-    branches: ['feat/opencode-agents-v2', 'release-evidence/**']
+    branches: ['main', 'dev', 'feat/opencode-agents-v2', 'release-evidence/**']
   workflow_dispatch:
 permissions:
   contents: read

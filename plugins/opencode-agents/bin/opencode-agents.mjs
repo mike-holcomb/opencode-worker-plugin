@@ -26865,7 +26865,7 @@ function doctor() {
   const major = Number(process.versions.node.split(".")[0]);
   const minor = Number(process.versions.node.split(".")[1]);
   const result2 = {
-    runtime: { node: process.versions.node, supportedNode: major === 24 && minor >= 15, toolkit: "2.0.0-dev.0" },
+    runtime: { node: process.versions.node, supportedNode: major === 24 && minor >= 15, toolkit: "2.1.0" },
     configuration: { path: configurationPath(), status: "missing" },
     backend: { mode: "managed", binary: null, version: null, configuredModels: [], certifiedPairs: [], executionTested: false },
     storage: { path: stateDirectory(), exists: existsSync4(stateDirectory()) }
@@ -44345,7 +44345,7 @@ function result(value) {
   return { structuredContent, content: [{ type: "text", text: text2 }] };
 }
 function createMcpServer(call) {
-  const server = new McpServer({ name: "opencode-agents", version: "2.0.0-dev.0" });
+  const server = new McpServer({ name: "opencode-agents", version: "2.1.0" });
   server.registerTool("opencode_health", {
     description: "Read toolkit and configured backend health without inference.",
     inputSchema: external_exports.object({ backend_id: Id4.optional() }).strict(),

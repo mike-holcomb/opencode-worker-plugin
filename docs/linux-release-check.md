@@ -6,11 +6,11 @@ at commit `494efb6c535e53aac7fb247233ef3db2163bcf90`. See
 This handoff covers the separate real managed-execution suite on Linux.
 
 Use a trusted disposable Linux filesystem workspace, Node 24.21.0, and the
-independently installed OpenCode 1.18.35 executable. Check out the PR #1 branch
+independently installed OpenCode 1.19.0 executable. Check out the 2.1.0 release branch
 and record the exact commit:
 
 ```sh
-git clone --branch feat/opencode-agents-v2 https://github.com/mike-holcomb/opencode-worker-plugin.git
+git clone --branch release/2.1.0 https://github.com/mike-holcomb/opencode-worker-plugin.git
 cd opencode-worker-plugin
 git rev-parse HEAD
 cd plugins/opencode-agents/runtime

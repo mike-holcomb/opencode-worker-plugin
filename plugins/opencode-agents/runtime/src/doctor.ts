@@ -17,7 +17,7 @@ export function doctor(): DoctorResult {
   const major = Number(process.versions.node.split(".")[0]);
   const minor = Number(process.versions.node.split(".")[1]);
   const result: DoctorResult = {
-    runtime: { node: process.versions.node, supportedNode: major === 24 && minor >= 15, toolkit: "2.0.0-dev.0" },
+    runtime: { node: process.versions.node, supportedNode: major === 24 && minor >= 15, toolkit: "2.1.0" },
     configuration: { path: configurationPath(), status: "missing" },
     backend: { mode: "managed", binary: null, version: null, configuredModels: [], certifiedPairs: [], executionTested: false },
     storage: { path: stateDirectory(), exists: existsSync(stateDirectory()) },

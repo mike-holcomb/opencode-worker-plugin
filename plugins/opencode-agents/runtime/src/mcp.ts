@@ -21,7 +21,7 @@ function result(value: unknown) {
 }
 
 export function createMcpServer(call: (method: string, params: unknown) => Promise<unknown>): McpServer {
-  const server = new McpServer({ name: "opencode-agents", version: "2.0.0-dev.0" });
+  const server = new McpServer({ name: "opencode-agents", version: "2.1.0" });
   server.registerTool("opencode_health", {
     description: "Read toolkit and configured backend health without inference.",
     inputSchema: z.object({ backend_id: Id.optional() }).strict(),

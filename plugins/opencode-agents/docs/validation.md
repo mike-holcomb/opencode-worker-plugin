@@ -1,19 +1,24 @@
 # V2 validation
 
-[OpenCode Agents v2.0.0](https://github.com/mike-holcomb/opencode-worker-plugin/releases/tag/v2.0.0)
-is a published full release. Its internal package version remains `2.0.0-dev.0`,
-and the compatibility manifest retains `execution_supported: false`. Live managed
-execution requires the exact trusted-workspace opt-in in [installation](installation.md).
-Release publication and execution certification are separate statuses.
+## Release 2.1.0 candidate
 
-## Development branch: OpenCode 1.19.0
+Plugin/runtime version `2.1.0` targets OpenCode and SDK 1.19.0 and includes
+issues #2, #3 and #4. Publication and execution certification are separate:
+`execution_supported` remains false, and live managed execution requires the
+exact trusted-workspace opt-in in [installation](installation.md).
+See the [release notes](https://github.com/mike-holcomb/opencode-worker-plugin/blob/main/docs/releases/v2.1.0.md) for candidate checks.
 
-The development branch pins OpenCode and SDK 1.19.0. Native checkpoint transport,
-read-only audits, continuation, supervisor recovery, permission delivery and
-cancellation have local Glimmer evidence. These checks do not certify the release;
-`execution_supported` remains false. See [progress validation](progress.md) for
+Native checkpoint transport, read-only audits, continuation, supervisor recovery,
+permission delivery and cancellation have local Glimmer evidence. These checks
+do not certify the release. See [progress validation](progress.md) for
 reproduction commands, measured response sizes and the denial fixture limit.
-The evidence below describes the historical published tag.
+Marketplace installation from the final `v2.1.0` tag remains pending.
+
+## Historical v2.0.0 evidence
+
+[v2.0.0](https://github.com/mike-holcomb/opencode-worker-plugin/releases/tag/v2.0.0)
+is the current published full release, with internal package version `2.0.0-dev.0`.
+The following results describe that historical release, not reruns of 2.1.0.
 
 ## Automated checks
 
@@ -65,9 +70,9 @@ Upgrade/rollback rehearsal also passed with matching backups and preserved data.
 
 - Policy-contradiction and false-completion evaluation outcomes.
 - Linux live and WSL2 operator evidence. Automated Ubuntu CI does not certify live Linux execution.
-- Marketplace installation from the final `v2.0.0` tag.
-- OpenCode 1.18.35 can load a project plugin introduced after launch inspection.
-  This accepted limitation requires trusted workspaces and is not a passed plugin-suppression test.
+- Marketplace installation from the final `v2.1.0` tag.
+- Full host/plugin discovery containment on OpenCode 1.19.0 remains unverified.
+  The historical 1.18.35 plugin-loading race is documented evidence, not a passed suppression test.
 - Attached execution and native questions remain intentionally disabled.
 
 See the repository's

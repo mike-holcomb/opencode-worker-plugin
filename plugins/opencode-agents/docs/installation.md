@@ -1,11 +1,13 @@
 # Installation, update, and rollback
 
-## Install the published release
+## Install release 2.1.0
 
-[OpenCode Agents v2.0.0](https://github.com/mike-holcomb/opencode-worker-plugin/releases/tag/v2.0.0)
-is the current full GitHub release. Its tagged plugin/runtime manifests still
-identify the package as `2.0.0-dev.0`. Select the release with `--ref v2.0.0` even
-if the installed package displays that internal version.
+The 2.1.0 candidate uses plugin/runtime version `2.1.0`. The commands below
+apply after the `v2.1.0` tag is published. Until then,
+[v2.0.0](https://github.com/mike-holcomb/opencode-worker-plugin/releases/tag/v2.0.0)
+remains the published release; install it with `--ref v2.0.0`. That historical
+tag displays internal version `2.0.0-dev.0` and targets OpenCode 1.18.35.
+See the [2.1.0 release notes](https://github.com/mike-holcomb/opencode-worker-plugin/blob/main/docs/releases/v2.1.0.md).
 
 1. Install Node.js 24.15 or later within the 24.x line. The `node` on the Codex
    host's PATH must resolve to that supported line; Node 25/26 are not supported.
@@ -15,7 +17,7 @@ if the installed package displays that internal version.
 3. Install from the repository marketplace:
 
    ```bash
-   codex plugin marketplace add mike-holcomb/opencode-worker-plugin --ref v2.0.0
+   codex plugin marketplace add mike-holcomb/opencode-worker-plugin --ref v2.1.0
    codex plugin add opencode-agents@opencode-worker-plugin
    ```
 
@@ -29,7 +31,7 @@ sidecar. End-user installation needs no Python, TypeScript compilation, or
 ## Configure execution
 
 The shipped compatibility manifest has `execution_supported: false`. Publishing
-v2.0.0 did not change that setting. Live managed tasks require the private
+a release does not change that setting. Live managed tasks require the private
 `development_execution` opt-in described below; without it, ordinary task
 admission returns `UNSUPPORTED_BACKEND`.
 
@@ -49,7 +51,7 @@ The configuration requires `schema_version: 1`, `project_roots`, `read_roots`,
 `provider_id`, `model_id`, and `destination` matching the operator's authorized
 OpenCode route. Optional `limits` control concurrency, timeouts, and artifact size.
 
-This development branch targets OpenCode/SDK 1.19.0. Managed workers disable project configuration discovery and load the native progress tool from a private, frozen directory. Full host/plugin discovery containment and release certification remain unverified; use the exact trusted-workspace opt-in. Worker tool permissions do not establish containment for plugin code. The published v2.0.0 tag retains its historical 1.18.35 target.
+Release 2.1.0 targets OpenCode/SDK 1.19.0. Managed workers disable project configuration discovery and load the native progress tool from a private, frozen directory. Full host/plugin discovery containment and release certification remain unverified; use the exact trusted-workspace opt-in. Worker tool permissions do not establish containment for plugin code. The published v2.0.0 tag retains its historical 1.18.35 target.
 
 For a trusted local test workspace, add this field to the operator's private `config.json` alongside `project_roots`, `opencode_binary`, and `models`:
 
@@ -62,7 +64,7 @@ For a trusted local test workspace, add this field to the operator's private `co
 
 Only the exact resolved workspace is trusted; listing its parent does not trust children. This opt-in applies to managed OpenCode 1.19.0 with the pinned SDK and matching OpenAPI digest. It does not bypass required capabilities, frozen provider routing, worker permissions, MCP disablement, plugin preflight, or report policy. Attached execution stays disabled. `doctor.backend.certifiedPairs` and `doctor.backend.executionTested` remain false, and `compatibility.json` remains execution-disabled. Removing the field blocks new starts and follow-ups; already admitted executions retain their frozen authorization and must be cancelled explicitly if they should stop.
 
-The Codex plugin declares one bundled stdio MCP server in `.mcp.json`, with a relative argument pointing to `bin/opencode-agents.mjs`. A read-only bundle smoke test exercises that command from the plugin directory. In an isolated local marketplace install, Codex CLI 0.162.0 resolved the MCP working directory to its plugin cache and ran the bundled diagnostic under Node 24.19.0. Codex CLI 0.162.1 also passed Git-backed installation from the historical `v2.0.0-dev.0` tag. Marketplace installation from `v2.0.0` remains unverified; the published ZIP passed a separate read-only installed-bundle smoke test. Ensure that the host's `node` resolves to a supported Node 24.x version before launching the plugin. The `opencode-agents:opencode-agents` skill describes the eleven development MCP tools. State defaults to platform application data and may be moved with `OPENCODE_AGENTS_STATE_DIR`; keep state, credentials, reports, and task workspaces outside the installed plugin.
+The Codex plugin declares one bundled stdio MCP server in `.mcp.json`, with a relative argument pointing to `bin/opencode-agents.mjs`. A read-only bundle smoke test exercises that command from the plugin directory. In an isolated local marketplace install, Codex CLI 0.162.0 resolved the MCP working directory to its plugin cache and ran the bundled diagnostic under Node 24.19.0. Codex CLI 0.162.1 also passed Git-backed installation from the historical `v2.0.0-dev.0` tag. Marketplace installation from the final `v2.1.0` tag remains unverified; historical installed-bundle evidence does not establish that result. Ensure that the host's `node` resolves to a supported Node 24.x version before launching the plugin. The `opencode-agents:opencode-agents` skill describes the eleven MCP tools. State defaults to platform application data and may be moved with `OPENCODE_AGENTS_STATE_DIR`; keep state, credentials, reports, and task workspaces outside the installed plugin.
 
 Use `opencode_health` from Codex for read-only prerequisites. From an extracted plugin directory, run `node ./bin/opencode-agents.mjs doctor`; installing the plugin does not add a global shell executable. The executable does not compile TypeScript or run `npm install` at startup. The installed bundle includes compiled JavaScript, compatibility data, schemas, worker profiles, and dependency license notices.
 
@@ -78,7 +80,7 @@ Read `cancellation_diagnostic` events through `opencode_get_task` or `opencode_w
 
 ## Upgrade and rollback
 
-Reconcile active tasks and drain the supervisor before activating an incompatible runtime. Preserve the state database and reports. When an existing database needs a schema upgrade, the runtime writes a SQLite snapshot under the state directory's `backups/` before changing its schema and aborts if that snapshot fails. Keep an independent operator backup for rollback. Do not run old and new supervisors against one state directory. Rollback uses a matching runtime and backup after reconciliation. Uninstall does not cancel accepted work or delete evidence.
+For 2.1.0, reconcile active tasks and drain the old supervisor before updating the plugin to 2.1.0 and OpenCode to 1.19.0. The exact binary/SDK/OpenAPI pair has changed from the published v2.0.0 target; do not replace a backend while an execution is active. Preserve the state database and reports. When an existing database needs a schema upgrade, the runtime writes a SQLite snapshot under the state directory's `backups/` before changing its schema and aborts if that snapshot fails. Keep an independent operator backup for rollback. Do not run old and new supervisors against one state directory. Rollback uses a matching runtime and backup after reconciliation. Uninstall does not cancel accepted work or delete evidence.
 
 The v2 installation has no legacy job import or launcher. New work starts through the MCP task API. Existing user files and database rows are left untouched during upgrade; back up the state database before schema changes.
 
