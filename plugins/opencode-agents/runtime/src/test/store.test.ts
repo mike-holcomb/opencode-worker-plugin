@@ -46,13 +46,14 @@ test("dispatch intent and exact session survive a restart", () => {
       baselineHash: "a".repeat(64), promptHash: "b".repeat(64),
     });
     task = store.bindSession(task.scopeId, task.taskId, task.revision, "backend-1", "session-1");
-    task = store.recordDispatchIntent(task.scopeId, task.taskId, task.revision, "backend-1", "session-1", "message-1");
+    task = store.recordDispatchIntent(task.scopeId, task.taskId, task.revision, "backend-1", "session-1", "message-1", "worker-1");
     store.close();
     store = new SqliteTaskStore(filename);
     const recovered = store.get(task.scopeId, task.taskId);
     assert.equal(recovered?.phase, "dispatching");
     assert.equal(recovered?.sessionId, "session-1");
     assert.equal(recovered?.userMessageId, "message-1");
+    assert.equal(recovered?.workerInstanceId, "worker-1");
     assert.deepEqual(store.events(task.executionId).map((event) => event.kind), ["queued", "session_bound", "dispatch_intent"]);
     store.close();
   } finally { rmSync(dir, { recursive: true, force: true }); }
@@ -353,6 +354,49 @@ test("version 3 database with missing v2 objects receives a backup before repair
     upgraded.close();
   } finally { rmSync(dir, { recursive: true, force: true }); }
 });
+
+for (const backupFails of [false, true]) {
+  test(`version 3 worker identity migration respects pre-migration backup (failure: ${backupFails})`, () => {
+    const dir = mkdtempSync(join(tmpdir(), "opencode-agents-worker-migration-"));
+    const filename = join(dir, "state.sqlite");
+    try {
+      const initial = new SqliteTaskStore(filename);
+      const task = initial.start({ scopeId: "coord_migrate", idempotencyKey: "start-migrate-000001", workspace: "/tmp/project",
+        packet: { objective: "Inspect" }, model: "local/model", profile: "bounded-inspect",
+        baselineHash: "a".repeat(64), promptHash: "b".repeat(64) });
+      initial.close();
+      const old = new DatabaseSync(filename);
+      old.exec("ALTER TABLE executions DROP COLUMN worker_instance_id");
+      old.close();
+
+      if (backupFails) {
+        writeFileSync(join(dir, "backups"), "not a directory");
+        assert.throws(() => new SqliteTaskStore(filename), /pre-migration database backup failed/);
+      } else {
+        const upgraded = new SqliteTaskStore(filename);
+        assert.equal(upgraded.get(task.scopeId, task.taskId)?.workerInstanceId, null);
+        upgraded.close();
+        const backups = readdirSync(join(dir, "backups"));
+        assert.equal(backups.length, 1);
+        const backupPath = join(dir, "backups", backups[0]!);
+        assert.equal(statSync(backupPath).mode & 0o777, 0o600);
+        const backup = new DatabaseSync(backupPath, { readOnly: true });
+        assert.equal((backup.prepare("PRAGMA table_info(executions)").all() as Array<{ name: string }>).some((column) => column.name === "worker_instance_id"), false);
+        assert.equal((backup.prepare("SELECT MAX(version) AS version FROM schema_version").get() as { version: number }).version, 3);
+        assert.equal((backup.prepare("SELECT task_id FROM tasks").get() as { task_id: string }).task_id, task.taskId);
+        backup.close();
+        const reopened = new SqliteTaskStore(filename);
+        reopened.close();
+        assert.equal(readdirSync(join(dir, "backups")).length, 1);
+      }
+
+      const check = new DatabaseSync(filename, { readOnly: true });
+      assert.equal((check.prepare("PRAGMA table_info(executions)").all() as Array<{ name: string }>).some((column) => column.name === "worker_instance_id"), !backupFails);
+      assert.equal((check.prepare("SELECT task_id FROM tasks").get() as { task_id: string }).task_id, task.taskId);
+      check.close();
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
+}
 
 test("failed pre-migration backup leaves an existing schema untouched", () => {
   const dir = mkdtempSync(join(tmpdir(), "opencode-agents-store-"));

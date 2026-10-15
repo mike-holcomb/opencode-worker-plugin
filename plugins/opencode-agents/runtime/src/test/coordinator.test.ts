@@ -251,6 +251,30 @@ test("an unavailable authenticated endpoint still permits recovery through the o
   } finally { await fx.coordinator.close(); fx.restore(); }
 });
 
+test("restart before termination intent cannot terminate a replacement worker", async (t) => {
+  const fx = setup(undefined, undefined, true);
+  let resumed: ExecutionCoordinator | null = null;
+  try {
+    await fx.coordinator.start();
+    const task = cancelFixture(fx);
+    assert.equal(task.workerInstanceId, "process_1");
+    assert.equal(fx.store.cancellationEvent(task.executionId, "cancellation_recovery_intent"), null);
+    await fx.coordinator.close();
+    t.mock.method(Date, "now", () => Date.parse(task.cancellationIntent!.createdAt) + 30_001);
+    resumed = fx.restart();
+    await resumed.start();
+    await until(() => fx.store.cancellationEvent(task.executionId, "cancellation_diagnostic")?.detail.reason === "owned_process_handle_unavailable");
+    assert.equal(fx.lifecycle.opens, 2);
+    assert.equal(fx.lifecycle.terminations, 0);
+    assert.equal(fx.backend.submitCount, 1);
+    assert.equal(fx.store.get("scope", task.taskId)?.workerInstanceId, "process_1");
+    assert.equal(fx.store.get("scope", task.taskId)?.phase, "cancelling");
+    assert.equal(fx.store.ownsResource(task.executionId, `workspace:${task.workspace}`), true);
+    assert.equal(fx.store.cancellationEvent(task.executionId, "cancellation_recovery_intent"), null);
+    assert.equal(fx.store.cancellationEvent(task.executionId, "cancellation_stop_confirmed"), null);
+  } finally { await resumed?.close(); await fx.coordinator.close(); fx.restore(); }
+});
+
 test("restart after termination intent cannot substitute a new handle for unconfirmed exit", async (t) => {
   const fx = setup(undefined, undefined, true);
   let resumed: ExecutionCoordinator | null = null;

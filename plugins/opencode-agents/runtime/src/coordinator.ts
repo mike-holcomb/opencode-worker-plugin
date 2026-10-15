@@ -292,7 +292,7 @@ export class ExecutionCoordinator {
     mkdirSync(task.reportPath, { recursive: true, mode: 0o700 });
     const sessionId = task.sessionId;
     const messageId = `msg_${randomUUID()}`;
-    task = this.store.recordDispatchIntent(task.scopeId, task.taskId, task.revision, lease.backendId, sessionId, messageId);
+    task = this.store.recordDispatchIntent(task.scopeId, task.taskId, task.revision, lease.backendId, sessionId, messageId, lease.instanceId ?? null);
     const slash = task.model.indexOf("/");
     const providerId = slash < 0 ? "" : task.model.slice(0, slash);
     const modelId = slash < 0 ? "" : task.model.slice(slash + 1);
@@ -450,7 +450,7 @@ export class ExecutionCoordinator {
     if (!task.cancellationIntent || Date.now() - Date.parse(task.cancellationIntent.createdAt) < 30_000) return false;
     const lease = task.backendId ? this.backends.get(task.backendId) : undefined;
     const intent = this.store.cancellationEvent(task.executionId, "cancellation_recovery_intent");
-    if (!lease?.terminateOwned || !lease.instanceId || (intent && intent.detail.instanceId !== lease.instanceId)) {
+    if (!lease?.terminateOwned || !lease.instanceId || !task.workerInstanceId || lease.instanceId !== task.workerInstanceId || (intent && intent.detail.instanceId !== lease.instanceId)) {
       this.cancellationDiagnostic(task, "owned_process_handle_unavailable", lease, observed);
       return true;
     }
