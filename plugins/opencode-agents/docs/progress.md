@@ -29,8 +29,10 @@ compact availability/cursor hints, without checkpoint bodies. Runtime observatio
 have timestamps and describe cached backend/request/task observations. A stream
 disconnect does not assert that the backend is unreachable.
 
-Restart, disconnect, retention, aggregate eviction and terminal expiry can produce
-an explicit `gap`. It reports missed history and supplies a recovery cursor at the
+Restart, disconnect, attribution or publication failure, retention, aggregate
+eviction and terminal expiry can produce an explicit `gap`. Attribution and
+publication failures use the reason `attribution_failure` while the event stream
+remains connected. A gap reports missed history and supplies a recovery cursor at the
 current head, with the latest snapshot when available. Retain that cursor rather
 than replaying old history. Malformed, future and cross-execution cursors fail.
 
@@ -41,7 +43,9 @@ than replaying old history. Malformed, future and cross-execution cursors fail.
   and at material milestones or blocker transitions.
 - Per execution: 100 retained records and a 256 KiB accounting budget, including
   bounded deduplication and rate metadata. At most 60 admissions per minute,
-  with 12 slots reserved for blocker transitions. Dropped submissions are counted.
+  with 12 slots reserved for blocker transitions. `dropped_count` counts rejected
+  submissions and failed attribution or publication attempts; intentional shutdown
+  aborts are excluded. No error bodies are retained.
 - The coordinator reserves 15 MiB for buffers and 1 MiB for bounded runtime
   observations. These are accounting budgets, not measurements of V8 heap usage.
   Terminal buffers expire after 30 minutes through supervisor maintenance.

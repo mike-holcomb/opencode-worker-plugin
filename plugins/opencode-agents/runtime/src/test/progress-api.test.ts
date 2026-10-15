@@ -69,30 +69,41 @@ test("SDK accepts only completed checkpoint parts attributed to the exact origin
   assert.equal(messageReads, reads, "unrelated/invalid events do not trigger SDK message reads");
 });
 
-test("progress-aware waits do not repeatedly wake after eviction recovery", async () => {
-  const root = mkdtempSync(join(tmpdir(), "progress-wait-recovery-"));
-  const store = new SqliteTaskStore(join(root, "state.sqlite"));
-  try {
-    let now = 0;
-    const service = new SupervisorService(store, new ArtifactStore(join(root, "artifacts")));
-    const progress = new ProgressManager({ now: () => now, terminalTtlMs: 100 });
-    Object.assign(service, { progress });
-    const task = store.start({ scopeId: "scope", idempotencyKey: "progress-wait-12345678", workspace: root,
-      packet: {}, model: "local/model", profile: "bounded-inspect", baselineHash: "a", promptHash: "b" });
-    progress.register(task.executionId, "supported"); progress.append(task.executionId, "before", checkpoint);
-    const expired = progress.hint(task.executionId).progress_cursor;
-    progress.markTerminal(task.executionId); now += 100; progress.maintain();
-    const target = { task_id: task.taskId, execution_id: task.executionId,
-      after_cursor: store.events(task.executionId).at(-1)!.cursor, after_progress_cursor: expired };
-    const changed = await service.handle("wait_tasks", { scope_id: "scope", targets: [target], timeout_ms: 50 }) as any;
-    assert.equal(changed.timed_out, false);
-    const gap = progress.read(task.executionId, { after_cursor: expired });
-    assert.equal(changed.changed[0].progress_cursor, gap.next_cursor);
-    const before = store.get("scope", task.taskId);
-    const waiting = { scope_id: "scope", targets: [{ ...target, after_progress_cursor: gap.next_cursor }], timeout_ms: 50 };
-    assert.deepEqual(await service.handle("wait_tasks", waiting), { timed_out: true, changed: [] });
-    assert.deepEqual(store.get("scope", task.taskId), before);
-    progress.register(task.executionId, "supported"); progress.append(task.executionId, "after", checkpoint);
-    assert.equal((await service.handle("wait_tasks", waiting) as any).timed_out, false);
-  } finally { store.close(); rmSync(root, { recursive: true, force: true }); }
-});
+for (const loss of ["eviction", "attribution failure", "pruned eviction"] as const) {
+  test(`progress-aware waits do not repeatedly wake after ${loss} recovery`, async () => {
+    const root = mkdtempSync(join(tmpdir(), "progress-wait-recovery-"));
+    const store = new SqliteTaskStore(join(root, "state.sqlite"));
+    try {
+      let now = 0;
+      const service = new SupervisorService(store, new ArtifactStore(join(root, "artifacts")));
+      const progress = new ProgressManager({ now: () => now, terminalTtlMs: 100 });
+      Object.assign(service, { progress });
+      const task = store.start({ scopeId: "scope", idempotencyKey: "progress-wait-12345678", workspace: root,
+        packet: {}, model: "local/model", profile: "bounded-inspect", baselineHash: "a", promptHash: "b" });
+      progress.register(task.executionId, "supported");
+      const initial = progress.hint(task.executionId).progress_cursor;
+      progress.append(task.executionId, "before", checkpoint);
+      const expired = loss === "pruned eviction" ? initial : progress.hint(task.executionId).progress_cursor;
+      if (loss === "attribution failure") progress.recordLoss(task.executionId);
+      else {
+        progress.markTerminal(task.executionId); now += 100; progress.maintain();
+        if (loss === "pruned eviction") {
+          for (let i = 0; i < 257; i++) { progress.register(`terminal${i}`, "supported"); progress.markTerminal(`terminal${i}`); }
+          now += 100; progress.maintain();
+        }
+      }
+      const target = { task_id: task.taskId, execution_id: task.executionId,
+        after_cursor: store.events(task.executionId).at(-1)!.cursor, after_progress_cursor: expired };
+      const changed = await service.handle("wait_tasks", { scope_id: "scope", targets: [target], timeout_ms: 50 }) as any;
+      assert.equal(changed.timed_out, false);
+      const gap = progress.read(task.executionId, { after_cursor: expired });
+      assert.equal(changed.changed[0].progress_cursor, gap.next_cursor);
+      const before = store.get("scope", task.taskId);
+      const waiting = { scope_id: "scope", targets: [{ ...target, after_progress_cursor: gap.next_cursor }], timeout_ms: 50 };
+      assert.deepEqual(await service.handle("wait_tasks", waiting), { timed_out: true, changed: [] });
+      assert.deepEqual(store.get("scope", task.taskId), before);
+      progress.register(task.executionId, "supported"); progress.append(task.executionId, "after", checkpoint);
+      assert.equal((await service.handle("wait_tasks", waiting) as any).timed_out, false);
+    } finally { store.close(); rmSync(root, { recursive: true, force: true }); }
+  });
+}

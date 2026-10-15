@@ -222,7 +222,11 @@ export class ExecutionCoordinator {
                   if (checkpoint.evidence_refs.some((id) => !this.store.artifact(current.executionId, id))) continue;
                   if (checkpoint.blocker?.request_id && !current.pendingRequests.some((request) => request.requestId === checkpoint.blocker!.request_id)) continue;
                   this.progress.append(current.executionId, update.sourceId, checkpoint);
-                } catch { /* Advisory publication cannot change task outcome. */ }
+                } catch {
+                  // Disclose advisory loss without changing task lifecycle or
+                  // reconnecting the stream. Shutdown aborts are intentional.
+                  if (!controller.signal.aborted && !this.stopping) this.progress.recordLoss(current.executionId);
+                }
               }
             }
             this.kick();

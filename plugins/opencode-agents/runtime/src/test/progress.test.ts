@@ -71,6 +71,32 @@ test("restart and disconnect have honest generation gaps, stable empty reads and
   assert.equal(restarted.hint("exec").progress_cursor, restarted.hint("exec").progress_cursor);
 });
 
+test("publication loss exposes repeatable gaps, preserves snapshots and dedup, and resumes at the head", () => {
+  const manager = new ProgressManager(); manager.register("exec", "supported");
+  const initial = manager.hint("exec").progress_cursor;
+  manager.recordLoss("exec");
+  const first = manager.read("exec", { after_cursor: initial });
+  assert.equal(first.gap?.reason, "attribution_failure"); assert.equal(first.dropped_count, 1);
+  assert.equal(first.gap.snapshot_available, false); assert.equal(first.snapshot, null);
+  manager.append("exec", "before", checkpoint);
+  const expired = manager.hint("exec").progress_cursor;
+  manager.recordLoss("exec");
+  const gap = manager.read("exec", { after_cursor: expired });
+  assert.equal(gap.gap?.reason, "attribution_failure"); assert.equal(gap.dropped_count, 2);
+  assert.deepEqual(gap.updates, []); assert.equal(gap.snapshot?.summary, checkpoint.summary);
+  assert.equal(gap.snapshot?.cursor, expired);
+  assert.deepEqual(manager.read("exec", { after_cursor: expired }), gap);
+  manager.maintain();
+  const empty = manager.read("exec", { after_cursor: gap.next_cursor });
+  assert.equal(empty.gap, null); assert.equal(empty.next_cursor, gap.next_cursor);
+  assert.equal(manager.append("exec", "before", checkpoint).duplicate, true);
+  assert.throws(() => manager.append("exec", "before", { ...checkpoint, summary: "Conflicting retry" }), /conflicting/);
+  manager.append("exec", "after", { ...checkpoint, summary: "After failure" });
+  assert.deepEqual(manager.read("exec", { after_cursor: gap.next_cursor }).updates.map((item) => item.summary), ["After failure"]);
+  const unknown = manager.read("unknown"); manager.recordLoss("unknown");
+  assert.deepEqual(manager.read("unknown"), unknown, "loss recording never registers an unknown buffer");
+});
+
 test("item and whole-response UTF-8 budgets preserve complete records", () => {
   const manager = new ProgressManager(); manager.register("exec", "supported");
   const large = { ...checkpoint, summary: "界".repeat(500), completed: ["界".repeat(200), "界".repeat(200)], remaining: ["界".repeat(200)] };
@@ -151,6 +177,50 @@ test("pruned eviction tombstones disclose unavailable history and issue a usable
   const gap = manager.read("exec", { after_cursor: recovery });
   assert.equal(gap.gap?.reason, "buffer_unavailable");
   assert.equal(manager.read("exec", { after_cursor: gap.next_cursor }).gap, null);
+});
+
+test("initial cursors stay expired after default terminal eviction tombstones are pruned", () => {
+  let now = 0;
+  const manager = new ProgressManager({ now: () => now });
+  manager.register("exec", "supported");
+  const initial = manager.hint("exec").progress_cursor;
+  manager.append("exec", "before", checkpoint);
+  manager.markTerminal("exec");
+  now += 30 * 60_000; manager.maintain();
+  assert.equal(manager.read("exec", { after_cursor: initial }).gap?.reason, "terminal");
+  for (let i = 0; i < 257; i++) {
+    const id = `terminal${i}`;
+    manager.register(id, "supported"); manager.markTerminal(id);
+  }
+  now += 30 * 60_000; manager.maintain();
+  const gap = manager.read("exec", { after_cursor: initial });
+  assert.equal(gap.gap?.reason, "buffer_unavailable");
+  assert.equal(gap.snapshot, null); assert.deepEqual(gap.updates, []);
+  assert.deepEqual(manager.read("exec", { after_cursor: initial }), gap);
+  const recovered = manager.read("exec", { after_cursor: gap.next_cursor });
+  assert.equal(recovered.gap, null); assert.equal(recovered.next_cursor, gap.next_cursor);
+  manager.register("exec", "supported");
+  assert.equal(manager.read("exec", { after_cursor: initial }).gap?.reason, "buffer_evicted");
+  assert.equal(manager.read("exec", { after_cursor: gap.next_cursor }).gap, null);
+  manager.append("exec", "after", { ...checkpoint, summary: "After expiry" });
+  assert.deepEqual(manager.read("exec", { after_cursor: gap.next_cursor }).updates.map((item) => item.summary), ["After expiry"]);
+});
+
+test("empty unknown streams have stable cursors that follow initial registration", () => {
+  const manager = new ProgressManager();
+  const initial = manager.hint("exec").progress_cursor;
+  const empty = manager.read("exec", { after_cursor: initial });
+  assert.equal(empty.gap, null); assert.equal(empty.next_cursor, initial);
+  manager.maintain();
+  assert.deepEqual(manager.read("exec", { after_cursor: initial }), empty);
+  manager.register("exec", "supported");
+  const registered = manager.hint("exec").progress_cursor;
+  assert.equal(manager.read("exec", { after_cursor: registered }).gap, null);
+  assert.equal(manager.read("exec", { after_cursor: initial }).gap, null);
+  manager.append("exec", "first", checkpoint);
+  assert.equal(manager.read("exec", { after_cursor: initial }).updates.length, 1);
+  manager.reset("exec", "disconnect");
+  assert.equal(manager.read("exec", { after_cursor: initial }).gap?.reason, "disconnect");
 });
 
 test("published input and response mutations cannot change retained checkpoints", () => {

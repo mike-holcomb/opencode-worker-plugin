@@ -67,7 +67,9 @@ export class ProgressManager {
     if (current) { current.availability = availability; return; }
     const eviction = this.evicted.get(executionId);
     this.evicted.delete(executionId);
-    this.states.set(executionId, { generation: eviction?.generation ?? this.processGeneration,
+    // Registered buffers must never share the unknown-buffer fallback: even
+    // their sequence-zero cursors must expire after a tombstone is pruned.
+    this.states.set(executionId, { generation: eviction?.generation ?? randomUUID(),
       sequence: 0, availability, entries: [], latest: null, dedup: new Map(), rate: [], dropped: 0,
       lastActivity: this.now(), terminalAt: null, resetReason: eviction?.reason ?? null, blocker: null });
     this.enforceAggregate();
@@ -112,11 +114,17 @@ export class ProgressManager {
     this.enforceAggregate();
     return { accepted: true, duplicate: false };
   }
-  reset(executionId: string, reason: "disconnect"): void {
+  recordLoss(executionId: string): void {
+    const state = this.states.get(executionId);
+    if (!state || state.availability !== "supported") return;
+    state.dropped = Math.min(Number.MAX_SAFE_INTEGER, state.dropped + 1);
+    this.reset(executionId, "attribution_failure");
+  }
+  reset(executionId: string, reason: "disconnect" | "attribution_failure"): void {
     const state = this.states.get(executionId);
     if (!state) return;
     state.generation = randomUUID(); state.sequence = 0; state.entries = [];
-    // Preserve a bounded snapshot and dedup hashes across reconnect. The snapshot
+    // Preserve a bounded snapshot and dedup hashes across a gap. The snapshot
     // retains its original cursor; next_cursor always identifies the new head.
     state.resetReason = reason;
     state.lastActivity = this.now();
@@ -138,11 +146,14 @@ export class ProgressManager {
     const options = ReadOptions.parse(input);
     const state = this.states.get(executionId);
     const cursor = options.after_cursor ? this.decode(options.after_cursor, executionId) : null;
+    // A cursor issued before registration (or after tombstone pruning) can
+    // consume a fresh stream. Any subsequent reset invalidates that baseline.
+    const freshBaseline = cursor?.g === this.processGeneration && cursor.s === 0 && state?.resetReason === null;
     let reason: string | null = null;
     if (cursor?.p !== undefined && cursor.p !== this.processGeneration) reason = "restart";
     else if (cursor && !state && (cursor.s > 0 || cursor.g !== (this.evicted.get(executionId)?.generation ?? this.processGeneration)))
       reason = this.evicted.get(executionId)?.reason ?? "buffer_unavailable";
-    else if (cursor && state && cursor.g !== state.generation) reason = state.resetReason ?? "buffer_evicted";
+    else if (cursor && state && cursor.g !== state.generation && !freshBaseline) reason = state.resetReason ?? "buffer_evicted";
     else if (cursor && state && cursor.s > state.sequence) throw new Error("progress cursor is ahead of the execution stream");
     else if (cursor && state?.entries.length && cursor.s < state.entries[0]!.sequence - 1) reason = "retention";
     const page: ProgressPage = { ...identity, availability: state?.availability ?? "not_enabled", updates: [],

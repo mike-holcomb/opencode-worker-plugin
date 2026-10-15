@@ -20527,7 +20527,7 @@ var ProgressManager = class {
     const eviction = this.evicted.get(executionId);
     this.evicted.delete(executionId);
     this.states.set(executionId, {
-      generation: eviction?.generation ?? this.processGeneration,
+      generation: eviction?.generation ?? randomUUID(),
       sequence: 0,
       availability,
       entries: [],
@@ -20598,6 +20598,12 @@ var ProgressManager = class {
     this.enforceAggregate();
     return { accepted: true, duplicate: false };
   }
+  recordLoss(executionId) {
+    const state = this.states.get(executionId);
+    if (!state || state.availability !== "supported") return;
+    state.dropped = Math.min(Number.MAX_SAFE_INTEGER, state.dropped + 1);
+    this.reset(executionId, "attribution_failure");
+  }
   reset(executionId, reason) {
     const state = this.states.get(executionId);
     if (!state) return;
@@ -20626,11 +20632,12 @@ var ProgressManager = class {
     const options = ReadOptions.parse(input2);
     const state = this.states.get(executionId);
     const cursor = options.after_cursor ? this.decode(options.after_cursor, executionId) : null;
+    const freshBaseline = cursor?.g === this.processGeneration && cursor.s === 0 && state?.resetReason === null;
     let reason = null;
     if (cursor?.p !== void 0 && cursor.p !== this.processGeneration) reason = "restart";
     else if (cursor && !state && (cursor.s > 0 || cursor.g !== (this.evicted.get(executionId)?.generation ?? this.processGeneration)))
       reason = this.evicted.get(executionId)?.reason ?? "buffer_unavailable";
-    else if (cursor && state && cursor.g !== state.generation) reason = state.resetReason ?? "buffer_evicted";
+    else if (cursor && state && cursor.g !== state.generation && !freshBaseline) reason = state.resetReason ?? "buffer_evicted";
     else if (cursor && state && cursor.s > state.sequence) throw new Error("progress cursor is ahead of the execution stream");
     else if (cursor && state?.entries.length && cursor.s < state.entries[0].sequence - 1) reason = "retention";
     const page = {
@@ -42072,6 +42079,7 @@ var ExecutionCoordinator = class {
                   if (checkpoint.blocker?.request_id && !current.pendingRequests.some((request) => request.requestId === checkpoint.blocker.request_id)) continue;
                   this.progress.append(current.executionId, update.sourceId, checkpoint);
                 } catch {
+                  if (!controller.signal.aborted && !this.stopping) this.progress.recordLoss(current.executionId);
                 }
               }
             }

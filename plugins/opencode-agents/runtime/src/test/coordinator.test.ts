@@ -194,6 +194,106 @@ for (const ending of ["socket error", "EOF"] as const) {
   });
 }
 
+for (const failure of ["declared size", "streamed size", "timeout", "publication", "shutdown"] as const) {
+  test(`checkpoint ${failure} preserves advisory loss semantics on a connected stream`, { timeout: 6_000 }, async (t) => {
+    const fx = setup();
+    const sdk = new SdkOpenCodeBackend("http://sdk.invalid", fx.backend.workspace, fx.backend.backendId);
+    const streams: ReadableStreamDefaultController<Uint8Array>[] = [];
+    const checkpoint = { stage: "verifying" as const, summary: "Before failure", completed: [], remaining: [], blocker: null, evidence_refs: [] };
+    const parts = new Map<string, unknown>();
+    let failAttribution = false; let pendingAttribution = false; let attributionAborted = false;
+    t.mock.method(globalThis, "fetch", async (input: Request | URL | string, init?: RequestInit) => {
+      const url = new URL(input instanceof Request ? input.url : String(input));
+      if (url.pathname === "/event") {
+        return new Response(new ReadableStream<Uint8Array>({ start(controller) { streams.push(controller); } }),
+          { headers: { "Content-Type": "text/event-stream" } });
+      }
+      assert.match(url.pathname, /\/session\/ses_fake\/message\/assistant$/);
+      if (failAttribution && (failure === "timeout" || failure === "shutdown")) {
+        const signal = input instanceof Request ? input.signal : init?.signal;
+        assert.ok(signal);
+        pendingAttribution = true;
+        return await new Promise<Response>((_resolve, reject) => {
+          const abort = () => { attributionAborted = true; reject(signal.reason); };
+          if (signal.aborted) abort();
+          else signal.addEventListener("abort", abort, { once: true });
+        });
+      }
+      const message = { info: { id: "assistant", sessionID: fx.backend.sessionId, role: "assistant", parentID: fx.backend.messageId },
+        parts: [...parts.values(), ...(failAttribution && failure !== "publication"
+          ? [{ id: "large-text", sessionID: fx.backend.sessionId, messageID: "assistant", type: "text", text: "x".repeat(256 * 1024) }] : [])] };
+      const body = JSON.stringify(message);
+      return new Response(body, { headers: { "Content-Type": "application/json",
+        ...(failAttribution && failure === "declared size" ? { "Content-Length": String(Buffer.byteLength(body)) } : {}) } });
+    });
+    const inspect = fx.backend.inspectBackend.bind(fx.backend);
+    Object.assign(fx.backend, {
+      subscribeEvents: sdk.subscribeEvents.bind(sdk), readCheckpoint: sdk.readCheckpoint.bind(sdk),
+      inspectBackend: async () => {
+        const inspection = await inspect();
+        return { ...inspection, capabilities: { ...inspection.capabilities, progressCheckpoints: true } };
+      },
+    });
+    const emit = (id: string, summary: string) => {
+      const part = { id, sessionID: fx.backend.sessionId, messageID: "assistant", type: "tool", tool: "report_progress",
+        state: { status: "completed", metadata: { opencode_agents_progress: { ...checkpoint, summary } } } };
+      parts.set(id, part);
+      streams[0]!.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ type: "message.part.updated", properties: { part, sessionID: fx.backend.sessionId } })}\n\n`));
+    };
+    try {
+      await fx.coordinator.start(); await until(() => streams.length === 1);
+      const initial = fx.coordinator.progress.hint(fx.task.executionId).progress_cursor;
+      for (const part of [
+        { id: "text", sessionID: fx.backend.sessionId, messageID: "assistant", type: "text", text: "Unrelated text" },
+        { id: "invalid", sessionID: fx.backend.sessionId, messageID: "assistant", type: "tool", tool: "report_progress",
+          state: { status: "completed", metadata: { opencode_agents_progress: { ...checkpoint, stage: "invalid" } } } },
+      ]) streams[0]!.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ type: "message.part.updated", properties: { part, sessionID: fx.backend.sessionId } })}\n\n`));
+      emit("before", checkpoint.summary);
+      await until(() => fx.coordinator.progress.read(fx.task.executionId, { include_snapshot: true }).snapshot?.summary === checkpoint.summary);
+      const admitted = fx.coordinator.progress.read(fx.task.executionId, { after_cursor: initial });
+      assert.equal(admitted.gap, null); assert.equal(admitted.dropped_count, 0); assert.equal(admitted.updates.length, 1);
+      const expired = fx.coordinator.progress.hint(fx.task.executionId).progress_cursor;
+      const taskBefore = fx.store.get("scope", fx.task.taskId)!;
+      const eventsBefore = fx.store.events(fx.task.executionId);
+      failAttribution = true;
+      emit(failure === "publication" ? "before" : "lost", "Lost checkpoint");
+      if (failure === "shutdown") {
+        await until(() => pendingAttribution);
+        await fx.coordinator.close();
+        await until(() => attributionAborted);
+        const page = fx.coordinator.progress.read(fx.task.executionId, { after_cursor: expired });
+        assert.equal(page.gap, null); assert.equal(page.dropped_count, 0); assert.equal(page.next_cursor, expired);
+      } else {
+        // The SDK's actual 2-second attribution deadline exercises timeout propagation.
+        if (failure === "timeout") {
+          await until(() => pendingAttribution);
+          await new Promise((resolve) => setTimeout(resolve, 2_050));
+          assert.equal(attributionAborted, true);
+        }
+        await until(() => fx.coordinator.progress.read(fx.task.executionId, { after_cursor: expired }).gap?.reason === "attribution_failure");
+        const gap = fx.coordinator.progress.read(fx.task.executionId, { after_cursor: expired });
+        assert.equal(gap.dropped_count, 1); assert.deepEqual(gap.updates, []);
+        assert.equal(gap.snapshot?.summary, checkpoint.summary);
+        assert.deepEqual(fx.coordinator.progress.read(fx.task.executionId, { after_cursor: expired }), gap);
+        const recovered = fx.coordinator.progress.read(fx.task.executionId, { after_cursor: gap.next_cursor });
+        assert.equal(recovered.gap, null); assert.equal(recovered.next_cursor, gap.next_cursor);
+        assert.deepEqual(recovered.updates, []);
+        failAttribution = false; parts.delete("lost");
+        emit("before", checkpoint.summary); emit("after", "After failure");
+        await until(() => fx.coordinator.progress.read(fx.task.executionId, { after_cursor: gap.next_cursor }).updates.length === 1);
+        const resumed = fx.coordinator.progress.read(fx.task.executionId, { after_cursor: gap.next_cursor });
+        assert.equal(resumed.gap, null); assert.equal(resumed.dropped_count, 1);
+        assert.deepEqual(resumed.updates.map((update) => update.summary), ["After failure"]);
+      }
+      const taskAfter = fx.store.get("scope", fx.task.taskId)!;
+      assert.equal(taskAfter.phase, taskBefore.phase); assert.equal(taskAfter.observation, taskBefore.observation);
+      assert.equal(taskAfter.revision, taskBefore.revision);
+      assert.deepEqual(fx.store.events(fx.task.executionId), eventsBefore);
+      assert.equal(fx.backend.submitCount, 1); assert.equal(streams.length, 1);
+    } finally { await fx.coordinator.close(); fx.restore(); }
+  });
+}
+
 function cancelFixture(fx: ReturnType<typeof setup>, deadline = false) {
   const task = fx.store.get("scope", fx.task.taskId)!;
   return fx.store.cancelTask({ scopeId: task.scopeId, taskId: task.taskId, executionId: task.executionId,
