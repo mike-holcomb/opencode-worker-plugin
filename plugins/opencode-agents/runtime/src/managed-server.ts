@@ -1,24 +1,25 @@
 import { randomBytes, randomUUID } from "node:crypto";
 import { execFile, spawn, type ChildProcessByStdio } from "node:child_process";
-import { once } from "node:events";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { homedir } from "node:os";
 import { isDeepStrictEqual } from "node:util";
 import { promisify } from "node:util";
 import { dirname, isAbsolute, join, parse, relative, resolve } from "node:path";
 import type { Readable } from "node:stream";
-import { executionPairAllowed } from "./backend.js";
+import { executionPairAllowed, type AbortStopProof } from "./backend.js";
 import { trustedDevelopmentWorkspace, type UserConfig } from "./config.js";
 import { assertFrozenEffectiveConfig, effectiveConfigHash, type ManagedLaunchContract } from "./launch-config.js";
 import { SdkOpenCodeBackend } from "./opencode-backend.js";
 
 export type ManagedServer = {
   backendId: string;
+  instanceId: string;
   baseUrl: string;
   backend: SdkOpenCodeBackend;
   isAlive(): boolean;
   /** Valid only while this owned, certified server process remains alive. */
-  confirmAbortStopped(sessionId: string, messageId: string): Promise<boolean>;
+  confirmAbortStopped(sessionId: string, messageId: string): Promise<AbortStopProof>;
+  terminateOwned(): Promise<boolean>;
   close(): Promise<void>;
 };
 
@@ -256,6 +257,9 @@ export async function startManagedServer(options: ManagedServerOptions): Promise
   const { env, profiles } = await launchEnvironment(options);
   const child = spawn(options.binary, ["serve", "--pure", "--hostname", "127.0.0.1", "--port", "0"], {
     cwd: options.workspace,
+    // Supported managed platforms are POSIX. Own a separate process group so
+    // ordinary tool subprocesses cannot outlive forced cancellation unnoticed.
+    detached: process.platform !== "win32",
     env: { ...env, OPENCODE_SERVER_PASSWORD: password },
     stdio: ["ignore", "pipe", "pipe"],
   });
@@ -285,18 +289,19 @@ export async function startManagedServer(options: ManagedServerOptions): Promise
     await stopOwnedChild(child);
     throw error;
   }
-  return { backendId, baseUrl, backend,
+  return { backendId, instanceId: randomUUID(), baseUrl, backend,
     isAlive: () => child.exitCode === null && child.signalCode === null,
     confirmAbortStopped: async (sessionId, messageId) => {
-      if (child.killed || child.exitCode !== null || child.signalCode !== null) return false;
+      if (child.killed || child.exitCode !== null || child.signalCode !== null) return { stopped: false, observation: null };
       // This is a new snapshot after the abort response, scoped to the exact
       // recorded session and user message. OpenCode 1.18.35 omits idle sessions
       // from the status map; an explicit idle entry is not this proof.
       const observed = await backend.inspectTurn(sessionId, messageId, { timeoutMs: 5_000 });
-      return !child.killed && child.exitCode === null && child.signalCode === null && observed.submitted &&
+      return { observation: observed, stopped: !child.killed && child.exitCode === null && child.signalCode === null && observed.submitted &&
         !observed.finished && observed.statusOmitted === true && observed.activeTools === 0 &&
-        observed.pendingRequests.length === 0;
+        observed.pendingRequests.length === 0 };
     },
+    terminateOwned: () => process.platform === "win32" ? Promise.resolve(false) : terminateOwnedChild(child, 5_000, true),
     close: () => stopOwnedChild(child) };
 }
 
@@ -354,12 +359,41 @@ function waitForServerUrl(child: OwnedChild, timeoutMs: number): Promise<string>
 }
 
 async function stopOwnedChild(child: OwnedChild): Promise<void> {
-  if (child.exitCode !== null || child.signalCode !== null) return;
-  const exited = once(child, "exit").then(() => undefined);
-  child.kill("SIGTERM");
-  await Promise.race([exited, new Promise<void>((resolve) => setTimeout(resolve, 5_000))]);
-  if (child.exitCode === null && child.signalCode === null) {
-    child.kill("SIGKILL");
-    await exited;
+  if (!await terminateOwnedChild(child, 5_000, process.platform !== "win32")) throw new Error("owned worker exit was not confirmed");
+}
+
+/** Only the original ChildProcess handle is accepted; signal delivery is not exit proof. */
+export async function terminateOwnedChild(child: {
+  pid?: number | undefined;
+  exitCode: number | null; signalCode: NodeJS.Signals | null;
+  kill(signal: NodeJS.Signals): boolean;
+  once(event: "exit", listener: () => void): unknown;
+  off(event: "exit", listener: () => void): unknown;
+},
+  waitMs = 5_000, ownsProcessGroup = false): Promise<boolean> {
+  // The group ID comes only from the child we spawned detached, never disk,
+  // process discovery, or a caller-provided PID. Missing/denied probes fail closed.
+  const groupGone = () => {
+    if (!ownsProcessGroup) return true;
+    if (!child.pid) return false;
+    try { process.kill(-child.pid, 0); return false; }
+    catch (error) { return (error as NodeJS.ErrnoException).code === "ESRCH"; }
+  };
+  const exited = () => (child.exitCode !== null || child.signalCode !== null) && groupGone();
+  for (const signal of ["SIGTERM", "SIGKILL"] as const) {
+    if (exited()) return true;
+    await new Promise<void>((resolve) => {
+      const finish = () => { clearTimeout(timer); clearInterval(poll); child.off("exit", onExit); resolve(); };
+      const onExit = () => { if (exited()) finish(); };
+      const timer = setTimeout(finish, waitMs);
+      const poll = setInterval(onExit, Math.min(waitMs, 25));
+      child.once("exit", onExit);
+      try {
+        if (ownsProcessGroup) { if (child.pid) process.kill(-child.pid, signal); else finish(); }
+        else child.kill(signal);
+      } catch { finish(); }
+      if (exited()) finish();
+    });
   }
+  return exited();
 }

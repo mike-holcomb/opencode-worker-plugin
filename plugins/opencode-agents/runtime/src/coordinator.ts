@@ -1,6 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
-import { executionPairAllowed, type OpenCodeBackend, type PendingRequest, type TurnObservation } from "./backend.js";
+import { executionPairAllowed, type AbortStopProof, type OpenCodeBackend, type PendingRequest, type TurnObservation } from "./backend.js";
 import { loadConfiguration, trustedDevelopmentWorkspace, type UserConfig } from "./config.js";
 import { captureEvidence } from "./evidence.js";
 import { startManagedServer } from "./managed-server.js";
@@ -11,9 +11,12 @@ import { compareBaseline, type WorkspaceBaseline } from "./workspace.js";
 import type { TaskPacket } from "./contracts.js";
 
 type BackendLease = { backendId: string; backend: OpenCodeBackend;
+  /** Unique to this owned process, never the stable backend storage identity. */
+  instanceId?: string;
+  terminateOwned?: () => Promise<boolean>;
   /** False only after the owned process has actually exited, not on a failed health probe. */
   isAlive?: () => boolean;
-  confirmAbortStopped?: (sessionId: string, messageId: string) => Promise<boolean>; close(): Promise<void> };
+  confirmAbortStopped?: (sessionId: string, messageId: string) => Promise<AbortStopProof>; close(): Promise<void> };
 export type BackendOpener = (input: { backendId: string; workspace: string; config: UserConfig;
   launchContract: ManagedLaunchContract | null; onDiagnostic?: (bytes: Buffer) => void }) => Promise<BackendLease>;
 
@@ -98,10 +101,10 @@ export class ExecutionCoordinator {
         const observed = await backend.inspectTurn(task.sessionId, task.userMessageId, { timeoutMs: 5_000 });
         this.updateRequests(task, observed);
         if (observed.pendingRequests.some((item) => item.id === request.id))
-          this.markUnknown(task, `reply delivery is uncertain: ${String(error)}`);
+          this.markUnknown(task, "reply delivery is uncertain; the exact request remains upstream and will not be resent");
         else this.store.resolveUnconfirmedInputResponse(task.executionId, request.id);
       } catch (inspectionError) {
-        this.markUnknown(task, `reply and exact-request observation are uncertain: ${String(inspectionError)}`);
+        this.markUnknown(task, "reply and exact-request observation are uncertain; the recorded response will not be resent");
       }
     }
     this.kick();
@@ -115,7 +118,7 @@ export class ExecutionCoordinator {
         for (const task of this.store.unresolved()) {
           if (this.stopping) break;
           try { await this.reconcile(task); }
-          catch (error) { this.handleFailure(task, error); }
+          catch (error) { await this.handleFailure(task, error); }
         }
         await this.releaseIdleBackends();
       } while (this.again && !this.stopping);
@@ -141,6 +144,8 @@ export class ExecutionCoordinator {
   }
 
   private async backendFor(task: StoredTask): Promise<BackendLease> {
+    if (this.store.cancellationEvent(task.executionId, "cancellation_recovery_intent"))
+      throw new Error("worker termination has begun; backend reopening is forbidden");
     // The launch contract belongs to the execution, not the mutable user config.
     // Earlier in-flight rows without a frozen contract need operator recovery.
     const config = task.backendConfig;
@@ -287,7 +292,7 @@ export class ExecutionCoordinator {
     mkdirSync(task.reportPath, { recursive: true, mode: 0o700 });
     const sessionId = task.sessionId;
     const messageId = `msg_${randomUUID()}`;
-    task = this.store.recordDispatchIntent(task.scopeId, task.taskId, task.revision, lease.backendId, sessionId, messageId);
+    task = this.store.recordDispatchIntent(task.scopeId, task.taskId, task.revision, lease.backendId, sessionId, messageId, lease.instanceId ?? null);
     const slash = task.model.indexOf("/");
     const providerId = slash < 0 ? "" : task.model.slice(0, slash);
     const modelId = slash < 0 ? "" : task.model.slice(slash + 1);
@@ -333,12 +338,26 @@ export class ExecutionCoordinator {
   }
 
   private async reconcileCancellation(task: StoredTask): Promise<void> {
+    if (this.store.cancellationEvent(task.executionId, "cancellation_stop_confirmed")) {
+      this.finishCancellation(task);
+      return;
+    }
+    if (this.store.cancellationEvent(task.executionId, "cancellation_recovery_intent")) {
+      await this.recoverCancellation(task);
+      return;
+    }
     if (!task.userMessageId) {
-      if (this.store.dispatchIntent(task.executionId)) { this.markUnknown(task, "cancellation lacks recorded message identity"); return; }
+      if (this.store.dispatchIntent(task.executionId)) {
+        if (!await this.recoverCancellation(task)) this.cancellationDiagnostic(task, "recorded_message_identity_missing");
+        return;
+      }
       if (!task.sessionId && task.creationIntent) {
         const { backend } = await this.backendFor(task);
         const found = await backend.findCreatedSession(task.creationIntent.marker, { timeoutMs: 5_000 });
-        if (!found) { this.markUnknown(task, "session creation remains ambiguous during cancellation"); return; }
+        if (!found) {
+          if (!await this.recoverCancellation(task)) this.cancellationDiagnostic(task, "session_creation_ambiguous");
+          return;
+        }
         if (found.backendId !== task.creationIntent.backendId || found.workspace !== task.workspace)
           throw new Error("recovered session binding mismatch during cancellation");
         task = this.store.bindSession(task.scopeId, task.taskId, task.revision, found.backendId, found.id);
@@ -349,10 +368,17 @@ export class ExecutionCoordinator {
         task.cancellationIntent?.deadlineOrigin ? "timed_out" : "cancelled", { promptSubmitted: false });
       return;
     }
-    if (!task.sessionId) { this.markUnknown(task, "cancellation lacks exact session identity"); return; }
+    if (!task.sessionId) {
+      if (!await this.recoverCancellation(task)) this.cancellationDiagnostic(task, "exact_session_identity_missing");
+      return;
+    }
+    const sessionId = task.sessionId;
+    const messageId = task.userMessageId;
     const lease = await this.backendFor(task);
     const { backend } = lease;
-    const before = await backend.inspectTurn(task.sessionId, task.userMessageId, { timeoutMs: 5_000 });
+    const before = await backend.inspectTurn(sessionId, messageId, { timeoutMs: 5_000 });
+    this.updateRequests(task, before);
+    task = this.store.get(task.scopeId, task.taskId)!;
     if (before.finished) {
       this.freshAbortAcks.delete(task.executionId);
       const abortApplied = Boolean(task.cancellationIntent?.abortAcknowledged && isCorrelatedAbort(before.error));
@@ -362,29 +388,95 @@ export class ExecutionCoordinator {
       return;
     }
     let acknowledged = Boolean(task.cancellationIntent?.abortAcknowledged);
-    if (!acknowledged) {
-      acknowledged = await backend.abortSession(task.sessionId, { timeoutMs: 5_000 });
-      if (acknowledged) {
+    if (!this.hasFreshAbort(task, lease)) {
+      const freshAcknowledgement = await backend.abortSession(sessionId, { timeoutMs: 5_000 });
+      acknowledged ||= freshAcknowledgement;
+      if (freshAcknowledgement) {
         this.store.acknowledgeAbort(task.executionId);
-        this.freshAbortAcks.set(task.executionId, { lease, sessionId: task.sessionId, messageId: task.userMessageId });
+        this.freshAbortAcks.set(task.executionId, { lease, sessionId, messageId });
       }
     }
-    const after = await backend.inspectTurn(task.sessionId, task.userMessageId, { timeoutMs: 5_000 });
+    let after = await backend.inspectTurn(sessionId, messageId, { timeoutMs: 5_000 });
+    this.updateRequests(task, after);
+    let stopped = false;
+    if (!after.finished && acknowledged && lease.confirmAbortStopped && this.hasFreshAbort(task, lease)) {
+      const proof = await lease.confirmAbortStopped(sessionId, messageId);
+      if (proof.observation) {
+        after = proof.observation;
+        this.updateRequests(task, after);
+      }
+      stopped = proof.stopped;
+    }
+    task = this.store.get(task.scopeId, task.taskId)!;
     if (after.finished) {
       this.freshAbortAcks.delete(task.executionId);
       const abortApplied = Boolean(acknowledged && isCorrelatedAbort(after.error));
       this.store.beginFinalization(task.scopeId, task.taskId, task.revision,
         abortApplied ? task.cancellationIntent?.deadlineOrigin ? "timed_out" : "cancelled" : after.error ? "failed" : "completed",
         { cancelEffect: abortApplied ? "applied" : "not_applied" });
-    } else if (acknowledged && lease.confirmAbortStopped &&
-      this.freshAbortAcks.get(task.executionId)?.lease === lease &&
-      this.freshAbortAcks.get(task.executionId)?.sessionId === task.sessionId &&
-      this.freshAbortAcks.get(task.executionId)?.messageId === task.userMessageId &&
-      await lease.confirmAbortStopped(task.sessionId, task.userMessageId)) {
+    } else if (stopped) {
       this.freshAbortAcks.delete(task.executionId);
       this.store.beginFinalization(task.scopeId, task.taskId, task.revision,
         task.cancellationIntent?.deadlineOrigin ? "timed_out" : "cancelled", { cancelEffect: "applied" });
-    } else this.markUnknown(task, "stop has not been confirmed");
+    } else {
+      if (!await this.recoverCancellation(task, after))
+        this.cancellationDiagnostic(task, "stop_not_confirmed", lease, after);
+    }
+  }
+
+  private hasFreshAbort(task: StoredTask, lease: BackendLease): boolean {
+    const ack = this.freshAbortAcks.get(task.executionId);
+    return ack?.lease === lease && ack.sessionId === task.sessionId && ack.messageId === task.userMessageId;
+  }
+
+  private cancellationDiagnostic(task: StoredTask, reason: string, lease?: BackendLease, observed?: TurnObservation): void {
+    this.markUnknown(task, reason);
+    this.store.recordCancellationEvent(task.executionId, "cancellation_diagnostic", {
+      reason, backendAvailable: Boolean(lease && lease.isAlive?.() !== false && reason !== "backend_observation_unavailable"),
+      freshAbortProof: Boolean(lease && this.hasFreshAbort(task, lease)),
+      status: observed?.status ?? null, statusOmitted: observed?.statusOmitted ?? null,
+      activeTools: observed?.activeTools ?? null, pendingRequests: observed?.pendingRequests.length ?? null,
+    });
+  }
+
+  private finishCancellation(task: StoredTask): void {
+    this.store.expireMissingInputRequests(task.executionId, []);
+    task = this.store.get(task.scopeId, task.taskId)!;
+    this.store.beginFinalization(task.scopeId, task.taskId, task.revision,
+      task.cancellationIntent?.deadlineOrigin ? "timed_out" : "cancelled", { cancelEffect: "applied", stopProof: "owned_worker_exit" });
+  }
+
+  private async recoverCancellation(task: StoredTask, observed?: TurnObservation): Promise<boolean> {
+    if (!task.cancellationIntent || Date.now() - Date.parse(task.cancellationIntent.createdAt) < 30_000) return false;
+    const lease = task.backendId ? this.backends.get(task.backendId) : undefined;
+    const intent = this.store.cancellationEvent(task.executionId, "cancellation_recovery_intent");
+    if (!lease?.terminateOwned || !lease.instanceId || !task.workerInstanceId || lease.instanceId !== task.workerInstanceId || (intent && intent.detail.instanceId !== lease.instanceId)) {
+      this.cancellationDiagnostic(task, "owned_process_handle_unavailable", lease, observed);
+      return true;
+    }
+    if (task.workspaceAccess !== "exclusive" || !this.store.ownsResource(task.executionId, `workspace:${task.workspace}`) ||
+      this.store.unresolved().some((other) => other.executionId !== task.executionId && other.admittedAt &&
+        (other.backendId === lease.backendId || other.workspace === task.workspace))) {
+      this.cancellationDiagnostic(task, "exclusive_worker_ownership_unproven", lease, observed);
+      return true;
+    }
+    // Persist intent before signaling. A replacement lease must never stand in
+    // for this process if a crash occurs before exit confirmation is committed.
+    const identity = { backendId: lease.backendId, instanceId: lease.instanceId };
+    this.store.recordCancellationEvent(task.executionId, "cancellation_recovery_intent", identity);
+    this.streams.get(lease.backendId)?.abort();
+    this.streams.delete(lease.backendId);
+    let stopped = false;
+    try { stopped = await lease.terminateOwned(); } catch { /* bounded retry with the original handle */ }
+    if (!stopped || lease.isAlive?.() !== false) {
+      this.cancellationDiagnostic(task, "owned_worker_exit_unconfirmed", lease);
+      return true;
+    }
+    this.store.recordCancellationEvent(task.executionId, "cancellation_stop_confirmed", identity);
+    this.freshAbortAcks.delete(task.executionId);
+    this.backends.delete(lease.backendId);
+    this.finishCancellation(task);
+    return true;
   }
 
   private async finalize(task: StoredTask): Promise<void> {
@@ -393,7 +485,7 @@ export class ExecutionCoordinator {
       if (!task.reportPath || !task.frozenBaseline) throw new Error("frozen report path or baseline missing");
       mkdirSync(task.reportPath, { recursive: true, mode: 0o700 });
       let structuredReport: unknown;
-      if (task.sessionId && task.userMessageId) {
+      if (task.sessionId && task.userMessageId && !this.store.cancellationEvent(task.executionId, "cancellation_stop_confirmed")) {
         try { structuredReport = (await (await this.backendFor(task)).backend.readResult(task.sessionId, task.userMessageId, { timeoutMs: 5_000 })).structured; }
         catch { /* file report remains available */ }
       }
@@ -412,16 +504,21 @@ export class ExecutionCoordinator {
 
   private markUnknown(task: StoredTask, reason: string): void {
     const current = this.store.get(task.scopeId, task.taskId);
-    if (current && current.executionId === task.executionId && current.observation !== "unknown")
+    if (current && current.executionId === task.executionId && current.observation !== "unknown" &&
+      !["completed", "failed", "cancelled", "timed_out"].includes(current.phase))
       this.store.transition(task.scopeId, task.taskId, current.revision, current.phase, "unknown", { reason });
   }
 
-  private handleFailure(task: StoredTask, error: unknown): void {
+  private async handleFailure(task: StoredTask, error: unknown): Promise<void> {
     const current = this.store.get(task.scopeId, task.taskId);
     if (!current || current.executionId !== task.executionId) return;
     if (current.phase === "queued" || (current.phase === "dispatching" && !current.creationIntent && !this.store.dispatchIntent(current.executionId))) {
       this.store.transition(current.scopeId, current.taskId, current.revision, "failed", "current", { error: String(error) });
       this.store.release(current.executionId);
+    } else if (current.cancellationIntent && current.phase === "cancelling") {
+      if (!await this.recoverCancellation(current))
+        this.cancellationDiagnostic(current, "backend_observation_unavailable",
+          current.backendId ? this.backends.get(current.backendId) : undefined);
     } else this.markUnknown(current, String(error));
   }
 }

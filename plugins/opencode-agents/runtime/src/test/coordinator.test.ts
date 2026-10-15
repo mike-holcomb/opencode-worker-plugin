@@ -11,7 +11,7 @@ import { ExecutionCoordinator } from "../coordinator.js";
 import type { TaskPacket } from "../contracts.js";
 import { renderPrompt } from "../prompt.js";
 import { SupervisorService } from "../service.js";
-import { SqliteTaskStore } from "../store.js";
+import { SqliteTaskStore, type CancellationDiagnostic } from "../store.js";
 import { captureBaseline } from "../workspace.js";
 
 class FakeBackend implements OpenCodeBackend {
@@ -20,6 +20,7 @@ class FakeBackend implements OpenCodeBackend {
   submitted = false;
   finished = false;
   aborted = false;
+  abortCount = 0;
   stopped = false;
   submitCount = 0;
   created = false;
@@ -60,7 +61,7 @@ class FakeBackend implements OpenCodeBackend {
     if (this.replyFailure !== "pending") this.requests = this.requests.filter((item) => item.id !== request.id);
     if (this.replyFailure) throw new Error("lost reply acknowledgement");
   }
-  async abortSession() { this.aborted = true; return true; }
+  async abortSession() { this.abortCount++; this.aborted = true; return true; }
   async readResult() { return { text: "", structured: null }; }
 }
 
@@ -80,20 +81,24 @@ function setup(executionTimeoutSeconds?: number, finalizationTimeoutSeconds?: nu
   const store = new SqliteTaskStore(join(root, "state.sqlite"));
   const artifacts = new ArtifactStore(join(root, "artifacts"));
   const backend = new FakeBackend(workspace);
-  const lifecycle = { opens: 0, closes: 0, alive: true };
+  const lifecycle = { opens: 0, closes: 0, alive: true, terminations: 0, terminationSucceeds: true };
   const opener = async ({ backendId }: { backendId: string }) => {
     lifecycle.opens++;
     lifecycle.alive = true;
     assert.notEqual(backendId, "");
     // The fake endpoint adopts the coordinator's stable storage identity.
     Object.assign(backend, { backendId });
-    return { backendId, backend, isAlive: () => lifecycle.alive,
+    return { backendId, backend, instanceId: `process_${lifecycle.opens}`, isAlive: () => lifecycle.alive,
       close: async () => { lifecycle.closes++; },
-      ...(managedStopProof ? { confirmAbortStopped: async (sessionId: string, messageId: string) => {
+      ...(managedStopProof ? { terminateOwned: async () => {
+        lifecycle.terminations++;
+        if (lifecycle.terminationSucceeds) lifecycle.alive = false;
+        return lifecycle.terminationSucceeds;
+      }, confirmAbortStopped: async (sessionId: string, messageId: string) => {
         assert.equal(sessionId, backend.sessionId);
         const observed = await backend.inspectTurn(sessionId, messageId);
-        return observed.submitted && !observed.finished && observed.statusOmitted === true && observed.activeTools === 0 &&
-          observed.pendingRequests.length === 0;
+        return { observation: observed, stopped: observed.submitted && !observed.finished && observed.statusOmitted === true && observed.activeTools === 0 &&
+          observed.pendingRequests.length === 0 };
       } } : {}) };
   };
   const coordinator = new ExecutionCoordinator(store, artifacts, opener);
@@ -119,6 +124,231 @@ function setup(executionTimeoutSeconds?: number, finalizationTimeoutSeconds?: nu
     store.close(); rmSync(root, { recursive: true, force: true });
   } };
 }
+
+async function until(predicate: () => boolean): Promise<void> {
+  for (let i = 0; i < 150; i++) {
+    if (predicate()) return;
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+  assert.ok(predicate(), "expected reconciliation did not finish");
+}
+
+function cancelFixture(fx: ReturnType<typeof setup>, deadline = false) {
+  const task = fx.store.get("scope", fx.task.taskId)!;
+  return fx.store.cancelTask({ scopeId: task.scopeId, taskId: task.taskId, executionId: task.executionId,
+    expectedRevision: task.revision, idempotencyKey: "issue-four-cancel-123456", reason: "stop", requester: "parent",
+    ...(deadline ? { deadlineOrigin: task.executionDeadlineAt! } : {}) });
+}
+
+function permission(fx: ReturnType<typeof setup>, id = "per_cancel"): PendingRequest {
+  return { id, sessionId: fx.backend.sessionId, type: "permission", api: "legacy",
+    detail: { permission: "bash", patterns: ["private-request-content"] } };
+}
+
+test("cancellation reconciles new and vanished permissions without restoring waiting_input", async () => {
+  const fx = setup(undefined, undefined, true);
+  try {
+    await fx.coordinator.start();
+    fx.backend.requests = [permission(fx)];
+    cancelFixture(fx);
+    fx.coordinator.kick();
+    await until(() => fx.store.get("scope", fx.task.taskId)?.pendingRequests.length === 1);
+    assert.equal(fx.store.get("scope", fx.task.taskId)?.phase, "cancelling");
+    fx.backend.requests = [];
+    fx.backend.stopped = true;
+    fx.coordinator.kick();
+    await until(() => fx.store.get("scope", fx.task.taskId)?.phase === "cancelled");
+    assert.equal(fx.store.get("scope", fx.task.taskId)?.pendingRequests.length, 0);
+    assert.equal(fx.store.inputRequests(fx.task.executionId)[0]?.status, "expired");
+  } finally { await fx.coordinator.close(); fx.restore(); }
+});
+
+for (const lostReply of [false, true]) {
+  test(`permission denial during cancellation is at most once (lost reply: ${lostReply})`, async () => {
+    const fx = setup();
+    try {
+      await fx.coordinator.start();
+      fx.backend.requests = [permission(fx)];
+      cancelFixture(fx);
+      fx.coordinator.kick();
+      await until(() => fx.store.get("scope", fx.task.taskId)?.pendingRequests.length === 1);
+      const service = new SupervisorService(fx.store, fx.artifacts, fx.coordinator);
+      const input = { scope_id: "scope", task_id: fx.task.taskId, execution_id: fx.task.executionId,
+        request_id: "per_cancel", request_revision: 1, reply: "deny", authorization_basis: "parent cancellation",
+        idempotency_key: "cancel-deny-request-12345" };
+      await assert.rejects(service.handle("respond_to_request", { ...input, reply: "allow_once" }), /only permission denial/);
+      await assert.rejects(service.handle("respond_to_request", { ...input, request_revision: 2 }), /revision is stale/);
+      if (lostReply) fx.backend.replyFailure = "pending";
+      await service.handle("respond_to_request", input);
+      await service.handle("respond_to_request", input);
+      assert.equal(fx.backend.replyCount, 1);
+      assert.equal(fx.store.get("scope", fx.task.taskId)?.phase, "cancelling");
+      fx.backend.requests = [];
+      fx.coordinator.kick();
+      await until(() => fx.store.get("scope", fx.task.taskId)?.pendingRequests.length === 0);
+      assert.equal(fx.store.inputRequests(fx.task.executionId)[0]?.status, lostReply ? "unconfirmed" : "responded");
+    } finally { await fx.coordinator.close(); fx.restore(); }
+  });
+}
+
+for (const deadline of [false, true]) {
+  test(`retained permissions trigger owned-worker recovery after the grace period (deadline: ${deadline})`, async (t) => {
+    const fx = setup(undefined, undefined, true);
+    try {
+      await fx.coordinator.start();
+      fx.backend.requests = [permission(fx)];
+      fx.backend.stopped = true;
+      const task = cancelFixture(fx, deadline);
+      let clock = Date.parse(task.cancellationIntent!.createdAt) + 29_999;
+      t.mock.method(Date, "now", () => clock);
+      fx.coordinator.kick();
+      await until(() => fx.store.get("scope", fx.task.taskId)?.observation === "unknown");
+      assert.equal(fx.lifecycle.terminations, 0);
+      assert.equal(fx.store.ownsResource(task.executionId, `workspace:${task.workspace}`), true);
+      clock++;
+      fx.coordinator.kick();
+      await until(() => fx.store.get("scope", fx.task.taskId)?.phase === (deadline ? "timed_out" : "cancelled"));
+      assert.equal(fx.lifecycle.terminations, 1);
+      assert.equal(fx.lifecycle.opens, 1, "finalization must not reopen the terminated backend");
+      assert.equal(fx.backend.submitCount, 1);
+      assert.equal(fx.store.get("scope", fx.task.taskId)?.pendingRequests.length, 0);
+      assert.equal(fx.store.ownsResource(task.executionId, `workspace:${task.workspace}`), false);
+      assert.ok(fx.store.cancellationEvent(task.executionId, "cancellation_stop_confirmed"));
+    } finally { await fx.coordinator.close(); fx.restore(); }
+  });
+}
+
+test("failed termination retains ownership and retries the original process handle", async (t) => {
+  const fx = setup(undefined, undefined, true);
+  try {
+    await fx.coordinator.start();
+    fx.lifecycle.terminationSucceeds = false;
+    const task = cancelFixture(fx);
+    t.mock.method(Date, "now", () => Date.parse(task.cancellationIntent!.createdAt) + 30_001);
+    fx.coordinator.kick();
+    await until(() => fx.lifecycle.terminations > 0);
+    assert.equal(fx.store.get("scope", task.taskId)?.phase, "cancelling");
+    assert.equal(fx.store.ownsResource(task.executionId, `workspace:${task.workspace}`), true);
+    assert.equal(fx.store.cancellationEvent(task.executionId, "cancellation_stop_confirmed"), null);
+    fx.lifecycle.terminationSucceeds = true;
+    fx.coordinator.kick();
+    await until(() => fx.store.get("scope", task.taskId)?.phase === "cancelled");
+    assert.equal(fx.lifecycle.opens, 1);
+  } finally { await fx.coordinator.close(); fx.restore(); }
+});
+
+test("an unavailable authenticated endpoint still permits recovery through the owned handle", async (t) => {
+  const fx = setup(undefined, undefined, true);
+  try {
+    await fx.coordinator.start();
+    const task = cancelFixture(fx);
+    fx.backend.inspectTurn = async () => { throw new Error("private credential must not appear in diagnostics"); };
+    t.mock.method(Date, "now", () => Date.parse(task.cancellationIntent!.createdAt) + 30_001);
+    fx.coordinator.kick();
+    await until(() => fx.store.get("scope", task.taskId)?.phase === "cancelled");
+    assert.equal(fx.lifecycle.terminations, 1);
+    assert.equal(JSON.stringify(fx.store.events(task.executionId)).includes("private credential"), false);
+  } finally { await fx.coordinator.close(); fx.restore(); }
+});
+
+test("restart before termination intent cannot terminate a replacement worker", async (t) => {
+  const fx = setup(undefined, undefined, true);
+  let resumed: ExecutionCoordinator | null = null;
+  try {
+    await fx.coordinator.start();
+    const task = cancelFixture(fx);
+    assert.equal(task.workerInstanceId, "process_1");
+    assert.equal(fx.store.cancellationEvent(task.executionId, "cancellation_recovery_intent"), null);
+    await fx.coordinator.close();
+    t.mock.method(Date, "now", () => Date.parse(task.cancellationIntent!.createdAt) + 30_001);
+    resumed = fx.restart();
+    await resumed.start();
+    await until(() => fx.store.cancellationEvent(task.executionId, "cancellation_diagnostic")?.detail.reason === "owned_process_handle_unavailable");
+    assert.equal(fx.lifecycle.opens, 2);
+    assert.equal(fx.lifecycle.terminations, 0);
+    assert.equal(fx.backend.submitCount, 1);
+    assert.equal(fx.store.get("scope", task.taskId)?.workerInstanceId, "process_1");
+    assert.equal(fx.store.get("scope", task.taskId)?.phase, "cancelling");
+    assert.equal(fx.store.ownsResource(task.executionId, `workspace:${task.workspace}`), true);
+    assert.equal(fx.store.cancellationEvent(task.executionId, "cancellation_recovery_intent"), null);
+    assert.equal(fx.store.cancellationEvent(task.executionId, "cancellation_stop_confirmed"), null);
+  } finally { await resumed?.close(); await fx.coordinator.close(); fx.restore(); }
+});
+
+test("restart after termination intent cannot substitute a new handle for unconfirmed exit", async (t) => {
+  const fx = setup(undefined, undefined, true);
+  let resumed: ExecutionCoordinator | null = null;
+  try {
+    await fx.coordinator.start();
+    fx.lifecycle.terminationSucceeds = false;
+    const task = cancelFixture(fx);
+    t.mock.method(Date, "now", () => Date.parse(task.cancellationIntent!.createdAt) + 30_001);
+    fx.coordinator.kick();
+    await until(() => fx.lifecycle.terminations > 0);
+    await fx.coordinator.close();
+    resumed = fx.restart();
+    await resumed.start();
+    assert.equal(fx.lifecycle.opens, 1);
+    assert.equal(fx.store.get("scope", task.taskId)?.phase, "cancelling");
+    assert.equal(fx.store.ownsResource(task.executionId, `workspace:${task.workspace}`), true);
+    assert.equal(fx.store.cancellationEvent(task.executionId, "cancellation_diagnostic")?.detail.reason, "owned_process_handle_unavailable");
+  } finally { await resumed?.close(); await fx.coordinator.close(); fx.restore(); }
+});
+
+test("confirmed exit survives restart and finalizes without opening a backend", async () => {
+  const fx = setup(undefined, undefined, true);
+  let resumed: ExecutionCoordinator | null = null;
+  try {
+    await fx.coordinator.start();
+    const task = cancelFixture(fx);
+    await fx.coordinator.close();
+    const proof = { backendId: task.backendId!, instanceId: "process_1" };
+    fx.store.recordCancellationEvent(task.executionId, "cancellation_recovery_intent", proof);
+    fx.store.recordCancellationEvent(task.executionId, "cancellation_stop_confirmed", proof);
+    resumed = fx.restart();
+    await resumed.start();
+    await until(() => fx.store.get("scope", task.taskId)?.phase === "cancelled");
+    assert.equal(fx.lifecycle.opens, 1);
+  } finally { await resumed?.close(); await fx.coordinator.close(); fx.restore(); }
+});
+
+test("recovery refuses a lease without exclusive workspace ownership", async (t) => {
+  const fx = setup(undefined, undefined, true);
+  try {
+    await fx.coordinator.start();
+    const task = cancelFixture(fx);
+    t.mock.method(fx.store, "ownsResource", () => false);
+    t.mock.method(Date, "now", () => Date.parse(task.cancellationIntent!.createdAt) + 30_001);
+    fx.coordinator.kick();
+    await until(() => fx.store.cancellationEvent(task.executionId, "cancellation_diagnostic")?.detail.reason === "exclusive_worker_ownership_unproven");
+    assert.equal(fx.lifecycle.terminations, 0);
+    assert.equal(fx.store.get("scope", task.taskId)?.phase, "cancelling");
+  } finally { await fx.coordinator.close(); fx.restore(); }
+});
+
+test("cancellation diagnostics retain counts, deduplicate repeats and emit a heartbeat", async (t) => {
+  const fx = setup();
+  try {
+    await fx.coordinator.start();
+    fx.backend.requests = [permission(fx)];
+    const task = cancelFixture(fx);
+    fx.coordinator.kick();
+    await until(() => Boolean(fx.store.cancellationEvent(task.executionId, "cancellation_diagnostic")));
+    const first = fx.store.cancellationEvent(task.executionId, "cancellation_diagnostic")!;
+    const count = () => fx.store.events(task.executionId).filter((event) => event.kind === "cancellation_diagnostic").length;
+    const initial = count();
+    fx.coordinator.kick();
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    assert.equal(count(), initial);
+    assert.equal(first.detail.pendingRequests, 1);
+    assert.equal(first.detail.activeTools, 1);
+    assert.equal(JSON.stringify(first).includes("private-request-content"), false);
+    t.mock.method(Date, "now", () => Date.parse(first.createdAt) + 30_000);
+    // Exercise durable heartbeat storage independently of recovery's changed reason.
+    fx.store.recordCancellationEvent(task.executionId, "cancellation_diagnostic", first.detail as CancellationDiagnostic);
+    assert.equal(count(), initial + 1);
+  } finally { await fx.coordinator.close(); fx.restore(); }
+});
 
 test("durable admission dispatches one exact message and a finished turn with no report remains unaccepted", async () => {
   const fx = setup();
@@ -322,7 +552,7 @@ test("a fresh managed abort acknowledgement and independent exact-turn stop snap
   } finally { await fx.coordinator.close(); fx.restore(); }
 });
 
-test("persisted abort acknowledgement cannot confirm stop after coordinator restart", async () => {
+test("restart obtains a fresh abort acknowledgement before confirming stop", async () => {
   const fx = setup(undefined, undefined, true);
   let resumed: ExecutionCoordinator | null = null;
   try {
@@ -338,10 +568,45 @@ test("persisted abort acknowledgement cannot confirm stop after coordinator rest
     fx.backend.stopped = true;
     resumed = fx.restart();
     await resumed.start();
-    await new Promise((resolve) => setTimeout(resolve, 60));
-    assert.equal(fx.store.get("scope", fx.task.taskId)?.phase, "cancelling");
-    assert.equal(fx.store.reserve(`other_${randomUUID()}`, [`workspace:${active.workspace}`]), false);
+    await until(() => fx.store.get("scope", fx.task.taskId)?.phase === "cancelled");
+    assert.equal(fx.backend.abortCount, 2);
+    assert.equal(fx.backend.submitCount, 1);
+    assert.equal(fx.store.ownsResource(active.executionId, `workspace:${active.workspace}`), false);
   } finally { await resumed?.close(); await fx.coordinator.close(); fx.restore(); }
+});
+
+test("a replacement backend lease obtains fresh abort proof without replaying the turn", async () => {
+  const fx = setup(undefined, undefined, true);
+  try {
+    await fx.coordinator.start();
+    cancelFixture(fx);
+    fx.coordinator.kick();
+    await until(() => fx.backend.abortCount === 1);
+    fx.lifecycle.alive = false;
+    fx.backend.stopped = true;
+    fx.coordinator.kick();
+    await until(() => fx.store.get("scope", fx.task.taskId)?.phase === "cancelled");
+    assert.equal(fx.lifecycle.opens, 2);
+    assert.equal(fx.backend.abortCount, 2);
+    assert.equal(fx.backend.submitCount, 1);
+  } finally { await fx.coordinator.close(); fx.restore(); }
+});
+
+test("normal completion in the independent stop-proof snapshot retains its outcome", async () => {
+  const fx = setup(undefined, undefined, true);
+  try {
+    await fx.coordinator.start();
+    const inspect = fx.backend.inspectTurn.bind(fx.backend);
+    let snapshots = 0;
+    fx.backend.inspectTurn = async (sessionId, messageId) => {
+      if (++snapshots === 3) { fx.backend.finished = true; fx.backend.stopped = true; }
+      return inspect(sessionId, messageId);
+    };
+    cancelFixture(fx);
+    fx.coordinator.kick();
+    await until(() => fx.store.get("scope", fx.task.taskId)?.phase === "completed");
+    assert.equal(fx.lifecycle.terminations, 0);
+  } finally { await fx.coordinator.close(); fx.restore(); }
 });
 
 test("a correlated abort error after deadline acknowledgement resolves as timed out", async () => {
