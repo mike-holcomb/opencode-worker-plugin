@@ -107,6 +107,52 @@ test("aggregate and terminal eviction are finite, explicit and never caused by r
   manager.maintain(); assert.equal(manager.read("terminal", { after_cursor: terminal }).gap?.reason, "terminal");
 });
 
+for (const reason of ["aggregate", "terminal"] as const) {
+  test(`${reason} recovery cursors stabilize and follow a re-registered stream`, () => {
+    let now = 0;
+    const manager = new ProgressManager({ now: () => now, maxAggregateBytes: 2000, terminalTtlMs: 100 });
+    manager.register("exec", "supported");
+    const initial = manager.hint("exec").progress_cursor;
+    manager.append("exec", "before", checkpoint);
+    const expired = manager.hint("exec").progress_cursor;
+    if (reason === "terminal") {
+      manager.markTerminal("exec"); now += 100; manager.maintain();
+    } else {
+      now++; manager.register("pressure", "supported"); manager.append("pressure", "pressure", checkpoint);
+    }
+    const gap = manager.read("exec", { after_cursor: expired });
+    assert.equal(gap.gap?.reason, reason);
+    assert.notEqual(gap.next_cursor, initial, "even the pre-eviction sequence-zero cursor is expired");
+    assert.deepEqual(manager.read("exec", { after_cursor: expired }), gap, "reading does not acknowledge the gap");
+    assert.equal(manager.read("exec", { after_cursor: initial }).gap?.reason, reason);
+    assert.equal(manager.hint("exec").progress_cursor, gap.next_cursor);
+    const recovered = manager.read("exec", { after_cursor: gap.next_cursor });
+    assert.equal(recovered.gap, null); assert.deepEqual(recovered.updates, []);
+    assert.equal(recovered.next_cursor, gap.next_cursor);
+    manager.maintain();
+    assert.deepEqual(manager.read("exec", { after_cursor: gap.next_cursor }), recovered);
+    now++; manager.register("exec", "supported");
+    assert.equal(manager.hint("exec").progress_cursor, gap.next_cursor);
+    assert.equal(manager.read("exec", { after_cursor: expired }).gap?.reason, reason);
+    manager.append("exec", "after", { ...checkpoint, summary: "New milestone" });
+    const resumed = manager.read("exec", { after_cursor: gap.next_cursor });
+    assert.equal(resumed.gap, null); assert.deepEqual(resumed.updates.map((item) => item.summary), ["New milestone"]);
+  });
+}
+
+test("pruned eviction tombstones disclose unavailable history and issue a usable fallback cursor", () => {
+  const manager = new ProgressManager({ maxAggregateBytes: 1024 });
+  manager.register("exec", "supported");
+  const initial = manager.hint("exec").progress_cursor;
+  manager.register("pressure", "supported");
+  const recovery = manager.read("exec", { after_cursor: initial }).next_cursor;
+  assert.notEqual(recovery, initial);
+  for (let i = 0; i < 10; i++) manager.register(`pressure${i}`, "supported");
+  const gap = manager.read("exec", { after_cursor: recovery });
+  assert.equal(gap.gap?.reason, "buffer_unavailable");
+  assert.equal(manager.read("exec", { after_cursor: gap.next_cursor }).gap, null);
+});
+
 test("published input and response mutations cannot change retained checkpoints", () => {
   const manager = new ProgressManager(); manager.register("exec", "supported");
   const mutable = { ...checkpoint, completed: ["Original"] }; manager.append("exec", "part", mutable); mutable.completed[0] = "Changed";

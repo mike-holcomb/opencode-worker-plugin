@@ -175,7 +175,7 @@ async function worktreeRoot(workspace: string, env: NodeJS.ProcessEnv): Promise<
   }
 }
 
-export function workerPolicy(reportPath: string, worktree: string): {
+export function workerPolicy(reportPath: string, worktree: string, options: { progressEnabled?: boolean } = {}): {
   profiles: Record<string, { mode: "primary"; permission: Record<string, unknown> }>;
   reportEditPattern: string;
 } {
@@ -186,7 +186,8 @@ export function workerPolicy(reportPath: string, worktree: string): {
   const common = {
     read: "allow", glob: "allow", grep: "allow", list: "allow",
     external_directory: { "*": "deny", [reportExternalPattern]: "allow" },
-    task: "deny", question: "deny", skill: "deny", report_progress: "allow",
+    task: "deny", question: "deny", skill: "deny",
+    ...(options.progressEnabled !== false ? { report_progress: "allow" } : {}),
   };
   return {
     reportEditPattern,
@@ -250,7 +251,10 @@ export async function launchEnvironment(options: ManagedServerOptions): Promise<
     throw new Error("frozen execution report path is missing");
   const reportPath = options.launchContract?.reportPath;
   if (!reportPath) throw new Error("managed worker requires an assigned execution report path");
-  const { profiles } = workerPolicy(reportPath, await worktreeRoot(options.workspace, baseEnv));
+  // Contracts predating native checkpoints retain their original permissions.
+  // Their backend transport remains disabled because no progress asset is frozen.
+  const { profiles } = workerPolicy(reportPath, await worktreeRoot(options.workspace, baseEnv),
+    { progressEnabled: !options.launchContract || Boolean(options.launchContract.progressTool) });
   if (options.launchContract) assertWorkerPolicy(resolved, profiles);
   const overlay = options.launchContract ? supplied : {
     ...supplied,

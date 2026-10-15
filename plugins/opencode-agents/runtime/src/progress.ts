@@ -33,7 +33,7 @@ const sha = (value: string) => createHash("sha256").update(value).digest("hex");
 export class ProgressManager {
   private readonly processGeneration = randomUUID();
   private readonly states = new Map<string, State>();
-  private readonly evicted = new Map<string, string>();
+  private readonly evicted = new Map<string, { reason: string; generation: string }>();
   private readonly now: () => number;
   private readonly maxCount: number;
   private readonly maxExecutionBytes: number;
@@ -49,7 +49,8 @@ export class ProgressManager {
       if (!Number.isSafeInteger(limit) || limit < 1) throw new Error("progress limits must be positive safe integers");
   }
   private cursor(executionId: string, state?: State, sequence = state?.sequence ?? 0): string {
-    return Buffer.from(JSON.stringify({ v: 1, e: executionId, p: this.processGeneration, g: state?.generation ?? this.processGeneration, s: sequence })).toString("base64url");
+    return Buffer.from(JSON.stringify({ v: 1, e: executionId, p: this.processGeneration,
+      g: state?.generation ?? this.evicted.get(executionId)?.generation ?? this.processGeneration, s: sequence })).toString("base64url");
   }
   private decode(encoded: string, executionId: string): Cursor {
     if (!/^[A-Za-z0-9_-]+$/.test(encoded) || Buffer.from(encoded, "base64url").toString("base64url") !== encoded) throw new Error("malformed progress cursor");
@@ -64,9 +65,11 @@ export class ProgressManager {
     this.sweep();
     const current = this.states.get(executionId);
     if (current) { current.availability = availability; return; }
-    this.states.set(executionId, { generation: this.evicted.has(executionId) ? randomUUID() : this.processGeneration,
+    const eviction = this.evicted.get(executionId);
+    this.evicted.delete(executionId);
+    this.states.set(executionId, { generation: eviction?.generation ?? this.processGeneration,
       sequence: 0, availability, entries: [], latest: null, dedup: new Map(), rate: [], dropped: 0,
-      lastActivity: this.now(), terminalAt: null, resetReason: this.evicted.get(executionId) ?? null, blocker: null });
+      lastActivity: this.now(), terminalAt: null, resetReason: eviction?.reason ?? null, blocker: null });
     this.enforceAggregate();
   }
   append(executionId: string, sourceId: string, input: CheckpointInput): { accepted: boolean; duplicate: boolean } {
@@ -137,7 +140,8 @@ export class ProgressManager {
     const cursor = options.after_cursor ? this.decode(options.after_cursor, executionId) : null;
     let reason: string | null = null;
     if (cursor?.p !== undefined && cursor.p !== this.processGeneration) reason = "restart";
-    else if (cursor && !state && (cursor.s > 0 || cursor.g !== this.processGeneration || this.evicted.has(executionId))) reason = this.evicted.get(executionId) ?? "buffer_unavailable";
+    else if (cursor && !state && (cursor.s > 0 || cursor.g !== (this.evicted.get(executionId)?.generation ?? this.processGeneration)))
+      reason = this.evicted.get(executionId)?.reason ?? "buffer_unavailable";
     else if (cursor && state && cursor.g !== state.generation) reason = state.resetReason ?? "buffer_evicted";
     else if (cursor && state && cursor.s > state.sequence) throw new Error("progress cursor is ahead of the execution stream");
     else if (cursor && state?.entries.length && cursor.s < state.entries[0]!.sequence - 1) reason = "retention";
@@ -165,7 +169,10 @@ export class ProgressManager {
       [...state.dedup].reduce((sum, [id]) => sum + Buffer.byteLength(id) + 160, 0) + state.rate.length * 24;
   }
   private evict(id: string, reason: string): void {
-    this.states.delete(id); this.evicted.delete(id); this.evicted.set(id, reason);
+    this.states.delete(id); this.evicted.delete(id);
+    // A new empty-buffer generation distinguishes expired cursors from the
+    // recovery cursor without reads acknowledging or mutating retained state.
+    this.evicted.set(id, { reason, generation: randomUUID() });
     // Tombstones are bounded; older unknown buffers still return an honest gap.
     while (this.evicted.size > 256 || this.evicted.size * 256 > this.maxAggregateBytes / 4) this.evicted.delete(this.evicted.keys().next().value!);
   }

@@ -197,7 +197,10 @@ export class SdkOpenCodeBackend implements OpenCodeBackend {
   }
 
   async *subscribeEvents(control?: RequestControl): AsyncIterable<BackendEvent> {
-    const { stream } = await this.client.event.subscribe({ directory: this.workspace }, { signal: signalFor(control) });
+    // Let the coordinator disclose a gap before reconnecting. SDK retries would
+    // otherwise hide lost checkpoints inside this same iterator.
+    const { stream } = await this.client.event.subscribe({ directory: this.workspace },
+      { signal: signalFor(control), sseMaxRetryAttempts: 1 });
     for await (const event of stream) {
       const data: unknown = event;
       const record = data && typeof data === "object" ? data as Record<string, unknown> : {};

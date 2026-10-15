@@ -13,6 +13,7 @@ import { renderPrompt } from "../prompt.js";
 import { SupervisorService } from "../service.js";
 import { SqliteTaskStore, type CancellationDiagnostic } from "../store.js";
 import { captureBaseline } from "../workspace.js";
+import { SdkOpenCodeBackend } from "../opencode-backend.js";
 
 class FakeBackend implements OpenCodeBackend {
   readonly backendId = "backend_fake";
@@ -131,6 +132,66 @@ async function until(predicate: () => boolean): Promise<void> {
     await new Promise((resolve) => setTimeout(resolve, 10));
   }
   assert.ok(predicate(), "expected reconciliation did not finish");
+}
+
+for (const ending of ["socket error", "EOF"] as const) {
+  test(`SDK ${ending} lets the coordinator disclose a gap before reconnecting`, { timeout: 5_000 }, async (t) => {
+    const fx = setup();
+    const sdk = new SdkOpenCodeBackend("http://sdk.invalid", fx.backend.workspace, fx.backend.backendId);
+    const streams: ReadableStreamDefaultController<Uint8Array>[] = [];
+    const checkpoint = { stage: "verifying" as const, summary: "Before disconnect", completed: [], remaining: [], blocker: null, evidence_refs: [] };
+    const parts = new Map<string, unknown>();
+    t.mock.method(globalThis, "fetch", async (input: Request | URL | string) => {
+      const url = new URL(input instanceof Request ? input.url : String(input));
+      if (url.pathname === "/event") {
+        return new Response(new ReadableStream<Uint8Array>({ start(controller) { streams.push(controller); } }),
+          { headers: { "Content-Type": "text/event-stream" } });
+      }
+      assert.match(url.pathname, /\/session\/ses_fake\/message\/assistant$/);
+      return Response.json({ info: { id: "assistant", sessionID: fx.backend.sessionId, role: "assistant", parentID: fx.backend.messageId },
+        parts: [...parts.values()] });
+    });
+    const inspect = fx.backend.inspectBackend.bind(fx.backend);
+    Object.assign(fx.backend, {
+      subscribeEvents: sdk.subscribeEvents.bind(sdk), readCheckpoint: sdk.readCheckpoint.bind(sdk),
+      inspectBackend: async () => {
+        const inspection = await inspect();
+        return { ...inspection, capabilities: { ...inspection.capabilities, progressCheckpoints: true } };
+      },
+    });
+    const emit = (connection: number, id: string, summary: string) => {
+      const part = { id, sessionID: fx.backend.sessionId, messageID: "assistant", type: "tool", tool: "report_progress",
+        state: { status: "completed", metadata: { opencode_agents_progress: { ...checkpoint, summary } } } };
+      parts.set(id, part);
+      streams[connection]!.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ type: "message.part.updated", properties: { part, sessionID: fx.backend.sessionId } })}\n\n`));
+    };
+    try {
+      await fx.coordinator.start(); await until(() => streams.length === 1);
+      emit(0, "before", checkpoint.summary);
+      await until(() => fx.coordinator.progress.read(fx.task.executionId, { include_snapshot: true }).snapshot?.summary === checkpoint.summary);
+      const expired = fx.coordinator.progress.hint(fx.task.executionId).progress_cursor;
+      const inspections = fx.backend.inspectionCount;
+      if (ending === "socket error") streams[0]!.error(new Error("socket disconnected"));
+      else streams[0]!.close();
+      await until(() => fx.coordinator.progress.read(fx.task.executionId, { after_cursor: expired }).gap?.reason === "disconnect");
+      assert.equal(streams.length, 1, "SDK did not reconnect internally");
+      const gap = fx.coordinator.progress.read(fx.task.executionId, { after_cursor: expired });
+      assert.equal(gap.snapshot?.summary, checkpoint.summary);
+      assert.equal(fx.coordinator.progress.read(fx.task.executionId, { after_cursor: gap.next_cursor }).gap, null);
+      await until(() => streams.length === 2);
+      assert.ok(fx.backend.inspectionCount > inspections, "authoritative reconciliation follows the disconnect");
+      emit(1, "before", checkpoint.summary); emit(1, "after", "After reconnect");
+      await until(() => fx.coordinator.progress.read(fx.task.executionId, { after_cursor: gap.next_cursor }).updates.length > 0);
+      const resumed = fx.coordinator.progress.read(fx.task.executionId, { after_cursor: gap.next_cursor });
+      assert.equal(resumed.gap, null); assert.deepEqual(resumed.updates.map((update) => update.summary), ["After reconnect"]);
+      assert.equal(fx.backend.submitCount, 1, "reconnect does not resubmit the originating turn");
+      await fx.coordinator.close();
+      // Closing the second stream deliberately must not reset progress again.
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      assert.equal(fx.coordinator.progress.read(fx.task.executionId, { after_cursor: resumed.next_cursor }).gap, null);
+      assert.equal(streams.length, 2);
+    } finally { await fx.coordinator.close(); fx.restore(); }
+  });
 }
 
 function cancelFixture(fx: ReturnType<typeof setup>, deadline = false) {

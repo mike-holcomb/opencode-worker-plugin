@@ -83,7 +83,7 @@ export function stageProgressTool(reportPath: string): { directory: string; sha2
 
 export function isolatedProgressEnvironment(baseEnv: NodeJS.ProcessEnv, directory: string): NodeJS.ProcessEnv {
   const env: NodeJS.ProcessEnv = { ...baseEnv, OPENCODE_CONFIG_DIR: directory, OPENCODE_DISABLE_PROJECT_CONFIG: "true",
-    OPENCODE_TEST_HOME: join(directory, "home"), XDG_CONFIG_HOME: join(directory, "config"), npm_config_offline: "true" };
+    OPENCODE_TEST_HOME: join(directory, "home"), XDG_CONFIG_HOME: join(directory, "config") };
   delete env.OPENCODE_CONFIG;
   return env;
 }

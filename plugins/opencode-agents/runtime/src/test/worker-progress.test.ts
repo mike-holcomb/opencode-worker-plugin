@@ -3,6 +3,7 @@ import { chmodSync, lstatSync, mkdtempSync, readFileSync, readdirSync, rmSync, s
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
+import { execFileSync } from "node:child_process";
 import { assertProgressTool, createProgressToolAsset, isolatedProgressEnvironment, stageProgressTool } from "../worker-progress.js";
 const checkpoint = { stage: "implementing", summary: "Milestone reached", completed: ["Added implementation"], remaining: ["Verify it"], blocker: null, evidence_refs: [] };
 const writable = (path: string) => { if (lstatSync(path).isSymbolicLink()) return; if (!lstatSync(path).isDirectory()) return;
@@ -58,5 +59,19 @@ test("owned discovery isolates home/global/project tools without changing HOME o
   assert.deepEqual(base, copy); assert.equal(env.HOME, base.HOME); assert.equal(env.OPENCODE_CONFIG, undefined);
   assert.equal(env.OPENCODE_DISABLE_PROJECT_CONFIG, "true"); assert.equal(env.OPENCODE_CONFIG_DIR, "/private/config");
   assert.equal(env.OPENCODE_TEST_HOME, "/private/config/home"); assert.equal(env.XDG_CONFIG_HOME, "/private/config/config");
-  assert.equal(env.npm_config_offline, "true");
+  assert.equal(env.npm_config_offline, undefined);
+});
+
+test("worker npm commands retain defaults and caller-supplied offline settings", () => {
+  const root = mkdtempSync(join(tmpdir(), "progress-npm-"));
+  try {
+    const base: NodeJS.ProcessEnv = { ...process.env, npm_config_userconfig: join(root, "npmrc"), npm_config_globalconfig: join(root, "global-npmrc") };
+    delete base.npm_config_offline;
+    delete base.NPM_CONFIG_OFFLINE;
+    const offline = (env: NodeJS.ProcessEnv) => execFileSync("npm", ["config", "get", "offline"],
+      { cwd: root, env: isolatedProgressEnvironment(env, join(root, "config")), encoding: "utf8" }).trim();
+    assert.equal(offline(base), "false");
+    assert.equal(offline({ ...base, npm_config_offline: "false" }), "false");
+    assert.equal(offline({ ...base, npm_config_offline: "true" }), "true");
+  } finally { rmSync(root, { recursive: true, force: true }); }
 });

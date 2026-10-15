@@ -20377,8 +20377,7 @@ function isolatedProgressEnvironment(baseEnv, directory) {
     OPENCODE_CONFIG_DIR: directory,
     OPENCODE_DISABLE_PROJECT_CONFIG: "true",
     OPENCODE_TEST_HOME: join2(directory, "home"),
-    XDG_CONFIG_HOME: join2(directory, "config"),
-    npm_config_offline: "true"
+    XDG_CONFIG_HOME: join2(directory, "config")
   };
   delete env.OPENCODE_CONFIG;
   return env;
@@ -20498,7 +20497,13 @@ var ProgressManager = class {
       if (!Number.isSafeInteger(limit) || limit < 1) throw new Error("progress limits must be positive safe integers");
   }
   cursor(executionId, state, sequence = state?.sequence ?? 0) {
-    return Buffer.from(JSON.stringify({ v: 1, e: executionId, p: this.processGeneration, g: state?.generation ?? this.processGeneration, s: sequence })).toString("base64url");
+    return Buffer.from(JSON.stringify({
+      v: 1,
+      e: executionId,
+      p: this.processGeneration,
+      g: state?.generation ?? this.evicted.get(executionId)?.generation ?? this.processGeneration,
+      s: sequence
+    })).toString("base64url");
   }
   decode(encoded, executionId) {
     if (!/^[A-Za-z0-9_-]+$/.test(encoded) || Buffer.from(encoded, "base64url").toString("base64url") !== encoded) throw new Error("malformed progress cursor");
@@ -20519,8 +20524,10 @@ var ProgressManager = class {
       current.availability = availability;
       return;
     }
+    const eviction = this.evicted.get(executionId);
+    this.evicted.delete(executionId);
     this.states.set(executionId, {
-      generation: this.evicted.has(executionId) ? randomUUID() : this.processGeneration,
+      generation: eviction?.generation ?? this.processGeneration,
       sequence: 0,
       availability,
       entries: [],
@@ -20530,7 +20537,7 @@ var ProgressManager = class {
       dropped: 0,
       lastActivity: this.now(),
       terminalAt: null,
-      resetReason: this.evicted.get(executionId) ?? null,
+      resetReason: eviction?.reason ?? null,
       blocker: null
     });
     this.enforceAggregate();
@@ -20621,7 +20628,8 @@ var ProgressManager = class {
     const cursor = options.after_cursor ? this.decode(options.after_cursor, executionId) : null;
     let reason = null;
     if (cursor?.p !== void 0 && cursor.p !== this.processGeneration) reason = "restart";
-    else if (cursor && !state && (cursor.s > 0 || cursor.g !== this.processGeneration || this.evicted.has(executionId))) reason = this.evicted.get(executionId) ?? "buffer_unavailable";
+    else if (cursor && !state && (cursor.s > 0 || cursor.g !== (this.evicted.get(executionId)?.generation ?? this.processGeneration)))
+      reason = this.evicted.get(executionId)?.reason ?? "buffer_unavailable";
     else if (cursor && state && cursor.g !== state.generation) reason = state.resetReason ?? "buffer_evicted";
     else if (cursor && state && cursor.s > state.sequence) throw new Error("progress cursor is ahead of the execution stream");
     else if (cursor && state?.entries.length && cursor.s < state.entries[0].sequence - 1) reason = "retention";
@@ -20657,7 +20665,7 @@ var ProgressManager = class {
   evict(id, reason) {
     this.states.delete(id);
     this.evicted.delete(id);
-    this.evicted.set(id, reason);
+    this.evicted.set(id, { reason, generation: randomUUID() });
     while (this.evicted.size > 256 || this.evicted.size * 256 > this.maxAggregateBytes / 4) this.evicted.delete(this.evicted.keys().next().value);
   }
   enforceAggregate() {
@@ -26284,7 +26292,10 @@ var SdkOpenCodeBackend = class {
     };
   }
   async *subscribeEvents(control) {
-    const { stream } = await this.client.event.subscribe({ directory: this.workspace }, { signal: signalFor(control) });
+    const { stream } = await this.client.event.subscribe(
+      { directory: this.workspace },
+      { signal: signalFor(control), sseMaxRetryAttempts: 1 }
+    );
     for await (const event of stream) {
       const data = event;
       const record2 = data && typeof data === "object" ? data : {};
@@ -26510,7 +26521,7 @@ async function worktreeRoot(workspace, env) {
     throw new Error(`cannot establish OpenCode worktree root: ${String(error62)}`);
   }
 }
-function workerPolicy(reportPath, worktree) {
+function workerPolicy(reportPath, worktree, options = {}) {
   if (!isAbsolute3(reportPath)) throw new Error("assigned report path must be absolute");
   const absoluteReport = resolve(reportPath);
   const reportEditPattern = `${relative(worktree, absoluteReport).replaceAll("\\", "/")}/*`;
@@ -26524,7 +26535,7 @@ function workerPolicy(reportPath, worktree) {
     task: "deny",
     question: "deny",
     skill: "deny",
-    report_progress: "allow"
+    ...options.progressEnabled !== false ? { report_progress: "allow" } : {}
   };
   return {
     reportEditPattern,
@@ -26586,7 +26597,11 @@ async function launchEnvironment(options) {
     throw new Error("frozen execution report path is missing");
   const reportPath = options.launchContract?.reportPath;
   if (!reportPath) throw new Error("managed worker requires an assigned execution report path");
-  const { profiles } = workerPolicy(reportPath, await worktreeRoot(options.workspace, baseEnv));
+  const { profiles } = workerPolicy(
+    reportPath,
+    await worktreeRoot(options.workspace, baseEnv),
+    { progressEnabled: !options.launchContract || Boolean(options.launchContract.progressTool) }
+  );
   if (options.launchContract) assertWorkerPolicy(resolved, profiles);
   const overlay = options.launchContract ? supplied : {
     ...supplied,
