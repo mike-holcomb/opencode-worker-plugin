@@ -55,7 +55,7 @@ export class SdkOpenCodeBackend implements OpenCodeBackend {
       pairs: Array<{ binary_version: string; sdk_version: string; openapi_sha256: string; execution_supported: boolean;
         capabilities: BackendInspection["capabilities"] }>;
     };
-    const pair = manifest.pairs.find((item) => item.binary_version === health.version && item.sdk_version === "1.18.35" && item.openapi_sha256 === openapiDigest);
+    const pair = manifest.pairs.find((item) => item.binary_version === health.version && item.sdk_version === "1.19.0" && item.openapi_sha256 === openapiDigest);
     return {
       version: health.version,
       openapiDigest,

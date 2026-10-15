@@ -2,12 +2,12 @@
   "schema_version": 1,
   "pairs": [
     {
-      "binary_version": "1.18.35",
-      "sdk_version": "1.18.35",
-      "openapi_sha256": "46db986090aae41846cd6dbe16225a1d883f0bbcb4c48814008d3f6ce140aa5c",
+      "binary_version": "1.19.0",
+      "sdk_version": "1.19.0",
+      "openapi_sha256": "04b16616693498e2b92af87408d9df3ea4ce60176d8416d36dc6c5bcf8d3bfed",
       "execution_supported": false,
       "accepted_exceptions": [
-        "FIXME: managed OpenCode 1.18.35 can load a project plugin added after launch-time inspection; use only trusted workspaces until an immutable sanitized worker view or upstream loader disable switch closes this boundary"
+        "FIXME: managed OpenCode 1.19.0 can load a project plugin added after launch-time inspection; use only trusted workspaces until an immutable sanitized worker view or upstream loader disable switch closes this boundary"
       ],
       "capabilities": {
         "callerAssignedMessageId": true,
@@ -17,32 +17,12 @@
         "sessionRecovery": true
       },
       "verified": [
-        "health and exact server version",
-        "workspace path binding",
-        "session creation and exact marker lookup",
-        "async prompt acknowledgement and caller-assigned user message ID",
-        "correlated assistant terminal message and result retrieval",
-        "pending permission and question enumeration on empty state",
-        "active bash permission request surfaced through legacy permission list",
-        "scoped permission rejection cleared pending request",
-        "rejected tool-call step remains nonterminal when status is omitted",
-        "exact session and correlated result recovered after server restart",
-        "permission allow-once cleared the exact request and resumed the correlated turn",
-        "abort acknowledgement was distinct from a later MessageAbortedError snapshot",
-        "completion and abort race was resolved from the correlated message",
-        "SSE reconnect recovered a pending request from an authoritative snapshot",
-        "bounded inspection denied project edit and shell while external file reports worked",
-        "generated bounded build profile wrote its assigned external report path"
+        "OpenCode 1.19.0 health, exact binary version and OpenAPI digest"
       ],
       "unverified": [
-        "general server-mode plugin suppression and all plugin discovery paths",
-        "native question replies, intentionally disabled",
-        "full managed task dispatch and release suite"
+        "managed task dispatch, permissions, cancellation, recovery and checkpoint transport on 1.19.0"
       ],
-      "known_failures": [
-        "FIXME (accepted known issue): serve --pure lazily loaded a project plugin during a live turn; launch-time checks cannot prevent plugins added later",
-        "json_schema structured output made session.messages return BadRequest"
-      ]
+      "known_failures": []
     }
   ]
 }

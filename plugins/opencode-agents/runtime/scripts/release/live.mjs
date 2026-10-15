@@ -22,7 +22,7 @@ const plugin = dirname(runtime), cli = join(runtime, 'dist/cli.js');
 const binary = realpathSync(opt('--binary'));
 const route = 'http://127.0.0.1:8124/v1', model = 'laguna-s-21';
 const version = execFileSync(binary, ['--version'], { encoding: 'utf8' }).trim();
-assert.equal(version, '1.18.35');
+assert.equal(version, '1.19.0');
 const endpoint = await fetch(`${route}/models`, { signal: AbortSignal.timeout(10000) });
 assert(endpoint.ok); const models = await endpoint.json(); assert(models.data.some(m => m.id === model));
 const manifest = JSON.parse(readFileSync(join(plugin, 'evaluation/v2-cases.json')));

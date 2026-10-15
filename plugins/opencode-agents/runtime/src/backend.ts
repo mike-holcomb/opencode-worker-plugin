@@ -24,7 +24,7 @@ export type BackendInspection = {
 /** A private development opt-in never changes the pair's certified status. */
 export function executionPairAllowed(inspection: BackendInspection, trustedDevelopmentOptIn: boolean): boolean {
   return inspection.supportedForExecution || (trustedDevelopmentOptIn &&
-    inspection.exactPairRecognized === true && inspection.version === "1.18.35");
+    inspection.exactPairRecognized === true && inspection.version === "1.19.0");
 }
 
 export type SessionIdentity = {

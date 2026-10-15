@@ -70,7 +70,7 @@ export async function inspectAttached(config: NonNullable<UserConfig["attached_b
     const manifest = JSON.parse(readFileSync(compatibilityPath(), "utf8")) as {
       pairs: Array<{ binary_version: string; sdk_version: string; openapi_sha256: string }> };
     const knownPair = manifest.pairs.some((pair) => pair.binary_version === base.version &&
-      pair.sdk_version === "1.18.35" && pair.openapi_sha256 === base.openapiSha256);
+      pair.sdk_version === "1.19.0" && pair.openapi_sha256 === base.openapiSha256);
     return { ...base, status: "unsupported", message: knownPair
       ? "attached process identity and effective config match, but plugin suppression and session ownership are not certified for dispatch"
       : "attached OpenCode version/OpenAPI pair is not in the certified manifest" };

@@ -44,7 +44,7 @@ function object(value: unknown): Record<string, unknown> {
 }
 
 export function assertNoLocalPlugins(workspace: string, env: NodeJS.ProcessEnv): void {
-  // FIXME: This is only a launch-time check. OpenCode 1.18.35 can discover V2
+  // FIXME: This is only a launch-time check. OpenCode 1.19.0 can discover V2
   // project plugins when it opens a location later; a file added after this
   // check can execute outside the bounded worker policy. Use an immutable,
   // sanitized worker config/project view or an upstream loader disable switch.
@@ -284,7 +284,7 @@ export async function startManagedServer(options: ManagedServerOptions): Promise
       { development_execution: options.developmentExecution }, options.workspace);
     if (!executionPairAllowed(inspected, developmentTrusted))
       throw new Error(`OpenCode ${inspected.version} is neither certified nor development-enabled for this exact workspace and pair`);
-    if (inspected.version !== "1.18.35") throw new Error(`OpenCode ${inspected.version} has no certified abort-stop proof`);
+    if (inspected.version !== "1.19.0") throw new Error(`OpenCode ${inspected.version} has no certified abort-stop proof`);
   } catch (error) {
     await stopOwnedChild(child);
     throw error;
@@ -294,7 +294,7 @@ export async function startManagedServer(options: ManagedServerOptions): Promise
     confirmAbortStopped: async (sessionId, messageId) => {
       if (child.killed || child.exitCode !== null || child.signalCode !== null) return { stopped: false, observation: null };
       // This is a new snapshot after the abort response, scoped to the exact
-      // recorded session and user message. OpenCode 1.18.35 omits idle sessions
+      // recorded session and user message. OpenCode 1.19.0 omits idle sessions
       // from the status map; an explicit idle entry is not this proof.
       const observed = await backend.inspectTurn(sessionId, messageId, { timeoutMs: 5_000 });
       return { observation: observed, stopped: !child.killed && child.exitCode === null && child.signalCode === null && observed.submitted &&
