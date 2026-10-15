@@ -1,3 +1,4 @@
+import { CheckpointInputSchema, ProgressManager } from "./progress.js";
 import { createHash, randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
 import { executionPairAllowed, type AbortStopProof, type OpenCodeBackend, type PendingRequest, type TurnObservation } from "./backend.js";
@@ -10,7 +11,7 @@ import { ArtifactStore } from "./artifacts.js";
 import { compareBaseline, type WorkspaceBaseline } from "./workspace.js";
 import type { TaskPacket } from "./contracts.js";
 
-type BackendLease = { backendId: string; backend: OpenCodeBackend;
+type BackendLease = { backendId: string; backend: OpenCodeBackend; progressSupported?: boolean;
   /** Unique to this owned process, never the stable backend storage identity. */
   instanceId?: string;
   terminateOwned?: () => Promise<boolean>;
@@ -50,6 +51,19 @@ function resourceKeys(task: StoredTask): string[] {
 
 /** Single-writer reconciler. All upstream side effects follow committed intents. */
 export class ExecutionCoordinator {
+  readonly progress = new ProgressManager({ maxAggregateBytes: 15 * 1024 * 1024 });
+  private readonly progressObservations = new Map<string, { observed_at: string; backend_reachable: boolean | null }>();
+
+  progressRuntime(executionId: string): Record<string, unknown> {
+    return this.progressObservations.get(executionId) ?? { observed_at: null, backend_reachable: null };
+  }
+
+  private recordProgressObservation(executionId: string, reachable: boolean): void {
+    this.progressObservations.delete(executionId);
+    this.progressObservations.set(executionId, { observed_at: new Date().toISOString(), backend_reachable: reachable });
+    // Separate 1 MiB reservation for bounded runtime-observation metadata.
+    if (this.progressObservations.size > 256) this.progressObservations.delete(this.progressObservations.keys().next().value!);
+  }
   private readonly backends = new Map<string, BackendLease>();
   private readonly streams = new Map<string, AbortController>();
   private readonly freshAbortAcks = new Map<string, { lease: BackendLease; sessionId: string; messageId: string }>();
@@ -115,6 +129,7 @@ export class ExecutionCoordinator {
     try {
       do {
         this.again = false;
+        this.progress.maintain();
         for (const task of this.store.unresolved()) {
           if (this.stopping) break;
           try { await this.reconcile(task); }
@@ -156,7 +171,10 @@ export class ExecutionCoordinator {
     if (task.backendId && task.backendId !== id) throw new Error("recorded backend identity differs from frozen launch configuration");
     const cached = this.backends.get(id);
     if (cached) {
-      if (cached.isAlive?.() !== false) return cached;
+      if (cached.isAlive?.() !== false) {
+        this.progress.register(task.executionId, cached.progressSupported ? "supported" : "unsupported");
+        return cached;
+      }
       // Only a proven dead owned process permits reopening its persisted namespace.
       // Session/message reconciliation below still forbids resubmitting the turn.
       await this.releaseBackend(id, cached);
@@ -176,6 +194,9 @@ export class ExecutionCoordinator {
     this.store.registerBackendInstance(id, task.workspace, inspection.configurationDigest, {
       version: inspection.version, openapiDigest: inspection.openapiDigest, workspace: inspection.workspace,
     });
+    lease.progressSupported = Boolean(inspection.capabilities.progressCheckpoints && lease.backend.readCheckpoint);
+    this.progress.register(task.executionId, lease.progressSupported ? "supported" : "unsupported");
+    this.recordProgressObservation(task.executionId, true);
     this.backends.set(id, lease);
     this.watchEvents(lease);
     return lease;
@@ -189,14 +210,29 @@ export class ExecutionCoordinator {
       let delay = 1_000;
       while (!controller.signal.aborted && !this.stopping) {
         try {
-          for await (const _event of lease.backend.subscribeEvents({ signal: controller.signal })) {
+          for await (const event of lease.backend.subscribeEvents({ signal: controller.signal })) {
             if (controller.signal.aborted) break;
+            if (event.type === "message.part.updated" && lease.backend.readCheckpoint) {
+              for (const current of this.store.unresolved()) {
+                if (current.backendId !== lease.backendId || current.sessionId !== event.sessionId || !current.userMessageId) continue;
+                try {
+                  const update = await lease.backend.readCheckpoint(event, current.sessionId!, current.userMessageId, { signal: controller.signal, timeoutMs: 2_000 });
+                  if (!update) continue;
+                  const checkpoint = CheckpointInputSchema.parse(update.checkpoint);
+                  if (checkpoint.evidence_refs.some((id) => !this.store.artifact(current.executionId, id))) continue;
+                  if (checkpoint.blocker?.request_id && !current.pendingRequests.some((request) => request.requestId === checkpoint.blocker!.request_id)) continue;
+                  this.progress.append(current.executionId, update.sourceId, checkpoint);
+                } catch { /* Advisory publication cannot change task outcome. */ }
+              }
+            }
             this.kick();
           }
         } catch { /* snapshots are authoritative after an SSE gap */ }
         if (controller.signal.aborted || this.stopping) break;
         for (const task of this.store.unresolved()) {
-          if (task.backendId !== lease.backendId || task.observation !== "current") continue;
+          if (task.backendId !== lease.backendId) continue;
+          this.progress.reset(task.executionId, "disconnect");
+          if (task.observation !== "current") continue;
           try { this.store.transition(task.scopeId, task.taskId, task.revision, task.phase, "reconciling",
             { reason: "event stream disconnected; authoritative snapshot required" }); }
           catch { /* another reconciliation may have changed this revision */ }
@@ -307,6 +343,7 @@ export class ExecutionCoordinator {
     if (!task.sessionId || !task.userMessageId) { this.markUnknown(task, "missing exact turn identity"); return; }
     const { backend } = await this.backendFor(task);
     const observed = await backend.inspectTurn(task.sessionId, task.userMessageId, { timeoutMs: 5_000 });
+    this.recordProgressObservation(task.executionId, true);
     task = this.store.get(task.scopeId, task.taskId)!;
     // Cancellation may have committed while inspection was in flight. Leave
     // both request updates and outcome selection to cancellation reconciliation.
@@ -495,10 +532,12 @@ export class ExecutionCoordinator {
         structuredReport, ...(task.backendConfig ? { maxSnapshotBytes: task.backendConfig.limits.artifact_bytes } : {}) });
       this.store.finalize(task.scopeId, task.taskId, task.revision, outcome, evidence.reportValidity, evidence.finalManifestHash);
       this.store.release(task.executionId);
+      this.progress.markTerminal(task.executionId);
     } catch (error) {
       if (!expired(task.finalizationDeadlineAt)) { this.markUnknown(task, `evidence capture: ${String(error)}`); return; }
       this.store.finalize(task.scopeId, task.taskId, task.revision, outcome, "invalid", null);
       this.store.release(task.executionId);
+      this.progress.markTerminal(task.executionId);
     }
   }
 

@@ -15,7 +15,7 @@ Choose the smallest adequate [lightweight](assets/task-lite.md), [standard](asse
 
 ## Run and recover
 
-Use the registered v2 MCP tools described in [tools](references/tools.md). Optionally preview with `opencode_start_task` and `dry_run: true`. For a real start, supply a caller-generated idempotency key and retain the returned scope, task, execution, and revision. Continue independent parent work and use bounded `opencode_wait_tasks` calls for material changes.
+Use the registered v2 MCP tools described in [tools](references/tools.md). Optionally preview with `opencode_start_task` and `dry_run: true`. For a real start, supply a caller-generated idempotency key and retain the returned scope, task, execution, and revision. Continue independent parent work and use bounded `opencode_wait_tasks` calls for material changes. When semantic milestones help coordination, read only unseen `opencode_get_progress` checkpoints for the exact execution and retain its separate cursor. Treat claims as advisory and gaps as missed transient history.
 
 A wait timeout, MCP disconnect, quiet worker, or missing acknowledgement is not permission to launch a replacement. Recover with `opencode_list_tasks` and `opencode_get_task`, using the original scope and operation key. Reply to a pending request only within actual authorization. Cancel with `opencode_cancel_task`, then observe until stopping is confirmed. Follow up only after the predecessor is terminal and operationally resolved. [Recovery](references/recovery.md) gives the detailed sequence.
 

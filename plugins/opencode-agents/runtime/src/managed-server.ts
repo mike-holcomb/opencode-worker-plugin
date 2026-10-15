@@ -1,3 +1,4 @@
+import { assertProgressTool, isolatedProgressEnvironment, stageProgressTool } from "./worker-progress.js";
 import { randomBytes, randomUUID } from "node:crypto";
 import { execFile, spawn, type ChildProcessByStdio } from "node:child_process";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
@@ -185,7 +186,7 @@ export function workerPolicy(reportPath: string, worktree: string): {
   const common = {
     read: "allow", glob: "allow", grep: "allow", list: "allow",
     external_directory: { "*": "deny", [reportExternalPattern]: "allow" },
-    task: "deny", question: "deny", skill: "deny",
+    task: "deny", question: "deny", skill: "deny", report_progress: "allow",
   };
   return {
     reportEditPattern,
@@ -222,7 +223,14 @@ export async function launchEnvironment(options: ManagedServerOptions): Promise<
   env: NodeJS.ProcessEnv;
   profiles: ReturnType<typeof workerPolicy>["profiles"];
 }> {
-  const baseEnv = { ...process.env, ...options.env };
+  let baseEnv = { ...process.env, ...options.env };
+  if (options.launchContract?.progressTool) {
+    const expected = stageProgressTool(options.launchContract.reportPath);
+    if (expected.directory !== options.launchContract.progressTool.directory || expected.sha256 !== options.launchContract.progressTool.sha256)
+      throw new Error("frozen progress tool attribution changed");
+    assertProgressTool(expected.directory, expected.sha256);
+    baseEnv = isolatedProgressEnvironment(baseEnv, expected.directory);
+  }
   assertNoLocalPlugins(options.workspace, baseEnv);
   const supplied = options.launchContract ? object(JSON.parse(options.launchContract.configContent)) :
     baseEnv.OPENCODE_CONFIG_CONTENT ? object(JSON.parse(baseEnv.OPENCODE_CONFIG_CONTENT)) : {};
@@ -274,11 +282,12 @@ export async function startManagedServer(options: ManagedServerOptions): Promise
   catch (error) { await stopOwnedChild(child); throw error; }
   const backendId = options.backendId ?? `backend_${randomUUID()}`;
   const token = Buffer.from(`opencode:${password}`).toString("base64");
-  const backend = new SdkOpenCodeBackend(baseUrl, options.workspace, backendId, { Authorization: `Basic ${token}` });
+  const backend = new SdkOpenCodeBackend(baseUrl, options.workspace, backendId, { Authorization: `Basic ${token}` }, Boolean(options.launchContract?.progressTool));
   try {
     const effective = await backend.effectiveConfiguration({ timeoutMs: 5_000 });
     assertWorkerPolicy(effective, profiles);
     if (options.launchContract) assertFrozenEffectiveConfig(effective, options.launchContract);
+    if (options.launchContract?.progressTool) assertProgressTool(options.launchContract.progressTool.directory, options.launchContract.progressTool.sha256);
     const inspected = await backend.inspectBackend({ timeoutMs: 5_000 });
     const developmentTrusted = trustedDevelopmentWorkspace(
       { development_execution: options.developmentExecution }, options.workspace);
@@ -309,7 +318,7 @@ export async function startManagedServer(options: ManagedServerOptions): Promise
 export async function freezeManagedLaunch(binary: string, workspace: string, reportPath: string,
   env: NodeJS.ProcessEnv = process.env): Promise<ManagedLaunchContract> {
   if (!isAbsolute(reportPath)) throw new Error("assigned report path must be absolute");
-  const baseEnv = { ...env };
+  const baseEnv = { ...env, OPENCODE_DISABLE_PROJECT_CONFIG: "true" };
   assertNoLocalPlugins(workspace, baseEnv);
   const { stdout } = await execFileAsync(binary, ["debug", "config", "--pure"], {
     cwd: workspace, env: baseEnv, timeout: 15_000, maxBuffer: 5 * 1024 * 1024,
@@ -321,13 +330,16 @@ export async function freezeManagedLaunch(binary: string, workspace: string, rep
   const content = JSON.stringify({ ...resolved, plugin: [],
     mcp: { ...inheritedMcp, ...disabledMcp },
     agent: { ...object(resolved.agent ?? {}), ...profiles } });
-  const frozenEnv = { ...baseEnv, OPENCODE_CONFIG_CONTENT: content };
+  const progressTool = stageProgressTool(reportPath);
+  const frozenEnv = { ...isolatedProgressEnvironment(baseEnv, progressTool.directory), OPENCODE_CONFIG_CONTENT: content };
   const expected = await execFileAsync(binary, ["debug", "config", "--pure"], {
     cwd: workspace, env: frozenEnv, timeout: 15_000, maxBuffer: 5 * 1024 * 1024,
   });
   const effective = object(JSON.parse(expected.stdout));
   assertWorkerPolicy(effective, profiles);
-  return { configContent: content, effectiveConfigSha256: effectiveConfigHash(effective), reportPath };
+  assertProgressTool(progressTool.directory, progressTool.sha256);
+  return { configContent: content, effectiveConfigSha256: effectiveConfigHash(effective), reportPath,
+    progressTool: { directory: progressTool.directory, sha256: progressTool.sha256 } };
 }
 
 function waitForServerUrl(child: OwnedChild, timeoutMs: number): Promise<string> {

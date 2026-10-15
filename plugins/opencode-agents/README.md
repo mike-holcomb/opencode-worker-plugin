@@ -12,9 +12,7 @@ The bundled [compatibility manifest](compatibility.json) still has
 [installation](docs/installation.md). Publication did not enable execution or
 complete the outstanding certification checks.
 
-Known plugin boundary: OpenCode 1.18.35 can load a project plugin added after the
-worker's launch-time scan. Use only trusted workspaces; bounded tool permissions
-do not provide plugin containment. Attached execution and native questions remain
+This development branch targets OpenCode/SDK 1.19.0 and adds native progress checkpoints. Managed workers isolate custom-tool discovery and disable project configuration discovery. Execution remains limited to explicitly trusted workspaces while release certification is pending. Attached execution and native questions remain
 disabled. See [validation](docs/validation.md) for passing evidence and remaining checks.
 
 ## Install
@@ -51,4 +49,8 @@ node --test evaluation/harness.test.mjs
 node evaluation/harness.mjs validate
 ```
 
-The archive is allowlisted and deterministic. The builder checks that the compiled executable matches the TypeScript source and writes `.manifest.json` with per-file SHA-256 values plus a `.sha256` sidecar for the archive and manifest. The installed smoke verifies those hashes, extracts the archive to a read-only path with spaces, runs diagnostics from an unrelated directory, starts the bundled MCP command with the plugin directory as its working directory, lists ten tools, and checks that runtime state stayed outside the bundle. Plugin-relative MCP resolution was verified in the local and historical-tag marketplace installs described above.
+The archive is allowlisted and deterministic. The builder checks that the compiled executable matches the TypeScript source and writes `.manifest.json` with per-file SHA-256 values plus a `.sha256` sidecar for the archive and manifest. The installed smoke verifies those hashes, extracts the archive to a read-only path with spaces, runs diagnostics from an unrelated directory, starts the bundled MCP command with the plugin directory as its working directory, lists eleven tools, and checks that runtime state stayed outside the bundle. Plugin-relative MCP resolution was verified in the local and historical-tag marketplace installs described above.
+
+## Worker progress
+
+`opencode_get_progress` reads only worker-authored checkpoints for one required execution. Retain its opaque `next_cursor` to consume unseen milestones; snapshot inclusion is explicit. Checkpoints are bounded and held in supervisor memory, with explicit gaps after restart, disconnect, or eviction. The native `report_progress` tool loads from an owned, hashed private directory and works in read-only assignments without project writes. Reading progress never starts inference or changes task lifecycle, requests, reports, or review status. See the [tool reference](skills/opencode-agents/references/tools.md) and [progress validation](docs/progress.md).

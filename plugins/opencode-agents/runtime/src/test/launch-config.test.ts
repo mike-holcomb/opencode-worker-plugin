@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync, chmodSync, statSync } from "node:fs";
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync, chmodSync, statSync, lstatSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { test } from "node:test";
@@ -8,6 +8,13 @@ import { assertSelectedModelDestination, policyNeutralConfigHash } from "../laun
 import { ArtifactStore } from "../artifacts.js";
 import { SupervisorService } from "../service.js";
 import { SqliteTaskStore } from "../store.js";
+
+function makeWritable(path: string): void {
+  const info = lstatSync(path);
+  if (info.isSymbolicLink() || !info.isDirectory()) return;
+  chmodSync(path, 0o700);
+  for (const child of readdirSync(path)) makeWritable(join(path, child));
+}
 
 test("managed launch freezes provider routing and rejects a changed effective config", async () => {
   const root = mkdtempSync(join(tmpdir(), "opencode-launch-binding-"));
@@ -45,13 +52,13 @@ process.stdout.write(JSON.stringify(config));
     assert.notEqual(contract.effectiveConfigSha256, siblingContract.effectiveConfigSha256);
     assert.equal(policyNeutralConfigHash(contract), policyNeutralConfigHash(siblingContract));
     await assert.rejects(launchEnvironment({ binary, workspace, env,
-      launchContract: { ...contract, reportPath: sibling } }), /worker policy mismatch/);
+      launchContract: { ...contract, reportPath: sibling } }), /frozen progress tool|worker policy mismatch/);
     const changedState = { ...env, OPENCODE_AGENTS_STATE_DIR: join(root, "elsewhere") };
     const reopened = await launchEnvironment({ binary, workspace, env: changedState, launchContract: contract });
     assert.equal(reopened.env.OPENCODE_CONFIG_CONTENT, contract.configContent);
     await assert.rejects(launchEnvironment({ binary, workspace,
       env: { ...env, FROZEN_DRIFT: "1" }, launchContract: contract }), /changed since task admission/);
-  } finally { rmSync(root, { recursive: true, force: true }); }
+  } finally { makeWritable(root); rmSync(root, { recursive: true, force: true }); }
 });
 
 test("frozen launch contract survives a restart without appearing in task projections", async () => {

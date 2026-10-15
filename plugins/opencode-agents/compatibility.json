@@ -7,20 +7,30 @@
       "openapi_sha256": "04b16616693498e2b92af87408d9df3ea4ce60176d8416d36dc6c5bcf8d3bfed",
       "execution_supported": false,
       "accepted_exceptions": [
-        "FIXME: managed OpenCode 1.19.0 can load a project plugin added after launch-time inspection; use only trusted workspaces until an immutable sanitized worker view or upstream loader disable switch closes this boundary"
+        "Full OpenCode 1.19.0 host/plugin discovery and cross-platform execution certification remains pending; managed execution requires exact trusted-workspace development opt-in."
       ],
       "capabilities": {
         "callerAssignedMessageId": true,
         "permissionRequests": true,
         "questionRequests": false,
         "structuredOutput": false,
-        "sessionRecovery": true
+        "sessionRecovery": true,
+        "progressCheckpoints": true
       },
       "verified": [
-        "OpenCode 1.19.0 health, exact binary version and OpenAPI digest"
+        "OpenCode 1.19.0 health, exact binary version and OpenAPI digest",
+        "isolated native report_progress tool discovery under frozen managed launch; no dependency download",
+        "Glimmer read-only audit: two attributed checkpoints before completion, exclusive deltas and hint-only waits, valid final report with parent review pending",
+        "live4: same-session continuation with new message identity and valid final reports",
+        "live6: supervisor restart recovered exact execution/session/message identity without duplicate dispatch; valid final report",
+        "live7: exact permission deny acknowledged; deadline stopped the task (no final report)",
+        "live8: allow_once acknowledged; active cancellation confirmed and partial artifacts retained",
+        "live9: backend restart preserved exact execution identity; cancellation confirmed without duplicate dispatch"
       ],
       "unverified": [
-        "managed task dispatch, permissions, cancellation, recovery and checkpoint transport on 1.19.0"
+        "Full 1.19.0 execution certification and hostile host/project plugin-discovery containment",
+        "Linux/WSL2 live evidence and remaining release evaluation outcomes",
+        "Attached execution, native questions and structured output remain disabled"
       ],
       "known_failures": []
     }
