@@ -1,24 +1,26 @@
+import { assertProgressTool, isolatedProgressEnvironment, stageProgressTool } from "./worker-progress.js";
 import { randomBytes, randomUUID } from "node:crypto";
 import { execFile, spawn, type ChildProcessByStdio } from "node:child_process";
-import { once } from "node:events";
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { homedir } from "node:os";
 import { isDeepStrictEqual } from "node:util";
 import { promisify } from "node:util";
 import { dirname, isAbsolute, join, parse, relative, resolve } from "node:path";
 import type { Readable } from "node:stream";
-import { executionPairAllowed } from "./backend.js";
+import { executionPairAllowed, type AbortStopProof } from "./backend.js";
 import { trustedDevelopmentWorkspace, type UserConfig } from "./config.js";
 import { assertFrozenEffectiveConfig, effectiveConfigHash, type ManagedLaunchContract } from "./launch-config.js";
 import { SdkOpenCodeBackend } from "./opencode-backend.js";
 
 export type ManagedServer = {
   backendId: string;
+  instanceId: string;
   baseUrl: string;
   backend: SdkOpenCodeBackend;
   isAlive(): boolean;
   /** Valid only while this owned, certified server process remains alive. */
-  confirmAbortStopped(sessionId: string, messageId: string): Promise<boolean>;
+  confirmAbortStopped(sessionId: string, messageId: string): Promise<AbortStopProof>;
+  terminateOwned(): Promise<boolean>;
   close(): Promise<void>;
 };
 
@@ -43,7 +45,7 @@ function object(value: unknown): Record<string, unknown> {
 }
 
 export function assertNoLocalPlugins(workspace: string, env: NodeJS.ProcessEnv): void {
-  // FIXME: This is only a launch-time check. OpenCode 1.18.35 can discover V2
+  // FIXME: This is only a launch-time check. OpenCode 1.19.0 can discover V2
   // project plugins when it opens a location later; a file added after this
   // check can execute outside the bounded worker policy. Use an immutable,
   // sanitized worker config/project view or an upstream loader disable switch.
@@ -173,7 +175,7 @@ async function worktreeRoot(workspace: string, env: NodeJS.ProcessEnv): Promise<
   }
 }
 
-export function workerPolicy(reportPath: string, worktree: string): {
+export function workerPolicy(reportPath: string, worktree: string, options: { progressEnabled?: boolean } = {}): {
   profiles: Record<string, { mode: "primary"; permission: Record<string, unknown> }>;
   reportEditPattern: string;
 } {
@@ -185,6 +187,7 @@ export function workerPolicy(reportPath: string, worktree: string): {
     read: "allow", glob: "allow", grep: "allow", list: "allow",
     external_directory: { "*": "deny", [reportExternalPattern]: "allow" },
     task: "deny", question: "deny", skill: "deny",
+    ...(options.progressEnabled !== false ? { report_progress: "allow" } : {}),
   };
   return {
     reportEditPattern,
@@ -221,7 +224,14 @@ export async function launchEnvironment(options: ManagedServerOptions): Promise<
   env: NodeJS.ProcessEnv;
   profiles: ReturnType<typeof workerPolicy>["profiles"];
 }> {
-  const baseEnv = { ...process.env, ...options.env };
+  let baseEnv = { ...process.env, ...options.env };
+  if (options.launchContract?.progressTool) {
+    const expected = stageProgressTool(options.launchContract.reportPath);
+    if (expected.directory !== options.launchContract.progressTool.directory || expected.sha256 !== options.launchContract.progressTool.sha256)
+      throw new Error("frozen progress tool attribution changed");
+    assertProgressTool(expected.directory, expected.sha256);
+    baseEnv = isolatedProgressEnvironment(baseEnv, expected.directory);
+  }
   assertNoLocalPlugins(options.workspace, baseEnv);
   const supplied = options.launchContract ? object(JSON.parse(options.launchContract.configContent)) :
     baseEnv.OPENCODE_CONFIG_CONTENT ? object(JSON.parse(baseEnv.OPENCODE_CONFIG_CONTENT)) : {};
@@ -241,7 +251,10 @@ export async function launchEnvironment(options: ManagedServerOptions): Promise<
     throw new Error("frozen execution report path is missing");
   const reportPath = options.launchContract?.reportPath;
   if (!reportPath) throw new Error("managed worker requires an assigned execution report path");
-  const { profiles } = workerPolicy(reportPath, await worktreeRoot(options.workspace, baseEnv));
+  // Contracts predating native checkpoints retain their original permissions.
+  // Their backend transport remains disabled because no progress asset is frozen.
+  const { profiles } = workerPolicy(reportPath, await worktreeRoot(options.workspace, baseEnv),
+    { progressEnabled: !options.launchContract || Boolean(options.launchContract.progressTool) });
   if (options.launchContract) assertWorkerPolicy(resolved, profiles);
   const overlay = options.launchContract ? supplied : {
     ...supplied,
@@ -256,6 +269,9 @@ export async function startManagedServer(options: ManagedServerOptions): Promise
   const { env, profiles } = await launchEnvironment(options);
   const child = spawn(options.binary, ["serve", "--pure", "--hostname", "127.0.0.1", "--port", "0"], {
     cwd: options.workspace,
+    // Supported managed platforms are POSIX. Own a separate process group so
+    // ordinary tool subprocesses cannot outlive forced cancellation unnoticed.
+    detached: process.platform !== "win32",
     env: { ...env, OPENCODE_SERVER_PASSWORD: password },
     stdio: ["ignore", "pipe", "pipe"],
   });
@@ -270,33 +286,35 @@ export async function startManagedServer(options: ManagedServerOptions): Promise
   catch (error) { await stopOwnedChild(child); throw error; }
   const backendId = options.backendId ?? `backend_${randomUUID()}`;
   const token = Buffer.from(`opencode:${password}`).toString("base64");
-  const backend = new SdkOpenCodeBackend(baseUrl, options.workspace, backendId, { Authorization: `Basic ${token}` });
+  const backend = new SdkOpenCodeBackend(baseUrl, options.workspace, backendId, { Authorization: `Basic ${token}` }, Boolean(options.launchContract?.progressTool));
   try {
     const effective = await backend.effectiveConfiguration({ timeoutMs: 5_000 });
     assertWorkerPolicy(effective, profiles);
     if (options.launchContract) assertFrozenEffectiveConfig(effective, options.launchContract);
+    if (options.launchContract?.progressTool) assertProgressTool(options.launchContract.progressTool.directory, options.launchContract.progressTool.sha256);
     const inspected = await backend.inspectBackend({ timeoutMs: 5_000 });
     const developmentTrusted = trustedDevelopmentWorkspace(
       { development_execution: options.developmentExecution }, options.workspace);
     if (!executionPairAllowed(inspected, developmentTrusted))
       throw new Error(`OpenCode ${inspected.version} is neither certified nor development-enabled for this exact workspace and pair`);
-    if (inspected.version !== "1.18.35") throw new Error(`OpenCode ${inspected.version} has no certified abort-stop proof`);
+    if (inspected.version !== "1.19.0") throw new Error(`OpenCode ${inspected.version} has no certified abort-stop proof`);
   } catch (error) {
     await stopOwnedChild(child);
     throw error;
   }
-  return { backendId, baseUrl, backend,
+  return { backendId, instanceId: randomUUID(), baseUrl, backend,
     isAlive: () => child.exitCode === null && child.signalCode === null,
     confirmAbortStopped: async (sessionId, messageId) => {
-      if (child.killed || child.exitCode !== null || child.signalCode !== null) return false;
+      if (child.killed || child.exitCode !== null || child.signalCode !== null) return { stopped: false, observation: null };
       // This is a new snapshot after the abort response, scoped to the exact
-      // recorded session and user message. OpenCode 1.18.35 omits idle sessions
+      // recorded session and user message. OpenCode 1.19.0 omits idle sessions
       // from the status map; an explicit idle entry is not this proof.
       const observed = await backend.inspectTurn(sessionId, messageId, { timeoutMs: 5_000 });
-      return !child.killed && child.exitCode === null && child.signalCode === null && observed.submitted &&
+      return { observation: observed, stopped: !child.killed && child.exitCode === null && child.signalCode === null && observed.submitted &&
         !observed.finished && observed.statusOmitted === true && observed.activeTools === 0 &&
-        observed.pendingRequests.length === 0;
+        observed.pendingRequests.length === 0 };
     },
+    terminateOwned: () => process.platform === "win32" ? Promise.resolve(false) : terminateOwnedChild(child, 5_000, true),
     close: () => stopOwnedChild(child) };
 }
 
@@ -304,7 +322,7 @@ export async function startManagedServer(options: ManagedServerOptions): Promise
 export async function freezeManagedLaunch(binary: string, workspace: string, reportPath: string,
   env: NodeJS.ProcessEnv = process.env): Promise<ManagedLaunchContract> {
   if (!isAbsolute(reportPath)) throw new Error("assigned report path must be absolute");
-  const baseEnv = { ...env };
+  const baseEnv = { ...env, OPENCODE_DISABLE_PROJECT_CONFIG: "true" };
   assertNoLocalPlugins(workspace, baseEnv);
   const { stdout } = await execFileAsync(binary, ["debug", "config", "--pure"], {
     cwd: workspace, env: baseEnv, timeout: 15_000, maxBuffer: 5 * 1024 * 1024,
@@ -316,13 +334,16 @@ export async function freezeManagedLaunch(binary: string, workspace: string, rep
   const content = JSON.stringify({ ...resolved, plugin: [],
     mcp: { ...inheritedMcp, ...disabledMcp },
     agent: { ...object(resolved.agent ?? {}), ...profiles } });
-  const frozenEnv = { ...baseEnv, OPENCODE_CONFIG_CONTENT: content };
+  const progressTool = stageProgressTool(reportPath);
+  const frozenEnv = { ...isolatedProgressEnvironment(baseEnv, progressTool.directory), OPENCODE_CONFIG_CONTENT: content };
   const expected = await execFileAsync(binary, ["debug", "config", "--pure"], {
     cwd: workspace, env: frozenEnv, timeout: 15_000, maxBuffer: 5 * 1024 * 1024,
   });
   const effective = object(JSON.parse(expected.stdout));
   assertWorkerPolicy(effective, profiles);
-  return { configContent: content, effectiveConfigSha256: effectiveConfigHash(effective), reportPath };
+  assertProgressTool(progressTool.directory, progressTool.sha256);
+  return { configContent: content, effectiveConfigSha256: effectiveConfigHash(effective), reportPath,
+    progressTool: { directory: progressTool.directory, sha256: progressTool.sha256 } };
 }
 
 function waitForServerUrl(child: OwnedChild, timeoutMs: number): Promise<string> {
@@ -354,12 +375,41 @@ function waitForServerUrl(child: OwnedChild, timeoutMs: number): Promise<string>
 }
 
 async function stopOwnedChild(child: OwnedChild): Promise<void> {
-  if (child.exitCode !== null || child.signalCode !== null) return;
-  const exited = once(child, "exit").then(() => undefined);
-  child.kill("SIGTERM");
-  await Promise.race([exited, new Promise<void>((resolve) => setTimeout(resolve, 5_000))]);
-  if (child.exitCode === null && child.signalCode === null) {
-    child.kill("SIGKILL");
-    await exited;
+  if (!await terminateOwnedChild(child, 5_000, process.platform !== "win32")) throw new Error("owned worker exit was not confirmed");
+}
+
+/** Only the original ChildProcess handle is accepted; signal delivery is not exit proof. */
+export async function terminateOwnedChild(child: {
+  pid?: number | undefined;
+  exitCode: number | null; signalCode: NodeJS.Signals | null;
+  kill(signal: NodeJS.Signals): boolean;
+  once(event: "exit", listener: () => void): unknown;
+  off(event: "exit", listener: () => void): unknown;
+},
+  waitMs = 5_000, ownsProcessGroup = false): Promise<boolean> {
+  // The group ID comes only from the child we spawned detached, never disk,
+  // process discovery, or a caller-provided PID. Missing/denied probes fail closed.
+  const groupGone = () => {
+    if (!ownsProcessGroup) return true;
+    if (!child.pid) return false;
+    try { process.kill(-child.pid, 0); return false; }
+    catch (error) { return (error as NodeJS.ErrnoException).code === "ESRCH"; }
+  };
+  const exited = () => (child.exitCode !== null || child.signalCode !== null) && groupGone();
+  for (const signal of ["SIGTERM", "SIGKILL"] as const) {
+    if (exited()) return true;
+    await new Promise<void>((resolve) => {
+      const finish = () => { clearTimeout(timer); clearInterval(poll); child.off("exit", onExit); resolve(); };
+      const onExit = () => { if (exited()) finish(); };
+      const timer = setTimeout(finish, waitMs);
+      const poll = setInterval(onExit, Math.min(waitMs, 25));
+      child.once("exit", onExit);
+      try {
+        if (ownsProcessGroup) { if (child.pid) process.kill(-child.pid, signal); else finish(); }
+        else child.kill(signal);
+      } catch { finish(); }
+      if (exited()) finish();
+    });
   }
+  return exited();
 }

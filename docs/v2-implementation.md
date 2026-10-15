@@ -2,7 +2,26 @@
 
 [v2.0.0](https://github.com/mike-holcomb/opencode-worker-plugin/releases/tag/v2.0.0) is published as a full GitHub release from the main merge of PR #1. The tagged plugin/runtime manifests retain internal version `2.0.0-dev.0`. Execution certification against [spec-v2.md](spec-v2.md) remains incomplete: the compatibility manifest still has `execution_supported: false`, and real tasks require a private development opt-in naming the exact trusted workspace. Without it, `start_task` returns `UNSUPPORTED_BACKEND`. The evidence ledger records the validation campaign and its outstanding gates; publication did not turn those gates into passing results.
 
-## Implemented in this branch
+## Release 2.1.0 candidate
+
+The candidate aligns plugin/runtime versions to `2.1.0`, targets OpenCode/SDK
+1.19.0, and includes PR #5 (issue #2 cancellation race), PR #6 (issue #4 stop
+confirmation and owned-worker recovery), and PR #7 (issue #3 native progress
+checkpoints). There are eleven parent MCP tools. Cancellation intent remains
+actionable across observations; uncertain stops retain reservations until proof
+and finalization. Worker checkpoints are bounded supervisor memory with explicit
+recovery gaps, independent of durable reports and parent review.
+
+Managed launch now disables project configuration discovery and freezes an
+isolated native tool directory. Full host/plugin discovery containment remains
+unverified, and execution still requires the exact trusted-workspace opt-in.
+See [release notes](releases/v2.1.0.md) and
+[progress validation](../plugins/opencode-agents/docs/progress.md).
+
+The sections below retain historical v2.0.0 implementation and campaign evidence;
+their 1.18.35 pair and test counts do not describe the 2.1.0 candidate.
+
+## Historical v2.0.0 implementation
 
 - Strict packet, worker report, and review contracts; ten registered MCP tools; a bundled Node CLI with task, cancellation, artifact, and diagnostic commands.
 - SQLite single-writer records with scoped idempotency, event cursors, pagination, frozen prompts and workspace baselines, immutable backend launch configuration, durable queue admission, resource reservations, exact session and message intents, and follow-up execution records. Existing databases needing schema repair receive a pre-migration SQLite snapshot, including committed WAL data; backup failure stops the upgrade.

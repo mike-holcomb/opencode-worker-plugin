@@ -41,7 +41,7 @@ fixture and explicitly do not satisfy the release soak.
 
 ## Authorized live execution and evaluation
 
-The live runner explicitly requires `--execute`, OpenCode 1.18.35, and the existing
+The live runner explicitly requires `--execute`, OpenCode 1.19.0, and the existing
 authorized `http://127.0.0.1:8124/v1` route serving `laguna-s-21`. It creates no
 SSH tunnel. It creates a private exact-workspace development opt-in and never
 changes the source certification flag. It uses isolated state/HOME/XDG paths,

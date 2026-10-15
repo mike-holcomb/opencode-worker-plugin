@@ -11,8 +11,9 @@ import { ExecutionCoordinator } from "../coordinator.js";
 import type { TaskPacket } from "../contracts.js";
 import { renderPrompt } from "../prompt.js";
 import { SupervisorService } from "../service.js";
-import { SqliteTaskStore } from "../store.js";
+import { SqliteTaskStore, type CancellationDiagnostic } from "../store.js";
 import { captureBaseline } from "../workspace.js";
+import { SdkOpenCodeBackend } from "../opencode-backend.js";
 
 class FakeBackend implements OpenCodeBackend {
   readonly backendId = "backend_fake";
@@ -20,6 +21,7 @@ class FakeBackend implements OpenCodeBackend {
   submitted = false;
   finished = false;
   aborted = false;
+  abortCount = 0;
   stopped = false;
   submitCount = 0;
   created = false;
@@ -60,7 +62,7 @@ class FakeBackend implements OpenCodeBackend {
     if (this.replyFailure !== "pending") this.requests = this.requests.filter((item) => item.id !== request.id);
     if (this.replyFailure) throw new Error("lost reply acknowledgement");
   }
-  async abortSession() { this.aborted = true; return true; }
+  async abortSession() { this.abortCount++; this.aborted = true; return true; }
   async readResult() { return { text: "", structured: null }; }
 }
 
@@ -80,20 +82,24 @@ function setup(executionTimeoutSeconds?: number, finalizationTimeoutSeconds?: nu
   const store = new SqliteTaskStore(join(root, "state.sqlite"));
   const artifacts = new ArtifactStore(join(root, "artifacts"));
   const backend = new FakeBackend(workspace);
-  const lifecycle = { opens: 0, closes: 0, alive: true };
+  const lifecycle = { opens: 0, closes: 0, alive: true, terminations: 0, terminationSucceeds: true };
   const opener = async ({ backendId }: { backendId: string }) => {
     lifecycle.opens++;
     lifecycle.alive = true;
     assert.notEqual(backendId, "");
     // The fake endpoint adopts the coordinator's stable storage identity.
     Object.assign(backend, { backendId });
-    return { backendId, backend, isAlive: () => lifecycle.alive,
+    return { backendId, backend, instanceId: `process_${lifecycle.opens}`, isAlive: () => lifecycle.alive,
       close: async () => { lifecycle.closes++; },
-      ...(managedStopProof ? { confirmAbortStopped: async (sessionId: string, messageId: string) => {
+      ...(managedStopProof ? { terminateOwned: async () => {
+        lifecycle.terminations++;
+        if (lifecycle.terminationSucceeds) lifecycle.alive = false;
+        return lifecycle.terminationSucceeds;
+      }, confirmAbortStopped: async (sessionId: string, messageId: string) => {
         assert.equal(sessionId, backend.sessionId);
         const observed = await backend.inspectTurn(sessionId, messageId);
-        return observed.submitted && !observed.finished && observed.statusOmitted === true && observed.activeTools === 0 &&
-          observed.pendingRequests.length === 0;
+        return { observation: observed, stopped: observed.submitted && !observed.finished && observed.statusOmitted === true && observed.activeTools === 0 &&
+          observed.pendingRequests.length === 0 };
       } } : {}) };
   };
   const coordinator = new ExecutionCoordinator(store, artifacts, opener);
@@ -119,6 +125,391 @@ function setup(executionTimeoutSeconds?: number, finalizationTimeoutSeconds?: nu
     store.close(); rmSync(root, { recursive: true, force: true });
   } };
 }
+
+async function until(predicate: () => boolean): Promise<void> {
+  for (let i = 0; i < 150; i++) {
+    if (predicate()) return;
+    await new Promise((resolve) => setTimeout(resolve, 10));
+  }
+  assert.ok(predicate(), "expected reconciliation did not finish");
+}
+
+for (const ending of ["socket error", "EOF"] as const) {
+  test(`SDK ${ending} lets the coordinator disclose a gap before reconnecting`, { timeout: 5_000 }, async (t) => {
+    const fx = setup();
+    const sdk = new SdkOpenCodeBackend("http://sdk.invalid", fx.backend.workspace, fx.backend.backendId);
+    const streams: ReadableStreamDefaultController<Uint8Array>[] = [];
+    const checkpoint = { stage: "verifying" as const, summary: "Before disconnect", completed: [], remaining: [], blocker: null, evidence_refs: [] };
+    const parts = new Map<string, unknown>();
+    t.mock.method(globalThis, "fetch", async (input: Request | URL | string) => {
+      const url = new URL(input instanceof Request ? input.url : String(input));
+      if (url.pathname === "/event") {
+        return new Response(new ReadableStream<Uint8Array>({ start(controller) { streams.push(controller); } }),
+          { headers: { "Content-Type": "text/event-stream" } });
+      }
+      assert.match(url.pathname, /\/session\/ses_fake\/message\/assistant$/);
+      return Response.json({ info: { id: "assistant", sessionID: fx.backend.sessionId, role: "assistant", parentID: fx.backend.messageId },
+        parts: [...parts.values()] });
+    });
+    const inspect = fx.backend.inspectBackend.bind(fx.backend);
+    Object.assign(fx.backend, {
+      subscribeEvents: sdk.subscribeEvents.bind(sdk), readCheckpoint: sdk.readCheckpoint.bind(sdk),
+      inspectBackend: async () => {
+        const inspection = await inspect();
+        return { ...inspection, capabilities: { ...inspection.capabilities, progressCheckpoints: true } };
+      },
+    });
+    const emit = (connection: number, id: string, summary: string) => {
+      const part = { id, sessionID: fx.backend.sessionId, messageID: "assistant", type: "tool", tool: "report_progress",
+        state: { status: "completed", metadata: { opencode_agents_progress: { ...checkpoint, summary } } } };
+      parts.set(id, part);
+      streams[connection]!.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ type: "message.part.updated", properties: { part, sessionID: fx.backend.sessionId } })}\n\n`));
+    };
+    try {
+      await fx.coordinator.start(); await until(() => streams.length === 1);
+      emit(0, "before", checkpoint.summary);
+      await until(() => fx.coordinator.progress.read(fx.task.executionId, { include_snapshot: true }).snapshot?.summary === checkpoint.summary);
+      const expired = fx.coordinator.progress.hint(fx.task.executionId).progress_cursor;
+      const inspections = fx.backend.inspectionCount;
+      if (ending === "socket error") streams[0]!.error(new Error("socket disconnected"));
+      else streams[0]!.close();
+      await until(() => fx.coordinator.progress.read(fx.task.executionId, { after_cursor: expired }).gap?.reason === "disconnect");
+      assert.equal(streams.length, 1, "SDK did not reconnect internally");
+      const gap = fx.coordinator.progress.read(fx.task.executionId, { after_cursor: expired });
+      assert.equal(gap.snapshot?.summary, checkpoint.summary);
+      assert.equal(fx.coordinator.progress.read(fx.task.executionId, { after_cursor: gap.next_cursor }).gap, null);
+      await until(() => streams.length === 2);
+      assert.ok(fx.backend.inspectionCount > inspections, "authoritative reconciliation follows the disconnect");
+      emit(1, "before", checkpoint.summary); emit(1, "after", "After reconnect");
+      await until(() => fx.coordinator.progress.read(fx.task.executionId, { after_cursor: gap.next_cursor }).updates.length > 0);
+      const resumed = fx.coordinator.progress.read(fx.task.executionId, { after_cursor: gap.next_cursor });
+      assert.equal(resumed.gap, null); assert.deepEqual(resumed.updates.map((update) => update.summary), ["After reconnect"]);
+      assert.equal(fx.backend.submitCount, 1, "reconnect does not resubmit the originating turn");
+      await fx.coordinator.close();
+      // Closing the second stream deliberately must not reset progress again.
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      assert.equal(fx.coordinator.progress.read(fx.task.executionId, { after_cursor: resumed.next_cursor }).gap, null);
+      assert.equal(streams.length, 2);
+    } finally { await fx.coordinator.close(); fx.restore(); }
+  });
+}
+
+for (const failure of ["declared size", "streamed size", "timeout", "publication", "shutdown"] as const) {
+  test(`checkpoint ${failure} preserves advisory loss semantics on a connected stream`, { timeout: 6_000 }, async (t) => {
+    const fx = setup();
+    const sdk = new SdkOpenCodeBackend("http://sdk.invalid", fx.backend.workspace, fx.backend.backendId);
+    const streams: ReadableStreamDefaultController<Uint8Array>[] = [];
+    const checkpoint = { stage: "verifying" as const, summary: "Before failure", completed: [], remaining: [], blocker: null, evidence_refs: [] };
+    const parts = new Map<string, unknown>();
+    let failAttribution = false; let pendingAttribution = false; let attributionAborted = false;
+    t.mock.method(globalThis, "fetch", async (input: Request | URL | string, init?: RequestInit) => {
+      const url = new URL(input instanceof Request ? input.url : String(input));
+      if (url.pathname === "/event") {
+        return new Response(new ReadableStream<Uint8Array>({ start(controller) { streams.push(controller); } }),
+          { headers: { "Content-Type": "text/event-stream" } });
+      }
+      assert.match(url.pathname, /\/session\/ses_fake\/message\/assistant$/);
+      if (failAttribution && (failure === "timeout" || failure === "shutdown")) {
+        const signal = input instanceof Request ? input.signal : init?.signal;
+        assert.ok(signal);
+        pendingAttribution = true;
+        return await new Promise<Response>((_resolve, reject) => {
+          const abort = () => { attributionAborted = true; reject(signal.reason); };
+          if (signal.aborted) abort();
+          else signal.addEventListener("abort", abort, { once: true });
+        });
+      }
+      const message = { info: { id: "assistant", sessionID: fx.backend.sessionId, role: "assistant", parentID: fx.backend.messageId },
+        parts: [...parts.values(), ...(failAttribution && failure !== "publication"
+          ? [{ id: "large-text", sessionID: fx.backend.sessionId, messageID: "assistant", type: "text", text: "x".repeat(256 * 1024) }] : [])] };
+      const body = JSON.stringify(message);
+      return new Response(body, { headers: { "Content-Type": "application/json",
+        ...(failAttribution && failure === "declared size" ? { "Content-Length": String(Buffer.byteLength(body)) } : {}) } });
+    });
+    const inspect = fx.backend.inspectBackend.bind(fx.backend);
+    Object.assign(fx.backend, {
+      subscribeEvents: sdk.subscribeEvents.bind(sdk), readCheckpoint: sdk.readCheckpoint.bind(sdk),
+      inspectBackend: async () => {
+        const inspection = await inspect();
+        return { ...inspection, capabilities: { ...inspection.capabilities, progressCheckpoints: true } };
+      },
+    });
+    const emit = (id: string, summary: string) => {
+      const part = { id, sessionID: fx.backend.sessionId, messageID: "assistant", type: "tool", tool: "report_progress",
+        state: { status: "completed", metadata: { opencode_agents_progress: { ...checkpoint, summary } } } };
+      parts.set(id, part);
+      streams[0]!.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ type: "message.part.updated", properties: { part, sessionID: fx.backend.sessionId } })}\n\n`));
+    };
+    try {
+      await fx.coordinator.start(); await until(() => streams.length === 1);
+      const initial = fx.coordinator.progress.hint(fx.task.executionId).progress_cursor;
+      for (const part of [
+        { id: "text", sessionID: fx.backend.sessionId, messageID: "assistant", type: "text", text: "Unrelated text" },
+        { id: "invalid", sessionID: fx.backend.sessionId, messageID: "assistant", type: "tool", tool: "report_progress",
+          state: { status: "completed", metadata: { opencode_agents_progress: { ...checkpoint, stage: "invalid" } } } },
+      ]) streams[0]!.enqueue(new TextEncoder().encode(`data: ${JSON.stringify({ type: "message.part.updated", properties: { part, sessionID: fx.backend.sessionId } })}\n\n`));
+      emit("before", checkpoint.summary);
+      await until(() => fx.coordinator.progress.read(fx.task.executionId, { include_snapshot: true }).snapshot?.summary === checkpoint.summary);
+      const admitted = fx.coordinator.progress.read(fx.task.executionId, { after_cursor: initial });
+      assert.equal(admitted.gap, null); assert.equal(admitted.dropped_count, 0); assert.equal(admitted.updates.length, 1);
+      const expired = fx.coordinator.progress.hint(fx.task.executionId).progress_cursor;
+      const taskBefore = fx.store.get("scope", fx.task.taskId)!;
+      const eventsBefore = fx.store.events(fx.task.executionId);
+      failAttribution = true;
+      emit(failure === "publication" ? "before" : "lost", "Lost checkpoint");
+      if (failure === "shutdown") {
+        await until(() => pendingAttribution);
+        await fx.coordinator.close();
+        await until(() => attributionAborted);
+        const page = fx.coordinator.progress.read(fx.task.executionId, { after_cursor: expired });
+        assert.equal(page.gap, null); assert.equal(page.dropped_count, 0); assert.equal(page.next_cursor, expired);
+      } else {
+        // The SDK's actual 2-second attribution deadline exercises timeout propagation.
+        if (failure === "timeout") {
+          await until(() => pendingAttribution);
+          await new Promise((resolve) => setTimeout(resolve, 2_050));
+          assert.equal(attributionAborted, true);
+        }
+        await until(() => fx.coordinator.progress.read(fx.task.executionId, { after_cursor: expired }).gap?.reason === "attribution_failure");
+        const gap = fx.coordinator.progress.read(fx.task.executionId, { after_cursor: expired });
+        assert.equal(gap.dropped_count, 1); assert.deepEqual(gap.updates, []);
+        assert.equal(gap.snapshot?.summary, checkpoint.summary);
+        assert.deepEqual(fx.coordinator.progress.read(fx.task.executionId, { after_cursor: expired }), gap);
+        const recovered = fx.coordinator.progress.read(fx.task.executionId, { after_cursor: gap.next_cursor });
+        assert.equal(recovered.gap, null); assert.equal(recovered.next_cursor, gap.next_cursor);
+        assert.deepEqual(recovered.updates, []);
+        failAttribution = false; parts.delete("lost");
+        emit("before", checkpoint.summary); emit("after", "After failure");
+        await until(() => fx.coordinator.progress.read(fx.task.executionId, { after_cursor: gap.next_cursor }).updates.length === 1);
+        const resumed = fx.coordinator.progress.read(fx.task.executionId, { after_cursor: gap.next_cursor });
+        assert.equal(resumed.gap, null); assert.equal(resumed.dropped_count, 1);
+        assert.deepEqual(resumed.updates.map((update) => update.summary), ["After failure"]);
+      }
+      const taskAfter = fx.store.get("scope", fx.task.taskId)!;
+      assert.equal(taskAfter.phase, taskBefore.phase); assert.equal(taskAfter.observation, taskBefore.observation);
+      assert.equal(taskAfter.revision, taskBefore.revision);
+      assert.deepEqual(fx.store.events(fx.task.executionId), eventsBefore);
+      assert.equal(fx.backend.submitCount, 1); assert.equal(streams.length, 1);
+    } finally { await fx.coordinator.close(); fx.restore(); }
+  });
+}
+
+function cancelFixture(fx: ReturnType<typeof setup>, deadline = false) {
+  const task = fx.store.get("scope", fx.task.taskId)!;
+  return fx.store.cancelTask({ scopeId: task.scopeId, taskId: task.taskId, executionId: task.executionId,
+    expectedRevision: task.revision, idempotencyKey: "issue-four-cancel-123456", reason: "stop", requester: "parent",
+    ...(deadline ? { deadlineOrigin: task.executionDeadlineAt! } : {}) });
+}
+
+function permission(fx: ReturnType<typeof setup>, id = "per_cancel"): PendingRequest {
+  return { id, sessionId: fx.backend.sessionId, type: "permission", api: "legacy",
+    detail: { permission: "bash", patterns: ["private-request-content"] } };
+}
+
+test("cancellation reconciles new and vanished permissions without restoring waiting_input", async () => {
+  const fx = setup(undefined, undefined, true);
+  try {
+    await fx.coordinator.start();
+    fx.backend.requests = [permission(fx)];
+    cancelFixture(fx);
+    fx.coordinator.kick();
+    await until(() => fx.store.get("scope", fx.task.taskId)?.pendingRequests.length === 1);
+    assert.equal(fx.store.get("scope", fx.task.taskId)?.phase, "cancelling");
+    fx.backend.requests = [];
+    fx.backend.stopped = true;
+    fx.coordinator.kick();
+    await until(() => fx.store.get("scope", fx.task.taskId)?.phase === "cancelled");
+    assert.equal(fx.store.get("scope", fx.task.taskId)?.pendingRequests.length, 0);
+    assert.equal(fx.store.inputRequests(fx.task.executionId)[0]?.status, "expired");
+  } finally { await fx.coordinator.close(); fx.restore(); }
+});
+
+for (const lostReply of [false, true]) {
+  test(`permission denial during cancellation is at most once (lost reply: ${lostReply})`, async () => {
+    const fx = setup();
+    try {
+      await fx.coordinator.start();
+      fx.backend.requests = [permission(fx)];
+      cancelFixture(fx);
+      fx.coordinator.kick();
+      await until(() => fx.store.get("scope", fx.task.taskId)?.pendingRequests.length === 1);
+      const service = new SupervisorService(fx.store, fx.artifacts, fx.coordinator);
+      const input = { scope_id: "scope", task_id: fx.task.taskId, execution_id: fx.task.executionId,
+        request_id: "per_cancel", request_revision: 1, reply: "deny", authorization_basis: "parent cancellation",
+        idempotency_key: "cancel-deny-request-12345" };
+      await assert.rejects(service.handle("respond_to_request", { ...input, reply: "allow_once" }), /only permission denial/);
+      await assert.rejects(service.handle("respond_to_request", { ...input, request_revision: 2 }), /revision is stale/);
+      if (lostReply) fx.backend.replyFailure = "pending";
+      await service.handle("respond_to_request", input);
+      await service.handle("respond_to_request", input);
+      assert.equal(fx.backend.replyCount, 1);
+      assert.equal(fx.store.get("scope", fx.task.taskId)?.phase, "cancelling");
+      fx.backend.requests = [];
+      fx.coordinator.kick();
+      await until(() => fx.store.get("scope", fx.task.taskId)?.pendingRequests.length === 0);
+      assert.equal(fx.store.inputRequests(fx.task.executionId)[0]?.status, lostReply ? "unconfirmed" : "responded");
+    } finally { await fx.coordinator.close(); fx.restore(); }
+  });
+}
+
+for (const deadline of [false, true]) {
+  test(`retained permissions trigger owned-worker recovery after the grace period (deadline: ${deadline})`, async (t) => {
+    const fx = setup(undefined, undefined, true);
+    try {
+      await fx.coordinator.start();
+      fx.backend.requests = [permission(fx)];
+      fx.backend.stopped = true;
+      const task = cancelFixture(fx, deadline);
+      let clock = Date.parse(task.cancellationIntent!.createdAt) + 29_999;
+      t.mock.method(Date, "now", () => clock);
+      fx.coordinator.kick();
+      await until(() => fx.store.get("scope", fx.task.taskId)?.observation === "unknown");
+      assert.equal(fx.lifecycle.terminations, 0);
+      assert.equal(fx.store.ownsResource(task.executionId, `workspace:${task.workspace}`), true);
+      clock++;
+      fx.coordinator.kick();
+      await until(() => fx.store.get("scope", fx.task.taskId)?.phase === (deadline ? "timed_out" : "cancelled"));
+      assert.equal(fx.lifecycle.terminations, 1);
+      assert.equal(fx.lifecycle.opens, 1, "finalization must not reopen the terminated backend");
+      assert.equal(fx.backend.submitCount, 1);
+      assert.equal(fx.store.get("scope", fx.task.taskId)?.pendingRequests.length, 0);
+      assert.equal(fx.store.ownsResource(task.executionId, `workspace:${task.workspace}`), false);
+      assert.ok(fx.store.cancellationEvent(task.executionId, "cancellation_stop_confirmed"));
+    } finally { await fx.coordinator.close(); fx.restore(); }
+  });
+}
+
+test("failed termination retains ownership and retries the original process handle", async (t) => {
+  const fx = setup(undefined, undefined, true);
+  try {
+    await fx.coordinator.start();
+    fx.lifecycle.terminationSucceeds = false;
+    const task = cancelFixture(fx);
+    t.mock.method(Date, "now", () => Date.parse(task.cancellationIntent!.createdAt) + 30_001);
+    fx.coordinator.kick();
+    await until(() => fx.lifecycle.terminations > 0);
+    assert.equal(fx.store.get("scope", task.taskId)?.phase, "cancelling");
+    assert.equal(fx.store.ownsResource(task.executionId, `workspace:${task.workspace}`), true);
+    assert.equal(fx.store.cancellationEvent(task.executionId, "cancellation_stop_confirmed"), null);
+    fx.lifecycle.terminationSucceeds = true;
+    fx.coordinator.kick();
+    await until(() => fx.store.get("scope", task.taskId)?.phase === "cancelled");
+    assert.equal(fx.lifecycle.opens, 1);
+  } finally { await fx.coordinator.close(); fx.restore(); }
+});
+
+test("an unavailable authenticated endpoint still permits recovery through the owned handle", async (t) => {
+  const fx = setup(undefined, undefined, true);
+  try {
+    await fx.coordinator.start();
+    const task = cancelFixture(fx);
+    fx.backend.inspectTurn = async () => { throw new Error("private credential must not appear in diagnostics"); };
+    t.mock.method(Date, "now", () => Date.parse(task.cancellationIntent!.createdAt) + 30_001);
+    fx.coordinator.kick();
+    await until(() => fx.store.get("scope", task.taskId)?.phase === "cancelled");
+    assert.equal(fx.lifecycle.terminations, 1);
+    assert.equal(JSON.stringify(fx.store.events(task.executionId)).includes("private credential"), false);
+  } finally { await fx.coordinator.close(); fx.restore(); }
+});
+
+test("restart before termination intent cannot terminate a replacement worker", async (t) => {
+  const fx = setup(undefined, undefined, true);
+  let resumed: ExecutionCoordinator | null = null;
+  try {
+    await fx.coordinator.start();
+    const task = cancelFixture(fx);
+    assert.equal(task.workerInstanceId, "process_1");
+    assert.equal(fx.store.cancellationEvent(task.executionId, "cancellation_recovery_intent"), null);
+    await fx.coordinator.close();
+    t.mock.method(Date, "now", () => Date.parse(task.cancellationIntent!.createdAt) + 30_001);
+    resumed = fx.restart();
+    await resumed.start();
+    await until(() => fx.store.cancellationEvent(task.executionId, "cancellation_diagnostic")?.detail.reason === "owned_process_handle_unavailable");
+    assert.equal(fx.lifecycle.opens, 2);
+    assert.equal(fx.lifecycle.terminations, 0);
+    assert.equal(fx.backend.submitCount, 1);
+    assert.equal(fx.store.get("scope", task.taskId)?.workerInstanceId, "process_1");
+    assert.equal(fx.store.get("scope", task.taskId)?.phase, "cancelling");
+    assert.equal(fx.store.ownsResource(task.executionId, `workspace:${task.workspace}`), true);
+    assert.equal(fx.store.cancellationEvent(task.executionId, "cancellation_recovery_intent"), null);
+    assert.equal(fx.store.cancellationEvent(task.executionId, "cancellation_stop_confirmed"), null);
+  } finally { await resumed?.close(); await fx.coordinator.close(); fx.restore(); }
+});
+
+test("restart after termination intent cannot substitute a new handle for unconfirmed exit", async (t) => {
+  const fx = setup(undefined, undefined, true);
+  let resumed: ExecutionCoordinator | null = null;
+  try {
+    await fx.coordinator.start();
+    fx.lifecycle.terminationSucceeds = false;
+    const task = cancelFixture(fx);
+    t.mock.method(Date, "now", () => Date.parse(task.cancellationIntent!.createdAt) + 30_001);
+    fx.coordinator.kick();
+    await until(() => fx.lifecycle.terminations > 0);
+    await fx.coordinator.close();
+    resumed = fx.restart();
+    await resumed.start();
+    assert.equal(fx.lifecycle.opens, 1);
+    assert.equal(fx.store.get("scope", task.taskId)?.phase, "cancelling");
+    assert.equal(fx.store.ownsResource(task.executionId, `workspace:${task.workspace}`), true);
+    assert.equal(fx.store.cancellationEvent(task.executionId, "cancellation_diagnostic")?.detail.reason, "owned_process_handle_unavailable");
+  } finally { await resumed?.close(); await fx.coordinator.close(); fx.restore(); }
+});
+
+test("confirmed exit survives restart and finalizes without opening a backend", async () => {
+  const fx = setup(undefined, undefined, true);
+  let resumed: ExecutionCoordinator | null = null;
+  try {
+    await fx.coordinator.start();
+    const task = cancelFixture(fx);
+    await fx.coordinator.close();
+    const proof = { backendId: task.backendId!, instanceId: "process_1" };
+    fx.store.recordCancellationEvent(task.executionId, "cancellation_recovery_intent", proof);
+    fx.store.recordCancellationEvent(task.executionId, "cancellation_stop_confirmed", proof);
+    resumed = fx.restart();
+    await resumed.start();
+    await until(() => fx.store.get("scope", task.taskId)?.phase === "cancelled");
+    assert.equal(fx.lifecycle.opens, 1);
+  } finally { await resumed?.close(); await fx.coordinator.close(); fx.restore(); }
+});
+
+test("recovery refuses a lease without exclusive workspace ownership", async (t) => {
+  const fx = setup(undefined, undefined, true);
+  try {
+    await fx.coordinator.start();
+    const task = cancelFixture(fx);
+    t.mock.method(fx.store, "ownsResource", () => false);
+    t.mock.method(Date, "now", () => Date.parse(task.cancellationIntent!.createdAt) + 30_001);
+    fx.coordinator.kick();
+    await until(() => fx.store.cancellationEvent(task.executionId, "cancellation_diagnostic")?.detail.reason === "exclusive_worker_ownership_unproven");
+    assert.equal(fx.lifecycle.terminations, 0);
+    assert.equal(fx.store.get("scope", task.taskId)?.phase, "cancelling");
+  } finally { await fx.coordinator.close(); fx.restore(); }
+});
+
+test("cancellation diagnostics retain counts, deduplicate repeats and emit a heartbeat", async (t) => {
+  const fx = setup();
+  try {
+    await fx.coordinator.start();
+    fx.backend.requests = [permission(fx)];
+    const task = cancelFixture(fx);
+    fx.coordinator.kick();
+    await until(() => Boolean(fx.store.cancellationEvent(task.executionId, "cancellation_diagnostic")));
+    const first = fx.store.cancellationEvent(task.executionId, "cancellation_diagnostic")!;
+    const count = () => fx.store.events(task.executionId).filter((event) => event.kind === "cancellation_diagnostic").length;
+    const initial = count();
+    fx.coordinator.kick();
+    await new Promise((resolve) => setTimeout(resolve, 30));
+    assert.equal(count(), initial);
+    assert.equal(first.detail.pendingRequests, 1);
+    assert.equal(first.detail.activeTools, 1);
+    assert.equal(JSON.stringify(first).includes("private-request-content"), false);
+    t.mock.method(Date, "now", () => Date.parse(first.createdAt) + 30_000);
+    // Exercise durable heartbeat storage independently of recovery's changed reason.
+    fx.store.recordCancellationEvent(task.executionId, "cancellation_diagnostic", first.detail as CancellationDiagnostic);
+    assert.equal(count(), initial + 1);
+  } finally { await fx.coordinator.close(); fx.restore(); }
+});
 
 test("durable admission dispatches one exact message and a finished turn with no report remains unaccepted", async () => {
   const fx = setup();
@@ -205,6 +596,102 @@ test("generic backend abort acknowledgement and idle snapshot retain ownership",
   } finally { await fx.coordinator.close(); fx.restore(); }
 });
 
+for (const scenario of ["no pending requests", "a pending request", "normal completion"]) {
+  test(`an in-flight observation preserves cancellation with ${scenario}`, async (t) => {
+    const fx = setup();
+    let resumed: ExecutionCoordinator | null = null;
+    const entered = Promise.withResolvers<void>();
+    const inspection = Promise.withResolvers<TurnObservation>();
+    try {
+      await fx.coordinator.start();
+      const active = fx.store.get("scope", fx.task.taskId)!;
+      assert.equal(active.phase, "running");
+      const inspectTurn = fx.backend.inspectTurn.bind(fx.backend);
+      fx.backend.inspectTurn = async () => {
+        entered.resolve();
+        return inspection.promise;
+      };
+      fx.coordinator.kick();
+      await entered.promise;
+      const current = fx.store.get("scope", active.taskId)!;
+      const cancelled = fx.store.cancelTask({ scopeId: "scope", taskId: current.taskId, executionId: current.executionId,
+        expectedRevision: current.revision, idempotencyKey: "observe-cancel-123456", reason: "stop", requester: "parent" });
+      assert.equal(cancelled.phase, "cancelling");
+      assert.ok(cancelled.cancellationIntent);
+      const requests: PendingRequest[] = scenario === "a pending request" ? [{ id: "per_race", sessionId: fx.backend.sessionId,
+        type: "permission", api: "legacy", detail: { permission: "bash", patterns: ["pwd"] } }] : [];
+      // Stop scheduling before releasing inspection so the assertion sees the
+      // raced observation's write, without a later tick masking the regression.
+      const closing = fx.coordinator.close();
+      fx.backend.finished = scenario === "normal completion";
+      inspection.resolve({ ...await inspectTurn(fx.backend.sessionId, fx.backend.messageId), pendingRequests: requests });
+      await closing;
+      fx.backend.inspectTurn = inspectTurn;
+      const after = fx.store.get("scope", active.taskId)!;
+      assert.equal(after.phase, "cancelling");
+      assert.equal(after.observation, cancelled.observation);
+      assert.deepEqual(after.cancellationIntent, cancelled.cancellationIntent);
+      assert.equal(fx.store.reserve("other-observation", [`workspace:${active.workspace}`]), false);
+
+      // An existing parent cancellation must still be actionable after the
+      // execution deadline, rather than being skipped or replaced by a timeout.
+      t.mock.method(Date, "now", () => Date.parse(active.executionDeadlineAt!) + 1);
+      resumed = fx.restart();
+      await resumed.start();
+      await resumed.close();
+      assert.equal(fx.backend.aborted, scenario !== "normal completion");
+      if (scenario !== "normal completion") {
+        assert.equal(fx.store.get("scope", active.taskId)?.phase, "cancelling");
+        assert.equal(fx.store.reserve("other-observation", [`workspace:${active.workspace}`]), false);
+        fx.backend.finished = true;
+        fx.backend.error = JSON.stringify({ name: "MessageAbortedError", data: { message: "Aborted" } });
+        resumed = fx.restart();
+        await resumed.start();
+        await resumed.close();
+      } else {
+        assert.ok(fx.store.events(active.executionId).some((event) => event.kind === "finalizing" &&
+          (event.detail as { detail?: { cancelEffect?: string } }).detail?.cancelEffect === "not_applied"));
+      }
+      assert.equal(fx.store.get("scope", active.taskId)?.phase, "finalizing");
+      resumed = fx.restart();
+      await resumed.start();
+      assert.equal(fx.store.get("scope", active.taskId)?.phase, scenario === "normal completion" ? "completed" : "cancelled");
+      const followup = fx.store.start({ scopeId: "scope", idempotencyKey: "after-cancel-12345678", workspace: active.workspace,
+        packet: active.packet, model: active.model, profile: active.profile,
+        baselineHash: active.baselineHash, promptHash: active.promptHash });
+      assert.ok(fx.store.admit("scope", followup.taskId, followup.revision, [`workspace:${active.workspace}`]));
+      assert.equal(fx.backend.submitCount, 1);
+    } finally {
+      inspection.resolve({ submitted: true, assistantMessageIds: [], activeTools: 1, status: "busy",
+        pendingRequests: [], finished: false, error: null });
+      await resumed?.close(); await fx.coordinator.close(); fx.restore();
+    }
+  });
+}
+
+for (const phase of ["dispatching", "running", "waiting_input"] as const) {
+  test(`reconciliation recovers durable cancellation intent stranded in ${phase}`, async (t) => {
+    const fx = setup();
+    let resumed: ExecutionCoordinator | null = null;
+    try {
+      await fx.coordinator.start();
+      await fx.coordinator.close();
+      const active = fx.store.get("scope", fx.task.taskId)!;
+      const cancelled = fx.store.cancelTask({ scopeId: "scope", taskId: active.taskId, executionId: active.executionId,
+        expectedRevision: active.revision, idempotencyKey: "stranded-cancel-12345", reason: "stop", requester: "parent" });
+      fx.store.transition("scope", active.taskId, cancelled.revision, phase, "current");
+      t.mock.method(Date, "now", () => Date.parse(active.executionDeadlineAt!) + 1);
+      resumed = fx.restart();
+      await resumed.start();
+      assert.equal(fx.backend.aborted, true);
+      assert.equal(fx.store.get("scope", active.taskId)?.phase, "cancelling");
+      assert.ok(fx.store.get("scope", active.taskId)?.cancellationIntent?.abortAcknowledged);
+      assert.equal(fx.store.reserve("other-stranded", [`workspace:${active.workspace}`]), false);
+      assert.equal(fx.backend.submitCount, 1);
+    } finally { await resumed?.close(); await fx.coordinator.close(); fx.restore(); }
+  });
+}
+
 test("a fresh managed abort acknowledgement and independent exact-turn stop snapshot release ownership", async () => {
   const fx = setup(undefined, undefined, true);
   try {
@@ -226,7 +713,7 @@ test("a fresh managed abort acknowledgement and independent exact-turn stop snap
   } finally { await fx.coordinator.close(); fx.restore(); }
 });
 
-test("persisted abort acknowledgement cannot confirm stop after coordinator restart", async () => {
+test("restart obtains a fresh abort acknowledgement before confirming stop", async () => {
   const fx = setup(undefined, undefined, true);
   let resumed: ExecutionCoordinator | null = null;
   try {
@@ -242,10 +729,45 @@ test("persisted abort acknowledgement cannot confirm stop after coordinator rest
     fx.backend.stopped = true;
     resumed = fx.restart();
     await resumed.start();
-    await new Promise((resolve) => setTimeout(resolve, 60));
-    assert.equal(fx.store.get("scope", fx.task.taskId)?.phase, "cancelling");
-    assert.equal(fx.store.reserve(`other_${randomUUID()}`, [`workspace:${active.workspace}`]), false);
+    await until(() => fx.store.get("scope", fx.task.taskId)?.phase === "cancelled");
+    assert.equal(fx.backend.abortCount, 2);
+    assert.equal(fx.backend.submitCount, 1);
+    assert.equal(fx.store.ownsResource(active.executionId, `workspace:${active.workspace}`), false);
   } finally { await resumed?.close(); await fx.coordinator.close(); fx.restore(); }
+});
+
+test("a replacement backend lease obtains fresh abort proof without replaying the turn", async () => {
+  const fx = setup(undefined, undefined, true);
+  try {
+    await fx.coordinator.start();
+    cancelFixture(fx);
+    fx.coordinator.kick();
+    await until(() => fx.backend.abortCount === 1);
+    fx.lifecycle.alive = false;
+    fx.backend.stopped = true;
+    fx.coordinator.kick();
+    await until(() => fx.store.get("scope", fx.task.taskId)?.phase === "cancelled");
+    assert.equal(fx.lifecycle.opens, 2);
+    assert.equal(fx.backend.abortCount, 2);
+    assert.equal(fx.backend.submitCount, 1);
+  } finally { await fx.coordinator.close(); fx.restore(); }
+});
+
+test("normal completion in the independent stop-proof snapshot retains its outcome", async () => {
+  const fx = setup(undefined, undefined, true);
+  try {
+    await fx.coordinator.start();
+    const inspect = fx.backend.inspectTurn.bind(fx.backend);
+    let snapshots = 0;
+    fx.backend.inspectTurn = async (sessionId, messageId) => {
+      if (++snapshots === 3) { fx.backend.finished = true; fx.backend.stopped = true; }
+      return inspect(sessionId, messageId);
+    };
+    cancelFixture(fx);
+    fx.coordinator.kick();
+    await until(() => fx.store.get("scope", fx.task.taskId)?.phase === "completed");
+    assert.equal(fx.lifecycle.terminations, 0);
+  } finally { await fx.coordinator.close(); fx.restore(); }
 });
 
 test("a correlated abort error after deadline acknowledgement resolves as timed out", async () => {

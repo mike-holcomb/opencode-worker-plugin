@@ -24,6 +24,11 @@ export type StoredInputRequest = {
 
 export type CreationIntent = { backendId: string; marker: string; sessionId: string | null; createdAt: string };
 export type CancellationIntent = { reason: string; requester: string; deadlineOrigin: string | null; createdAt: string; abortAcknowledged: boolean };
+export type CancellationDiagnostic = {
+  reason: string; backendAvailable: boolean; freshAbortProof: boolean;
+  status: string | null; statusOmitted: boolean | null; activeTools: number | null; pendingRequests: number | null;
+};
+type CancellationEventKind = "cancellation_diagnostic" | "cancellation_recovery_intent" | "cancellation_stop_confirmed";
 type PublicEvent = { cursor: number; kind: string; detail: unknown; createdAt: string;
   detailTruncated?: { originalBytes: number; sha256: string; cursor: string } };
 
@@ -65,6 +70,7 @@ export type StoredTask = {
   reportValidity: "pending" | "valid" | "missing" | "invalid";
   finalManifestHash: string | null;
   reviewStatus: "pending" | "accepted" | "needs_correction" | "rejected" | "awaiting_evidence";
+  workerInstanceId: string | null;
 };
 
 export type StartRecord = {
@@ -134,8 +140,8 @@ export type RequestReplyRecord = {
 };
 
 export class StoreConflict extends Error {
-  constructor(readonly code: "IDEMPOTENCY_CONFLICT" | "STALE_REVISION" | "SESSION_BUSY" | "INVALID_STATE" | "REQUEST_EXPIRED") {
-    super(code);
+  constructor(readonly code: "IDEMPOTENCY_CONFLICT" | "STALE_REVISION" | "SESSION_BUSY" | "INVALID_STATE" | "REQUEST_EXPIRED", message: string = code) {
+    super(message);
   }
 }
 
@@ -218,7 +224,7 @@ export class SqliteTaskStore {
     const schemaNeedsUpgrade = schemaVersion !== 3 || requiredObjects.some((name) => !objects.has(name)) ||
       missingColumn("executions", ["packet_json", "frozen_prompt", "frozen_baseline_json", "report_path",
         "queue_deadline_at", "admitted_at", "execution_deadline_at", "finalization_deadline_at", "intended_outcome",
-        "execution_timeout_seconds", "context_mode", "backend_config_json", "launch_contract_json"]) ||
+        "execution_timeout_seconds", "context_mode", "backend_config_json", "launch_contract_json", "worker_instance_id"]) ||
       missingColumn("tasks", ["workspace_access", "request_model_json"]) ||
       missingColumn("input_requests", ["created_at", "response_json", "authorization_basis_json"]) ||
       missingColumn("cancellation_intents", ["abort_acknowledged"]);
@@ -327,6 +333,7 @@ export class SqliteTaskStore {
       queue_deadline_at: "TEXT", admitted_at: "TEXT", execution_deadline_at: "TEXT",
       finalization_deadline_at: "TEXT", intended_outcome: "TEXT", execution_timeout_seconds: "INTEGER", context_mode: "TEXT",
       backend_config_json: "TEXT", launch_contract_json: "TEXT",
+      worker_instance_id: "TEXT",
     })) {
       if (!columns.has(name)) this.db.exec(`ALTER TABLE executions ADD COLUMN ${name} ${definition}`);
     }
@@ -541,7 +548,7 @@ export class SqliteTaskStore {
       e.session_id,e.user_message_id,e.report_validity,e.review_status,e.final_manifest_hash,e.backend_config_json,e.launch_contract_json,
       e.baseline_hash,e.prompt_hash,e.frozen_prompt,e.frozen_baseline_json,e.report_path,
       e.queue_deadline_at,e.admitted_at,e.execution_deadline_at,e.finalization_deadline_at,e.intended_outcome,
-      e.packet_json,e.created_at,e.updated_at
+      e.worker_instance_id,e.packet_json,e.created_at,e.updated_at
       FROM tasks t JOIN executions e ON e.task_id=t.task_id
       WHERE t.scope_id=? AND t.task_id=? AND e.execution_id=?`).get(scopeId, taskId, executionId) as Record<string, unknown> | undefined;
     if (!row) return null;
@@ -574,6 +581,7 @@ export class SqliteTaskStore {
       reportValidity: row.report_validity as StoredTask["reportValidity"],
       finalManifestHash: row.final_manifest_hash as string | null,
       reviewStatus: row.review_status as StoredTask["reviewStatus"],
+      workerInstanceId: row.worker_instance_id as string | null,
     };
   }
 
@@ -856,20 +864,26 @@ export class SqliteTaskStore {
     });
   }
 
-  recordDispatchIntent(scopeId: string, taskId: string, expectedRevision: number, backendId: string, sessionId: string, messageId: string): StoredTask {
+  recordDispatchIntent(scopeId: string, taskId: string, expectedRevision: number, backendId: string, sessionId: string, messageId: string, workerInstanceId?: string | null): StoredTask {
     return this.transaction(() => {
       const task = this.get(scopeId, taskId);
       if (!task) throw new Error("task not found");
       if (task.revision !== expectedRevision) throw new StoreConflict("STALE_REVISION");
       if (task.backendId !== backendId || task.sessionId !== sessionId || !["queued", "dispatching"].includes(task.phase)) throw new StoreConflict("INVALID_STATE");
       if (task.userMessageId || this.dispatchIntent(task.executionId)) throw new StoreConflict("INVALID_STATE");
-      const execution = this.db.prepare("SELECT prompt_hash FROM executions WHERE execution_id=?")
-        .get(task.executionId) as { prompt_hash: string };
+      const execution = this.db.prepare("SELECT prompt_hash,worker_instance_id FROM executions WHERE execution_id=?")
+        .get(task.executionId) as { prompt_hash: string; worker_instance_id: string | null };
       this.db.prepare("INSERT INTO dispatch_intents VALUES(?,?,?,?,?,0,?)")
         .run(task.executionId, backendId, sessionId, messageId, execution.prompt_hash, now());
-      this.db.prepare("UPDATE executions SET user_message_id=?,phase='dispatching',revision=revision+1,updated_at=? WHERE execution_id=?")
-        .run(messageId, now(), task.executionId);
-      this.event(task.executionId, "dispatch_intent", { messageId });
+      const updates = ["user_message_id=?", "phase='dispatching'", "revision=revision+1", "updated_at=?"];
+      const params: any[] = [messageId, now()];
+      if (workerInstanceId && !execution.worker_instance_id) {
+        updates.push("worker_instance_id=?");
+        params.push(workerInstanceId);
+      }
+      params.push(task.executionId);
+      this.db.prepare(`UPDATE executions SET ${updates.join(",")} WHERE execution_id=?`).run(...params);
+      this.event(task.executionId, "dispatch_intent", { messageId, workerInstanceId: workerInstanceId ?? null });
       return this.get(scopeId, taskId)!;
     });
   }
@@ -969,6 +983,29 @@ export class SqliteTaskStore {
     });
   }
 
+  cancellationEvent(executionId: string, kind: CancellationEventKind): { detail: Record<string, unknown>; createdAt: string } | null {
+    const row = this.db.prepare("SELECT detail_json,created_at FROM events WHERE execution_id=? AND kind=? ORDER BY sequence DESC LIMIT 1")
+      .get(executionId, kind) as { detail_json: string; created_at: string } | undefined;
+    return row ? { detail: JSON.parse(row.detail_json), createdAt: row.created_at } : null;
+  }
+
+  recordCancellationEvent(executionId: string, kind: CancellationEventKind,
+    detail: CancellationDiagnostic | { backendId: string; instanceId: string }): void {
+    this.transaction(() => {
+      const previous = this.cancellationEvent(executionId, kind);
+      if (previous && canonical(previous.detail) === canonical(detail) &&
+        (kind !== "cancellation_diagnostic" || Date.now() - Date.parse(previous.createdAt) < 30_000)) return;
+      this.event(executionId, kind, detail);
+      this.db.prepare("UPDATE executions SET revision=revision+1,updated_at=? WHERE execution_id=?").run(now(), executionId);
+    });
+  }
+
+  ownsResource(executionId: string, resourceKey: string): boolean {
+    const row = this.db.prepare("SELECT execution_id FROM resource_reservations WHERE resource_key=?")
+      .get(resourceKey) as { execution_id: string } | undefined;
+    return row?.execution_id === executionId;
+  }
+
   cancelTask(input: CancelRecord): StoredTask {
     const payloadHash = cancelSemanticHash(input);
     return this.transaction(() => {
@@ -1026,7 +1063,7 @@ export class SqliteTaskStore {
     kind: "permission" | "question", detail: unknown): StoredInputRequest {
     return this.transaction(() => {
       const task = this.get(scopeId, taskId);
-      if (!task || task.executionId !== executionId || !["running", "waiting_input", "dispatching"].includes(task.phase)) {
+      if (!task || task.executionId !== executionId || !["running", "waiting_input", "dispatching", "cancelling"].includes(task.phase)) {
         throw new StoreConflict("INVALID_STATE");
       }
       const previous = this.inputRequests(executionId).find((request) => request.requestId === requestId);
@@ -1040,8 +1077,8 @@ export class SqliteTaskStore {
         this.db.prepare("INSERT INTO input_requests(request_id,execution_id,kind,revision,detail_json,status,created_at) VALUES(?,?,?,1,?,'pending',?)")
           .run(requestId, executionId, kind, canonical(detail), instant);
       }
-      this.db.prepare("UPDATE executions SET phase='waiting_input',revision=revision+1,updated_at=? WHERE execution_id=?")
-        .run(instant, executionId);
+      this.db.prepare("UPDATE executions SET phase=?,revision=revision+1,updated_at=? WHERE execution_id=?")
+        .run(task.cancellationIntent ? "cancelling" : "waiting_input", instant, executionId);
       this.event(executionId, "input_request", { requestId, kind, revision: previous ? previous.revision + 1 : 1 });
       return this.inputRequests(executionId).find((request) => request.requestId === requestId)!;
     });
@@ -1064,9 +1101,17 @@ export class SqliteTaskStore {
       const task = this.get(input.scopeId, input.taskId);
       if (!task || task.executionId !== input.executionId) throw new StoreConflict("INVALID_STATE");
       if (task.revision !== input.expectedRevision) throw new StoreConflict("STALE_REVISION");
-      if (task.phase !== "waiting_input") throw new StoreConflict("REQUEST_EXPIRED");
       const request = this.inputRequests(input.executionId).find((item) => item.requestId === input.requestId);
-      if (!request || request.status !== "pending" || request.revision !== input.requestRevision) throw new StoreConflict("REQUEST_EXPIRED");
+      if (!request || request.status !== "pending") throw new StoreConflict("REQUEST_EXPIRED", "request is no longer pending; observe the execution");
+      if (request.revision !== input.requestRevision) throw new StoreConflict("REQUEST_EXPIRED", "request revision is stale; observe the execution");
+      if (task.cancellationIntent) {
+        if (task.phase !== "cancelling" || request.kind !== "permission" || input.reply !== "deny" ||
+          this.cancellationEvent(task.executionId, "cancellation_recovery_intent"))
+          throw new StoreConflict("INVALID_STATE", "cancellation permits only permission denial before worker termination begins");
+      } else if (task.phase !== "waiting_input") throw new StoreConflict("INVALID_STATE", "execution is not waiting for input");
+      const binding = request.detail as { sessionId?: unknown; type?: unknown };
+      if (binding.sessionId !== task.sessionId || binding.type !== request.kind)
+        throw new StoreConflict("REQUEST_EXPIRED", "request binding does not match the execution; observe the execution");
       const instant = now();
       this.db.prepare("UPDATE input_requests SET status='responding',response_json=?,authorization_basis_json=? WHERE request_id=?")
         .run(canonical(input.reply), canonical(input.authorizationBasis), input.requestId);
@@ -1130,6 +1175,8 @@ export class SqliteTaskStore {
         this.event(executionId, status === "unconfirmed" ? "input_response_unconfirmed" : "input_request_expired",
           { requestId: request.requestId, reason: "request_absent_in_exact_session_snapshot" });
       }
+      if (expired.length) this.db.prepare("UPDATE executions SET revision=revision+1,updated_at=? WHERE execution_id=?")
+        .run(now(), executionId);
       return expired.map((request) => request.requestId);
     });
   }

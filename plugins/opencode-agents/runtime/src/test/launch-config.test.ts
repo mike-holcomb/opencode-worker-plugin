@@ -1,13 +1,20 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, rmSync, writeFileSync, chmodSync, statSync } from "node:fs";
+import { mkdtempSync, mkdirSync, rmSync, writeFileSync, chmodSync, statSync, lstatSync, readdirSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, parse } from "node:path";
 import { test } from "node:test";
-import { freezeManagedLaunch, launchEnvironment } from "../managed-server.js";
-import { assertSelectedModelDestination, policyNeutralConfigHash } from "../launch-config.js";
+import { freezeManagedLaunch, launchEnvironment, workerPolicy } from "../managed-server.js";
+import { assertSelectedModelDestination, effectiveConfigHash, policyNeutralConfigHash } from "../launch-config.js";
 import { ArtifactStore } from "../artifacts.js";
 import { SupervisorService } from "../service.js";
 import { SqliteTaskStore } from "../store.js";
+
+function makeWritable(path: string): void {
+  const info = lstatSync(path);
+  if (info.isSymbolicLink() || !info.isDirectory()) return;
+  chmodSync(path, 0o700);
+  for (const child of readdirSync(path)) makeWritable(join(path, child));
+}
 
 test("managed launch freezes provider routing and rejects a changed effective config", async () => {
   const root = mkdtempSync(join(tmpdir(), "opencode-launch-binding-"));
@@ -40,18 +47,61 @@ process.stdout.write(JSON.stringify(config));
       destination: "http://127.0.0.1:9999/v1" }, contract), /route differs/);
     const prepared = await launchEnvironment({ binary, workspace, env, launchContract: contract });
     assert.equal(prepared.env.OPENCODE_CONFIG_CONTENT, contract.configContent);
+    assert.ok(contract.progressTool);
+    for (const profile of Object.values(prepared.profiles)) assert.equal(profile.permission.report_progress, "allow");
     const sibling = join(root, "state", "reports", "exec_sibling");
     const siblingContract = await freezeManagedLaunch(binary, workspace, sibling, env);
     assert.notEqual(contract.effectiveConfigSha256, siblingContract.effectiveConfigSha256);
     assert.equal(policyNeutralConfigHash(contract), policyNeutralConfigHash(siblingContract));
     await assert.rejects(launchEnvironment({ binary, workspace, env,
-      launchContract: { ...contract, reportPath: sibling } }), /worker policy mismatch/);
+      launchContract: { ...contract, reportPath: sibling } }), /frozen progress tool|worker policy mismatch/);
     const changedState = { ...env, OPENCODE_AGENTS_STATE_DIR: join(root, "elsewhere") };
     const reopened = await launchEnvironment({ binary, workspace, env: changedState, launchContract: contract });
     assert.equal(reopened.env.OPENCODE_CONFIG_CONTENT, contract.configContent);
     await assert.rejects(launchEnvironment({ binary, workspace,
       env: { ...env, FROZEN_DRIFT: "1" }, launchContract: contract }), /changed since task admission/);
-  } finally { rmSync(root, { recursive: true, force: true }); }
+  } finally { makeWritable(root); rmSync(root, { recursive: true, force: true }); }
+});
+
+test("persisted legacy executions reopen with their original policy and no progress tool", async () => {
+  const root = mkdtempSync(join(tmpdir(), "opencode-legacy-launch-"));
+  let store: SqliteTaskStore | undefined;
+  try {
+    const workspace = join(root, "project"); mkdirSync(workspace);
+    const binary = join(root, "fake-opencode");
+    writeFileSync(binary, `#!${process.execPath}
+const config = JSON.parse(process.env.OPENCODE_CONFIG_CONTENT);
+if (process.env.FROZEN_DRIFT) config.agent['bounded-inspect'].permission.bash = 'allow';
+process.stdout.write(JSON.stringify(config));
+`);
+    chmodSync(binary, 0o700);
+    const reportPath = join(root, "reports", "exec_legacy");
+    // Model the previous policy independently of the legacy-option implementation.
+    const profiles = workerPolicy(reportPath, parse(workspace).root).profiles;
+    for (const profile of Object.values(profiles)) delete profile.permission.report_progress;
+    const config = { plugin: [], mcp: {}, agent: profiles };
+    const contract = { reportPath, configContent: JSON.stringify(config), effectiveConfigSha256: effectiveConfigHash(config) };
+    const database = join(root, "state.sqlite");
+    store = new SqliteTaskStore(database);
+    const admitted = store.start({ scopeId: "scope", executionId: "exec_legacy", idempotencyKey: "legacy-launch-12345678",
+      workspace, packet: {}, model: "local/model", profile: "bounded-inspect", baselineHash: "a", promptHash: "b", launchContract: contract });
+    store.close(); store = new SqliteTaskStore(database);
+    const task = store.get("scope", admitted.taskId)!;
+    assert.equal(task.executionId, admitted.executionId);
+    assert.deepEqual(task.launchContract, contract);
+    const env: NodeJS.ProcessEnv = { ...process.env, HOME: join(root, "home"), OPENCODE_TEST_HOME: join(root, "home"),
+      XDG_CONFIG_HOME: join(root, "config"), OPENCODE_CONFIG_DIR: join(root, "config", "opencode") };
+    delete env.OPENCODE_CONFIG; delete env.OPENCODE_CONFIG_CONTENT;
+    const prepared = await launchEnvironment({ binary, workspace, env, launchContract: task.launchContract! });
+    assert.equal(prepared.env.OPENCODE_CONFIG_CONTENT, contract.configContent);
+    assert.equal(prepared.env.OPENCODE_CONFIG_DIR, env.OPENCODE_CONFIG_DIR);
+    for (const profile of Object.values(prepared.profiles)) assert.equal(Object.hasOwn(profile.permission, "report_progress"), false);
+    await assert.rejects(launchEnvironment({ binary, workspace, env: { ...env, FROZEN_DRIFT: "1" }, launchContract: contract }), /changed since task admission/);
+    profiles["bounded-inspect"]!.permission.bash = "allow";
+    await assert.rejects(launchEnvironment({ binary, workspace, env, launchContract: {
+      ...contract, configContent: JSON.stringify(config), effectiveConfigSha256: effectiveConfigHash(config),
+    } }), /worker policy mismatch/);
+  } finally { store?.close(); rmSync(root, { recursive: true, force: true }); }
 });
 
 test("frozen launch contract survives a restart without appearing in task projections", async () => {

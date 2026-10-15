@@ -5,6 +5,7 @@ export type ManagedLaunchContract = {
   configContent: string;
   effectiveConfigSha256: string;
   reportPath: string;
+  progressTool?: { directory: string; sha256: string };
 };
 
 export type SelectedModel = { provider_id: string; model_id: string; destination: string };

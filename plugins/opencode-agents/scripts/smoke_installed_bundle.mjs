@@ -169,7 +169,7 @@ export async function smoke(archive, node = process.execPath) {
     const listed = await client.request(2, "tools/list", {});
     assert(!listed.error, `MCP tools/list failed: ${JSON.stringify(listed.error)}`);
     const names = new Set(listed.result.tools.map((tool) => tool.name));
-    assert(names.size === 10 && names.has("opencode_start_task") && names.has("opencode_record_review"),
+    assert(names.size === 11 && names.has("opencode_get_progress") && names.has("opencode_start_task") && names.has("opencode_record_review"),
       "bundled MCP tools do not match v2 surface");
     await stopChild(child);
     child = null;

@@ -1,6 +1,7 @@
 import { McpServer } from "@modelcontextprotocol/server";
 import { StdioServerTransport } from "@modelcontextprotocol/server/stdio";
 import { z } from "zod";
+import { ProgressReadSchema } from "./progress.js";
 import { TaskPacketSchema, ReviewSchema } from "./contracts.js";
 import { rpcRequest } from "./rpc.js";
 import { stateDirectory } from "./config.js";
@@ -20,7 +21,7 @@ function result(value: unknown) {
 }
 
 export function createMcpServer(call: (method: string, params: unknown) => Promise<unknown>): McpServer {
-  const server = new McpServer({ name: "opencode-agents", version: "2.0.0-dev.0" });
+  const server = new McpServer({ name: "opencode-agents", version: "2.1.0" });
   server.registerTool("opencode_health", {
     description: "Read toolkit and configured backend health without inference.",
     inputSchema: z.object({ backend_id: Id.optional() }).strict(),
@@ -48,6 +49,15 @@ export function createMcpServer(call: (method: string, params: unknown) => Promi
       event_detail_cursor: Id.optional(), diagnostic_cursor: Id.optional() }).strict(),
     annotations: { readOnlyHint: true },
   }, async (input) => result(await call("get_task", input)));
+  server.registerTool("opencode_get_progress", {
+    description: "Read bounded unseen worker checkpoints for one exact execution without inference.",
+    inputSchema: ProgressReadSchema,
+    annotations: { readOnlyHint: true },
+  }, async (input) => {
+    const value = await call("get_progress", input) as Record<string, unknown>;
+    return { structuredContent: value, content: [{ type: "text" as const,
+      text: "Read structuredContent for the bounded, advisory worker progress delta." }] };
+  });
   server.registerTool("opencode_list_tasks", {
     description: "Recover task identities in a coordination scope.",
     inputSchema: z.object({ ...Scope, states: z.array(Id).optional(), limit: z.number().int().min(1).max(100).default(20), page_cursor: Id.optional() }).strict(),
@@ -55,7 +65,7 @@ export function createMcpServer(call: (method: string, params: unknown) => Promi
   }, async (input) => result(await call("list_tasks", input)));
   server.registerTool("opencode_wait_tasks", {
     description: "Wait briefly for material changes; timeout never cancels work.",
-    inputSchema: z.object({ ...Scope, targets: z.array(z.object({ task_id: Id, after_cursor: z.number().int().min(0).default(0) }).strict()).min(1).max(16), timeout_ms: z.number().int().min(0).max(30_000).default(20_000) }).strict(),
+    inputSchema: z.object({ ...Scope, targets: z.array(z.object({ task_id: Id, after_cursor: z.number().int().min(0).default(0), execution_id: Id.optional(), after_progress_cursor: Id.max(512).optional() }).strict()).min(1).max(16), timeout_ms: z.number().int().min(0).max(30_000).default(20_000) }).strict(),
     annotations: { readOnlyHint: true },
   }, async (input) => result(await call("wait_tasks", input)));
   server.registerTool("opencode_continue_task", {

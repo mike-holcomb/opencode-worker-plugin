@@ -2,47 +2,37 @@
   "schema_version": 1,
   "pairs": [
     {
-      "binary_version": "1.18.35",
-      "sdk_version": "1.18.35",
-      "openapi_sha256": "46db986090aae41846cd6dbe16225a1d883f0bbcb4c48814008d3f6ce140aa5c",
+      "binary_version": "1.19.0",
+      "sdk_version": "1.19.0",
+      "openapi_sha256": "04b16616693498e2b92af87408d9df3ea4ce60176d8416d36dc6c5bcf8d3bfed",
       "execution_supported": false,
       "accepted_exceptions": [
-        "FIXME: managed OpenCode 1.18.35 can load a project plugin added after launch-time inspection; use only trusted workspaces until an immutable sanitized worker view or upstream loader disable switch closes this boundary"
+        "Full OpenCode 1.19.0 host/plugin discovery and cross-platform execution certification remains pending; managed execution requires exact trusted-workspace development opt-in."
       ],
       "capabilities": {
         "callerAssignedMessageId": true,
         "permissionRequests": true,
         "questionRequests": false,
         "structuredOutput": false,
-        "sessionRecovery": true
+        "sessionRecovery": true,
+        "progressCheckpoints": true
       },
       "verified": [
-        "health and exact server version",
-        "workspace path binding",
-        "session creation and exact marker lookup",
-        "async prompt acknowledgement and caller-assigned user message ID",
-        "correlated assistant terminal message and result retrieval",
-        "pending permission and question enumeration on empty state",
-        "active bash permission request surfaced through legacy permission list",
-        "scoped permission rejection cleared pending request",
-        "rejected tool-call step remains nonterminal when status is omitted",
-        "exact session and correlated result recovered after server restart",
-        "permission allow-once cleared the exact request and resumed the correlated turn",
-        "abort acknowledgement was distinct from a later MessageAbortedError snapshot",
-        "completion and abort race was resolved from the correlated message",
-        "SSE reconnect recovered a pending request from an authoritative snapshot",
-        "bounded inspection denied project edit and shell while external file reports worked",
-        "generated bounded build profile wrote its assigned external report path"
+        "OpenCode 1.19.0 health, exact binary version and OpenAPI digest",
+        "isolated native report_progress tool discovery under frozen managed launch; no dependency download",
+        "Glimmer read-only audit: two attributed checkpoints before completion, exclusive deltas and hint-only waits, valid final report with parent review pending",
+        "live4: same-session continuation with new message identity and valid final reports",
+        "live6: supervisor restart recovered exact execution/session/message identity without duplicate dispatch; valid final report",
+        "live7: exact permission deny acknowledged; deadline stopped the task (no final report)",
+        "live8: allow_once acknowledged; active cancellation confirmed and partial artifacts retained",
+        "live9: backend restart preserved exact execution identity; cancellation confirmed without duplicate dispatch"
       ],
       "unverified": [
-        "general server-mode plugin suppression and all plugin discovery paths",
-        "native question replies, intentionally disabled",
-        "full managed task dispatch and release suite"
+        "Full 1.19.0 execution certification and hostile host/project plugin-discovery containment",
+        "Linux/WSL2 live evidence and remaining release evaluation outcomes",
+        "Attached execution, native questions and structured output remain disabled"
       ],
-      "known_failures": [
-        "FIXME (accepted known issue): serve --pure lazily loaded a project plugin during a live turn; launch-time checks cannot prevent plugins added later",
-        "json_schema structured output made session.messages return BadRequest"
-      ]
+      "known_failures": []
     }
   ]
 }
